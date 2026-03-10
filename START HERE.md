@@ -41,9 +41,11 @@ Universal Protocol before doing any vault work:
 3. After reading it once, proceed normally
 
 ## Project Context
-Infer the active project from the Claude Project name.
-Find the project folder and look for a guidelines file
-(typically named "0.0 Project Guidelines.md").
+At the start of the first conversation, ask the user:
+"What project are we working on?"
+
+Then find the project folder in the vault and look for a
+guidelines file (typically named "0.0 Project Guidelines.md").
 If none exists, follow the Universal Protocol's bootstrap
 section to help the user create one.
 ```

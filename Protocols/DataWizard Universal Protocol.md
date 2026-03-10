@@ -36,7 +36,8 @@ tags:
 - Processing new sources by type + message log pattern (Section 14) *(new, updated)*
 - What NOT to do (Section 15) *(new)*
 - Naming conventions (Section 16) *(new)*
-- Vault bootstrap — what to do if START HERE is empty (Section 17) *(was Section 13)*
+- Archiving (Section 17) *(new)*
+- Vault bootstrap — what to do if START HERE is empty (Section 18) *(was Section 13)*
 
 It does **not** cover vault-specific folder structures, project registries, content placement rules, naming conventions, or document routing tables — those live in the START HERE file and each project's own instructions file.
 
@@ -727,6 +728,7 @@ The project guidelines file is always `0.0 Project Guidelines.md`. This replaces
 
 ### Other file naming
 
+- `START HERE - For Humans.md` — every project should have one. This is the human onboarding doc: what the project is, what's in the folder, how to navigate. It lives alongside the `0.x` files but is unnumbered (it's for humans, not part of the agent infrastructure). It should include a copy of the universal Claude Project Instructions block so new collaborators can paste it into their AI setup.
 - Use descriptive titles, not codes or abbreviations
 - Hyphens for multi-word YAML values (`meeting-note`, `video-transcript`)
 - Dates in filenames use ISO format: `YYYY-MM-DD`
@@ -736,13 +738,71 @@ The project guidelines file is always `0.0 Project Guidelines.md`. This replaces
 
 ---
 
+- ! begin edit 2026-03-10 15:45 — NEW SECTION
+
+## 17. Archiving
+
+When files are superseded, retired, or no longer active — archive them, don't delete them. Archived files are preserved for reference but kept out of the way.
+
+### When to archive
+
+- A file has been **replaced** by a newer version (e.g. old protocol doc superseded by the Universal Protocol)
+- A content type or naming convention has been **retired** and the file renamed/restructured
+- A document is **no longer active** but may contain useful historical context
+- You're unsure whether something is still needed — archive it rather than deleting
+
+### When NOT to archive
+
+- Files that are just **old but still active** — an untouched seed from 6 months ago is still a seed, not an archive candidate
+- Files that were **moved** to a different folder — moving is not archiving
+- Files that are **stubs or empty** — delete these (with human confirmation) rather than archiving
+
+### Where archived files live
+
+Each project has its own archive folder using the `xArchive` prefix:
+
+```
+_ProjectFolder/xArchive/
+```
+
+The `x` prefix sorts the folder to the bottom of the file explorer, keeping it out of the way. For vault-level files not tied to a specific project, use a root-level archive:
+
+```
+_xArchive/
+```
+
+### How to archive
+
+1. **Move the file** to the project's `xArchive/` folder (or `_xArchive/` for vault-level files). Use `obsidian:move_note` — Obsidian updates wikilinks automatically.
+2. **Do NOT rename the file.** Keep the original filename so existing wikilinks still resolve.
+3. **Add a note at the top of the archived file** explaining why it was archived and what replaced it:
+
+```markdown
+> ⚠️ **Archived (YYYY-MM-DD).** Superseded by [[New File Name]]. Retained for historical reference.
+```
+
+4. **Update the session log** — note what was archived and why.
+5. **Update the MOC** — remove the file from active listings or move it to an "Archived" section.
+
+### AI agents and archiving
+
+- **Never delete files without explicit human confirmation.** When in doubt, archive.
+- **Propose archiving** when you notice superseded files during a session — but always get approval before moving.
+- **Don't archive files outside your project scope.** If you find a vault-level file that should be archived, flag it to the human.
+
+- ! end edit 2026-03-10 15:45 — END SECTION 17
+
+---
+
 - ! begin edit 2026-03-08 19:30 — REVISED SECTION (removed circularity)
 
-## 17. Vault Bootstrap
+## 18. Vault Bootstrap
 
 If you've been pointed to this protocol by a START HERE file, your project-specific context should already be loaded — either via your system prompt (Claude Project Instructions) or via the project's guidelines file.
 
 **If you have project context** — you're ready to work. Follow the orientation steps in Section 3.
+
+**If you don't know which project you're working on** — ask the user: "What project are we working on?" Then find the project folder in the vault and look for `0.0 Project Guidelines.md`.
 
 **If you have NO project context** (e.g., this is a fresh DataWizard deployment with no project set up yet) — the vault needs initial setup.
 
@@ -756,7 +816,16 @@ This only needs to happen once per Claude Project. After the instructions are pa
 
 ### Bootstrapping a new project
 
-Once instructions are pasted, interview the vault owner to create a project guidelines file (`0.0 Project Guidelines.md`). Ask about:
+Once instructions are pasted, interview the vault owner to create the project infrastructure. A fully bootstrapped project has:
+
+1. **`0.0 Project Guidelines.md`** — project-specific rules for AI agents
+2. **`0.1 MOC.md`** — map of contents
+3. **`0.2 Session Log.md`** — maintenance diary
+4. **`START HERE - For Humans.md`** — human onboarding doc: what the project is, what's in the folder, how to navigate, and a copy of the universal Claude Project Instructions block for new collaborators to paste
+
+Additional infrastructure files (`0.3 Decision Log`, `0.4 Harvest Log`, `0.5 Action Items`) are created as the project grows — not all are needed at bootstrap.
+
+To create the guidelines file, ask about:
 
 1. **Project identity** — What is this project called? What is it for? Who owns it?
 2. **Folder structure** — What are the key folders? Which folders are private?

@@ -7,7 +7,7 @@ type: project-doc
 title: Claude Project Instructions — Universal Template
 status: active
 created: '2026-03-08'
-updated: '2026-03-08'
+updated: '2026-03-10'
 ---
 
 # Claude Project Instructions — Universal Template
@@ -29,27 +29,21 @@ obsidian:move_note, obsidian:move_file, obsidian:manage_tags,
 obsidian:delete_note, obsidian:get_vault_stats
 
 ## Orientation (once per thread)
-If you haven't oriented yet this thread, read this before
-doing any vault work:
+If you haven't oriented yet this thread, find and read the
+Universal Protocol before doing any vault work:
 
-_DataWizard/Seed/Protocols/DataWizard Universal Protocol.md
-
-After reading it once, proceed normally — no need to re-read
-within the same thread.
+1. Look for a START HERE file in the _DataWizard/Seed/ folder
+2. Follow its instructions to read the Universal Protocol
+3. After reading it once, proceed normally
 
 ## Project Context
-Infer the active project from the Claude Project name. Then
-find and read the project's guidelines file:
+At the start of the first conversation, ask the user:
+"What project are we working on?"
 
-1. Run obsidian:list_directory on the project folder
-2. Look for a file named "0.0 Project Guidelines" or
-   containing "Guidelines" or "START HERE" or "AI + LLMs"
-3. Read it for project-specific rules, scope, and
-   content routing
-
-If no project guidelines file exists yet, follow the
-Universal Protocol's Section 16 (Vault Bootstrap) to help
-the user set one up.
+Then find the project folder in the vault and look for a
+guidelines file (typically named "0.0 Project Guidelines.md").
+If none exists, follow the Universal Protocol's bootstrap
+section to help the user create one.
 ```
 
 ---
@@ -57,6 +51,6 @@ the user set one up.
 ## Notes
 
 - The `_DataWizard/Seed/` folder must be present in every vault that uses this system
-- The instructions never need editing — they work for any project name
-- The LLM infers the project from the Claude Project name (e.g. "FutureVision" → `_FutureVision/`)
+- The instructions never need editing — they work for any project
+- The LLM asks the user which project, then finds the folder and guidelines
 - If the project folder or guidelines file doesn't exist yet, the LLM enters bootstrap mode
