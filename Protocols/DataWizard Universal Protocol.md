@@ -80,6 +80,18 @@ Always use these tools directly — never ask the human to copy/paste note conte
 5. Read the project MOC — every project has one and it is the single source of truth for what files exist and their status.
 6. Read the harvest log (`0.4 Harvest Log — [Doc Name].md`) to understand what source material has been processed and what's pending.
 
+### Protocol Version Check
+
+When reading the Universal Protocol, check where you're reading it from:
+
+**If reading from a local vault copy** (`_DataWizard/Seed/Protocols/DataWizard Universal Protocol.md`): Check the version in the frontmatter. Then fetch the latest version number from GitHub to compare:
+
+`https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md`
+
+If the GitHub version is newer, tell the user: "Your local DataWizard protocol is v[local] but the latest is v[github]. Want me to fetch the update and replace your local copy?" If they approve, fetch the full file from GitHub and overwrite the local copy.
+
+**If reading from GitHub directly**: You always have the latest version. No check needed.
+
 ### Each Working Session (do every time)
 
 1. Check the session log (`0.2 Session Log.md`) for recent changes — especially if another agent has been working.
