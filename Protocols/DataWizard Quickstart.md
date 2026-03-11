@@ -106,13 +106,14 @@ Walk them through the guide at `_DataWizard/Seed/Guides for Humans/Git Backup Se
 
 ```
 _DataWizard/Seed/
+  PASTE INTO CLAUDE.md                   — Copy-paste this into Claude Project Instructions
+  README.md                              — GitHub landing page (this file)
   START HERE.md                          — Entry point for vault orientation
   Protocols/
     DataWizard Universal Protocol.md     — Full AI operational rulebook (18 sections)
     Content Type Taxonomy.md             — 20 content types for note classification
-    Claude Project Instructions Template.md
     START HERE For Humans Template.md
-    DataWizard Quickstart.md             — This file (also serves as the GitHub README)
+    DataWizard Quickstart.md             — Detailed setup guide for humans and AI
   Guides for Humans/
     START HERE - For Humans.md           — Human orientation guide
     Getting Started.md

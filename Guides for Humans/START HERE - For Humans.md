@@ -22,7 +22,7 @@ The goal is not to read everything yourself. It's to build a system that reads f
 
 ## How to Get Started
 
-**Step 1 — Set up your AI.** Open `_DataWizard/Seed/START HERE.md` and follow the instructions. It walks you through pasting the Claude Project Instructions into your AI setup — this is the only configuration your AI needs.
+**Step 1 — Set up your AI.** Open `_DataWizard/Seed/PASTE INTO CLAUDE.md` and copy the contents into your Claude Project Instructions. That's the only configuration your AI needs. For more detail, see `_DataWizard/Seed/START HERE.md`.
 
 **Step 2 — Read the setup guides** (this folder):
 
