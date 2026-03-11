@@ -75,6 +75,7 @@ Always use these tools directly — never ask the human to copy/paste note conte
 1. Read the START HERE file (you should have already — it pointed you here).
 2. Read this document fully.
 3. Read the project-specific instructions file (listed in START HERE's project registry).
+   - Check its `datawizard_protocol_version` frontmatter field. If it doesn't match the version at the top of this document, flag it to the human — the guidelines may need reviewing against changes made since that version.
 4. Run `obsidian:list_directory` on the project folder to understand current structure.
 5. Read the project MOC — every project has one and it is the single source of truth for what files exist and their status.
 6. Read the harvest log (`0.4 Harvest Log — [Doc Name].md`) to understand what source material has been processed and what's pending.
@@ -767,11 +768,23 @@ If the user has not yet pasted the universal project instructions into their Cla
 
 This only needs to happen once per Claude Project. After the instructions are pasted, the LLM will read the protocol and find the project context automatically in every future thread.
 
+### Set up vault backup
+
+Before doing any substantive work in the vault, confirm a backup system is in place. Ask the user:
+
+> "Do you have git backup configured for this vault?"
+
+If yes — confirm it's working and continue.
+
+If no — walk them through setup using the guide at `_DataWizard/Seed/Guides for Humans/Git Backup Setup — Claude-Guided Walkthrough.md` before proceeding. This creates a clean snapshot to roll back to if anything goes wrong during setup or pipeline runs.
+
+---
+
 ### Bootstrapping a new project
 
 Once instructions are pasted, interview the vault owner to create the project infrastructure. A fully bootstrapped project has:
 
-1. **`0.0 Project Guidelines.md`** — project-specific rules for AI agents
+1. **`0.0 Project Guidelines.md`** — project-specific rules for AI agents. Must include a `datawizard_protocol_version` field in its frontmatter recording the version of this protocol it was written against (e.g. `datawizard_protocol_version: "1.0"`). This allows future agents to detect when the guidelines predate a protocol update.
 2. **`0.1 MOC.md`** — map of contents
 3. **`0.2 Session Log.md`** — maintenance diary
 4. **`START HERE - For Humans.md`** — human onboarding doc: what the project is, what's in the folder, how to navigate, and a copy of the universal Claude Project Instructions block for new collaborators to paste

@@ -31,7 +31,7 @@ The goal is not to read everything yourself. It's to build a system that reads f
 | **[[Getting Started]]** | Prerequisites, hardware, models, the setup journey |
 | **[[Vault Structure Guide]]** | Folder layout, YAML schema, naming conventions |
 | **[[Connecting Obsidian to Claude Desktop on Mac]]** | MCP setup — connecting Claude to your vault |
-| **[[Vault Backup Setup Guide]]** | Git + GitHub backup configuration |
+| **[[Git Backup Setup — Claude-Guided Walkthrough]]** | Git + GitHub backup — step-by-step guide Claude walks you through |
 
 **Step 3 — Start a conversation with your AI.** It will ask what project you're working on, find the right guidelines file, and orient itself. If no project exists yet, it will walk you through bootstrapping one.
 
