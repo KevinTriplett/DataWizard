@@ -1,80 +1,62 @@
 # Welcome to DataWizard
 
-*A quick orientation for working on this project*
+*A quick orientation for new users — human and AI alike.*
 
 ---
 
 ## What Is This?
 
-DataWizard is a **local-first knowledge management pipeline** — a modular system that watches for new data across multiple sources, processes it through local AI models, and makes everything searchable and queryable. All data, indexes, and models live on your machine.
+DataWizard is a **local-first AI knowledge management pipeline** for Obsidian. It processes your notes through local AI models — classifying, enriching, and linking content automatically — without sending anything to the cloud.
 
 The goal is not to read everything yourself. It's to build a system that reads for you, remembers for you, and retrieves what matters when you need it.
 
 **What DataWizard does:**
-- Ingests content from multiple sources (web clips, transcripts, PDFs, bookmarks, YouTube)
-- Processes each through a local AI pipeline: classify → segment → enrich → harvest → link
-- Builds a searchable knowledge graph across all vaults
-- Extracts lexicon candidates — distinctive phrases and framings worth preserving
-- Routes everything into the right place in Obsidian automatically
+- Classifies notes by content type (article, transcript, seed, entity, etc.)
+- Enriches notes with tags, themes, and metadata
+- Processes transcripts into segmented, searchable companion notes
+- Routes content into the right place in Obsidian automatically
 
 **Core principles:** local-first, markdown as universal format, modular pipelines, prompts as portable `.md` files, progressive enrichment, confidence-based metadata.
 
 ---
 
-## What Are All These Documents?
+## How to Get Started
 
-| Document | What's In It | When You'd Use It |
-|---|---|---|
-| **DataWizard Overview** | Project vision, current status, module map, hardware context | You need a snapshot of where the project is and what it does |
-| **Architecture v0.3** | Full technical design — pipelines, data flow, components | You're building or debugging a pipeline module |
-| **Enrichment Pipeline Spec** | Detailed spec for all content types and enrichment passes | You're writing a pipeline script or prompt |
-| **Transcript Processing Spec** | Transcript-specific pipeline: segmentation, companion notes, meme harvesting | You're building or running Steps 2–4 on a transcript |
-| **Chunking Strategy** | Three-tier chunking architecture with RAPTOR for books | You're building the RAG/vector search layer |
-| **Content Type Taxonomy** | 21 active content types with YAML conventions | You're classifying a note or updating `classify.py` |
-| **Decision Log** | Every key architectural decision with rationale | You need to understand why something was built a certain way |
-| **Session Log** | Reverse-chronological work log | You're picking up after a break — start here |
-| **Research Log** | Tools, models, and community findings | You're researching a new component |
-| **Review Queue** | Notes and batch operations waiting for human review | You need to process pending classification or migration tasks |
+**Step 1 — Set up your AI.** Open `_DataWizard/Seed/START HERE.md` and follow the instructions. It walks you through pasting the Claude Project Instructions into your AI setup — this is the only configuration your AI needs.
 
----
+**Step 2 — Read the setup guides** (this folder):
 
-## How to Resume a Session
+| Guide | What It Covers |
+|---|---|
+| **[[Getting Started]]** | Prerequisites, hardware, models, the setup journey |
+| **[[Vault Structure Guide]]** | Folder layout, YAML schema, naming conventions |
+| **[[Connecting Obsidian to Claude Desktop on Mac]]** | MCP setup — connecting Claude to your vault |
+| **[[Vault Backup Setup Guide]]** | Git + GitHub backup configuration |
 
-1. **Read the Session Log** (`_DataWizard/00 - Project/04 - Session Log.md`) — the most recent entry tells you exactly where you left off and what's next.
-2. **Check the Decision Log** (`03 - Decision Log.md`) for any open questions that may be relevant.
-3. **Check the Review Queue** (`Review Queue.md`) for any pending human-review items.
-4. **Scan the Overview** (`00 - DataWizard Overview.md`) "Current Status" block for a quick project snapshot.
+**Step 3 — Start a conversation with your AI.** It will ask what project you're working on, find the right guidelines file, and orient itself. If no project exists yet, it will walk you through bootstrapping one.
 
 ---
 
-## Key File Locations
+## Folder Map
 
 ```
 _DataWizard/
-  00 - Project/
-    00 - DataWizard Overview.md     ← project snapshot and module map
-    01 - Architecture v0.3.md       ← full technical architecture
-    02 - Research Log.md            ← tools and community research
-    03 - Decision Log.md            ← all design decisions with rationale
-    04 - Session Log.md             ← start here when resuming
-  01 - Research/
-    Enrichment Pipeline Spec.md     ← full pipeline spec
-    Transcript Processing Spec.md   ← transcript Steps 2–4
-    Chunking Strategy.md            ← three-tier RAG architecture
-    [other research docs]
-  Content Type Taxonomy.md          ← 21 active types, YAML conventions
-  Review Queue.md                   ← pending human-review items
-  AI + LLMs - START HERE - DataWizard - Universal Protocol.md  ← universal AI protocol (vault-wide)
-
-~/DataWizard/                       ← pipeline code (to be created)
-~/Library/CloudStorage/Dropbox/Scripts/  ← existing scripts
+  Seed/                                ← shareable DataWizard kit (you are here)
+    START HERE.md                      ← AI entry point — start here
+    Guides for Humans/                 ← setup guides (this folder)
+    Protocols/
+      DataWizard Universal Protocol.md ← full AI rulebook
+      Content Type Taxonomy.md         ← 20 content types
+      Claude Project Instructions Template.md
+      START HERE For Humans Template.md
+  Workshop/                            ← R&D and vault-specific working files (not shared)
 ```
 
 ---
 
 ## For Your AI — Copy Into Project Instructions
 
-Paste this block into your Claude Project Instructions before starting a session. This is the only setup your AI needs — the vault docs handle everything else.
+Paste this block into your Claude Project Instructions (or equivalent system prompt). This is the only setup your AI needs — the vault docs handle everything else.
 
 ```
 ## Tools
@@ -88,16 +70,20 @@ obsidian:update_frontmatter, obsidian:get_notes_info,
 obsidian:move_note, obsidian:move_file, obsidian:manage_tags,
 obsidian:delete_note, obsidian:get_vault_stats
 
-## This Project
-DataWizard — vault infrastructure, pipeline architecture, and
-the enrichment system. Work here includes pipeline development,
-content taxonomy, protocol docs, and project scaffolding.
-
 ## Orientation (once per thread)
-If you haven't read this yet this thread, read it before
-doing any vault work:
-1. _DataWizard/AI + LLMs - START HERE - DataWizard - Universal Protocol.md
+If you haven't oriented yet this thread, find and read the
+Universal Protocol before doing any vault work:
 
-After reading it once, proceed normally — no need to re-read
-within the same thread.
+1. Look for a START HERE file in the _DataWizard/Seed/ folder
+2. Follow its instructions to read the Universal Protocol
+3. After reading it once, proceed normally
+
+## Project Context
+At the start of the first conversation, ask the user:
+"What project are we working on?"
+
+Then find the project folder in the vault and look for a
+guidelines file (typically named "0.0 Project Guidelines.md").
+If none exists, follow the Universal Protocol's bootstrap
+section to help the user create one.
 ```
