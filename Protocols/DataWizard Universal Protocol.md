@@ -8,13 +8,13 @@ tags:
   - protocol
   - AI-collaboration
   - DataWizard
-version: '1.2'
+version: '1.3'
 ---
 
 
 # DataWizard Universal Protocol
 
-**Version 1.2 — 2026-03-11**
+**Version 1.3 — 2026-03-11**
 
 *This is the master protocol for AI agents working in any DataWizard-managed vault. It is vault-agnostic — all vault-specific context lives in the START HERE file. Follow these rules everywhere.*
 
@@ -63,6 +63,16 @@ obsidian:get_vault_stats
 ```
 
 Always use these tools directly — never ask the human to copy/paste note content.
+
+### Bulk Operations
+
+For batch tasks — adding a YAML field to many notes, renaming files by pattern, updating frontmatter across a folder — use MCP tools directly rather than Obsidian plugins:
+
+- **Bulk YAML edits**: `obsidian:update_frontmatter` — loop through a folder's files and set/update properties. Merges with existing frontmatter without touching content.
+- **Bulk renames**: `obsidian:move_note` — one call per file. Obsidian updates wikilinks automatically. Check for filename conflicts (target already exists) before overwriting.
+- **Bulk reads**: `obsidian:read_multiple_notes` (up to 10) or `obsidian:get_frontmatter` (YAML only, faster) to audit before writing.
+
+Pattern: list the folder → read current state → apply changes → report results. Always flag conflicts or errors rather than silently skipping.
 
 ---
 
