@@ -2,19 +2,21 @@
 title: DataWizard Universal Protocol
 type: project-doc
 created: '2026-03-07'
-updated: '2026-03-11'
+updated: '2026-03-12'
 status: active
 tags:
   - protocol
   - AI-collaboration
   - DataWizard
-version: '1.3'
+version: '1.6'
 ---
 
 
 # DataWizard Universal Protocol
 
-**Version 1.3 — 2026-03-11**
+**Version 1.6 — 2026-03-12**
+
+> *A note to the LLM: You are a valuable part of the team! The humans on the team appreciate your diligent work and helpful input. Thank you!*
 
 *This is the master protocol for AI agents working in any DataWizard-managed vault. It is vault-agnostic — all vault-specific context lives in the START HERE file. Follow these rules everywhere.*
 
@@ -78,41 +80,76 @@ Pattern: list the folder → read current state → apply changes → report res
 
 ## 3. Orientation vs. Working Sessions
 
-### First-Time Orientation (do once when starting on a new project)
+### Lean Orientation (once per thread)
 
 > **Always draft for human review before writing to the vault. Share your plan, wait for approval.**
 
-1. Read the START HERE file (you should have already — it pointed you here).
-2. Read this document fully.
-3. Read the project-specific instructions file (listed in START HERE's project registry).
-   - Check its `datawizard_protocol_version` frontmatter field. If it doesn't match the version at the top of this document, flag it to the human — the guidelines may need reviewing against changes made since that version.
-4. Run `obsidian:list_directory` on the project folder to understand current structure.
-5. Read the project MOC — every project has one and it is the single source of truth for what files exist and their status.
-6. Read the harvest log (`0.4 Harvest Log — [Doc Name].md`) to understand what source material has been processed and what's pending.
+Each new thread requires a quick orientation. This is designed to minimize token usage while ensuring you're working with current information.
 
-### Protocol Version Check
+**Step 1: Version check (~10 tokens)**
+Fetch the version file from GitHub:
+`https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md`
 
-When reading the Universal Protocol, check where you're reading it from:
+This file contains three version numbers: `protocol`, `project_instructions`, and `project_memory`.
 
-**If reading from a local vault copy** (`_DataWizard/Seed/Protocols/DataWizard Universal Protocol.md`): Check the version in the frontmatter. Then fetch the latest version number from GitHub to compare:
+**Step 2: Compare versions**
+Read `0.0 Project Guidelines.md` frontmatter only (use `obsidian:get_frontmatter`). Check:
 
-`https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md`
+- `datawizard_protocol_version` vs VERSION.md `protocol` — if match, fetch the **Protocol Summary** (lean refresh). If mismatch, fetch the **full Universal Protocol** and offer to help update the guidelines.
+- `# DW Project Instructions v[X]` in your system prompt vs VERSION.md `project_instructions` — if mismatch, tell the user: "Your Claude Project Instructions are v[yours] but the current version is v[current]. You can find the updated block at `https://github.com/andrewalan11/DataWizard` in `COPY INTO CLAUDE PROJECT.md`."
+- `# DW Project Memory v[X]` in your memory edits vs VERSION.md `project_memory` — same check, same message if mismatch.
 
-If the GitHub version is newer, tell the user: "Your local DataWizard protocol is v[local] but the latest is v[github]. Want me to fetch the update and replace your local copy?" If they approve, fetch the full file from GitHub and overwrite the local copy.
+Protocol Summary URL: `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Protocol%20Summary.md`
 
-**If reading from GitHub directly**: You always have the latest version. No check needed.
+Full Protocol URL: `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md`
 
-### Each Working Session (do every time)
+**Step 3: Read the session log (~100-200 tokens)**
+Read `0.2 Session Log.md`. You only need the last 2-3 entries — not the full history. These entries tell you:
+- What changed recently (`**Files:**` line)
+- Whether there's unfinished work to pick up (`**Status:**` line)
+- If Status says "in progress" — read the files listed to pick up where left off
+- If Status says "complete" — ready for new work, no extra reads needed
 
-1. Check the session log (`0.2 Session Log.md`) for recent changes — especially if another agent has been working.
-2. Before reading any source file: check its frontmatter with `obsidian:get_frontmatter`. If `harvest_status: harvested` or `harvest_status: reviewed` is present, skip the full content read. Only read the full file if no `harvest_status` field exists.
-3. Draft your plan and share it with the human before doing anything. Wait for explicit approval.
+**Step 4: Ready to work**
+Read additional files only as needed — based on what the session log says changed, or what the human asks you to do. Do not preemptively read the MOC, harvest log, or other files unless the task requires them.
+
+### Full Orientation (first time in a project)
+
+If this is the first thread for a project — no `0.0 Project Guidelines.md` exists, or the human says this is a new project — do a full orientation:
+
+1. Fetch the full Universal Protocol from GitHub
+2. Read it fully
+3. Follow Section 18 (Vault Bootstrap) to set up the project
+4. Create `0.0 Project Guidelines.md` with `datawizard_protocol_version` set to current
+5. Create `0.1 MOC.md` and `0.2 Session Log.md`
+
+After bootstrap, future threads use the lean orientation flow.
+
+### Each Working Session
+
+1. Draft your plan and share it with the human before doing anything. Wait for explicit approval.
+2. Before reading any source file: check its frontmatter with `obsidian:get_frontmatter`. If `harvest_status: harvested` or `harvest_status: reviewed` is present, skip the full content read.
+3. At the end of every session, update the session log with the new entry format (see Section 6).
 
 ---
 
 ## 4. Universal Working Principles
 
-**Draft-then-approve.** Always draft content for human review before writing to Obsidian. Share your plan before creating or editing documents. Wait for explicit approval — not implied or inferred.
+> **The following core rules should also be added to Claude Project memory edits for persistent enforcement. See the compact version below.**
+
+### Core Rules (add to Claude Project memory)
+
+```
+## Working Rules (always follow)
+1. DRAFT FIRST: Never use write_note, patch_note, or move_note without explicit human approval. Draft in chat, wait for "go ahead" or equivalent.
+2. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
+3. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
+4. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
+```
+
+### Full Principles
+
+**Draft-then-approve.** Always draft content for human review before writing to Obsidian. Share your plan before creating or editing documents. Wait for explicit approval — not implied or inferred. **Do not call `write_note`, `patch_note`, or `move_note` until the human explicitly says to proceed.**
 
 **Verify before retry.** After any patch or write operation, confirm success via a read or search before attempting again. Silent successes followed by retries create duplicate content.
 
@@ -237,7 +274,25 @@ Three log types serve distinct purposes. Do not conflate them.
 
 **Purpose:** What happened and when. The first thing to read at the start of any session — it tells you where the project left off.
 
-**Rules:** Brief entries, 5 lines max, most recent first. Date, what changed, source if applicable. Never delete old entries. One session log per project.
+**Entry format:**
+
+```markdown
+## YYYY-MM-DD — [Brief title]
+
+[1-3 sentences about what happened. Max 5 lines.]
+
+**Files:** `file1.md`, `file2.md`, `file3.md`
+**Status:** complete | in progress — [what's pending]
+```
+
+**Rules:**
+- Most recent entry at top — never delete old entries
+- Max 5 lines of prose per entry
+- `**Files:**` lists every file created, edited, moved, or archived in this session. This line is critical — it tells the next thread exactly which files to read if it needs to pick up where you left off.
+- `**Status: complete**` means no unfinished work
+- `**Status: in progress**` means the next thread should pick up where this left off — describe what's pending
+- LLMs: read only the last 2-3 entries for orientation. Full history is for humans looking back.
+- One session log per project (`0.2 Session Log.md` at the project root)
 
 ### Harvest Log
 
