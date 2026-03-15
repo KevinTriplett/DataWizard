@@ -120,7 +120,7 @@ A user has shared this link with you. Your job is to walk them through setting u
 4. **Create a Claude Project.** Once MCP is working, have them create a new Claude Project and paste these into the Project Instructions field:
 
 ```
-# DW Project Instructions v1.0
+# DW Project Instructions v2.0
 
 ## Tools
 You have Obsidian MCP tools. Use them directly — never ask the
@@ -133,6 +133,24 @@ obsidian:update_frontmatter, obsidian:get_notes_info,
 obsidian:move_note, obsidian:move_file, obsidian:manage_tags,
 obsidian:delete_note, obsidian:get_vault_stats
 
+## Working Rules (always follow)
+1. WRITE TO VAULT: For new content, write directly to the vault
+   as .md — never draft markdown in chat (it's hard to read
+   there). Share your plan first, get approval, then write to
+   vault. The user will read it in Obsidian.
+2. EDITS TO EXISTING DOCS: When editing an existing file, show
+   the proposed changes in chat first as plain text (not
+   markdown). Once approved, write to vault.
+3. RE-READ BEFORE WRITING: In shared projects (Relay), always
+   re-read the file immediately before writing. Another user or
+   agent may have changed it since your last read.
+4. CHUNK: Break multi-step plans into chunks. Present each
+   chunk, get approval, execute, check in before next chunk.
+5. VERIFY: After any write/patch/move, confirm success before
+   retrying. Silent success + retry = duplicate content.
+6. ASK: When uncertain about anything — placement, naming,
+   scope — ask rather than assume.
+
 ## Orientation (once per thread)
 1. Fetch version check:
    https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md
@@ -142,8 +160,8 @@ obsidian:delete_note, obsidian:get_vault_stats
      https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Protocol%20Summary.md
    - Mismatch or no guidelines → fetch full protocol:
      https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md
-4. Compare DW Project Instructions and Memory versions
-   against VERSION.md — flag if user needs to re-paste
+4. Compare DW Project Instructions version against VERSION.md
+   — flag if user needs to re-paste
 5. Read 0.2 Session Log (last 2-3 entries only)
 6. Ready to work — read files only as needed
 
@@ -157,28 +175,15 @@ If none exists, follow the Universal Protocol's bootstrap
 section to help the user create one.
 ```
 
-5. **Set up Project Memory.** Have them add this as a memory edit (Settings → Memory):
-
-```
-# DW Project Memory v1.1
-
-## Working Rules (always follow)
-1. WRITE TO VAULT: For new content, write directly to the vault as .md — never draft markdown in chat (it's hard to read there). Share your plan first, get approval, then write to vault. The user will read it in Obsidian.
-2. EDITS TO EXISTING DOCS: When editing an existing file, show the proposed changes in chat first as plain text (not markdown). Once approved, write to vault.
-3. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
-4. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
-5. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
-```
-
-6. **Ask about collaboration.** "Are you collaborating on a project with others?" If yes:
+5. **Ask about collaboration.** "Are you collaborating on a project with others?" If yes:
    - Help them install the **Obsidian Relay** plugin (Community Plugins → Browse → search "Relay")
    - Tell them: "Ask your project admin for the Relay server key and paste it here."
    - Walk them through entering the key in the Relay plugin settings
    - Once connected, the shared project folder will sync to their vault automatically
 
-7. **Start a new conversation** in that Claude Project. From there, the AI will fetch the protocols from GitHub and can bootstrap any project.
+6. **Start a new conversation** in that Claude Project. From there, the AI will fetch the protocols from GitHub and can bootstrap any project.
 
-8. **Post-install feedback.** Once setup is complete and the user has confirmed everything is working, ask: "Would you like me to generate a quick report on how the install went? I can note any issues we hit, steps that were confusing, and suggestions for improving the DataWizard setup process." If yes, generate a brief report covering: what worked smoothly, what was confusing or required troubleshooting, any errors encountered, and suggestions for improving the setup instructions. The user can share this report with the DataWizard maintainer to improve the onboarding experience.
+7. **Post-install feedback.** Once setup is complete and the user has confirmed everything is working, ask: "Would you like me to generate a quick report on how the install went? I can note any issues we hit, steps that were confusing, and suggestions for improving the DataWizard setup process." If yes, generate a brief report covering: what worked smoothly, what was confusing or required troubleshooting, any errors encountered, and suggestions for improving the setup instructions. The user can share this report with the DataWizard maintainer to improve the onboarding experience.
 
 ---
 

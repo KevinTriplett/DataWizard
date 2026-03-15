@@ -13,7 +13,7 @@ updated: '2026-03-12'
 
 ---
 
-## Key Rules
+## Key Rules (from Project Instructions v2.0)
 - **New content → write to vault.** Share your plan, get approval, write directly as .md. Never draft markdown in chat (hard to read there). User reads in Obsidian.
 - **Edits to existing docs → show in chat first.** Show proposed changes as plain text, get approval, then write to vault.
 - **Chunk large tasks.** Present each chunk, get approval, execute, check in before next chunk.
