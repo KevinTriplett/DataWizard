@@ -467,11 +467,36 @@ Is the document already long and hard to navigate?
 
 3. **Create numbered section files.** Use the `1.0+` numbering convention (see Section 16). Each section file starts with `*Part of the [[Shell Document Name]]*` and carries YAML frontmatter with `type`, `section`, and `parent` fields.
 
-4. **Move content from the original into sections.** Cut each section's content from the original and paste into the corresponding section file. The original becomes the shell.
+4. **Create a section folder.** Name it after the shell document (drop any number prefix). Move all section files into it. The shell stays in the parent folder.
 
-5. **Verify embeds render correctly.** In Obsidian's reading view, the shell should display all sections seamlessly.
+   ```
+   ProjectFolder/
+   ├── Document Name.md              ← shell (embeds only)
+   ├── Document Name/                ← section folder
+   │   ├── 1.0 First Section.md
+   │   ├── 2.0 Second Section.md
+   │   └── ...
+   ```
 
-6. **Update the MOC.** Add all new section files to the project MOC with status.
+   **Why a subfolder?** Without one, a chunked document with 10+ sections dominates the folder listing and buries other files. Obsidian resolves `![[embeds]]` by filename regardless of folder path, so moving sections into a subfolder does not break the shell's rendering.
+
+   **When NOT to use a subfolder:** If the document has only 2-3 sections, a subfolder may be overkill. Roughly 5+ sections is the threshold.
+
+5. **Move content from the original into sections.** Cut each section's content from the original and paste into the corresponding section file. The original becomes the shell.
+
+6. **Verify embeds render correctly.** In Obsidian's reading view, the shell should display all sections seamlessly.
+
+7. **Update the MOC.** Add all new section files to the project MOC. Use a sub-table or indented group to make the shell/section relationship visible:
+
+   ```markdown
+   ### Document Name (shell + sections)
+
+   | File | Status | Notes |
+   |---|---|---|
+   | [[Document Name]] | Active | **Shell file** — read in reading view |
+   | [[1.0 First Section]] | Active | Description |
+   | [[2.0 Second Section]] | Active | Description |
+   ```
 
 **Chunk size guidance:**
 
