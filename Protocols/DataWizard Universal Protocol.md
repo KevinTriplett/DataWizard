@@ -178,6 +178,8 @@ After bootstrap, future threads use the lean orientation flow.
 
 ## 5. YAML Schema
 
+> **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
+
 ### What "Harvest" Means
 
 *Harvesting* is the process of reading a source file (transcript, clipping, contributor document, federated copy) and synthesizing relevant content from it into a project document. The source file is the origin; the project document section is the destination. After harvesting, the source file's YAML is updated to record what was done and where content went.
@@ -206,10 +208,6 @@ harvested_date: YYYY-MM-DD
 last_agent: Claude
 ```
 
-> **Wikilink format required.** Always use `[[Note Name]]` syntax (note name only, no path) in `harvested_into` values. This makes destinations clickable in the Obsidian properties panel. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
->
-> **Do NOT use full file paths** like `_MetaMyth/MetaMyth Shared/MetaMyth Bible/1.0 What Is MetaMyth.md`. Use `"[[1.0 What Is MetaMyth]]"` instead.
-
 **Never** add a blank or placeholder `harvest_status` field. Absence means untouched — that's meaningful information. Do not use `harvest_pending`.
 
 ### Federation Fields
@@ -220,7 +218,7 @@ last_agent: Claude
 
 ```yaml
 federated_to:
-  - _ProjectFolder/Subfolder/Filename.md
+  - "[[Filename]]"
 federated_date: YYYY-MM-DD
 federated_note: "Full copy"
 ```
@@ -230,7 +228,7 @@ If later federated to a second project, append to `federated_to`.
 **On the federated copy** (in the project folder):
 
 ```yaml
-federated_from: _PrivateFolder/OriginalFilename.md
+federated_from: "[[OriginalFilename]]"
 federated_date: YYYY-MM-DD
 federated_note: "Full copy"
 ```
