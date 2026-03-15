@@ -200,6 +200,26 @@ Guides/
   Vault Structure Guide.md
 ```
 
+### Direct File URLs (for AI agents)
+
+If you're an AI reading this README and need to fetch any file, here are the raw URLs:
+
+**Core Files:**
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md`
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/COPY%20INTO%20CLAUDE%20PROJECT.md`
+
+**Protocols:**
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md`
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Protocol%20Summary.md`
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Content%20Type%20Taxonomy.md`
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Human%20Onboarding%20Doc%20Template.md`
+
+**Guides:**
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Connecting%20Obsidian%20to%20Claude%20Desktop%20on%20Mac.md`
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Git%20Backup%20Setup%20%E2%80%94%20Claude-Guided%20Walkthrough.md`
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Vault%20Backup%20Setup%20Guide.md`
+- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Vault%20Structure%20Guide.md`
+
 ---
 
 ## Want a Local Copy? (Optional)
