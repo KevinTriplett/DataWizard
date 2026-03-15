@@ -132,6 +132,8 @@ section to help the user create one.
 
 7. **Start a new conversation** in that Claude Project. From there, the AI will fetch the protocols from GitHub and can bootstrap any project.
 
+8. **Post-install feedback.** Once setup is complete and the user has confirmed everything is working, ask: "Would you like me to generate a quick report on how the install went? I can note any issues we hit, steps that were confusing, and suggestions for improving the DataWizard setup process." If yes, generate a brief report covering: what worked smoothly, what was confusing or required troubleshooting, any errors encountered, and suggestions for improving the setup instructions. The user can share this report with the DataWizard maintainer to improve the onboarding experience.
+
 ---
 
 ## What's in This Repo
