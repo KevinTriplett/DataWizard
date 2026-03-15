@@ -21,6 +21,8 @@ There are three ways to set this up, from easiest to most manual:
 
 This is an Obsidian community plugin that handles everything automatically — no terminal required.
 
+> **Note:** This plugin requires the **Local REST API** community plugin to be installed and enabled first. If you see "Local REST API (Required)" marked with a red ✗ in the MCP Tools settings, install that plugin before proceeding.
+
 ## Steps
 
 1. Open **Obsidian**
@@ -62,10 +64,12 @@ Smithery is a platform for installing MCP tools with a single command.
 npx -y @smithery/cli install mcp-obsidian --client claude
 ```
 
+> **Known issue (Node.js v25+):** If you see `r.setPassword is not a function`, this is a Smithery bug with newer Node.js versions. Skip to Method 3 (Manual Setup) instead.
+
 3. When prompted, enter the **full path to your Obsidian vault**  
    (e.g., `/Users/yourusername/Documents/My Vault`)
 
-4. **Restart Claude Desktop** completely (Cmd + Q, then reopen)
+4. **Restart Claude Desktop** completely — use **Force Quit** (Apple menu →  → Force Quit → Claude), then reopen
 
 5. Go to **Settings → Developer** — you should see "obsidian" listed
 
@@ -210,10 +214,12 @@ Merge the `mcpServers` section into the existing file. For example:
 
 ## Step 4: Restart Claude Desktop
 
-1. **Quit completely:** Cmd + Q (or Claude menu → Quit Claude)
+1. **Force Quit:** Go to the Apple menu () → **Force Quit** → select **Claude** → click **Force Quit**
 2. **Reopen** Claude Desktop
 3. Go to **Settings → Developer**
 4. You should see **"obsidian"** with a green "running" badge 🎉
+
+> **Why Force Quit?** A normal Cmd+Q sometimes doesn't reload the config file. Force Quit ensures Claude picks up your changes.
 
 ---
 
@@ -305,7 +311,7 @@ You should see a version number.
 
 1. Check JSON syntax (no trailing commas, matching brackets)
 2. Verify the vault path exists
-3. Fully quit and restart Claude Desktop (not just close the window)
+3. **Force Quit** Claude Desktop (Apple menu → Force Quit → Claude) and reopen — a normal Cmd+Q may not reload the config
 
 ## MCP server shows but isn't connecting
 
