@@ -115,13 +115,14 @@ section to help the user create one.
 5. **Set up Project Memory.** Have them add this as a memory edit (Settings → Memory):
 
 ```
-# DW Project Memory v1.0
+# DW Project Memory v1.1
 
 ## Working Rules (always follow)
-1. DRAFT FIRST: Never use write_note, patch_note, or move_note without explicit human approval. Draft in chat, wait for "go ahead" or equivalent.
-2. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
-3. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
-4. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
+1. WRITE TO VAULT: For new content, write directly to the vault as .md — never draft markdown in chat (it's hard to read there). Share your plan first, get approval, then write to vault. The user will read it in Obsidian.
+2. EDITS TO EXISTING DOCS: When editing an existing file, show the proposed changes in chat first as plain text (not markdown). Once approved, write to vault.
+3. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
+4. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
+5. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
 ```
 
 6. **Ask about collaboration.** "Are you collaborating on a project with others?" If yes:

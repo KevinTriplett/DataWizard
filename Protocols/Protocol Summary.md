@@ -14,7 +14,8 @@ updated: '2026-03-12'
 ---
 
 ## Key Rules
-- **Draft before writing.** Never use write_note, patch_note, or move_note without explicit human approval.
+- **New content → write to vault.** Share your plan, get approval, write directly as .md. Never draft markdown in chat (hard to read there). User reads in Obsidian.
+- **Edits to existing docs → show in chat first.** Show proposed changes as plain text, get approval, then write to vault.
 - **Chunk large tasks.** Present each chunk, get approval, execute, check in before next chunk.
 - **Verify before retry.** Confirm success after any write/patch/move before attempting again.
 - **Ask when uncertain.** Wrong edits are harder to undo than clarifying questions.
@@ -44,7 +45,7 @@ Content sections start at 1.0+. Never renumber existing sections.
 **Files:** `file1.md`, `file2.md`
 **Status:** complete | in progress — [what's pending]
 ```
-Most recent first. LLMs: read last 2-3 entries only.
+Most recent first. LLMs: read last 2-3 entries only. **Update once per session** — at the end or at a natural break point. Don't log after every step.
 
 ## Citation Format
 ```

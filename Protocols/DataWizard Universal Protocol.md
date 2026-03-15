@@ -82,7 +82,7 @@ Pattern: list the folder → read current state → apply changes → report res
 
 ### Lean Orientation (once per thread)
 
-> **Always draft for human review before writing to the vault. Share your plan, wait for approval.**
+> **Share your plan, get approval, then write to the vault. See Section 4 for the full workflow.**
 
 Each new thread requires a quick orientation. This is designed to minimize token usage while ensuring you're working with current information.
 
@@ -127,9 +127,9 @@ After bootstrap, future threads use the lean orientation flow.
 
 ### Each Working Session
 
-1. Draft your plan and share it with the human before doing anything. Wait for explicit approval.
+1. Share your plan before doing anything. For new content, get approval then write directly to vault. For edits to existing docs, show changes in chat first.
 2. Before reading any source file: check its frontmatter with `obsidian:get_frontmatter`. If `harvest_status: harvested` or `harvest_status: reviewed` is present, skip the full content read.
-3. At the end of every session, update the session log with the new entry format (see Section 6).
+3. At the end of every session, update the session log and MOC. Do this **once per session** — at the end, or at a natural break point if the session is long. Don't update after every individual step. One entry covering the whole session is better than ten micro-entries.
 
 ---
 
@@ -140,16 +140,21 @@ After bootstrap, future threads use the lean orientation flow.
 ### Core Rules (add to Claude Project memory)
 
 ```
+# DW Project Memory v1.1
+
 ## Working Rules (always follow)
-1. DRAFT FIRST: Never use write_note, patch_note, or move_note without explicit human approval. Draft in chat, wait for "go ahead" or equivalent.
-2. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
-3. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
-4. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
+1. WRITE TO VAULT: For new content, write directly to the vault as .md — never draft markdown in chat (it's hard to read there). Share your plan first, get approval, then write to vault. The user will read it in Obsidian.
+2. EDITS TO EXISTING DOCS: When editing an existing file, show the proposed changes in chat first as plain text (not markdown). Once approved, write to vault.
+3. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
+4. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
+5. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
 ```
 
 ### Full Principles
 
-**Draft-then-approve.** Always draft content for human review before writing to Obsidian. Share your plan before creating or editing documents. Wait for explicit approval — not implied or inferred. **Do not call `write_note`, `patch_note`, or `move_note` until the human explicitly says to proceed.**
+**Write new content directly to vault.** For new documents, notes, and drafts — write them as .md files in the vault rather than drafting markdown in chat. Markdown is hard to read in the chat interface but renders beautifully in Obsidian. Share your plan first, get approval, then write. The human reviews in Obsidian.
+
+**Show edits in chat first.** When editing an existing document, show the proposed changes as plain text in chat before writing them. This lets the human see what's changing without having to diff the file themselves. Once approved, apply the edits to the vault.
 
 **Verify before retry.** After any patch or write operation, confirm success via a read or search before attempting again. Silent successes followed by retries create duplicate content.
 
@@ -293,6 +298,7 @@ Three log types serve distinct purposes. Do not conflate them.
 - `**Status: in progress**` means the next thread should pick up where this left off — describe what's pending
 - LLMs: read only the last 2-3 entries for orientation. Full history is for humans looking back.
 - One session log per project (`0.2 Session Log.md` at the project root)
+- **Update once per session, not after every step.** A session is a continuous working conversation. Write one entry at the end that covers everything that happened. If the session is very long, a mid-session update at a natural break point is fine — but don't interrupt the flow of work to log constantly. The same applies to MOC updates.
 
 ### Harvest Log
 

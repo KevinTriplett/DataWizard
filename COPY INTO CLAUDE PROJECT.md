@@ -73,16 +73,17 @@ section to help the user create one.
 Go to **Settings → Memory → Add memory edit** and paste this block:
 
 ```
-# DW Project Memory v1.0
+# DW Project Memory v1.1
 
 ## Working Rules (always follow)
-1. DRAFT FIRST: Never use write_note, patch_note, or move_note without explicit human approval. Draft in chat, wait for "go ahead" or equivalent.
-2. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
-3. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
-4. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
+1. WRITE TO VAULT: For new content, write directly to the vault as .md — never draft markdown in chat (it's hard to read there). Share your plan first, get approval, then write to vault. The user will read it in Obsidian.
+2. EDITS TO EXISTING DOCS: When editing an existing file, show the proposed changes in chat first as plain text (not markdown). Once approved, write to vault.
+3. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
+4. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
+5. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
 ```
 
-*Re-paste only when the Project Memory version changes (currently v1.0).*
+*Re-paste only when the Project Memory version changes (currently v1.1).*
 
 ---
 
@@ -91,7 +92,7 @@ Go to **Settings → Memory → Add memory edit** and paste this block:
 | What | Version | Last changed | Re-paste needed? |
 |---|---|---|---|
 | Project Instructions | v1.0 | 2026-03-12 | Only when this version changes |
-| Project Memory | v1.0 | 2026-03-12 | Only when this version changes |
+| Project Memory | v1.1 | 2026-03-15 | Only when this version changes |
 | Universal Protocol | v1.5 | 2026-03-12 | Never — Claude fetches latest automatically |
 
 *The Universal Protocol updates automatically via GitHub. You never need to re-paste when only the protocol changes.*
