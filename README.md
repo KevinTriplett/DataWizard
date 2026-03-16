@@ -120,7 +120,7 @@ A user has shared this link with you. Your job is to walk them through setting u
 4. **Create a Claude Project.** Once MCP is working, have them create a new Claude Project and paste these into the Project Instructions field:
 
 ```
-# DW Project Instructions v2.0
+# DW Project Instructions v2.1
 
 ## Tools
 You have Obsidian MCP tools. Use them directly — never ask the
@@ -150,6 +150,13 @@ obsidian:delete_note, obsidian:get_vault_stats
    retrying. Silent success + retry = duplicate content.
 6. ASK: When uncertain about anything — placement, naming,
    scope — ask rather than assume.
+7. HARVEST DISCIPLINE: When harvesting from transcripts or
+   source files, treat each source as one atomic unit:
+   (a) Segment first — add ## headers before extracting
+   (b) Harvest content into destination docs
+   (c) Update source YAML (harvest_status, harvested_into)
+   Complete all three before moving to the next source.
+   See Protocol Sections 7 and 9.
 
 ## Orientation (once per thread)
 1. Fetch version check:

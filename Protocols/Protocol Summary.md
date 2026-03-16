@@ -13,12 +13,14 @@ updated: '2026-03-12'
 
 ---
 
-## Key Rules (from Project Instructions v2.0)
-- **New content → write to vault.** Share your plan, get approval, write directly as .md. Never draft markdown in chat (hard to read there). User reads in Obsidian.
-- **Edits to existing docs → show in chat first.** Show proposed changes as plain text, get approval, then write to vault.
+## Key Rules (Project Instructions v2.1)
+- **Write to vault** — new content as .md, never draft markdown in chat
+- **Edits in chat first** — show proposed changes as plain text, then write
+- **Re-read before writing** — in shared/Relay projects, always re-read first
 - **Chunk large tasks.** Present each chunk, get approval, execute, check in before next chunk.
 - **Verify before retry.** Confirm success after any write/patch/move before attempting again.
 - **Ask when uncertain.** Wrong edits are harder to undo than clarifying questions.
+- **Harvest discipline.** Per source: segment with `##` headers → harvest → update source YAML. Complete all three before next source.
 
 ## Infrastructure Files (0.x series)
 | Number | File | Required? |

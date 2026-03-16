@@ -135,21 +135,17 @@ After bootstrap, future threads use the lean orientation flow.
 
 ## 4. Universal Working Principles
 
-> **The following core rules are included in the DW Project Instructions block (v2.0). They are pasted into Claude Project settings, not into memory. See `COPY INTO CLAUDE PROJECT.md` for the full block.**
+> **The working rules below are included in the DW Project Instructions block (v2.1), which users paste into Claude Project settings. The canonical version is in `COPY INTO CLAUDE PROJECT.md`. What follows is the full explanation of each rule.**
 
-### Core Rules (included in Project Instructions)
+### Working Rules (canonical version in Project Instructions)
 
-```
-# DW Project Instructions v2.0 — Working Rules
-
-## Working Rules (always follow)
-1. WRITE TO VAULT: For new content, write directly to the vault as .md — never draft markdown in chat (it's hard to read there). Share your plan first, get approval, then write to vault. The user will read it in Obsidian.
-2. EDITS TO EXISTING DOCS: When editing an existing file, show the proposed changes in chat first as plain text (not markdown). Once approved, write to vault.
-3. RE-READ BEFORE WRITING: In shared projects (Relay), always re-read the file immediately before writing. Another user or agent may have changed it since your last read.
-4. CHUNK: Break multi-step plans into chunks. Present each chunk, get approval, execute, check in before next chunk.
-5. VERIFY: After any write/patch/move, confirm success before retrying. Silent success + retry = duplicate content.
-6. ASK: When uncertain about anything — placement, naming, scope — ask rather than assume.
-```
+1. **WRITE TO VAULT** — new content goes directly to vault as .md, not drafted in chat
+2. **EDITS TO EXISTING DOCS** — show proposed changes in chat as plain text first
+3. **RE-READ BEFORE WRITING** — in shared/Relay projects, re-read before every write
+4. **CHUNK** — break plans into chunks, get approval between each
+5. **VERIFY** — confirm success before retrying
+6. **ASK** — when uncertain, ask rather than assume
+7. **HARVEST DISCIPLINE** — per source: segment → harvest → update YAML, complete before next source
 
 ### Full Principles
 
@@ -160,6 +156,8 @@ After bootstrap, future threads use the lean orientation flow.
 **Verify before retry.** After any patch or write operation, confirm success via a read or search before attempting again. Silent successes followed by retries create duplicate content.
 
 **Re-read before writing in shared projects.** When working in a vault with Relay or any shared folder, always re-read the file immediately before writing to it. Another user or agent may have edited it since you last read it. Stale content + overwrite = lost work. This applies to `write_note` (overwrite mode) and `patch_note` — the file may have changed since your last read, so your `oldString` may no longer match.
+
+**Harvest one source at a time, completely.** When processing source files (transcripts, clippings, contributor docs) into project documents, treat each source as one atomic unit of work: (1) segment the transcript with `##` headers first (Protocol Section 9), (2) harvest content into destination docs, (3) update the source's YAML with `harvest_status`, `harvested_into`, date, and agent (Protocol Section 7). Complete all three steps before moving to the next source. This prevents the common failure mode where the exciting work (harvesting) gets done but the bookkeeping (segmentation, YAML updates) gets skipped.
 
 **When in doubt, ask.** If anything is unclear about document placement, content decisions, or integration choices, ask rather than assuming. A wrong edit is harder to undo than a clarifying question.
 

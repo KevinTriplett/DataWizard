@@ -19,7 +19,7 @@ Paste this single block into **Settings → Project Instructions** for every Cla
 ## Paste This Into Project Instructions
 
 ```
-# DW Project Instructions v2.0
+# DW Project Instructions v2.1
 
 ## Tools
 You have Obsidian MCP tools. Use them directly — never ask the
@@ -49,6 +49,13 @@ obsidian:delete_note, obsidian:get_vault_stats
    retrying. Silent success + retry = duplicate content.
 6. ASK: When uncertain about anything — placement, naming,
    scope — ask rather than assume.
+7. HARVEST DISCIPLINE: When harvesting from transcripts or
+   source files, treat each source as one atomic unit:
+   (a) Segment first — add ## headers before extracting
+   (b) Harvest content into destination docs
+   (c) Update source YAML (harvest_status, harvested_into)
+   Complete all three before moving to the next source.
+   See Protocol Sections 7 and 9.
 
 ## Orientation (once per thread)
 1. Fetch version check:
@@ -74,7 +81,7 @@ If none exists, follow the Universal Protocol's bootstrap
 section to help the user create one.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v2.0).*
+*Re-paste only when the Project Instructions version changes (currently v2.1).*
 
 ---
 
@@ -82,7 +89,7 @@ section to help the user create one.
 
 | What | Version | Last changed | Re-paste needed? |
 |---|---|---|---|
-| Project Instructions | v2.0 | 2026-03-15 | Only when this version changes |
+| Project Instructions | v2.1 | 2026-03-15 | Only when this version changes |
 | Universal Protocol | v1.6 | 2026-03-12 | Never — Claude fetches latest automatically |
 
 *The Universal Protocol updates automatically via GitHub. You never need to re-paste when only the protocol changes.*
