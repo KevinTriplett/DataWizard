@@ -25,6 +25,7 @@ DataWizard doesn't require a specific folder layout, but it works best when your
 Your Vault/
   _!nbox/              ← new captures land here (DataWizard processes this first)
   _Clippings/          ← web clips (Obsidian Web Clipper)
+  _Companions/         ← AI-generated companion notes (mirrored subfolders)
   _Transcripts/        ← raw meeting/call transcripts
   _Voice Memos/        ← voice memo transcripts
   _People/             ← people notes
@@ -33,6 +34,46 @@ Your Vault/
 ```
 
 The `_` prefix on system folders keeps them sorted to the top in Obsidian's file explorer and signals "infrastructure, not content."
+
+---
+
+## The `_Companions/` Folder
+
+Companion notes are AI-generated summaries, section maps, and key concept extractions for source notes (transcripts, clippings, etc.). They live in `_Companions/` with a subfolder structure that mirrors the source folder:
+
+```
+_Companions/
+  _Transcripts/        ← companions for notes in _Transcripts/
+  _Clippings/          ← companions for notes in _Clippings/
+  _Meetings/           ← companions for notes in _Meetings/
+```
+
+**Why mirrored subfolders?** It keeps companions discoverable — you always know where to find a companion note based on where its source lives. It also keeps the source folders clean (transcripts with transcripts, companions with companions).
+
+**Naming convention:** `Source Note Title — Companion.md`. Example: `2025-10-22 Michael Garfield — Companion.md`
+
+**What companions contain:**
+- Section map with timestamps (for transcripts)
+- Key people, projects, and entities mentioned
+- Per-section summaries optimized for LLM navigation
+- Key concepts and themes extracted
+
+**What companions do NOT contain:**
+- Cross-conversation analysis (that belongs in higher-level design docs)
+- The source content itself (the companion points back to the source via `source_transcript` or `source_note` in YAML)
+
+**YAML for companions:**
+```yaml
+type: companion
+source_transcript: "[[Source Note Name]]"
+participants: ["[[Person 1]]", "[[Person 2]]"]
+tags:
+  - companion
+  - ai-generated
+generating_agent: Andrew / Claude
+```
+
+Wikilinks in `source_transcript` (or `source_note` for non-transcripts) make the relationship clickable in Obsidian's properties panel.
 
 ---
 
@@ -105,11 +146,11 @@ Used when a file is copied from a private folder into a shared project folder:
 ```yaml
 # On the original:
 federated_to:
-  - _ProjectFolder/Subfolder/Filename.md
+  - "[[Filename]]"
 federated_date: 2026-03-07
 
 # On the copy:
-federated_from: _Clippings/OriginalFilename.md
+federated_from: "[[OriginalFilename]]"
 federated_date: 2026-03-07
 ```
 
@@ -117,7 +158,7 @@ federated_date: 2026-03-07
 
 ## Naming Conventions
 
-**Notes:** Use natural language titles. No date prefixes needed for content notes — DataWizard uses frontmatter `created:` for dates.
+**Notes:** Use natural language titles. No date prefixes needed for content notes — DataWizard uses frontmatter `created:` for dates. **Do not use em-dashes (—), curly quotes, or other special characters in note titles** — use plain hyphens (-) and straight quotes instead. Special characters cause patch and path-matching failures for AI agents.
 
 **Transcripts:** `YYYY-MM-DD [Participant Names] — [Topic].md`
 Example: `2026-02-14 Andrew and Jay — Flow Funding Pilot.md`
