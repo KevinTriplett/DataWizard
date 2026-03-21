@@ -1,13 +1,13 @@
 ---
 title: Protocol Summary
 type: project-doc
-version: '1.5'
+version: '1.9'
 status: active
 created: '2026-03-12'
-updated: '2026-03-12'
+updated: '2026-03-21'
 ---
 
-# DataWizard Protocol Summary (v1.5)
+# DataWizard Protocol Summary (v1.9)
 
 *Quick reference for oriented agents. Read the full protocol for details, edge cases, and examples.*
 
@@ -16,11 +16,11 @@ updated: '2026-03-12'
 ## Key Rules (Project Instructions v2.1)
 - **Write to vault** — new content as .md, never draft markdown in chat
 - **Edits in chat first** — show proposed changes as plain text, then write
-- **Re-read before writing** — in shared/Relay projects, always re-read first
+- **Re-read before writing** — in shared/Relay projects, always re-read the file immediately before writing (another user may have changed it). In solo work, re-read only if the file was last read many messages ago. YAML-only updates via `update_frontmatter` are safe without re-reading (it merges, not overwrites).
 - **Chunk large tasks.** Present each chunk, get approval, execute, check in before next chunk.
 - **Verify before retry.** Confirm success after any write/patch/move before attempting again.
 - **Ask when uncertain.** Wrong edits are harder to undo than clarifying questions.
-- **Harvest discipline.** Per source: segment with `##` headers → harvest → update source YAML. Complete all three before next source.
+- **Harvest discipline.** Per source: segment with `##` headers → harvest → update source YAML. Complete all three before next source. Before harvesting from any transcript, check YAML for `segmented: true` — if missing or false, prompt the user to run segmentation first.
 
 ## Infrastructure Files
 | Prefix | File | Required? |
@@ -38,8 +38,15 @@ Content sections start at 1.0+. Never renumber existing sections.
 
 ## YAML Essentials
 - `type:` — lowercase, single value, from Content Type Taxonomy
-- Harvest tracking: absent = untouched, `reviewed` = nothing to harvest, `harvested` = content extracted
-- `harvested_into:` uses `[[wikilinks]]` — never full paths
+- Harvest tracking: absent = untouched, `pending` = triaged and routed, `reviewed` = nothing to harvest, `harvested` = content extracted
+- `harvest_for:` — list of project wikilinks indicating which projects should harvest this note. A single note can be relevant to multiple projects. Set by the Harvest Agent or by hand. Example:
+  ```yaml
+  harvest_for:
+    - "[[_MetaMyth]]"
+    - "[[_Weave Project Shared]]"
+  ```
+- `harvested_into:` uses `[[wikilinks]]` — never full paths. Set by the project-specific agent after harvesting.
+- `highlighted_by_hand: true` — flag for notes where a human has manually highlighted key passages
 - `ai-generated` is a tag, not a content type. `generating_agent` is optional.
 
 ## Session Log Format
@@ -78,6 +85,46 @@ Most recent first. LLMs: read last 2-3 entries only. **Update once per session**
 - YAML: `type: companion`, `source_transcript:` or `source_note:` as wikilink
 - Contain section maps, key people/projects, per-section summaries
 - Do NOT contain cross-conversation analysis (that belongs in design docs)
+
+## Scripts and Guides
+
+User-specific paths (scripts location, vault root) are in `_DataWizard/Seed/Vault Config.md`. Read this file to find the scripts directory before generating terminal commands.
+
+**Available scripts** (in the `scripts_dir` from Vault Config):
+
+| Script | Purpose |
+|---|---|
+| `classify.py` | Classify vault notes by content type |
+| `segment_transcript.py` | Add `##` topic headers to transcripts via Qwen/Ollama |
+| `process_dewey_reddit.py` | Import Reddit saves from Dewey CSV exports |
+| `dedup_reddit_saves.py` | Deduplicate Reddit saves by source URL |
+| `organize_reddit_saves.py` | Sort Reddit saves into subreddit folders |
+| `process_fathom.py` | Post-process Fathom transcript exports |
+
+**Vault guides (read via MCP):**
+
+| Guide | Path |
+|---|---|
+| Federation Guide | `_DataWizard/Seed/Guides/Federation Guide.md` |
+| Vault Structure Guide | `_DataWizard/Seed/Guides/Vault Structure Guide.md` |
+| Harvest Agent instructions | `_DataWizard/Seed/Agents/Harvest Agent.md` |
+| Vault Config (user-specific) | `_DataWizard/Seed/Vault Config.md` |
+
+## In-Thread Commands
+
+These commands can be used in any thread at any time:
+
+| Command | What it does |
+|---|---|
+| `DW review` | Re-read Protocol Summary and Vault Config to pick up any changes made since thread started |
+| `DW status` | Check the Transcript Status Dashboard and report pending items |
+
+When a user types `DW review`, re-read these files immediately:
+1. `_DataWizard/Seed/Protocols/Protocol Summary.md`
+2. `_DataWizard/Seed/Vault Config.md`
+3. Your agent-specific instructions file (if applicable, e.g., Harvest Agent)
+
+Then confirm: "Updated — now running Protocol Summary v[X.X]."
 
 ## What NOT to Do
 - Don't put private content in shared folders
