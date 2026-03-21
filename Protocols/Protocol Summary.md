@@ -1,13 +1,13 @@
 ---
 title: Protocol Summary
 type: project-doc
-version: '1.9'
+version: '2.0'
 status: active
 created: '2026-03-12'
 updated: '2026-03-21'
 ---
 
-# DataWizard Protocol Summary (v1.9)
+# DataWizard Protocol Summary (v2.0)
 
 *Quick reference for oriented agents. Read the full protocol for details, edge cases, and examples.*
 
@@ -23,14 +23,16 @@ updated: '2026-03-21'
 - **Harvest discipline.** Per source: segment with `##` headers → harvest → update source YAML. Complete all three before next source. Before harvesting from any transcript, check YAML for `segmented: true` — if missing or false, prompt the user to run segmentation first.
 
 ## Infrastructure Files
-| Prefix | File | Required? |
+| Prefix | File | Required |
 |---|---|---|
-| `!` | Action Items | When needed (sorts to top of folder) |
-| 0.0 | Project Guidelines | Always |
-| 0.1 | MOC | Always |
-| 0.2 | Session Log | Always |
-| 0.3 | Decision Log | Usually |
-| 0.4 | Harvest Log - [Doc Name] | When harvesting |
+| `!` | Action Items - Project Name | When needed (sorts to top of folder) |
+| 0.0 | Project Guidelines - Project Name | Always |
+| 0.1 | MOC - Project Name | Always |
+| 0.2 | Session Log - Project Name | Always |
+| 0.3 | Decision Log - Project Name | Usually |
+| 0.4 | Harvest Log - Project Name | When harvesting |
+
+All infrastructure files MUST include the project name after a hyphen to be uniquely identifiable across the vault. Use plain hyphens (`-`), never em-dashes (`—`).
 
 The `!` prefix sorts files and folders to the top of any directory listing. Use it for action items (`! Action Items - Project Name.md`) and for master document folders (`! Master Documents/`).
 
