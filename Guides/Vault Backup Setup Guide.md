@@ -15,7 +15,7 @@ tags:
 
 > ⚠️ **This is a vault-specific record, not the shareable guide.** It documents the actual setup performed on Andrew's Regen Vault on 2026-03-07, including real paths, usernames, and gotchas encountered.
 >
-> For the generic, Claude-guided setup guide suitable for sharing, see: **[[Git Backup Setup — Claude-Guided Walkthrough]]** in this same folder.
+> For the generic, Claude-guided setup guide suitable for sharing, see: **[[Git Backup Setup - Claude-Guided Walkthrough]]** in this same folder.
 
 A record of how the Regen Vault git backup system was configured, and how to operate it going forward.
 

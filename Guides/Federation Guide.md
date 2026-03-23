@@ -61,6 +61,10 @@ federated_from: "[[_Clippings/Source Article One]]"
 
 The instance may also update `type`, `tags`, `harvest_status`, or `harvest_for` on the copy to match the project context.
 
+### Step 3: Update the project MOC
+
+After federation, add the newly federated files to the project's MOC (`0.1 MOC`). This is easy to forget — don't skip it.
+
 ## When to Federate vs. When to Wikilink
 
 | Situation | Use |

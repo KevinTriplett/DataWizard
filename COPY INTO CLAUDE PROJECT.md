@@ -1,13 +1,13 @@
 ---
+title: Copy Into Claude Project
+type: project-doc
+status: active
+created: '2026-03-12'
+updated: '2026-03-23'
 tags:
   - protocol
   - AI-collaboration
   - DataWizard
-type: project-doc
-title: Copy Into Claude Project
-status: active
-created: '2026-03-12'
-updated: '2026-03-15'
 ---
 
 # DataWizard — Copy Into Claude Project
@@ -19,7 +19,7 @@ Paste this single block into **Settings → Project Instructions** for every Cla
 ## Paste This Into Project Instructions
 
 ```
-# DW Project Instructions v2.1
+# DW Project Instructions v2.2
 
 ## Tools
 You have Obsidian MCP tools. Use them directly — never ask the
@@ -40,9 +40,10 @@ obsidian:delete_note, obsidian:get_vault_stats
 2. EDITS TO EXISTING DOCS: When editing an existing file, show
    the proposed changes in chat first as plain text (not
    markdown). Once approved, write to vault.
-3. RE-READ BEFORE WRITING: In shared projects (Relay), always
-   re-read the file immediately before writing. Another user or
-   agent may have changed it since your last read.
+3. RE-READ BEFORE WRITING: In shared projects using Relay
+   Obsidian plugin or similar, always re-read the file
+   immediately before writing. Another user or agent may have
+   changed it since your last read.
 4. CHUNK: Break multi-step plans into chunks. Present each
    chunk, get approval, execute, check in before next chunk.
 5. VERIFY: After any write/patch/move, confirm success before
@@ -60,7 +61,8 @@ obsidian:delete_note, obsidian:get_vault_stats
 ## Orientation (once per thread)
 1. Fetch version check:
    https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md
-2. Read 0.0 Project Guidelines (frontmatter only)
+2. Read 0.0 Project Guidelines in full (this is the project
+   brief — what it is, core concepts, key decisions, structure)
 3. Compare datawizard_protocol_version against VERSION.md
    - Match → fetch protocol summary:
      https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Protocol%20Summary.md
@@ -69,19 +71,21 @@ obsidian:delete_note, obsidian:get_vault_stats
 4. Compare DW Project Instructions version against VERSION.md
    — flag if user needs to re-paste
 5. Read 0.2 Session Log (last 2-3 entries only)
-6. Ready to work — read files only as needed
+6. Read action items file if one exists
+7. Ready to work — read other files only as needed
 
 ## Project Context
-At the start of the first conversation, ask the user:
-"What project are we working on?"
+If you don't yet know this project's home folder path, ask the
+user for it. Store it in project memory once provided — never
+ask again. The home folder is the vault-relative path where the
+project's .md files live (e.g. _DataWizard/ or _MyProject/).
 
-Then find the project folder in the vault and look for a
-guidelines file (typically named "0.0 Project Guidelines.md").
-If none exists, follow the Universal Protocol's bootstrap
-section to help the user create one.
+Once you have the home folder, look for a guidelines file there
+(typically "0.0 Project Guidelines.md"). If none exists, follow
+the Universal Protocol's bootstrap section to help create one.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v2.1).*
+*Re-paste only when the Project Instructions version changes (currently v2.2).*
 
 ---
 
@@ -89,10 +93,20 @@ section to help the user create one.
 
 | What | Version | Last changed | Re-paste needed? |
 |---|---|---|---|
-| Project Instructions | v2.1 | 2026-03-15 | Only when this version changes |
-| Universal Protocol | v1.6 | 2026-03-12 | Never — Claude fetches latest automatically |
+| Project Instructions | v2.2 | 2026-03-23 | Only when this version changes |
+| Universal Protocol | v1.7 | 2026-03-23 | Never — Claude fetches latest automatically |
 
 *The Universal Protocol updates automatically via GitHub. You never need to re-paste when only the protocol changes.*
+
+---
+
+## What Changed in v2.2
+
+**Project Context bootstrap simplified.** Instead of asking "what project are we working on?" and inferring the folder, the instance now asks for the home folder path directly, stores it in project memory, and never asks again. Eliminates ambiguity and wasted turns.
+
+**Orientation expanded.** 0.0 is now read in full (it's the project brief, not just metadata). Action items file added as an orientation step. These give incoming instances a complete picture without burning excessive tokens.
+
+**Relay rule clarified.** RE-READ BEFORE WRITING now specifies "Relay Obsidian plugin or similar" instead of the generic "shared projects."
 
 ---
 
@@ -100,9 +114,7 @@ section to help the user create one.
 
 Previously, DataWizard used two separate blocks — Project Instructions (tools + orientation) and Project Memory (working rules). This didn't work because Claude's Project Memory is auto-generated from conversations, not manually editable.
 
-**v2.0 consolidates everything into a single Project Instructions block.** Paste once, done.
-
-If you previously had a DW Project Memory edit in your Claude settings, you can remove it — those rules now live in Project Instructions.
+**v2.0 consolidated everything into a single Project Instructions block.** Paste once, done.
 
 ---
 

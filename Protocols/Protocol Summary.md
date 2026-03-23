@@ -1,26 +1,36 @@
 ---
 title: Protocol Summary
 type: project-doc
-version: '2.0'
+version: '2.3'
 status: active
 created: '2026-03-12'
-updated: '2026-03-21'
+updated: '2026-03-23'
 ---
 
-# DataWizard Protocol Summary (v2.0)
+# DataWizard Protocol Summary (v2.3)
 
 *Quick reference for oriented agents. Read the full protocol for details, edge cases, and examples.*
 
 ---
 
-## Key Rules (Project Instructions v2.1)
+## Key Rules (Project Instructions v2.2)
 - **Write to vault** — new content as .md, never draft markdown in chat
 - **Edits in chat first** — show proposed changes as plain text, then write
-- **Re-read before writing** — in shared/Relay projects, always re-read the file immediately before writing (another user may have changed it). In solo work, re-read only if the file was last read many messages ago. YAML-only updates via `update_frontmatter` are safe without re-reading (it merges, not overwrites).
+- **Re-read before writing** — in shared projects using Relay Obsidian plugin or similar, always re-read the file immediately before writing (another user may have changed it). In solo work, re-read only if the file was last read many messages ago. YAML-only updates via `update_frontmatter` are safe without re-reading (it merges, not overwrites).
 - **Chunk large tasks.** Present each chunk, get approval, execute, check in before next chunk.
 - **Verify before retry.** Confirm success after any write/patch/move before attempting again.
 - **Ask when uncertain.** Wrong edits are harder to undo than clarifying questions.
 - **Harvest discipline.** Per source: segment with `##` headers → harvest → update source YAML. Complete all three before next source. Before harvesting from any transcript, check YAML for `segmented: true` — if missing or false, prompt the user to run segmentation first.
+- **Git push before batch ops.** Before any script that moves or modifies files in bulk, commit and push. `git checkout .` is your undo.
+
+## Orientation (once per thread)
+
+1. **Version check**: Fetch `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md`
+2. **Read 0.0 Project Guidelines** in full — this is the project brief (what it is, core concepts, key decisions, folder structure, pointers). Compare `datawizard_protocol_version` against VERSION.md. Match → fetch Protocol Summary. Mismatch → fetch full Universal Protocol.
+3. **Compare instructions version** — flag if user needs to re-paste.
+4. **Read session log** (0.2) — last 2-3 entries only.
+5. **Read action items** if the file exists (typically `! Action Items - [Project Name].md`).
+6. **Ready to work** — read other files only as needed.
 
 ## Infrastructure Files
 | Prefix | File | Required |
@@ -34,9 +44,42 @@ updated: '2026-03-21'
 
 All infrastructure files MUST include the project name after a hyphen to be uniquely identifiable across the vault. Use plain hyphens (`-`), never em-dashes (`—`).
 
+For shared/collaborative projects (using Relay or shared folders), infrastructure files may live inside the shared workspace (e.g., `_Project/Project Shared/0.0 Project Guidelines - Project.md`) rather than at the project root, so collaborators can see them.
+
 The `!` prefix sorts files and folders to the top of any directory listing. Use it for action items (`! Action Items - Project Name.md`) and for master document folders (`! Master Documents/`).
 
 Content sections start at 1.0+. Never renumber existing sections.
+
+### What goes in a 0.0 Project Guidelines file
+
+Adapt depth to project complexity. A lightweight project might only need sections 1, 2, 6, 7, 8.
+
+1. **What this project is** — one paragraph (name, purpose, scope)
+2. **Current state** — pointer to session log and action items (don't duplicate status)
+3. **Core concepts** — 3-6 key ideas/patterns that shape the project
+4. **Key architecture decisions** — one-liners pointing to decision log
+5. **Stack / instance config** — hardware, models, tools, paths (label as instance-specific)
+6. **Folder structure** — what's where
+7. **Key pointers** — canonical docs, config files, repos
+8. **Working conventions** — project-specific rules beyond the universal protocol
+
+Aim for 800-1200 tokens — dense but scannable, cheap to read every thread.
+
+## Folder Taxonomy (type to home)
+
+| Content Type | Folder |
+|---|---|
+| `seed`, `seedpod` | `_Seeds/` |
+| `entity` | `_Entities/` |
+| `event` | `_Events/` |
+| `resource`, `resource-list` | `_Resources/` |
+| `person` | `_People/` |
+| `article`, `video` | `_Clippings/` |
+| `video-transcript`, `podcast-transcript`, `meeting-transcript` | `_Transcripts/` |
+| `voice-memo-transcript` | `_Transcripts/Voice Memos/` |
+| `meeting-note`, `message` | `_Meetings/` |
+| `companion` | `_Companions/` |
+| `document`, `multi-part` | Project folder (human routes) |
 
 ## YAML Essentials
 - `type:` — lowercase, single value, from Content Type Taxonomy
@@ -97,6 +140,7 @@ User-specific paths (scripts location, vault root) are in `_DataWizard/Seed/Vaul
 | Script | Purpose |
 |---|---|
 | `classify.py` | Classify vault notes by content type |
+| `route_notes.py` | Move classified notes to proper folders by type |
 | `segment_transcript.py` | Add `##` topic headers to transcripts via Qwen/Ollama |
 | `process_dewey_reddit.py` | Import Reddit saves from Dewey CSV exports |
 | `dedup_reddit_saves.py` | Deduplicate Reddit saves by source URL |
@@ -109,8 +153,10 @@ User-specific paths (scripts location, vault root) are in `_DataWizard/Seed/Vaul
 |---|---|
 | Federation Guide | `_DataWizard/Seed/Guides/Federation Guide.md` |
 | Vault Structure Guide | `_DataWizard/Seed/Guides/Vault Structure Guide.md` |
+| Editing Claude Desktop Config | `_DataWizard/Seed/Guides/Editing the Claude Desktop Config.md` |
 | Harvest Agent instructions | `_DataWizard/Seed/Agents/Harvest Agent.md` |
 | Vault Config (user-specific) | `_DataWizard/Seed/Vault Config.md` |
+| Vault Cleanup Architecture | `_DataWizard/Workshop/Vault Cleanup Architecture.md` |
 
 ## In-Thread Commands
 
@@ -118,15 +164,35 @@ These commands can be used in any thread at any time:
 
 | Command | What it does |
 |---|---|
-| `DW review` | Re-read Protocol Summary and Vault Config to pick up any changes made since thread started |
+| `DW review` | Audit the project against protocol. Offers scope options before starting. |
 | `DW status` | Check the Transcript Status Dashboard and report pending items |
 
-When a user types `DW review`, re-read these files immediately:
+### DW Review — Tiered Audit
+
+When a user types `DW review`, first re-read:
 1. `_DataWizard/Seed/Protocols/Protocol Summary.md`
 2. `_DataWizard/Seed/Vault Config.md`
-3. Your agent-specific instructions file (if applicable, e.g., Harvest Agent)
+3. Your agent-specific instructions file (if applicable)
 
-Then confirm: "Updated — now running Protocol Summary v[X.X]."
+Then ask the user what scope they want:
+
+| Scope | What it checks | Token cost |
+|---|---|---|
+| **Quick** | Filenames, folder structure, infrastructure file presence | Low |
+| **Standard** | Quick + frontmatter on all files (via `get_frontmatter`, not full reads) | Medium |
+| **Full** | Standard + content spot-checks on key files (shells, guidelines, MOC) | High |
+| **Incremental** | Only files modified since the last DW review date | Low-Medium |
+
+For incremental reviews, check the session log for the last `DW review` entry and only audit files modified after that date.
+
+After completing a review, log it in the session log:
+```
+## YYYY-MM-DD — DW Review (scope)
+[Summary of findings]
+**Status:** complete — [N] issues found, [M] fixed
+```
+
+Confirm to the user: "Updated — now running Protocol Summary v[X.X]. Review complete."
 
 ## What NOT to Do
 - Don't put private content in shared folders
@@ -139,4 +205,4 @@ Then confirm: "Updated — now running Protocol Summary v[X.X]."
 
 ---
 
-*Full protocol: DataWizard Universal Protocol v1.5*
+*Full protocol: DataWizard Universal Protocol v1.7*
