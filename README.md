@@ -68,30 +68,59 @@ A user has shared this link with you. Your job is to walk them through setting u
 
 2. **Install Obsidian** (if needed). Download from https://obsidian.md — it's free. Have them create a new vault or open an existing one.
 
-3. **Set up MCP.** This connects you to their Obsidian vault so you can read and write files directly. Try to fetch the full setup guide first:
+3. **Set up MCP.** This connects you to their Obsidian vault so you can read and write files directly.
+
+   **IMPORTANT: Present exactly ONE setup method to the user based on their Node version. Do not offer multiple methods, do not present a menu of options, do not mention the MCP Tools plugin. Check the Node version first, then give them the single correct path.**
+
+   Try to fetch the full setup guide first:
 
    `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Connecting%20Obsidian%20to%20Claude%20Desktop%20on%20Mac.md`
 
    If you can't fetch it, here are the essential steps:
 
-   **Prerequisites:** Node.js must be installed. Check with `node --version` in Terminal. If not installed: `brew install node` (install Homebrew first if needed from https://brew.sh).
+   **First: Check Node.js version.** Have them open Terminal (Cmd + Space, type "Terminal", hit Enter) and run:
+   ```bash
+   node --version
+   ```
+   - If "command not found" → install Node.js first: `brew install node` (install Homebrew first if needed from https://brew.sh). Then check the version again.
+   - If **v24 or below** → use **Smithery** (easier, one command).
+   - If **v25 or above** → use **Manual Config** (Smithery has a known bug on v25+).
 
-   **Setup (manual config — most reliable method):**
+   **Find the vault path first (needed for both methods):** In Finder, navigate to the Obsidian vault folder, press Cmd+Option+C to copy the full path.
 
-   a. Find the vault path — in Finder, navigate to the Obsidian vault folder, press Cmd+Option+C to copy the full path.
+   ---
 
-   b. Open the Claude Desktop config file in Terminal:
+   **Smithery Setup (Node v24 and below):**
+
+   a. In Terminal, copy and paste this command and press Enter:
+   ```bash
+   npx -y @smithery/cli install mcp-obsidian --client claude
+   ```
+
+   b. When prompted, paste the vault path you copied above.
+
+   c. **Force Quit Claude Desktop** (Apple menu → Force Quit → Claude) and reopen. A normal Cmd+Q may not reload the config.
+
+   d. Verify: go to Settings → Developer — you should see "obsidian" with a green "running" badge.
+
+   e. Test: start a new conversation and try "What folders are in my vault?"
+
+   ---
+
+   **Manual Config Setup (Node v25+):**
+
+   a. Open the config file in Terminal:
    ```bash
    open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
    ```
-   If the file doesn't exist, create it first:
+   If the file doesn't exist:
    ```bash
    mkdir -p ~/Library/Application\ Support/Claude && \
    echo '{}' > ~/Library/Application\ Support/Claude/claude_desktop_config.json && \
    open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
    ```
 
-   c. Add this to the file (merge with existing content if any), replacing the vault path:
+   b. Replace the contents with this (substituting the vault path you copied):
    ```json
    {
      "mcpServers": {
@@ -105,17 +134,19 @@ A user has shared this link with you. Your job is to walk them through setting u
      }
    }
    ```
+   If the file already has content, merge the `mcpServers` section inside the existing braces. Make sure the JSON is valid — no trailing commas.
 
-   d. **Force Quit Claude Desktop** (Apple menu → Force Quit → Claude) and reopen. A normal Cmd+Q may not reload the config.
+   c. Save (Cmd+S), then **Force Quit Claude Desktop** (Apple menu → Force Quit → Claude) and reopen.
 
-   e. Verify: go to Settings → Developer — you should see "obsidian" with a green "running" badge.
+   d. Verify: go to Settings → Developer — you should see "obsidian" with a green "running" badge.
 
-   f. Test: start a new conversation and try "What folders are in my vault?"
+   e. Test: start a new conversation and try "What folders are in my vault?"
+
+   ---
 
    **Troubleshooting:**
    - "No servers added" → check JSON syntax (no trailing commas), verify vault path exists, Force Quit and reopen
-   - Smithery one-line install (`npx -y @smithery/cli install mcp-obsidian --client claude`) is an alternative but has a known bug on Node.js v25+ (`r.setPassword is not a function`). Use manual config instead.
-   - MCP Tools plugin in Obsidian requires the "Local REST API" plugin to be installed first
+   - If Smithery fails with `r.setPassword is not a function` → their Node is v25+, switch to Manual Config above
 
 4. **Create a Claude Project.** Once MCP is working, have them create a new Claude Project and paste these into the Project Instructions field:
 

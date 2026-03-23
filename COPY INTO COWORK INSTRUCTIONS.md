@@ -59,7 +59,7 @@ Paste this block into the **Instructions** field when setting up a Cowork instan
 If you don't yet know this project's home folder path, ask the
 user for it. Store it in project memory once provided — never
 ask again. The home folder is the vault-relative path where the
-project's .md files live (e.g. _DataWizard/ or _MyProject/).
+project's .md files live (e.g. _MyProject/).
 
 Once you have the home folder, look for a guidelines file there
 (typically "0.0 Project Guidelines.md"). If none exists, follow

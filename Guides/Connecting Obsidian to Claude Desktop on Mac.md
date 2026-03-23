@@ -27,7 +27,7 @@ A window will appear with a blinking cursor. That's where you'll paste the comma
 
 ---
 
-## Step 2: Check for Node.js
+## Step 2: Check Node.js
 
 In Terminal, type this and press Enter:
 
@@ -35,12 +35,15 @@ In Terminal, type this and press Enter:
 node --version
 ```
 
-- If you see a version number (like `v20.11.0`) — you're good, skip to Step 3.
-- If you see "command not found" — you need to install Node.js first. See [Installing Node.js](#installing-nodejs) below, then come back here.
+- If you see **"command not found"** — you need to install Node.js first. See [Installing Node.js](#installing-nodejs) below, then come back here.
+- If the version starts with **v24 or lower** (e.g. `v20.11.0`, `v22.5.1`) → go to **Step 3A** (Smithery — easier, one command).
+- If the version starts with **v25 or higher** (e.g. `v25.6.0`) → go to **Step 3B** (Manual Config — Smithery has a known bug on v25+).
 
 ---
 
-## Step 3: Install MCP-Obsidian
+## Step 3A: Install with Smithery (Node v24 and below)
+
+**Skip this if your Node version is v25+. Go to [Step 3B](#step-3b-install-with-manual-config-node-v25) instead.**
 
 Copy and paste this command into Terminal and press Enter:
 
@@ -55,7 +58,58 @@ When prompted, enter the **full path to your Obsidian vault**. To find it:
 
 The path will look something like: `/Users/yourusername/Documents/My Vault`
 
-> **If you get an error** that says `r.setPassword is not a function`, this is a known bug with Node.js v25+. See the [Manual Setup](#manual-setup-fallback) section below instead.
+Now skip to [Step 4](#step-4-restart-claude-desktop).
+
+---
+
+## Step 3B: Install with Manual Config (Node v25+)
+
+**Skip this if you already completed Step 3A.**
+
+Smithery has a known bug on Node.js v25+ (`r.setPassword is not a function`), so we'll edit the config file directly instead.
+
+### Find or create the config file
+
+Open Terminal and run:
+
+```bash
+open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+If the file doesn't exist, create it first:
+
+```bash
+mkdir -p ~/Library/Application\ Support/Claude && \
+echo '{}' > ~/Library/Application\ Support/Claude/claude_desktop_config.json && \
+open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+### Find your vault path
+
+1. Open Finder and navigate to your vault folder
+2. Press **Cmd + Option + C** to copy the full path
+
+### Edit the config
+
+If the file is empty or just has `{}`, replace everything with this (substituting your vault path):
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": [
+        "@mauricio.wolff/mcp-obsidian@latest",
+        "/Users/YOURUSERNAME/path/to/your/vault"
+      ]
+    }
+  }
+}
+```
+
+If the file already has content, add the `mcpServers` section inside the existing braces. Make sure the JSON is valid — no trailing commas, matching brackets. Use [jsonlint.com](https://jsonlint.com) to check if unsure.
+
+Save the file with **Cmd + S**, then continue to Step 4.
 
 ---
 
@@ -149,48 +203,6 @@ node --version
 You should see a version number. Now go back to Step 3.
 
 ---
-
-## Manual Setup (Fallback)
-
-Use this only if the Smithery command in Step 3 doesn't work.
-
-### Find or create the config file
-
-Open Terminal and run:
-
-```bash
-open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
-```
-
-If the file doesn't exist, create it first:
-
-```bash
-mkdir -p ~/Library/Application\ Support/Claude && \
-echo '{}' > ~/Library/Application\ Support/Claude/claude_desktop_config.json && \
-open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
-```
-
-### Edit the config
-
-If the file is empty or just has `{}`, replace everything with this (substituting your vault path):
-
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "npx",
-      "args": [
-        "@mauricio.wolff/mcp-obsidian@latest",
-        "/Users/YOURUSERNAME/path/to/your/vault"
-      ]
-    }
-  }
-}
-```
-
-If the file already has content, add the `mcpServers` section inside the existing braces. Make sure the JSON is valid — no trailing commas, matching brackets. Use [jsonlint.com](https://jsonlint.com) to check if unsure.
-
-Save the file with **Cmd + S**, then **Force Quit** and reopen Claude Desktop (Step 4).
 
 ---
 
