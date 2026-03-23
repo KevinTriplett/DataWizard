@@ -3,7 +3,7 @@ type: project-doc
 title: START HERE For Humans — Template
 status: active
 created: '2026-03-10'
-updated: '2026-03-10'
+updated: '2026-03-23'
 tags:
   - protocol
   - AI-collaboration
@@ -51,33 +51,7 @@ Use this template when creating a `START HERE - For Humans.md` for a new project
 
 ## For Your AI — Copy Into Project Instructions
 
-Paste this block into your LLM's project settings (Claude Project Instructions, or equivalent). This is the only setup your AI needs.
+Paste this block into your LLM's project settings (Claude Project Instructions, or equivalent). This is the only setup your AI needs. For the latest version, see `_DataWizard/Seed/COPY INTO CLAUDE PROJECT.md`.
 
-## Tools
-You have Obsidian MCP tools. Use them directly — never ask the
-user to copy/paste vault content.
-
-obsidian:read_note, obsidian:write_note, obsidian:patch_note,
-obsidian:read_multiple_notes, obsidian:list_directory,
-obsidian:search_notes, obsidian:get_frontmatter,
-obsidian:update_frontmatter, obsidian:get_notes_info,
-obsidian:move_note, obsidian:move_file, obsidian:manage_tags,
-obsidian:delete_note, obsidian:get_vault_stats
-
-## Orientation (once per thread)
-If you haven't oriented yet this thread, find and read the
-Universal Protocol before doing any vault work:
-
-1. Look for a START HERE file in the _DataWizard/Seed/ folder
-2. Follow its instructions to read the Universal Protocol
-3. After reading it once, proceed normally
-
-## Project Context
-At the start of the first conversation, ask the user:
-"What project are we working on?"
-
-Then find the project folder in the vault and look for a
-guidelines file (typically named "0.0 Project Guidelines.md").
-If none exists, follow the Universal Protocol's bootstrap
-section to help the user create one.
+[Paste the current instructions block from COPY INTO CLAUDE PROJECT.md here]
 ```

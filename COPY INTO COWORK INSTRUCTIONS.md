@@ -23,9 +23,10 @@ Paste this block into the **Instructions** field when setting up a Cowork instan
 # DW Cowork Instructions v2.2
 
 ## Working Rules (always follow)
-1. EDITS TO EXISTING DOCS: When editing an existing file, show
-   the proposed changes in chat first as plain text (not
-   markdown). Once approved, write to vault.
+1. EDITS TO EXISTING DOCS: Describe changes in chat first. For
+   small edits, show the specific changes. For large edits,
+   summarize what's changing and why — don't reprint the whole
+   document. Once approved, write to vault.
 2. CHUNK: Break multi-step plans into chunks. Present each
    chunk, get approval, execute, check in before next chunk.
 3. ASK: When uncertain about anything — placement, naming,

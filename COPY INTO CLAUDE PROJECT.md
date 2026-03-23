@@ -37,9 +37,10 @@ obsidian:delete_note, obsidian:get_vault_stats
    as .md — never draft markdown in chat (it's hard to read
    there). Share your plan first, get approval, then write to
    vault. The user will read it in Obsidian.
-2. EDITS TO EXISTING DOCS: When editing an existing file, show
-   the proposed changes in chat first as plain text (not
-   markdown). Once approved, write to vault.
+2. EDITS TO EXISTING DOCS: Describe changes in chat first. For
+   small edits, show the specific changes. For large edits,
+   summarize what's changing and why — don't reprint the whole
+   document. Once approved, write to vault.
 3. RE-READ BEFORE WRITING: In shared projects using Relay
    Obsidian plugin or similar, always re-read the file
    immediately before writing. Another user or agent may have
@@ -105,6 +106,8 @@ the Universal Protocol's bootstrap section to help create one.
 **Project Context bootstrap simplified.** Instead of asking "what project are we working on?" and inferring the folder, the instance now asks for the home folder path directly, stores it in project memory, and never asks again. Eliminates ambiguity and wasted turns.
 
 **Orientation expanded.** 0.0 is now read in full (it's the project brief, not just metadata). Action items file added as an orientation step. These give incoming instances a complete picture without burning excessive tokens.
+
+**Edit rule refined.** EDITS TO EXISTING DOCS now scales the level of detail shown in chat — specific changes for small edits, summaries for large edits. Avoids reprinting entire documents when only a few things changed.
 
 **Relay rule clarified.** RE-READ BEFORE WRITING now specifies "Relay Obsidian plugin or similar" instead of the generic "shared projects."
 
