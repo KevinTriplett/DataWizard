@@ -48,7 +48,7 @@ node --version
 Copy and paste this command into Terminal and press Enter:
 
 ```bash
-npx -y @smithery/cli install mcp-obsidian --client claude
+npx -y @smithery/cli install @bitbonsai/mcpvault --client claude
 ```
 
 When prompted, enter the **full path to your Obsidian vault**. To find it:
@@ -99,7 +99,7 @@ If the file is empty or just has `{}`, replace everything with this (substitutin
     "obsidian": {
       "command": "npx",
       "args": [
-        "@mauricio.wolff/mcp-obsidian@latest",
+        "@bitbonsai/mcpvault@latest",
         "/Users/YOURUSERNAME/path/to/your/vault"
       ]
     }
@@ -206,6 +206,35 @@ You should see a version number. Now go back to Step 3.
 
 ---
 
+## Multiple Vaults
+
+If you have more than one Obsidian vault (e.g., a main vault and a research vault), add a second entry in the config with a different name:
+
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": [
+        "@bitbonsai/mcpvault@latest",
+        "/Users/yourusername/Vaults/Main Vault"
+      ]
+    },
+    "obsidian-second": {
+      "command": "npx",
+      "args": [
+        "@bitbonsai/mcpvault@latest",
+        "/Users/yourusername/Vaults/Second Vault"
+      ]
+    }
+  }
+}
+```
+
+Each vault gets its own set of tools with its own prefix (e.g., `obsidian:read_note` for the first vault, `obsidian-second:read_note` for the second). Both run simultaneously.
+
+---
+
 ## Troubleshooting
 
 **"No servers added" in Developer settings:**
@@ -234,7 +263,7 @@ Start a new conversation. Check that Obsidian is still running and the server sh
     "obsidian": {
       "command": "npx",
       "args": [
-        "@mauricio.wolff/mcp-obsidian@latest",
+        "@bitbonsai/mcpvault@latest",
         "/path/to/your/vault"
       ]
     }
@@ -246,9 +275,9 @@ Start a new conversation. Check that Obsidian is still running and the server sh
 
 ## Additional Resources
 
-- **Smithery:** [smithery.ai](https://smithery.ai)
-- **MCP-Obsidian:** [mcp-obsidian.org](https://mcp-obsidian.org/)
+- **MCP-Vault (bitbonsai):** [mcp-obsidian.org](https://mcp-obsidian.org/)
 - **GitHub:** [github.com/bitbonsai/mcp-obsidian](https://github.com/bitbonsai/mcp-obsidian)
+- **Smithery:** [smithery.ai](https://smithery.ai)
 
 ---
 

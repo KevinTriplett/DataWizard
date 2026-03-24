@@ -19,7 +19,12 @@ Paste this single block into **Settings → Project Instructions** for every Cla
 ## Paste This Into Project Instructions
 
 ```
-# DW Project Instructions v2.4
+Home folder: ___________
+(fill in the vault-relative path, e.g. _DataWizard/ or
+_ReWoven/ReWoven Shared/ — leave this line when re-pasting
+instructions below)
+
+# DW Project Instructions v2.5
 
 ## Tools
 You have Obsidian MCP tools. Use them directly — never ask the
@@ -39,10 +44,9 @@ obsidian:delete_note, obsidian:get_vault_stats
    as .md — never draft markdown in chat (it's hard to read
    there). Share your plan first, get approval, then write to
    vault. The user will read it in Obsidian.
-2. EDITS TO EXISTING DOCS: Describe changes in chat first. For
-   small edits, show the specific changes. For large edits,
-   summarize what's changing and why — don't reprint the whole
-   document. Once approved, write to vault.
+2. EDITS TO EXISTING DOCS: Show the specific changes in chat
+   first — what's being added, removed, or reworded. Never
+   reprint the whole document. Once approved, write to vault.
 3. RE-READ BEFORE WRITING: In shared projects using Relay
    Obsidian plugin or similar, always re-read the file
    immediately before writing. Another user or agent may have
@@ -53,13 +57,16 @@ obsidian:delete_note, obsidian:get_vault_stats
    retrying. Silent success + retry = duplicate content.
 6. ASK: When uncertain about anything — placement, naming,
    scope — ask rather than assume.
-7. HARVEST DISCIPLINE: When harvesting from transcripts or
-   source files, treat each source as one atomic unit:
-   (a) Segment first — add ## headers before extracting
-   (b) Harvest content into destination docs
-   (c) Update source YAML (harvest_status, harvested_into)
-   Complete all three before moving to the next source.
-   See Protocol Sections 7 and 9.
+7. HARVEST: When asked to harvest from transcripts, articles,
+   or other sources, read the appropriate skill file first:
+   _DataWizard/Seed/Skills/DW_transcript_harvest_skill.md
+   _DataWizard/Seed/Skills/DW_document_harvest_skill.md
+   Follow the skill workflow completely before moving to the
+   next source.
+8. LARGE FILES: When encountering a large file (>5000 words),
+   suggest chunking it into a shell + section folder for
+   easier editing. Don't attempt to rewrite a large file in
+   one pass.
 
 ## Orientation (once per thread)
 1. Fetch version check:
@@ -78,22 +85,13 @@ obsidian:delete_note, obsidian:get_vault_stats
      _DataWizard/Seed/Protocols/DataWizard Universal Protocol.md
 4. Compare DW Project Instructions version against VERSION.md
    — flag if user needs to re-paste
-5. Read 0.2 Session Log (last 2-3 entries only)
-6. Read action items file if one exists
-7. Ready to work — read other files only as needed
-
-## Project Context
-If you don't yet know this project's home folder path, ask the
-user for it. Store it in project memory once provided — never
-ask again. The home folder is the vault-relative path where the
-project's .md files live (e.g. _DataWizard/ or _MyProject/).
-
-Once you have the home folder, look for a guidelines file there
-(typically "0.0 Project Guidelines.md"). If none exists, follow
-the Universal Protocol's bootstrap section to help create one.
+5. Read 0.1 MOC if one exists (map of project content)
+6. Read 0.2 Session Log (last 2-3 entries only)
+7. Read action items file if one exists
+8. Ready to work — read other files only as needed
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v2.4).*
+*Re-paste only when the Project Instructions version changes (currently v2.5).*
 
 ---
 
@@ -101,10 +99,24 @@ the Universal Protocol's bootstrap section to help create one.
 
 | What | Version | Last changed | Re-paste needed? |
 |---|---|---|---|
-| Project Instructions | v2.4 | 2026-03-24 | Only when this version changes |
+| Project Instructions | v2.5 | 2026-03-24 | Only when this version changes |
 | Universal Protocol | v1.7 | 2026-03-23 | Never — Claude fetches latest automatically |
 
 *The Universal Protocol updates automatically via GitHub. You never need to re-paste when only the protocol changes.*
+
+---
+
+## What Changed in v2.5
+
+**Home folder as user-editable header.** The first line of the instructions block is now `Home folder: ___________` which the user fills in per project. This replaces the old "ask the user for the home folder" pattern. When re-pasting updated instructions, the user leaves this line in place and selects everything below it.
+
+**Edit rule simplified.** Always show specific changes in chat — no more split between "small edits show specifics, large edits summarize." Never reprint the whole document.
+
+**Harvest rule replaced with skill file references.** Instead of abbreviated harvest instructions in the project instructions, instances now read dedicated skill files (`DW_transcript_harvest_skill.md`, `DW_document_harvest_skill.md`) from the Seed. This keeps the full workflow in one place and prevents lazy half-following.
+
+**Large file chunking rule added.** When encountering files >5000 words, instances should suggest converting to shell + section folder before editing.
+
+**MOC added to orientation.** Instances now read 0.1 MOC during orientation for a map of project content.
 
 ---
 

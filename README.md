@@ -94,7 +94,7 @@ A user has shared this link with you. Your job is to walk them through setting u
 
    a. In Terminal, copy and paste this command and press Enter:
    ```bash
-   npx -y @smithery/cli install mcp-obsidian --client claude
+   npx -y @smithery/cli install @bitbonsai/mcpvault --client claude
    ```
 
    b. When prompted, paste the vault path you copied above.
@@ -127,7 +127,7 @@ A user has shared this link with you. Your job is to walk them through setting u
        "obsidian": {
          "command": "npx",
          "args": [
-           "@mauricio.wolff/mcp-obsidian@latest",
+           "@bitbonsai/mcpvault@latest",
            "/Users/YOURUSERNAME/path/to/your/vault"
          ]
        }
