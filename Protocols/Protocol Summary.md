@@ -20,6 +20,7 @@ updated: '2026-03-23'
 - **Chunk large tasks.** Present each chunk, get approval, execute, check in before next chunk.
 - **Verify before retry.** Confirm success after any write/patch/move before attempting again.
 - **Ask when uncertain.** Wrong edits are harder to undo than clarifying questions.
+- **Load tools before using them.** MCP tools load lazily — if `patch_note` or another tool isn't in your tool list, run `tool_search` with a specific query (e.g., "obsidian patch note") to load it. Don't assume a tool is unavailable just because it didn't appear in the first batch.
 - **Harvest discipline.** Per source: segment with `##` headers → harvest → update source YAML. Complete all three before next source. Before harvesting from any transcript, check YAML for `segmented: true` — if missing or false, prompt the user to run segmentation first.
 - **Git push before batch ops.** Before any script that moves or modifies files in bulk, commit and push. `git checkout .` is your undo.
 
@@ -41,14 +42,32 @@ updated: '2026-03-23'
 | 0.2 | Session Log - Project Name | Always |
 | 0.3 | Decision Log - Project Name | Usually |
 | 0.4 | Harvest Log - Project Name | When harvesting |
+| 0.6 | Related Notes - Project Name | Recommended |
 
 All infrastructure files MUST include the project name after a hyphen to be uniquely identifiable across the vault. Use plain hyphens (`-`), never em-dashes (`—`).
+
+All 0.x infrastructure files MUST include in frontmatter:
+- `updated:` — date of last modification (YYYY-MM-DD)
+- `datawizard_protocol_version:` — the protocol version the file was last written or reviewed against (currently 1.7)
 
 For shared/collaborative projects (using Relay or shared folders), infrastructure files may live inside the shared workspace (e.g., `_Project/Project Shared/0.0 Project Guidelines - Project.md`) rather than at the project root, so collaborators can see them.
 
 The `!` prefix sorts files and folders to the top of any directory listing. Use it for action items (`! Action Items - Project Name.md`) and for master document folders (`! Master Documents/`).
 
 Content sections start at 1.0+. Never renumber existing sections.
+
+### 0.6 Related Notes (Dataview)
+
+A Dataview query that surfaces vault notes tagged with or relevant to this project but living outside the project folder (e.g., clippings, seeds, transcripts, Reddit saves routed to content-type folders). Helps harvest agents and project instances discover material they might otherwise miss. Example query:
+
+```dataview
+TABLE type, harvest_status, updated
+FROM #project-tag
+WHERE !contains(file.path, "ProjectFolder/")
+SORT updated DESC
+```
+
+Replace `#project-tag` and `"ProjectFolder/"` with the project's actual tag and home folder path.
 
 ### What goes in a 0.0 Project Guidelines file
 
@@ -102,6 +121,8 @@ Aim for 800-1200 tokens — dense but scannable, cheap to read every thread.
 **Status:** complete | in progress — [what's pending]
 ```
 Most recent first. LLMs: read last 2-3 entries only. **Update once per session** — at the end or at a natural break point. Don't log after every step.
+
+**Chunk long session logs.** When a session log exceeds ~10 entries or ~5000 words, convert to shell + section folder pattern. Shell contains embeds; individual sessions become section files in `0.2 Session Log - Project/`. Instances read only the last 2-3 section files for orientation.
 
 ## Citation Format
 ```

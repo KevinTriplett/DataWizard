@@ -19,11 +19,13 @@ Paste this single block into **Settings → Project Instructions** for every Cla
 ## Paste This Into Project Instructions
 
 ```
-# DW Project Instructions v2.2
+# DW Project Instructions v2.4
 
 ## Tools
 You have Obsidian MCP tools. Use them directly — never ask the
-user to copy/paste vault content.
+user to copy/paste vault content. Tools load lazily — run
+tool_search to load any tool before first use (e.g.,
+tool_search "obsidian patch note").
 
 obsidian:read_note, obsidian:write_note, obsidian:patch_note,
 obsidian:read_multiple_notes, obsidian:list_directory,
@@ -62,6 +64,8 @@ obsidian:delete_note, obsidian:get_vault_stats
 ## Orientation (once per thread)
 1. Fetch version check:
    https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md
+   If GitHub is unreachable, read from the local Seed instead:
+   _DataWizard/Seed/VERSION.md
 2. Read 0.0 Project Guidelines in full (this is the project
    brief — what it is, core concepts, key decisions, structure)
 3. Compare datawizard_protocol_version against VERSION.md
@@ -69,6 +73,9 @@ obsidian:delete_note, obsidian:get_vault_stats
      https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Protocol%20Summary.md
    - Mismatch or no guidelines → fetch full protocol:
      https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md
+   - If GitHub is unreachable for either, read from local Seed:
+     _DataWizard/Seed/Protocols/Protocol Summary.md
+     _DataWizard/Seed/Protocols/DataWizard Universal Protocol.md
 4. Compare DW Project Instructions version against VERSION.md
    — flag if user needs to re-paste
 5. Read 0.2 Session Log (last 2-3 entries only)
@@ -86,7 +93,7 @@ Once you have the home folder, look for a guidelines file there
 the Universal Protocol's bootstrap section to help create one.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v2.2).*
+*Re-paste only when the Project Instructions version changes (currently v2.4).*
 
 ---
 
@@ -94,10 +101,22 @@ the Universal Protocol's bootstrap section to help create one.
 
 | What | Version | Last changed | Re-paste needed? |
 |---|---|---|---|
-| Project Instructions | v2.2 | 2026-03-23 | Only when this version changes |
+| Project Instructions | v2.4 | 2026-03-24 | Only when this version changes |
 | Universal Protocol | v1.7 | 2026-03-23 | Never — Claude fetches latest automatically |
 
 *The Universal Protocol updates automatically via GitHub. You never need to re-paste when only the protocol changes.*
+
+---
+
+## What Changed in v2.4
+
+**Local Seed fallback added.** If GitHub is unreachable during orientation (network disabled, connectivity issues), instances now fall back to reading protocol files from the local Seed at `_DataWizard/Seed/`. Fixes orientation failures when network access is unavailable.
+
+---
+
+## What Changed in v2.3
+
+**Tool loading reminder added.** MCP tools load lazily — instances must run `tool_search` to load tools before first use. This was causing instances to miss `patch_note` and fall back to full-file overwrites. The Tools section now includes an explicit reminder.
 
 ---
 
