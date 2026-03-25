@@ -1,10 +1,10 @@
 ---
 title: Protocol Summary
 type: project-doc
-version: '2.3'
+version: '2.4'
 status: active
 created: '2026-03-12'
-updated: '2026-03-23'
+updated: '2026-03-24'
 ---
 
 # DataWizard Protocol Summary (v2.3)
@@ -28,10 +28,21 @@ updated: '2026-03-23'
 
 1. **Version check**: Fetch `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md`
 2. **Read 0.0 Project Guidelines** in full — this is the project brief (what it is, core concepts, key decisions, folder structure, pointers). Compare `datawizard_protocol_version` against VERSION.md. Match → fetch Protocol Summary. Mismatch → fetch full Universal Protocol.
-3. **Compare instructions version** — flag if user needs to re-paste.
-4. **Read session log** (0.2) — last 2-3 entries only.
+3. **Compare instructions version** — see Version Update Flow below.
+4. **Read session log** (0.2) — last 2-3 entries only. The most recent entry's "What's next" section tells you where to pick up if the user says "let's continue" or "start where we left off."
 5. **Read action items** if the file exists (typically `! Action Items - [Project Name].md`).
 6. **Ready to work** — read other files only as needed.
+
+## Version Update Flow
+
+When orientation step 3 detects a Project Instructions version mismatch (your pasted version vs. the `project_instructions:` field in VERSION.md):
+
+1. Tell the user which versions you see (yours vs. current).
+2. Ask if they want to update now.
+3. If yes → fetch the latest paste block from GitHub (`COPY INTO CLAUDE PROJECT.md`), extract the content between the ``` fences, and print it in full so the user can copy it directly into Settings → Project Instructions. Remind them to keep their `Home folder:` line.
+4. If no → continue with the current instructions.
+
+The protocol and 0.0 guidelines update automatically via GitHub fetch — only Project Instructions require manual re-paste.
 
 ## Infrastructure Files
 | Prefix | File | Required |
@@ -81,6 +92,7 @@ Adapt depth to project complexity. A lightweight project might only need section
 6. **Folder structure** — what's where
 7. **Key pointers** — canonical docs, config files, repos
 8. **Working conventions** — project-specific rules beyond the universal protocol
+9. **Content interests** — what kinds of external content, tools, patterns, or connections would be valuable to this project. Written for a routing agent: "If you're scanning articles, Reddit posts, web clips, or tools, flag anything matching these interests." The framing will vary by project type (tech interests, narrative interests, connection interests, etc.) but the purpose is consistent: guide content routing.
 
 Aim for 800-1200 tokens — dense but scannable, cheap to read every thread.
 
@@ -119,8 +131,13 @@ Aim for 800-1200 tokens — dense but scannable, cheap to read every thread.
 [1-3 sentences. Max 5 lines.]
 **Files:** `file1.md`, `file2.md`
 **Status:** complete | in progress — [what's pending]
+### What's next
+[2-6 bullet points for the next session, written as a
+briefing for a fresh instance with no prior context]
 ```
-Most recent first. LLMs: read last 2-3 entries only. **Update once per session** — at the end or at a natural break point. Don't log after every step.
+Most recent first. LLMs: read last 2-3 entries only — the "What's next" section tells you where to pick up. **Update once per session** — at the end or at a natural break point. Don't log after every step.
+
+**Writing a good "What's next":** Write it as if briefing a new team member who has read the 0.0 but nothing else. Include: specific file paths to read (not just topic names), why this work matters and how it connects to the larger arc, what depends on what (sequence matters), and which items are the main focus vs side tasks. The goal is that a fresh instance reading "What's next" can jump straight into productive work without needing a separate handoff message from the user.
 
 **Chunk long session logs.** When a session log exceeds ~10 entries or ~5000 words, convert to shell + section folder pattern. Shell contains embeds; individual sessions become section files in `0.2 Session Log - Project/`. Instances read only the last 2-3 section files for orientation.
 

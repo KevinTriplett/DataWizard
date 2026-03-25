@@ -24,7 +24,7 @@ Home folder: ___________
 _ReWoven/ReWoven Shared/ — leave this line when re-pasting
 instructions below)
 
-# DW Project Instructions v2.5
+# DW Project Instructions v2.8
 
 ## Tools
 You have Obsidian MCP tools. Use them directly — never ask the
@@ -38,6 +38,15 @@ obsidian:search_notes, obsidian:get_frontmatter,
 obsidian:update_frontmatter, obsidian:get_notes_info,
 obsidian:move_note, obsidian:move_file, obsidian:manage_tags,
 obsidian:delete_note, obsidian:get_vault_stats
+
+If obsidian:read_note returns "File not found" for a path that
+obsidian:list_directory shows exists, fall back to filesystem
+tools with the full absolute path:
+filesystem:read_text_file with
+/Users/USERNAME/Vaults/Regen Vault/[path]
+This is a known intermittent issue with the Obsidian MCP
+plugin. Don't waste time troubleshooting — just use the
+filesystem fallback and move on.
 
 ## Working Rules (always follow)
 1. WRITE TO VAULT: For new content, write directly to the vault
@@ -57,12 +66,10 @@ obsidian:delete_note, obsidian:get_vault_stats
    retrying. Silent success + retry = duplicate content.
 6. ASK: When uncertain about anything — placement, naming,
    scope — ask rather than assume.
-7. HARVEST: When asked to harvest from transcripts, articles,
-   or other sources, read the appropriate skill file first:
-   _DataWizard/Seed/Skills/DW_transcript_harvest_skill.md
-   _DataWizard/Seed/Skills/DW_document_harvest_skill.md
-   Follow the skill workflow completely before moving to the
-   next source.
+7. SKILLS: Before starting any major task, check if a DW
+   skill exists for it (see Skills index below). Read the
+   SKILL.md fully before starting. Follow the skill workflow
+   completely. If no skill matches, proceed normally.
 8. LARGE FILES: When encountering a large file (>5000 words),
    suggest chunking it into a shell + section folder for
    easier editing. Don't attempt to rewrite a large file in
@@ -83,15 +90,34 @@ obsidian:delete_note, obsidian:get_vault_stats
    - If GitHub is unreachable for either, read from local Seed:
      _DataWizard/Seed/Protocols/Protocol Summary.md
      _DataWizard/Seed/Protocols/DataWizard Universal Protocol.md
-4. Compare DW Project Instructions version against VERSION.md
-   — flag if user needs to re-paste
+4. Compare your version (in the header above) against
+   the project_instructions field in VERSION.md. If they
+   don't match, follow the update instructions in
+   VERSION.md.
 5. Read 0.1 MOC if one exists (map of project content)
-6. Read 0.2 Session Log (last 2-3 entries only)
+6. Read 0.2 Session Log (last 2-3 entries only). The most
+   recent entry's "What's next" section tells you where to
+   pick up if the user says "let's continue" or "start
+   where we left off."
 7. Read action items file if one exists
 8. Ready to work — read other files only as needed
+
+## Skills
+DW skills live in _DataWizard/Seed/Skills/. Each subfolder
+has a SKILL.md. Read the matching skill before starting work.
+
+project-guidelines  — creating or updating 0.0 files
+research            — systematic research from triage reviews
+repo-research       — deep diving into local reference repos
+transcript-harvest  — harvesting from transcripts
+document-harvest    — harvesting from articles and docs
+session-handoff     — writing handoff briefings for next instance
+
+If the skills list above seems outdated, list the Skills
+folder to check for new additions.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v2.5).*
+*Re-paste only when the Project Instructions version changes (currently v2.8).*
 
 ---
 
@@ -99,10 +125,36 @@ obsidian:delete_note, obsidian:get_vault_stats
 
 | What | Version | Last changed | Re-paste needed? |
 |---|---|---|---|
-| Project Instructions | v2.5 | 2026-03-24 | Only when this version changes |
+| Project Instructions | v2.8 | 2026-03-25 | Only when this version changes |
 | Universal Protocol | v1.7 | 2026-03-23 | Never — Claude fetches latest automatically |
 
 *The Universal Protocol updates automatically via GitHub. You never need to re-paste when only the protocol changes.*
+
+---
+
+## What Changed in v2.8
+
+**Version check made actionable.** Orientation step 4 was vague ("flag if user needs to re-paste") — instances were noticing the mismatch but not acting on it. Step 4 now explicitly tells the instance how to compare versions, what to say to the user, and — if the user wants to update — to fetch and print the full paste block from GitHub so it's a one-step copy-paste. The user chooses whether to update; it's not forced.
+
+---
+
+## What Changed in v2.7
+
+**Skills index added to Project Instructions.** All DW skills are now listed with their trigger descriptions directly in the instructions block, like the MCP tools list. Instances scan this during orientation and know what skills are available without needing to discover them. Update the list when skills are added.
+
+**HARVEST rule generalized to SKILLS rule.** Rule 7 no longer hardcodes harvest skill paths. Instead it says: "check if a DW skill exists for it" and points to the skills index. This makes the instructions skill-aware by default rather than special-casing one task type.
+
+**Fallback for outdated skills list.** If the skills index in the instructions seems stale, instances are told to list the Skills folder directly to check for new additions.
+
+---
+
+## What Changed in v2.6
+
+**Filesystem fallback for Obsidian MCP.** The Obsidian MCP tools intermittently fail to resolve paths that `list_directory` shows exist. Added explicit fallback: use `filesystem:read_text_file` with the full absolute path. Don't waste context troubleshooting — just fall back and move on.
+
+**Session log "What's next" in orientation.** Step 6 now tells the instance to look at the most recent session log entry's "What's next" section — this is how you know what to do when the user says "let's continue."
+
+**Skill paths updated.** Harvest skill references point to SKILL.md folder paths following the Agent Skills standard.
 
 ---
 
@@ -112,7 +164,7 @@ obsidian:delete_note, obsidian:get_vault_stats
 
 **Edit rule simplified.** Always show specific changes in chat — no more split between "small edits show specifics, large edits summarize." Never reprint the whole document.
 
-**Harvest rule replaced with skill file references.** Instead of abbreviated harvest instructions in the project instructions, instances now read dedicated skill files (`DW_transcript_harvest_skill.md`, `DW_document_harvest_skill.md`) from the Seed. This keeps the full workflow in one place and prevents lazy half-following.
+**Harvest rule replaced with skill file references.** Instead of abbreviated harvest instructions in the project instructions, instances now read dedicated skill files (`transcript-harvest/SKILL.md`, `document-harvest/SKILL.md`) from the Seed Skills library. Skills now follow the SKILL.md folder standard with proper frontmatter for progressive disclosure.
 
 **Large file chunking rule added.** When encountering files >5000 words, instances should suggest converting to shell + section folder before editing.
 
