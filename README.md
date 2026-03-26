@@ -102,7 +102,7 @@ If you already have backups set up, skip ahead. If not, your Seed includes a set
 
 1. In Claude Desktop, create a new Project
 2. Go to Settings - Project Instructions
-3. Open `_DataWizard/Seed/COPY INTO CLAUDE PROJECT.md` in Obsidian
+3. Open `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md` in Obsidian
 4. Copy the block between the ``` fences and paste it into Project Instructions
 5. Fill in the Home folder line (e.g., `_DataWizard/`)
 
@@ -130,7 +130,7 @@ This downloads the latest Seed and overwrites only the Seed files. Your project 
 ```
 _DataWizard/Seed/
   VERSION.md                              - Version numbers and update instructions
-  COPY INTO CLAUDE PROJECT.md             - Project Instructions to paste into Claude
+  Project Instructions - Copy-Paste into Claude.md  - Project Instructions to paste into Claude
   README.md                               - This file
   update_seed.sh                          - Install/update script
   Protocols/

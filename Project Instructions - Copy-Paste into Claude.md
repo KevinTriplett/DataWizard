@@ -1,9 +1,9 @@
 ---
-title: Copy Into Claude Project
+title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-03-25'
+updated: '2026-03-26'
 tags:
   - protocol
   - AI-collaboration
@@ -20,16 +20,20 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 
 ```
 Home folder: ___________
-(fill in the vault-relative path, e.g. _DataWizard/ or
-_ReWoven/ReWoven Shared/ - leave this line when re-pasting)
+(fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.0
+# DW Project Instructions v3.1
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
 the user to copy/paste vault content. Tools load lazily -
-run tool_search to load any tool before first use (e.g.,
-tool_search "obsidian patch note").
+run tool_search to load any tool before first use. Use
+descriptive queries (short/vague terms may miss tools).
+
+Load all needed tools during orientation with these calls:
+  tool_search "obsidian read_note write_note patch_note replace"
+  tool_search "obsidian list_directory search_notes get_frontmatter"
+  tool_search "obsidian update_frontmatter move_note manage_tags"
 
 obsidian:read_note, obsidian:write_note, obsidian:patch_note,
 obsidian:read_multiple_notes, obsidian:list_directory,
@@ -80,7 +84,7 @@ known intermittent MCP issue.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.0).*
+*Re-paste only when the Project Instructions version changes (currently v3.1).*
 
 ---
 
@@ -88,8 +92,16 @@ known intermittent MCP issue.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.0 | 2026-03-25 |
+| Project Instructions | v3.1 | 2026-03-26 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.1
+
+**Tool loading fix.** Replaced vague tool_search example with three explicit queries that reliably load all Obsidian MCP tools during orientation. Prevents patch_note and other tools from failing to load due to overly short search terms.
+
+**File renamed.** `COPY INTO CLAUDE PROJECT.md` renamed to `Project Instructions - Copy-Paste into Claude.md`.
 
 ---
 
