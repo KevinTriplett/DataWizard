@@ -137,13 +137,13 @@ _DataWizard/Seed/
     DataWizard Universal Protocol.md      - Full AI operational rulebook
     Protocol Summary.md                   - Quick reference
     Content Type Taxonomy.md              - 20 content types for classification
-  Skills/
-    project-guidelines/SKILL.md           - Creating/updating 0.0 files
-    research/SKILL.md                     - Systematic research from triage
-    repo-research/SKILL.md                - Deep diving into reference repos
-    transcript-harvest/SKILL.md           - Harvesting from transcripts
-    document-harvest/SKILL.md             - Harvesting from articles and docs
-    session-closer/SKILL.md              - Session log writing and handoff
+  SKILLS.md                               - Available skills catalog
+  Skills/                                 - See SKILLS.md for details
+    project-guidelines/SKILL.md
+    repo-research/SKILL.md
+    transcript-harvest/SKILL.md
+    document-harvest/SKILL.md
+    session-closer/SKILL.md
   Agents/
     Harvest Agent.md                      - Content harvesting agent instructions
   Guides/

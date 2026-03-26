@@ -37,7 +37,7 @@ Scan the conversation for:
 
 ### Step 2: Draft the session log entry
 
-Follow the output format below. Write the full entry and present it in chat for user approval.
+Follow the output format below. Write the full entry and present it in chat for user approval. **Present the "What's next" section separately in chat** so the user can review and confirm the plan for next session before it gets written to the vault.
 
 ### Step 3: Get approval and write
 
