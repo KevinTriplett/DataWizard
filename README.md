@@ -1,13 +1,13 @@
 
 # DataWizard
 
-> **Getting started?** Paste this URL into a Claude conversation and Claude will walk you through setup: `https://github.com/andrewalan11/DataWizard`
+> A local-first AI knowledge management system for Obsidian.
 
 ---
 
 ## What Is DataWizard?
 
-DataWizard is a **local-first AI knowledge management system** for Obsidian. It teaches AI agents how to work in your vault — reading, writing, organizing, and enriching your notes automatically.
+DataWizard teaches AI agents how to work in your Obsidian vault - reading, writing, organizing, and enriching your notes automatically.
 
 The goal is not to read everything yourself. It's to build a system that reads for you, remembers for you, and retrieves what matters when you need it.
 
@@ -23,279 +23,177 @@ The goal is not to read everything yourself. It's to build a system that reads f
 
 ---
 
-## Getting Started
+## Quick Start
 
-**You don't need to read documentation.** Give this link to Claude and it will walk you through everything — installing Obsidian, connecting your AI, setting up your first project.
+### 1. Install Obsidian
 
-If you prefer to understand what you're getting into first, here's the setup overview:
+Download from https://obsidian.md (free). Create a new vault or open an existing one.
 
-### What You'll Need
+### 2. Install the DataWizard Seed
 
-- **Obsidian** — free, from https://obsidian.md
-- **Claude Pro** — for Claude Projects and MCP support
-- **Apple Silicon Mac** recommended (M1/M2/M3) — the local AI pipeline is optimized for unified memory
-- **Ollama** (optional) — for running local AI models like Qwen3 for automated classification
-
-### The Setup Flow
-
-1. Install Obsidian and create a vault
-2. Set up MCP (connects Claude to your vault so it can read/write files)
-3. Create a Claude Project and paste the DataWizard instructions
-4. Start a conversation — Claude reads the protocols and helps you set up your first project
-5. If collaborating: install the Relay plugin and get a server key from your project admin
-
-Claude handles steps 2–5 for you. Just paste the GitHub link into a conversation and follow along.
-
-### Core Concepts
-
-**Content Types** — Every note gets a `type:` field. DataWizard uses a taxonomy of 20 content types — seeds, articles, transcripts, entities, and more.
-
-**The 0.x Infrastructure** — Every project folder has standardized infrastructure files: `0.0 Project Guidelines`, `0.1 MOC`, `0.2 Session Log`, etc. Same numbers always mean the same thing.
-
-**Draft → Review → Apply** — Nothing gets written to your vault until you approve it. Every operation produces a plan or log first. You review, then approve.
-
-**Local First** — Your notes never leave your machine. The protocol system works with Claude via MCP, but all data stays in your vault.
-
----
-
-## For AI Agents Reading This Page
-
-A user has shared this link with you. Your job is to walk them through setting up DataWizard from scratch. **They don't need to download anything.** You'll read the protocols directly from GitHub.
-
-### Setup Flow
-
-1. **Ask what they have.** Do they have Obsidian installed? Do they have a vault? Are they collaborating on an existing project with someone, or starting fresh?
-
-2. **Install Obsidian** (if needed). Download from https://obsidian.md — it's free. Have them create a new vault or open an existing one.
-
-3. **Set up MCP.** This connects you to their Obsidian vault so you can read and write files directly.
-
-   **IMPORTANT: Present exactly ONE setup method to the user based on their Node version. Do not offer multiple methods, do not present a menu of options, do not mention the MCP Tools plugin. Check the Node version first, then give them the single correct path.**
-
-   Try to fetch the full setup guide first:
-
-   `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Connecting%20Obsidian%20to%20Claude%20Desktop%20on%20Mac.md`
-
-   If you can't fetch it, here are the essential steps:
-
-   **First: Check Node.js version.** Have them open Terminal (Cmd + Space, type "Terminal", hit Enter) and run:
-   ```bash
-   node --version
-   ```
-   - If "command not found" → install Node.js first: `brew install node` (install Homebrew first if needed from https://brew.sh). Then check the version again.
-   - If **v24 or below** → use **Smithery** (easier, one command).
-   - If **v25 or above** → use **Manual Config** (Smithery has a known bug on v25+).
-
-   **Find the vault path first (needed for both methods):** In Finder, navigate to the Obsidian vault folder, press Cmd+Option+C to copy the full path.
-
-   ---
-
-   **Smithery Setup (Node v24 and below):**
-
-   a. In Terminal, copy and paste this command and press Enter:
-   ```bash
-   npx -y @smithery/cli install @bitbonsai/mcpvault --client claude
-   ```
-
-   b. When prompted, paste the vault path you copied above.
-
-   c. **Force Quit Claude Desktop** (Apple menu → Force Quit → Claude) and reopen. A normal Cmd+Q may not reload the config.
-
-   d. Verify: go to Settings → Developer — you should see "obsidian" with a green "running" badge.
-
-   e. Test: start a new conversation and try "What folders are in my vault?"
-
-   ---
-
-   **Manual Config Setup (Node v25+):**
-
-   a. Open the config file in Terminal:
-   ```bash
-   open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
-   ```
-   If the file doesn't exist:
-   ```bash
-   mkdir -p ~/Library/Application\ Support/Claude && \
-   echo '{}' > ~/Library/Application\ Support/Claude/claude_desktop_config.json && \
-   open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
-   ```
-
-   b. Replace the contents with this (substituting the vault path you copied):
-   ```json
-   {
-     "mcpServers": {
-       "obsidian": {
-         "command": "npx",
-         "args": [
-           "@bitbonsai/mcpvault@latest",
-           "/Users/YOURUSERNAME/path/to/your/vault"
-         ]
-       }
-     }
-   }
-   ```
-   If the file already has content, merge the `mcpServers` section inside the existing braces. Make sure the JSON is valid — no trailing commas.
-
-   c. Save (Cmd+S), then **Force Quit Claude Desktop** (Apple menu → Force Quit → Claude) and reopen.
-
-   d. Verify: go to Settings → Developer — you should see "obsidian" with a green "running" badge.
-
-   e. Test: start a new conversation and try "What folders are in my vault?"
-
-   ---
-
-   **Troubleshooting:**
-   - "No servers added" → check JSON syntax (no trailing commas), verify vault path exists, Force Quit and reopen
-   - If Smithery fails with `r.setPassword is not a function` → their Node is v25+, switch to Manual Config above
-
-4. **Create a Claude Project.** Once MCP is working, have them create a new Claude Project and paste these into the Project Instructions field:
-
-```
-# DW Project Instructions v2.1
-
-## Tools
-You have Obsidian MCP tools. Use them directly — never ask the
-user to copy/paste vault content.
-
-obsidian:read_note, obsidian:write_note, obsidian:patch_note,
-obsidian:read_multiple_notes, obsidian:list_directory,
-obsidian:search_notes, obsidian:get_frontmatter,
-obsidian:update_frontmatter, obsidian:get_notes_info,
-obsidian:move_note, obsidian:move_file, obsidian:manage_tags,
-obsidian:delete_note, obsidian:get_vault_stats
-
-## Working Rules (always follow)
-1. WRITE TO VAULT: For new content, write directly to the vault
-   as .md — never draft markdown in chat (it's hard to read
-   there). Share your plan first, get approval, then write to
-   vault. The user will read it in Obsidian.
-2. EDITS TO EXISTING DOCS: When editing an existing file, show
-   the proposed changes in chat first as plain text (not
-   markdown). Once approved, write to vault.
-3. RE-READ BEFORE WRITING: In shared projects (Relay), always
-   re-read the file immediately before writing. Another user or
-   agent may have changed it since your last read.
-4. CHUNK: Break multi-step plans into chunks. Present each
-   chunk, get approval, execute, check in before next chunk.
-5. VERIFY: After any write/patch/move, confirm success before
-   retrying. Silent success + retry = duplicate content.
-6. ASK: When uncertain about anything — placement, naming,
-   scope — ask rather than assume.
-7. HARVEST DISCIPLINE: When harvesting from transcripts or
-   source files, treat each source as one atomic unit:
-   (a) Segment first — add ## headers before extracting
-   (b) Harvest content into destination docs
-   (c) Update source YAML (harvest_status, harvested_into)
-   Complete all three before moving to the next source.
-   See Protocol Sections 7 and 9.
-
-## Orientation (once per thread)
-1. Fetch version check:
-   https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md
-2. Read 0.0 Project Guidelines (frontmatter only)
-3. Compare datawizard_protocol_version against VERSION.md
-   - Match → fetch protocol summary:
-     https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Protocol%20Summary.md
-   - Mismatch or no guidelines → fetch full protocol:
-     https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md
-4. Compare DW Project Instructions version against VERSION.md
-   — flag if user needs to re-paste
-5. Read 0.2 Session Log (last 2-3 entries only)
-6. Ready to work — read files only as needed
-
-## Project Context
-At the start of the first conversation, ask the user:
-"What project are we working on?"
-
-Then find the project folder in the vault and look for a
-guidelines file (typically named "0.0 Project Guidelines.md").
-If none exists, follow the Universal Protocol's bootstrap
-section to help the user create one.
-```
-
-5. **Ask about collaboration.** "Are you collaborating on a project with others?" If yes:
-   - Help them install the **Obsidian Relay** plugin (Community Plugins → Browse → search "Relay")
-   - Tell them: "Ask your project admin for the Relay server key and paste it here."
-   - Walk them through entering the key in the Relay plugin settings
-   - Once connected, the shared project folder will sync to their vault automatically
-
-6. **Start a new conversation** in that Claude Project. From there, the AI will fetch the protocols from GitHub and can bootstrap any project.
-
-7. **Post-install feedback.** Once setup is complete and the user has confirmed everything is working, ask: "Would you like me to generate a quick report on how the install went? I can note any issues we hit, steps that were confusing, and suggestions for improving the DataWizard setup process." If yes, generate a brief report covering: what worked smoothly, what was confusing or required troubleshooting, any errors encountered, and suggestions for improving the setup instructions. The user can share this report with the DataWizard maintainer to improve the onboarding experience.
-
----
-
-## What's in This Repo
-
-```
-COPY INTO CLAUDE PROJECT.md            — Both blocks to paste (instructions + memory)
-README.md                              — This file
-VERSION.md                             — Version numbers for auto-update checks
-Protocols/
-  DataWizard Universal Protocol.md     — Full AI operational rulebook (v1.6, 18 sections)
-  Protocol Summary.md                  — Lean quick-reference (~500 tokens vs ~15K)
-  Content Type Taxonomy.md             — 20 content types for classification
-  Human Onboarding Doc Template.md     — Template for project onboarding docs
-Guides/
-  Connecting Obsidian to Claude Desktop on Mac.md
-  Git Backup Setup — Claude-Guided Walkthrough.md
-  Vault Backup Setup Guide.md
-  Vault Structure Guide.md
-```
-
-### Direct File URLs (for AI agents)
-
-If you're an AI reading this README and need to fetch any file, here are the raw URLs:
-
-**Core Files:**
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md`
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/COPY%20INTO%20CLAUDE%20PROJECT.md`
-
-**Protocols:**
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/DataWizard%20Universal%20Protocol.md`
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Protocol%20Summary.md`
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Content%20Type%20Taxonomy.md`
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Protocols/Human%20Onboarding%20Doc%20Template.md`
-
-**Guides:**
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Connecting%20Obsidian%20to%20Claude%20Desktop%20on%20Mac.md`
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Git%20Backup%20Setup%20%E2%80%94%20Claude-Guided%20Walkthrough.md`
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Vault%20Backup%20Setup%20Guide.md`
-- `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/Guides/Vault%20Structure%20Guide.md`
-
----
-
-## Want a Local Copy? (Optional)
-
-By default, Claude reads the protocols directly from GitHub — you don't need to download anything. But a local copy gives you some advantages: the protocol is searchable inside Obsidian, you can link to it from other notes with `[[wikilinks]]`, and it works offline.
-
-If you want a local copy, download the ZIP and unzip into `_DataWizard/Seed/` in your vault. Then change your project instructions to read from the vault instead of GitHub:
-
-```
-## Orientation (once per thread)
-If you haven't oriented yet this thread, read the Universal
-Protocol before doing any vault work:
-
-_DataWizard/Seed/Protocols/DataWizard Universal Protocol.md
-
-After reading it once, proceed normally.
-```
-
-The protocol includes a version check — Claude will compare your local copy against GitHub and offer to update it when a new version is available.
-
----
-
-## For Protocol Developers
-
-If you're maintaining or extending the DataWizard protocol, clone this repo locally:
+Open Terminal (Cmd + Space, type "Terminal", hit Enter) and run this command. Replace the path with your vault location:
 
 ```bash
-cd /path/to/your/vault
-git clone https://github.com/andrewalan11/DataWizard.git _DataWizard/Seed
-rm -rf _DataWizard/Seed/.git
+cd ~/path/to/your/vault && \
+curl -sL https://github.com/andrewalan11/DataWizard/archive/refs/heads/main.zip -o /tmp/dw-seed.zip && \
+unzip -qo /tmp/dw-seed.zip -d /tmp/dw-seed && \
+mkdir -p _DataWizard/Seed && \
+cp -R /tmp/dw-seed/DataWizard-main/* _DataWizard/Seed/ && \
+rm -rf /tmp/dw-seed /tmp/dw-seed.zip && \
+echo "DataWizard Seed installed to _DataWizard/Seed/"
 ```
 
-This gives you a local working copy in your vault.
+To find your vault path: open Finder, navigate to your vault folder, press Cmd+Option+C to copy the full path.
+
+You should see "DataWizard Seed installed" and a new `_DataWizard/Seed/` folder in your vault.
+
+### 3. Set up MCP
+
+MCP connects Claude to your Obsidian vault so it can read and write files directly. The full guide is in your Seed at `_DataWizard/Seed/Guides/Connecting Obsidian to Claude Desktop on Mac.md`, but here are the essential steps:
+
+**Check your Node.js version** (needed for MCP). In Terminal:
+```bash
+node --version
+```
+- "command not found" - install Node.js first: `brew install node` (install Homebrew from https://brew.sh if needed)
+- v24 or below - use Smithery (one command, easier)
+- v25 or above - use Manual Config (Smithery has a known bug on v25+)
+
+**Smithery (Node v24 and below):**
+```bash
+npx -y @smithery/cli install @bitbonsai/mcpvault --client claude
+```
+When prompted, paste your vault path.
+
+**Manual Config (Node v25+):**
+```bash
+open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+If the file doesn't exist:
+```bash
+mkdir -p ~/Library/Application\ Support/Claude && \
+echo '{}' > ~/Library/Application\ Support/Claude/claude_desktop_config.json && \
+open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+Replace contents with (substituting your vault path):
+```json
+{
+  "mcpServers": {
+    "obsidian": {
+      "command": "npx",
+      "args": [
+        "@bitbonsai/mcpvault@latest",
+        "/Users/YOURUSERNAME/path/to/your/vault"
+      ]
+    }
+  }
+}
+```
+
+**After either method:** Force Quit Claude Desktop (Apple menu - Force Quit - Claude) and reopen. Check Settings - Developer for a green "obsidian" badge.
+
+### 4. Back up your vault
+
+Before going further, make sure your vault is backed up. The recommended method is a private git repository.
+
+If you already have backups set up, skip ahead. If not, your Seed includes a setup guide at `_DataWizard/Seed/Guides/Git Backup Setup - Claude-Guided Walkthrough.md`. You can ask Claude to walk you through it after completing step 5.
+
+### 5. Create a Claude Project
+
+1. In Claude Desktop, create a new Project
+2. Go to Settings - Project Instructions
+3. Open `_DataWizard/Seed/COPY INTO CLAUDE PROJECT.md` in Obsidian
+4. Copy the block between the ``` fences and paste it into Project Instructions
+5. Fill in the Home folder line (e.g., `_DataWizard/`)
+
+### 6. Start working
+
+Open a conversation in your new Claude Project. Claude will orient itself by reading your Seed and project files, then it's ready to help you set up your first project, classify notes, or whatever you need.
+
+---
+
+## Updating
+
+DataWizard checks for updates automatically. When you start a new conversation, Claude compares your local Seed version against the latest on GitHub. If there's an update available, it tells you what changed and asks if you want to update.
+
+To update manually at any time:
+```bash
+bash _DataWizard/Seed/update_seed.sh
+```
+
+This downloads the latest Seed and overwrites only the Seed files. Your project content (session logs, Workshop docs, action items) is never touched.
+
+---
+
+## What's in the Seed
+
+```
+_DataWizard/Seed/
+  VERSION.md                              - Version numbers and update instructions
+  COPY INTO CLAUDE PROJECT.md             - Project Instructions to paste into Claude
+  README.md                               - This file
+  update_seed.sh                          - Install/update script
+  Protocols/
+    DataWizard Universal Protocol.md      - Full AI operational rulebook
+    Protocol Summary.md                   - Quick reference
+    Content Type Taxonomy.md              - 20 content types for classification
+  Skills/
+    project-guidelines/SKILL.md           - Creating/updating 0.0 files
+    research/SKILL.md                     - Systematic research from triage
+    repo-research/SKILL.md                - Deep diving into reference repos
+    transcript-harvest/SKILL.md           - Harvesting from transcripts
+    document-harvest/SKILL.md             - Harvesting from articles and docs
+    session-handoff/SKILL.md              - Writing handoff briefings
+  Agents/
+    Harvest Agent.md                      - Content harvesting agent instructions
+  Guides/
+    Connecting Obsidian to Claude Desktop on Mac.md
+    Git Backup Setup - Claude-Guided Walkthrough.md
+    Vault Backup Setup Guide.md
+    Vault Structure Guide.md
+    Federation Guide.md
+    Editing the Claude Desktop Config.md
+    Human Onboarding Doc Template.md
+  Vault Config.md                         - User-specific paths and settings
+```
+
+---
+
+## For AI Agents
+
+If a user shares this README or the GitHub link with you, your job is to help them get DataWizard set up. Follow the Quick Start steps above.
+
+**Key points:**
+- The Seed should be installed locally in the vault, not read from GitHub
+- All protocols, skills, and guides are in `_DataWizard/Seed/` - read them via MCP
+- The only GitHub fetch is VERSION.md for update checks during orientation
+- Always get user approval before writing to the vault
+- If the user already has a Seed installed, check if it needs updating before starting
+
+**If the Seed is already installed:**
+Read `_DataWizard/Seed/VERSION.md` locally and compare against the GitHub version. If an update is available, offer it before proceeding.
+
+**If the Seed is NOT installed:**
+Give the user the install command from step 2 above, customized with their vault path. Wait for them to confirm it worked, then continue with MCP setup.
+
+---
+
+## Troubleshooting
+
+**"No servers added" in Developer settings:**
+Check JSON syntax in the config file, verify the vault path exists, and Force Quit Claude Desktop (not just Cmd+Q).
+
+**MCP server shows but isn't connecting:**
+Run `node --version` and `npx --version` in Terminal. Make sure Obsidian is running.
+
+**Permission errors:**
+System Settings - Privacy & Security - Files and Folders. Ensure Claude Desktop has access to your vault.
+
+**Tools disappear mid-conversation:**
+Start a new conversation. Check that Obsidian is still running.
+
+**Seed install shows errors:**
+Run the install command again. If it persists, download the ZIP manually from https://github.com/andrewalan11/DataWizard and unzip into `_DataWizard/Seed/`.
 
 ---
 

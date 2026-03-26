@@ -4,12 +4,12 @@ type: project-doc
 version: '2.4'
 status: active
 created: '2026-03-12'
-updated: '2026-03-24'
+updated: '2026-03-25'
 ---
 
-# DataWizard Protocol Summary (v2.3)
+# DataWizard Protocol Summary (v2.4)
 
-*Quick reference for oriented agents. Read the full protocol for details, edge cases, and examples.*
+*Quick reference for agents. This document is NOT read during orientation - it's a reference you read when you need it for a specific task like DW review, project setup, or protocol questions.*
 
 ---
 
@@ -26,23 +26,17 @@ updated: '2026-03-24'
 
 ## Orientation (once per thread)
 
-1. **Version check**: Fetch `https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md`
-2. **Read 0.0 Project Guidelines** in full — this is the project brief (what it is, core concepts, key decisions, folder structure, pointers). Compare `datawizard_protocol_version` against VERSION.md. Match → fetch Protocol Summary. Mismatch → fetch full Universal Protocol.
-3. **Compare instructions version** — see Version Update Flow below.
-4. **Read session log** (0.2) — last 2-3 entries only. The most recent entry's "What's next" section tells you where to pick up if the user says "let's continue" or "start where we left off."
-5. **Read action items** if the file exists (typically `! Action Items - [Project Name].md`).
-6. **Ready to work** — read other files only as needed.
+*Note: This orientation flow is defined in the Project Instructions (v3.0). It's reproduced here for reference.*
+
+1. **Version check**: Fetch VERSION.md from GitHub, compare against local Seed. Follow VERSION.md instructions for mismatches.
+2. **Read 0.0 Project Guidelines** in full (project context).
+3. **Read session log** (0.2) - last 2-3 entries. The "What's next" section tells you where to pick up.
+4. **Read action items** if the file exists.
+5. **Ready to work** - read Seed docs as needed for specific tasks.
 
 ## Version Update Flow
 
-When orientation step 3 detects a Project Instructions version mismatch (your pasted version vs. the `project_instructions:` field in VERSION.md):
-
-1. Tell the user which versions you see (yours vs. current).
-2. Ask if they want to update now.
-3. If yes → fetch the latest paste block from GitHub (`COPY INTO CLAUDE PROJECT.md`), extract the content between the ``` fences, and print it in full so the user can copy it directly into Settings → Project Instructions. Remind them to keep their `Home folder:` line.
-4. If no → continue with the current instructions.
-
-The protocol and 0.0 guidelines update automatically via GitHub fetch — only Project Instructions require manual re-paste.
+Version update instructions now live in VERSION.md itself. When orientation detects a mismatch, VERSION.md tells the instance exactly what to do - whether to update the Seed (run update_seed.sh) or re-paste Project Instructions (fetch from GitHub).
 
 ## Infrastructure Files
 | Prefix | File | Required |
