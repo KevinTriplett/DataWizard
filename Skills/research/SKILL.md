@@ -154,7 +154,7 @@ Process one triage chunk at a time. Within each chunk, work subreddits in order.
 
 ## Handing Off Research to Another Instance
 
-When research will continue in a new thread (common for large triage batches or multi-repo deep dives), write a handoff briefing using the session-handoff skill. For research tasks specifically, the handoff must include:
+When research will continue in a new thread (common for large triage batches or multi-repo deep dives), write the session log entry using the session-closer skill. For research tasks specifically, the "What's next" section must include:
 
 1. **Specific files to read, in priority order** — not "study the repos" but "read this file first, then this file, then this file." The incoming instance should be able to start reading immediately.
 2. **What to extract from each source** — different sources yield different things. State what you're looking for in each (methodology from one, patterns from another, formal requirements from a third).
@@ -164,7 +164,7 @@ When research will continue in a new thread (common for large triage batches or 
 
 ## See Also
 
-- session-handoff skill — general handoff methodology
+- session-closer skill — session log writing and handoff methodology
 - Synthesis skill (not yet built) — the next pass after research
 - Triage review docs in Recall Vault `_Claude Recall/`
 - Link log at `_Companions/! Research Link Log.md`

@@ -143,7 +143,7 @@ _DataWizard/Seed/
     repo-research/SKILL.md                - Deep diving into reference repos
     transcript-harvest/SKILL.md           - Harvesting from transcripts
     document-harvest/SKILL.md             - Harvesting from articles and docs
-    session-handoff/SKILL.md              - Writing handoff briefings
+    session-closer/SKILL.md              - Session log writing and handoff
   Agents/
     Harvest Agent.md                      - Content harvesting agent instructions
   Guides/
