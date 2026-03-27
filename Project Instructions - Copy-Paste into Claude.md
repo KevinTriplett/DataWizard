@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.1
+# DW Project Instructions v3.2
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -34,13 +34,6 @@ Load all needed tools during orientation with these calls:
   tool_search "obsidian read_note write_note patch_note replace"
   tool_search "obsidian list_directory search_notes get_frontmatter"
   tool_search "obsidian update_frontmatter move_note manage_tags"
-
-obsidian:read_note, obsidian:write_note, obsidian:patch_note,
-obsidian:read_multiple_notes, obsidian:list_directory,
-obsidian:search_notes, obsidian:get_frontmatter,
-obsidian:update_frontmatter, obsidian:get_notes_info,
-obsidian:move_note, obsidian:move_file, obsidian:manage_tags,
-obsidian:delete_note, obsidian:get_vault_stats
 
 If obsidian:read_note returns "File not found" for a path
 that obsidian:list_directory shows exists, fall back to
@@ -70,8 +63,9 @@ known intermittent MCP issue.
    to patch. They cause patch_note to fail on matching.
 
 ## Orientation (once per thread)
-1. Fetch VERSION.md from GitHub:
-   https://raw.githubusercontent.com/andrewalan11/DataWizard/main/VERSION.md
+1. Fetch VERSION.md from GitHub API:
+   https://api.github.com/repos/andrewalan11/DataWizard/contents/VERSION.md
+   The API returns JSON - decode the base64 "content" field.
    Compare against local _DataWizard/Seed/VERSION.md.
    Follow the instructions in VERSION.md for any mismatches
    (Seed version, project instructions version).
@@ -84,7 +78,7 @@ known intermittent MCP issue.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.1).*
+*Re-paste only when the Project Instructions version changes (currently v3.2).*
 
 ---
 
@@ -92,8 +86,14 @@ known intermittent MCP issue.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.1 | 2026-03-26 |
+| Project Instructions | v3.2 | 2026-03-26 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.2
+
+**GitHub API for version check.** Orientation step 1 now fetches VERSION.md from the GitHub API (`api.github.com/repos/.../contents/`) instead of `raw.githubusercontent.com`. The raw CDN caches aggressively, causing instances to see stale version info even after a fresh push. The API endpoint reflects commits immediately.
 
 ---
 

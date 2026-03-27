@@ -89,6 +89,11 @@ under bold topic headers. Include file paths for anything created or modified.]
 
 ### Learnings
 
+Each learning is a discrete, standalone observation -- a fact that's useful on its
+own without needing the rest of the session context. (This is the "observational
+memory" pattern: discrete facts are 4-10x more token-efficient and more searchable
+than conversation summaries.)
+
 - **category**: Description of the learning with enough context that a future
   instance searching for this topic would find it useful. Reference the source
   (decision, tool, research, conversation) that produced the insight.
@@ -103,6 +108,15 @@ If no learnings this session, write: "No new learnings this session."
 [Write this as if briefing a new team member who has read the 0.0 but nothing
 else. This section is the handoff — it must be specific enough that the next
 instance can start working immediately.]
+
+**"What's next" is a direction, not a contract.** The items listed here are the
+best guess at what's most valuable to do next, based on where this session ended.
+They are NOT commitments. The next session may go in a completely different
+direction if the user wants to follow a thread, go deep on something unexpected,
+or if the work naturally evolves. Sessions that spend their entire context on one
+deep task (a handbook deep-read, a design discussion, a complex refactor) are
+just as productive as sessions that tick off five items. Never rush through work
+or cut corners to get through the list. There's always a next session.
 
 Include:
 - **Specific file paths** to read first (not just topic names)
@@ -119,12 +133,41 @@ Adapt detail to the work type:
 - Debugging: what's broken, what was tried, where the evidence is
 ```
 
+## Structured Format for Complex Sessions
+
+For sessions with many moving parts (multi-file refactors, long research batches, architecture changes across several docs), the narrative "What happened" can optionally be replaced with a structured format based on the AI Agent Handbook's compaction template. This makes the session log entry function as a structured state snapshot that's easier for the next instance to parse.
+
+Use the structured format when: the session touched 5+ files, made multiple independent decisions, or spanned multiple work phases. Use the narrative format for simpler sessions.
+
+```markdown
+### What happened (structured)
+
+**Active goal:** [One sentence: what were we trying to achieve this session?]
+
+**Key decisions:**
+- [What was decided] -- [why / what alternatives were rejected]
+- [What was decided] -- [why]
+
+**Artifacts modified:**
+- `path/to/file.md` -- [what changed and why, 1-2 sentences]
+- `path/to/other.md` -- [what changed and why]
+
+**Current state:** [What's done, what's in progress, what's blocked]
+
+**Errors and resolutions:** [Any problems hit and how they were solved, or "None"]
+
+**Critical context:** [Anything else a fresh instance needs to know that doesn't fit above]
+```
+
+The "Files created/updated" lists and "Status" line still apply on top of either format. The Learnings and What's Next sections are unchanged.
+
 ## Writing the Title
 
 The session title should capture the main theme in 3-8 words. Use plain hyphens, not em-dashes. Good titles: "Session Closer Skill, Reddit Triage". Bad titles: "Various tasks and cleanup" (too vague).
 
 ## Common Mistakes
 
+- **Treating "What's next" as a checklist.** It's a direction, not a mandate. The next instance should feel free to spend the entire session on one deep task if that's where the value is. Rushing through items to "complete the list" produces worse work than going deep on one thing. The user values depth over breadth.
 - **Vague "What's next."** "Continue the skills work" is useless. "Build the session-closer skill — read Section 6 Proposal #1 and Section 7 Proposal #11 in the Agent Architecture doc for the spec" is useful.
 - **Missing file paths in "What's next."** Every "What's next" should have at least 2-3 exact paths. The incoming instance shouldn't need to search for anything.
 - **No prioritization.** Without it, the next instance treats everything as equal priority. Use "Priority 1 / Priority 2" or "The main focus is X. Also when you get a chance: Y."
@@ -138,3 +181,7 @@ The session title should capture the main theme in 3-8 words. Use plain hyphens,
 - **Action items**: Check off completed items, add new ones. Optional but recommended.
 - **Decision log**: Decisions belong as separate numbered entries. The session log references them but doesn't replace them.
 - **Harvest log**: Harvesting work gets its own log entry with source, output, and status.
+
+## Synthesis Check
+
+Before closing, verify: if this session involved multi-item analysis (research batches, triage passes, cross-doc comparisons), have the cross-cutting findings been captured? Synthesis degrades across context boundaries but mechanical execution doesn't. If the thinking hasn't been written down yet (as an integration memo, design doc update, or explicit "Learnings" entry), capture it now — before the session log, not after. See [[Context and Session Management]] for the rationale.
