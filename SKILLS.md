@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-03-26'
+updated: '2026-03-28'
 ---
 
 # DataWizard Skills
@@ -18,8 +18,8 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **project-guidelines** | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. |
 | **session-closer** | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. |
 | **research-tracking** | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |
-| **tools-research** | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Depth calibration, detail harvesting, batch synthesis. References research-tracking. |
-| **design-harvest** | Technique | Turning research findings into design doc updates, skill refinements, roadmap additions, and guideline improvements. The interpretive bridge between research (facts) and living docs (architecture). Completes the research lifecycle: tools-research (evaluate) -> research-tracking (track) -> design-harvest (integrate). |
+| **tools-research** | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Batch mode includes harvest pre-filtering and two-speed processing. References research-tracking. |
+| **design-harvest** | Technique | Turning research findings into design doc updates, skill refinements, roadmap additions, and guideline improvements. The interpretive bridge between research (facts) and living docs (architecture). Includes target-section overlap check before planting. Completes the research lifecycle: tools-research (evaluate) -> research-tracking (track) -> design-harvest (integrate). |
 | **transcript-harvest** | Technique (stub) | Harvesting content from transcripts (video, podcast, meeting, voice memo) into project documents. |
 | **document-harvest** | Technique (stub) | Harvesting content from articles, clippings, and web content into project documents. |
 
@@ -30,6 +30,15 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **repo-research** | tools-research | 2026-03-27 |
 | **session-handoff** | session-closer | 2026-03-26 |
 | **research** (Seed version) | dw-research-workflow (Workshop/Agents/) | 2026-03-26 |
+
+## Workshop Skills (DW-Specific)
+
+Skills that depend on DW infrastructure (tracking index, triage docs, two-vault architecture). Not portable to other projects. Live in `Workshop/Skills - DW Workshop/`.
+
+| Skill | Description |
+|---|---|
+| **dw-research-workflow** | DW-specific research orchestration: Reddit triage campaigns, two-vault architecture, cross-project routing, git repo collection. Layers on tools-research + research-tracking + design-harvest. |
+| **batch-triage** | Cluster-level triage with integrated design harvesting. Pre-filters items by harvest potential, runs two-speed evaluation (sweep for dismissals, harvest for design-relevant finds), updates all DW tracking infrastructure in one pass. Layers on tools-research + research-tracking + design-harvest. |
 
 ## Skill Format
 

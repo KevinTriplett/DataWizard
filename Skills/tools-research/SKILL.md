@@ -7,6 +7,9 @@ description: >-
   external systems against current architecture, working through a triage list
   of flagged items, or any link or resource that needs investigation. Covers
   both single-target deep dives and batch triage passes.
+type: skill
+updated: '2026-03-28'
+version: '1.2'
 ---
 
 # Tools Research
@@ -50,16 +53,39 @@ workflow linearly: read the source, go deep, write the note.
 Working through a list of flagged items. The rhythm is different:
 
 1. Scan the batch and mentally cluster related items
-2. Read a cluster of related items together
-3. During reading, harvest standout details (see below)
-4. Assess depth for each item in the cluster
-5. After the cluster, do a batch synthesis step
-6. Write outputs (notes for moderate/deep, inline verdicts for light)
-7. Update tracking for the whole batch at once
-8. Plant synthesis findings in target design docs (see below)
+2. Pre-filter by harvest potential (see below)
+3. Read a cluster of related items together, using two-speed
+   processing (see below)
+4. During reading, harvest standout details (see below)
+5. Assess depth for each item in the cluster
+6. After the cluster, do a batch synthesis step
+7. Write outputs (notes for moderate/deep, inline verdicts for light)
+8. Update tracking for the whole batch at once
+9. Plant synthesis findings in target design docs (see below)
 
 Batch mode lets you cross-reference items and spot patterns that
 individual evaluation would miss.
+
+**Pre-filtering by harvest potential.** Before reading source
+material, sort each item into sweep (likely dismiss/validate) vs.
+harvest (likely has transferable patterns for design docs). The key
+question is "does this change how we build something?" -- not just
+"is this relevant?" This reframes triage from relevance assessment
+to design impact assessment. Items with harvest potential get read
+carefully; sweep items get titles-and-triage-notes-only treatment.
+This step saves massive context -- a 30-item cluster might have 6
+harvest candidates and 24 sweep items. Ask the user which items
+have harvest potential if the batch is large; their domain knowledge
+is the best filter.
+
+**Two-speed processing.** Within a cluster, switch between sweep
+speed (quick verdict, inline tracking entry, move on) and harvest
+speed (extract patterns, identify target design docs, preserve
+specific formulations) based on what you find. A sweep item can
+escalate to harvest if the source reveals unexpected depth. A
+harvest candidate can downgrade to sweep if the source is thinner
+than expected. The pre-filter is a starting estimate, not a
+commitment.
 
 ### Deep-Read Mode
 

@@ -7,6 +7,9 @@ description: >-
   what we learned', completing a research deep-read or batch and needing to
   update living docs, or any time research has produced findings that should
   change how the project works.
+type: skill
+updated: '2026-03-28'
+version: '1.2'
 ---
 
 # Design Harvest Skill
@@ -70,6 +73,14 @@ finding and propose where it belongs.
 For every target identified in Step 1, re-read the specific section
 that will be updated. Don't rely on memory of the doc from earlier
 in the session -- re-read immediately before proposing changes.
+
+Check for existing planted findings in the target section. Previous
+sessions may have already planted related findings -- adding without
+checking risks contradiction or duplication. If existing findings
+overlap with new ones, integrate rather than append. A section with
+three separate "Session N findings" blocks that partially overlap
+is harder to use than one coherent section that synthesizes across
+sessions.
 
 Note the chunk-context wrapper principle: when reading each target,
 note WHY you're reading it ("Reading this section because Finding X

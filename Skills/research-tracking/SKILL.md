@@ -7,6 +7,9 @@ description: >-
   research tracking', completing a batch of evaluations, noticing research notes
   accumulating without a tracking system, or any time you are about to evaluate
   a tool, repo, framework, or external resource.
+type: skill
+updated: '2026-03-28'
+version: '1.1'
 ---
 
 # Research Tracking
@@ -80,6 +83,7 @@ write those patterns where they belong architecturally:
 
 The tracking index can note which items were processed in the same
 batch, but the pattern itself lives in a document with more context.
+See design-harvest for the full integration workflow.
 
 ## When to Create a Tracking Index
 

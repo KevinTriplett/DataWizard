@@ -5,6 +5,9 @@ description: >-
   Triggers on: 'update our 0.0', 'bring project to DW spec', 'project
   migration', 'write project guidelines', 'set up a new project', or any mention
   of 0.0 files needing creation or updates.
+type: skill
+version: '1.1'
+updated: '2026-03-28'
 ---
 
 # Project Guidelines Skill
@@ -67,8 +70,7 @@ title: Project Guidelines - [Project Name]
 type: project-doc
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-datawizard_protocol_version: "1.7"
-project_instructions_version: "2.5"
+datawizard_protocol_version: "[current]"
 status: active
 ```
 
@@ -91,7 +93,3 @@ status: active
 
 See `_DataWizard/0.0 Project Guidelines - DataWizard.md` for a complex project example.
 
-## See Also
-
-- Migration Dashboard — `_DataWizard/! Project Migration Dashboard.md`
-- Routing Agent Design — `_DataWizard/Workshop/Design/Routing Agent and Dynamic Vault Map.md`

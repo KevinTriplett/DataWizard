@@ -1,7 +1,7 @@
 
 seed: 1.0.0
 protocol: 1.7
-project_instructions: 3.2
+project_instructions: 3.3
 
 ## What's New in 1.0.0
 - Local-first distribution: Seed installs directly into your vault

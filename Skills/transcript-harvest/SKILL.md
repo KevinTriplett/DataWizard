@@ -5,6 +5,9 @@ description: >-
   on: 'harvest from this transcript', 'extract from this recording', processing
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
+type: skill
+updated: '2026-03-28'
+version: '0.1'
 ---
 
 # Transcript Harvest Skill

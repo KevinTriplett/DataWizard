@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.2
+# DW Project Instructions v3.3
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -56,7 +56,10 @@ known intermittent MCP issue.
    exists in _DataWizard/Seed/Skills/. Read the SKILL.md
    fully before starting. Follow it completely.
 8. LARGE FILES: Files >5000 words - suggest chunking into
-   shell + section folder before editing.
+   shell + section folder before editing. Also when READING
+   a file that's notably long or gets truncated, proactively
+   suggest sectioning it. Don't just work around the size -
+   flag it as a candidate for the shell + sections pattern.
 9. SAFE CHARACTERS: In note titles, use plain hyphens (-)
    never em-dashes, and straight quotes never curly quotes.
    In content, avoid these in headings and text you expect
@@ -86,8 +89,14 @@ known intermittent MCP issue.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.2 | 2026-03-26 |
+| Project Instructions | v3.3 | 2026-03-28 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.3
+
+**Large file vigilance on read.** Working Rule 8 expanded: instances now proactively suggest sectioning when they encounter a long or truncated file during reading, not just during editing. Prevents the pattern where instances silently work around file size instead of flagging it.
 
 ---
 

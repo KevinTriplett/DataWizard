@@ -6,6 +6,9 @@ description: >-
   for today', end of any work session. Also triggers when the user says 'let's
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
+type: skill
+updated: '2026-03-28'
+version: '1.1'
 ---
 
 # Session Closer Skill

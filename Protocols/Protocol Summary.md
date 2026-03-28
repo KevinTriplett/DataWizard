@@ -1,13 +1,13 @@
 ---
 title: Protocol Summary
 type: project-doc
-version: '2.4'
+version: '2.5'
 status: active
 created: '2026-03-12'
-updated: '2026-03-25'
+updated: '2026-03-28'
 ---
 
-# DataWizard Protocol Summary (v2.4)
+# DataWizard Protocol Summary (v2.5)
 
 *Quick reference for agents. This document is NOT read during orientation - it's a reference you read when you need it for a specific task like DW review, project setup, or protocol questions.*
 
@@ -30,9 +30,10 @@ updated: '2026-03-25'
 
 1. **Version check**: Fetch VERSION.md from GitHub, compare against local Seed. Follow VERSION.md instructions for mismatches.
 2. **Read 0.0 Project Guidelines** in full (project context).
-3. **Read session log** (0.2) - last 2-3 entries. The "What's next" section tells you where to pick up.
-4. **Read action items** if the file exists.
-5. **Ready to work** - read Seed docs as needed for specific tasks.
+3. **Read 0.1 MOC** for file inventory and status overview.
+4. **Read session log** (0.2) - last 2-3 entries. The "What's next" section tells you where to pick up.
+5. **Read action items** if the file exists.
+6. **Ready to work** - read Seed docs as needed for specific tasks.
 
 ## Version Update Flow
 
@@ -45,8 +46,8 @@ Version update instructions now live in VERSION.md itself. When orientation dete
 | 0.0 | Project Guidelines - Project Name | Always |
 | 0.1 | MOC - Project Name | Always |
 | 0.2 | Session Log - Project Name | Always |
-| 0.3 | Decision Log - Project Name | Usually |
-| 0.4 | Harvest Log - Project Name | When harvesting |
+| 0.3 | Decision Log - Project Name | Always |
+| 0.4 | Harvest Log - Project Name | On first harvest |
 | 0.6 | Related Notes - Project Name | Recommended |
 
 All infrastructure files MUST include the project name after a hyphen to be uniquely identifiable across the vault. Use plain hyphens (`-`), never em-dashes (`—`).
@@ -133,7 +134,7 @@ Most recent first. LLMs: read last 2-3 entries only — the "What's next" sectio
 
 **Writing a good "What's next":** Write it as if briefing a new team member who has read the 0.0 but nothing else. Include: specific file paths to read (not just topic names), why this work matters and how it connects to the larger arc, what depends on what (sequence matters), and which items are the main focus vs side tasks. The goal is that a fresh instance reading "What's next" can jump straight into productive work without needing a separate handoff message from the user.
 
-**Chunk long session logs.** When a session log exceeds ~10 entries or ~5000 words, convert to shell + section folder pattern. Shell contains embeds; individual sessions become section files in `0.2 Session Log - Project/`. Instances read only the last 2-3 section files for orientation.
+**Shell + sections from day one.** Session logs use shell + section folder architecture from the start. The shell (`0.2 Session Log - Project.md`) contains `![[embed]]` references; each session entry is its own file in `~Sections/Session Log - Project/`. This keeps orientation fast and avoids restructuring later.
 
 ## Citation Format
 ```
@@ -141,18 +142,17 @@ Most recent first. LLMs: read last 2-3 entries only — the "What's next" sectio
 ```
 
 ## Archiving
-- Move to `xArchive/` folder — don't leave in place
+- Move to `~Archive - ProjectName/` folder — don't leave in place
 - Don't rename — keep original filename for wikilinks
 - Add `> ⚠️ Archived (YYYY-MM-DD). Superseded by [[New File]].` at top
 
 ## Shell + Section Architecture
 - Shell contains only `![[embed]]` references — never edit directly
 - Section files hold content — always edit these
-- Shell file and section subfolder share the same name (e.g., `My Document.md` + `My Document/`)
+- Section subfolders live in `~Sections/` to keep the project root clean. Shell files stay in the root.
 - Section numbering starts at 1.0 (not 0.0)
 - Section YAML: `parent: "[[Shell Name]]"` and `section: N` (matching the filename prefix)
 - 5+ sections → create a section subfolder
-- For projects with multiple shell documents, use a `! Master Documents/` folder for shells and action items, keeping them separate from section subfolders
 - Empty folders cannot be deleted via MCP — when files are moved out, the human deletes the empty folder manually in Obsidian
 
 ## Companion Notes

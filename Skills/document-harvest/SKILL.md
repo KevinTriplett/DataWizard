@@ -6,6 +6,9 @@ description: >-
   'extract insights from this doc', processing sources with harvest_status:
   pending, or hand-highlighted documents. NOT for transcripts - use
   transcript-harvest instead.
+type: skill
+updated: '2026-03-28'
+version: '0.1'
 ---
 
 # Document Harvest Skill
