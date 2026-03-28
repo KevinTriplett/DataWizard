@@ -27,6 +27,8 @@ actually propagate into the documents that instances read.
 
 - After completing a research deep-read or batch that produced
   actionable findings
+- After batch triage synthesis -- when patterns emerged across
+  multiple evaluated items that are relevant to specific design docs
 - When an integration memo exists with a findings-to-design-doc
   mapping table
 - When the user says "what should we update based on this"
@@ -34,6 +36,11 @@ actually propagate into the documents that instances read.
   tagged as design doc updates
 - During a session that started with research and naturally
   transitions into implementation
+
+Design harvest applies to any research output that produces findings
+relevant to design docs -- deep-read research notes, batch triage
+synthesis, or ad-hoc discoveries. The source format differs but the
+five-type classification and placement logic are the same.
 
 ### When NOT to Use
 
@@ -49,7 +56,7 @@ actually propagate into the documents that instances read.
 Read the research note(s) being harvested from. Look for:
 - Explicit findings-to-design-doc mapping tables (integration memos
   have these)
-- "Follow-Up Actions" or "DW Design Decision Mapping" sections
+- "Follow-Up Actions" or "Design Decision Mapping" sections
 - Findings tagged with design doc names or decision numbers
 - Validated patterns (things that confirm existing choices)
 - Identified gaps (things the project should be doing but isn't)
@@ -144,6 +151,15 @@ research surfaced but that doesn't belong inline in a design doc.
 
 ## Principles
 
+- **Research findings live where the future work happens, not where
+  the research happened.** Research tracking answers "has this been
+  evaluated?" The session log captures what happened chronologically.
+  Neither is read when starting task-specific work. Design docs are.
+  If a finding matters for retrieval, it belongs in the retrieval
+  design doc. If it matters for the transcript pipeline, it belongs
+  in the transcript spec. This is the core reason design harvest
+  exists -- bridging the gap between where research is done and
+  where research is needed.
 - **Don't duplicate the research note.** The design doc should
   reference the finding and its implication, not reproduce the
   full analysis. Link back to the research note for evidence.

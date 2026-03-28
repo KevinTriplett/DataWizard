@@ -56,6 +56,7 @@ Working through a list of flagged items. The rhythm is different:
 5. After the cluster, do a batch synthesis step
 6. Write outputs (notes for moderate/deep, inline verdicts for light)
 7. Update tracking for the whole batch at once
+8. Plant synthesis findings in target design docs (see below)
 
 Batch mode lets you cross-reference items and spot patterns that
 individual evaluation would miss.
@@ -112,6 +113,18 @@ can't be reconstructed.
    the pattern where it belongs architecturally -- a design doc, a
    session log learning, a note in a relevant skill. Not in the
    tracking index.
+8. **Plant findings in target design docs** (batch mode only). After
+   synthesis, identify which design docs each finding is relevant to.
+   Write a short dated subsection in each target doc with the specific
+   findings and pointers to tracking entries, repos, or source material.
+   This is what makes batch research findable when it becomes relevant
+   -- a future instance working on that system will read the design doc
+   and find the findings waiting there. Without this step, synthesis
+   patterns live only in research tracking (an anti-duplication tool,
+   not a discovery tool) and session logs (not read during task-specific
+   work). Research tracking records WHAT was evaluated. Design docs
+   carry WHAT WAS LEARNED. Queued items connect specific resources to
+   specific future triggers. All three layers are needed.
 
 ## Calibrating Depth
 
@@ -146,6 +159,13 @@ Even at light depth, record the evaluation. A brief verdict saying
   the specific formulations and details that make insights concrete.
   "Community validates markdown-first" is less useful than the specific
   failure modes and design constraints people described.
+- **Skipping the planting step.** After batch synthesis, findings must
+  be planted in the design docs where future work happens. Rich
+  tracking entries feel like the work is done, but no one scrolls
+  through dozens of tracking rows when starting a new workstream. If a
+  finding is relevant to a specific system, it belongs in that system's
+  design doc. The principle: research findings should live where the
+  future work happens, not where the research happened.
 
 ## See Also
 
