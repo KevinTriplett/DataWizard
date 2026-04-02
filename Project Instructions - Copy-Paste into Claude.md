@@ -3,7 +3,7 @@ title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-03-26'
+updated: '2026-04-02'
 tags:
   - protocol
   - AI-collaboration
@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.3
+# DW Project Instructions v3.4
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -52,18 +52,34 @@ known intermittent MCP issue.
 5. VERIFY: Confirm success after any write/patch/move before
    retrying. Silent success + retry = duplicate content.
 6. ASK: When uncertain about anything, ask rather than assume.
-7. SKILLS: Before starting any major task, check if a skill
-   exists in _DataWizard/Seed/Skills/. Read the SKILL.md
-   fully before starting. Follow it completely.
-8. LARGE FILES: Files >5000 words - suggest chunking into
+7. LARGE FILES: Files >5000 words - suggest chunking into
    shell + section folder before editing. Also when READING
    a file that's notably long or gets truncated, proactively
    suggest sectioning it. Don't just work around the size -
    flag it as a candidate for the shell + sections pattern.
-9. SAFE CHARACTERS: In note titles, use plain hyphens (-)
+8. SAFE CHARACTERS: In note titles, use plain hyphens (-)
    never em-dashes, and straight quotes never curly quotes.
    In content, avoid these in headings and text you expect
    to patch. They cause patch_note to fail on matching.
+
+## Skills
+Seed Skills (general skills applicable to all projects) live
+in _DataWizard/Seed/Skills/. Project-specific skills live in
+the project home folder under Skills/.
+Read the full SKILL.md before using any skill. Follow it
+completely. Skills apply to lifecycle transitions (session
+close, project setup) not just content tasks.
+
+Seed Skills:
+  session-closer: End-of-session log entry, learnings, handoff.
+  project-guidelines: Creating or updating 0.0 Project Guidelines.
+  research-tracking: Tracking research to prevent duplicate work.
+  tools-research: Evaluating external tools, repos, frameworks.
+  design-harvest: Planting research findings into design docs.
+  transcript-harvest: Harvesting transcripts into project docs.
+  document-harvest: Harvesting articles/clippings into project docs.
+
+See _DataWizard/Seed/SKILLS.md for full catalog.
 
 ## Orientation (once per thread)
 1. Fetch VERSION.md from GitHub API:
@@ -81,7 +97,7 @@ known intermittent MCP issue.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.2).*
+*Re-paste only when the Project Instructions version changes (currently v3.4).*
 
 ---
 
@@ -89,12 +105,14 @@ known intermittent MCP issue.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.3 | 2026-03-28 |
+| Project Instructions | v3.4 | 2026-04-02 |
 | Seed | v1.0.0 | 2026-03-25 |
 
 ---
 
-## What Changed in v3.3
+## What Changed in v3.4
+
+**Skills section replaces Rule 7.** The old SKILLS rule ("check if a skill exists before major tasks") is replaced by a dedicated `## Skills` section listing all Seed skills with one-line descriptions. Instances now know what skills exist from the system prompt -- no MCP scan needed for discovery. The section also explicitly includes lifecycle transitions (session close, project setup) as skill triggers, fixing the gap where instances missed skills like session-closer because closing a session didn't feel like a "major task." Project-specific skills are referenced generically (project home folder under Skills/) to keep the PI universal across projects. Working Rules renumbered: old 8 (LARGE FILES) becomes 7, old 9 (SAFE CHARACTERS) becomes 8.
 
 **Large file vigilance on read.** Working Rule 8 expanded: instances now proactively suggest sectioning when they encounter a long or truncated file during reading, not just during editing. Prevents the pattern where instances silently work around file size instead of flagging it.
 
