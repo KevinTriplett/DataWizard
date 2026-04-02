@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-03-28'
-version: '1.1'
+updated: '2026-03-31'
+version: '1.3'
 ---
 
 # Session Closer Skill
@@ -42,12 +42,47 @@ Scan the conversation for:
 
 Follow the output format below. Write the full entry and present it in chat for user approval. **Present the "What's next" section separately in chat** so the user can review and confirm the plan for next session before it gets written to the vault.
 
+> **Harvest sessions:** For sessions that are primarily harvest work, the session log entry may already be partially written as part of the end-of-harvest checklist (which includes a session log update). In that case, the session closer adds Learnings and What's Next to the existing entry rather than writing a full entry from scratch. Check whether a partial entry already exists before drafting.
+
 ### Step 3: Get approval and write
 
 Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
 1. Re-read the session log shell to get the current section number and embed list
 2. Write the new section file to the session log folder
 3. Patch the shell to add the embed reference for the new section
+
+> **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
+
+### Step 3.5: Knowledge transfer check
+
+**Before moving to infrastructure updates, ask the user:**
+
+"Is there anything else from this session that needs to be
+documented in more detail before we close? I want to make sure
+we've transferred the details of what we learned into the
+appropriate design docs, skills, and tracking files -- not just
+the session log."
+
+This is not optional. The session log captures WHAT happened,
+but detailed findings belong in the docs where future work
+happens.
+
+> **Harvest sessions:** In a harvest session, the entire session is knowledge transfer -- every chunk writes findings into destination documents. The check is still valuable (use it to verify nothing remains only in chat), but recognize that harvest sessions are inherently knowledge-transfer-complete in a way that design or build sessions aren't.
+
+A learning noted in the session log as "discovered X
+pattern" is far less useful than that same pattern written into
+the relevant skill or design doc with full context.
+
+Scan your own context for:
+- Findings that are only in chat, not yet in any vault file
+- Patterns described in Learnings that should also live in a
+  skill or design doc
+- Tool evaluations discussed but not added to the tracking index
+- Design implications mentioned but not planted in design docs
+- Decisions made but not logged in the decision log
+
+If everything has been planted, say so and move on. If not,
+propose what still needs writing and where it goes.
 
 ### Step 4: Update related infrastructure files
 
@@ -102,7 +137,8 @@ than conversation summaries.)
   (decision, tool, research, conversation) that produced the insight.
 
 Categories: pattern-confirmed, pattern-discovered, tool-behavior,
-decision-validated, assumption-invalidated, edge-case
+decision-validated, assumption-invalidated, edge-case,
+routing-heuristic, harvest-pattern
 
 If no learnings this session, write: "No new learnings this session."
 
@@ -187,4 +223,10 @@ The session title should capture the main theme in 3-8 words. Use plain hyphens,
 
 ## Synthesis Check
 
-Before closing, verify: if this session involved multi-item analysis (research batches, triage passes, cross-doc comparisons), have the cross-cutting findings been captured? Synthesis degrades across context boundaries but mechanical execution doesn't. If the thinking hasn't been written down yet (as an integration memo, design doc update, or explicit "Learnings" entry), capture it now — before the session log, not after. See [[Context and Session Management]] for the rationale.
+Before closing, verify two things:
+
+1. **Cross-cutting synthesis.** If this session involved multi-item analysis (research batches, triage passes, cross-doc comparisons), have the cross-cutting findings been captured? Synthesis degrades across context boundaries but mechanical execution doesn't. If the thinking hasn't been written down yet (as an integration memo, design doc update, or explicit "Learnings" entry), capture it now -- before the session log, not after.
+
+2. **Knowledge transfer completeness.** The session log is a handoff document, not a knowledge store. Detailed findings, patterns, tool evaluations, and architectural implications belong in design docs, skills, and tracking files where future instances will encounter them during task-specific work. If a finding only exists in the session log, it will likely be missed -- future instances read the last 2-3 session entries for orientation, then work from design docs and skills. Always ask: "would a future instance working on [relevant topic] find this in the doc they'd naturally read?" If not, plant it there.
+
+See [[Context and Session Management]] for the rationale.

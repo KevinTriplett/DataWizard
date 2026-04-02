@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-03-28'
+updated: '2026-04-02'
 ---
 
 # DataWizard Skills
@@ -25,11 +25,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 
 ## Archived Skills
 
-| Skill | Superseded By | Date |
-|---|---|---|
-| **repo-research** | tools-research | 2026-03-27 |
-| **session-handoff** | session-closer | 2026-03-26 |
-| **research** (Seed version) | dw-research-workflow (Workshop/Agents/) | 2026-03-26 |
+Retired skills live in `Workshop/~Archive - Skills/`. See there for superseded skill files and history.
 
 ## Workshop Skills (DW-Specific)
 
