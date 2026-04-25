@@ -6,8 +6,8 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-04-24'
-version: '0.2'
+updated: '2026-04-25'
+version: '0.3'
 ---
 
 # Transcript Harvest Skill
@@ -37,20 +37,24 @@ Harvest content from transcripts (video, podcast, meeting, voice memo) into proj
 3. **Check segmentation** — look for `segmented: true` in YAML. If missing, the transcript needs `##` section headers first. Either run `segment_transcript.py` or add headers manually.
 4. **Read the transcript** — understand the full content before extracting anything.
 5. **Harvest into destination docs** — synthesize relevant content into project documents. Use citation format: `([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]])`. Don't transcribe — synthesize.
-6. **Update source YAML** — set `harvest_status: harvested`, add `harvested_into:` with `[[wikilink]]` to each destination doc, set `harvested_date:`.
+6. **Update source YAML** -- set `harvest_status`, `harvested_into` (with section-level anchors), `harvest_date`, and `harvest_notes`. For re-harvests, append to `harvested_into` and convert `harvest_date` to an array (most recent last). Or set `harvest_status: reviewed` with `harvest_notes` explaining why nothing was harvested.
+7. **Update Harvest Ledger** -- add or update a row in `0.4 Harvest Ledger - [Project].md` with source, harvest date, destinations, and agent.
+8. **Session log** -- add harvest details to `0.2 Session Log.md` at the end of the session as part of normal session logging -- not after each individual source.
 
 ## Common Mistakes
 
-- Harvesting without checking segmentation first — citations can't deep-link without `##` headers
-- Transcribing instead of synthesizing — one idea per paragraph, don't reproduce the conversation
-- Flattening tensions and disagreements — preserve nuance
-- Forgetting to update source YAML — the next agent won't know this was already processed
-- Harvesting without checking project assignment — content ends up in the wrong project docs or gets orphaned
-- Processing multiple sources without completing all 6 steps per source first
+- Harvesting without checking segmentation first -- citations can't deep-link without `##` headers
+- Transcribing instead of synthesizing -- one idea per paragraph, don't reproduce the conversation
+- Flattening tensions and disagreements -- preserve nuance
+- Forgetting to update source YAML -- the next agent won't know this was already processed
+- Skipping `harvest_notes` -- the "commit message" is the most valuable part, especially for `reviewed` or partial harvests
+- Forgetting the Harvest Ledger -- source YAML is the truth, but the ledger is how humans and agents scan routing at a glance
+- Harvesting without checking project assignment -- content ends up in the wrong project docs or gets orphaned
+- Processing multiple sources without completing all 8 steps per source first (session log excepted -- that waits til end)
 
 ## Principles
 
-- Treat each source as one atomic unit — complete all six steps before the next source
+- Treat each source as one atomic unit -- complete steps 1-7 before the next source (step 8 waits til session end)
 - Synthesize, don't transcribe. One idea per paragraph.
 - Preserve tensions and disagreements — don't flatten nuance.
 - Include speaker attribution where relevant.
@@ -58,6 +62,9 @@ Harvest content from transcripts (video, podcast, meeting, voice memo) into proj
 
 ## See Also
 
-- Protocol Section 7 (Editorial Principles)
-- Protocol Section 8 (Transcript Preparation)
-- Protocol Section 9 (Citations and Source Tags)
+- [[Harvest Workflow Guide]] -- full walkthrough with examples and edge cases
+- Protocol Section 5 (YAML Schema) -- harvest field definitions
+- Protocol Section 7 (Harvest Checklist) -- the 3-step post-harvest checklist
+- Protocol Section 8 (Editorial Principles)
+- Protocol Section 9 (Transcript Preparation)
+- Protocol Section 10 (Citations and Source Tags)
