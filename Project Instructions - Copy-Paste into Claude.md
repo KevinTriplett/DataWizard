@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.4
+# DW Project Instructions v3.5
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -61,6 +61,10 @@ known intermittent MCP issue.
    never em-dashes, and straight quotes never curly quotes.
    In content, avoid these in headings and text you expect
    to patch. They cause patch_note to fail on matching.
+9. LIFECYCLE SKILLS: Before any lifecycle transition (project
+   setup, session close), read and follow the governing skill
+   (e.g. project-guidelines, session-closer). Do not write
+   lifecycle artifacts from pattern-matching.
 
 ## Skills
 Seed Skills (general skills applicable to all projects) live
@@ -93,11 +97,16 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 3. Read 0.2 Session Log (last 2-3 entries only). The most
    recent "What's next" section tells you where to pick up.
 4. Read action items file if one exists.
-5. Ready to work. Read Seed docs (protocols, taxonomy,
+5. State the session number and propose a thread name.
+   Format: ProjectAbbrev SNN - expected focus (no date).
+   Base it on "What's next" and any user direction.
+6. Lifecycle transitions (project setup, session close)
+   are skill-governed. Read the skill before executing.
+7. Ready to work. Read Seed docs (protocols, taxonomy,
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.4).*
+*Re-paste only when the Project Instructions version changes (currently v3.5).*
 
 ---
 
@@ -105,8 +114,18 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.4 | 2026-04-02 |
+| Project Instructions | v3.5 | 2026-04-24 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.5
+
+**Lifecycle skills rule (Working Rule 9).** Agents must read the governing skill before any lifecycle transition (project setup, session close). Names the two key skills inline (project-guidelines, session-closer) so instances don't have to cross-reference. Fixes the pattern where agents skip skill-governed workflows by pattern-matching from prior session log entries instead of following the skill.
+
+**Thread naming in orientation (step 5).** After completing orientation, the instance states the session number and proposes a provisional thread name. Format: `ProjectAbbrev SNN - expected focus` (no date). Based on "What's next" from the previous session plus any user direction. Session-closer skill handles the final rename at session end.
+
+**Lifecycle reminder in orientation (step 6).** Explicit note that lifecycle transitions are skill-governed. Reinforces Working Rule 9 at the moment when instances are loading their session plan.
 
 ---
 
