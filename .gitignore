@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Obsidian workspace (per-user, not for sync)
+.obsidian/
+.trash/
+
+# User-specific config
+Vault Config.md
