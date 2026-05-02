@@ -9,7 +9,7 @@ scope: seed
 
 > **This is the Multi-Project setup for DW Save.** For an overview of DW Save (what it is, Single vs Multi-Project, backup scheduling guidance), see Git Guide Section 5.5. This guide covers the Multi-Project path only -- use it when your vault contains multiple separate git repos that all need to sync with one keystroke.
 
-This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs collaborative project repos (like ReWoven, Weave) via git. It replaces Obsidian Relay with direct git sync through GitHub.
+This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs your shared git repos via git. It replaces Obsidian Relay with direct git sync through GitHub. "Shared repos" means any repo inside your vault that pushes to GitHub -- collaborative projects (like ReWoven, Weave) and the DW Seed itself.
 
 ## What It Does
 
@@ -28,10 +28,13 @@ The script reads repo paths from `~/.datawizard-sync.conf`. Create this file wit
 
 ```bash
 cat > ~/.datawizard-sync.conf << 'EOF'
-# DataWizard collaborative project repos
-# Add one absolute path per line
+# DataWizard shared repos -- one absolute path per line
+# Include the DW Seed AND any collaborative project repos.
 
-# Example:
+# The Seed (always include this):
+# /Users/yourname/Vaults/YourVault/_DataWizard/Seed
+
+# Collaborative project repos:
 # /Users/yourname/Vaults/YourVault/_ProjectName/Project Shared
 EOF
 ```
@@ -218,3 +221,5 @@ If a user asks you to help set up sync for a new project, the steps are:
 3. Add the repo path to `~/.datawizard-sync.conf`
 4. Exclude the folder from the vault-level `.gitignore`
 5. Test with `dwsync` or `bash ~/Scripts/datawizard-sync.sh`
+
+Also verify the DW Seed path (`_DataWizard/Seed`) is in the config -- it's easy to add collaborative repos and forget the Seed itself.
