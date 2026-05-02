@@ -1,13 +1,13 @@
 ---
 title: Protocol Summary
 type: project-doc
-version: '2.5'
+version: '2.6'
 status: active
 created: '2026-03-12'
-updated: '2026-03-28'
+updated: '2026-05-02'
 ---
 
-# DataWizard Protocol Summary (v2.5)
+# DataWizard Protocol Summary (v2.6)
 
 *Quick reference for agents. This document is NOT read during orientation - it's a reference you read when you need it for a specific task like DW review, project setup, or protocol questions.*
 
@@ -134,7 +134,7 @@ Most recent first. LLMs: read last 2-3 entries only — the "What's next" sectio
 
 **Writing a good "What's next":** Write it as if briefing a new team member who has read the 0.0 but nothing else. Include: specific file paths to read (not just topic names), why this work matters and how it connects to the larger arc, what depends on what (sequence matters), and which items are the main focus vs side tasks. The goal is that a fresh instance reading "What's next" can jump straight into productive work without needing a separate handoff message from the user.
 
-**Shell + sections from day one.** Session logs use shell + section folder architecture from the start. The shell (`0.2 Session Log - Project.md`) contains `![[embed]]` references; each session entry is its own file in `~Sections/Session Log - Project/`. This keeps orientation fast and avoids restructuring later.
+**Shell + sections from day one.** Session logs use shell + section folder architecture from the start. The shell (`0.2 Session Log - Project.md`) contains `![[embed]]` references; each session entry is its own file in `_Sections - Project/Session Log/`. This keeps orientation fast and avoids restructuring later.
 
 ## Citation Format
 ```
@@ -142,14 +142,17 @@ Most recent first. LLMs: read last 2-3 entries only — the "What's next" sectio
 ```
 
 ## Archiving
-- Move to `~Archive - ProjectName/` folder — don't leave in place
+- Move to `_Archive - ProjectName/` folder — don't leave in place
 - Don't rename — keep original filename for wikilinks
 - Add `> ⚠️ Archived (YYYY-MM-DD). Superseded by [[New File]].` at top
 
 ## Shell + Section Architecture
 - Shell contains only `![[embed]]` references — never edit directly
 - Section files hold content — always edit these
-- Section subfolders live in `~Sections/` to keep the project root clean. Shell files stay in the root.
+- Shell files live in **domain folders** appropriate to their content (e.g., `Project Synth Documents/`, `Project Story/`). Lightweight projects may keep shells at the project root.
+- Section files live in `_Sections - ProjectName/` in a subfolder that mirrors the shell's name (e.g., `_Sections - ProjectName/Session Log/1.0 First Entry.md`). Section folders are siblings of shell folders, not children.
+- Meta-folders use `_` prefix with project name suffix: `_Sections - ProjectName/`, `_Infrastructure - ProjectName/`, `_Archive - ProjectName/`. The `_` prefix is shell-safe and sorts to top.
+- Section headers use plain numeric prefixes matching section filenames. No Roman numerals in shell structure (e.g., `## 3. Data Sovereignty`, not `## III.`).
 - Section numbering starts at 1.0 (not 0.0)
 - Section YAML: `parent: "[[Shell Name]]"` and `section: N` (matching the filename prefix)
 - 5+ sections → create a section subfolder

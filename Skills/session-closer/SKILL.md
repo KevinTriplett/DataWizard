@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-03-31'
-version: '1.3'
+updated: '2026-04-25'
+version: '1.4'
 ---
 
 # Session Closer Skill
@@ -53,7 +53,11 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 
 > **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
 
-### Step 3.5: Knowledge transfer check
+### Step 3.5: Suggest final thread name
+
+Suggest a final thread name for the session. Format: `checkmark ProjectAbbrev SNN - brief description` (e.g., `√ DW S43 - Weave git migration final stage`). The checkmark prefix signals the session is complete. Base the description on what actually happened, not the provisional name from orientation.
+
+### Step 3.6: Knowledge transfer check
 
 **Before moving to infrastructure updates, ask the user:**
 
@@ -89,7 +93,7 @@ propose what still needs writing and where it goes.
 Check whether the session produced work that belongs in other files:
 - **Action items**: Check off completed items, add new ones. Optional but recommended.
 - **Decision log**: If decisions were made during the session (agreements, vision refinements, commitments, technical choices, scope changes), they belong as separate entries in the Decision Log. Note them in "What happened" and point to the Decision Log entry.
-- **Harvest log**: If harvesting was done during the session, update the Harvest Log with what was harvested, from which sources, and into which project notes.
+- **Harvest ledger**: If harvesting was done during the session, verify the Harvest Ledger was updated as part of the harvest checklist. If not, update `0.4 Harvest Ledger - [Project].md` now.
 
 Propose specific changes for each file. Get approval before writing.
 
@@ -219,7 +223,7 @@ The session title should capture the main theme in 3-8 words. Use plain hyphens,
 - **Session log shell** (`0.2 Session Log - Project.md`): Add an embed reference (`![[section filename]]`) to the shell after creating the section file.
 - **Action items**: Check off completed items, add new ones. Optional but recommended.
 - **Decision log**: Decisions belong as separate numbered entries. The session log references them but doesn't replace them.
-- **Harvest log**: Harvesting work gets its own log entry with source, output, and status.
+- **Harvest ledger**: If harvesting was done, update `0.4 Harvest Ledger - [Project].md` with source, destinations, and agent. Source YAML should already be updated as part of the harvest checklist.
 
 ## Synthesis Check
 

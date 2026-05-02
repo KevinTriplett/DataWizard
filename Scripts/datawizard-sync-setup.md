@@ -7,6 +7,8 @@ scope: seed
 
 # DataWizard Sync Setup Guide
 
+> **This is the Multi-Project setup for DW Save.** For an overview of DW Save (what it is, Single vs Multi-Project, backup scheduling guidance), see Git Guide Section 5.5. This guide covers the Multi-Project path only -- use it when your vault contains multiple separate git repos that all need to sync with one keystroke.
+
 This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs collaborative project repos (like ReWoven, Weave) via git. It replaces Obsidian Relay with direct git sync through GitHub.
 
 ## What It Does
