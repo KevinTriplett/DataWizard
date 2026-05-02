@@ -23,10 +23,11 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **transcript-harvest** | Technique (stub) | Harvesting content from transcripts (video, podcast, meeting, voice memo) into project documents. |
 | **document-harvest** | Technique (stub) | Harvesting content from articles, clippings, and web content into project documents. |
 | **harvest-router** | Technique | Scanning the vault for unharvested content and routing it to the right projects. Moves files to correct content folders, sets routing YAML, appends action items. The upstream skill in the harvest pipeline -- it routes, transcript-harvest and document-harvest execute. |
+| **git-onboarding** | Technique | Walking a new collaborator through git setup for a vault or DW project. Gathers variables, guides through setup interactively, sets up DW Save (Cmd+Shift+S) with backup scheduling, and generates a project-specific onboarding guide. Uses the Git Guide (`Seed/Guides/Git Guide.md`) as reference. |
 
 ## Archived Skills
 
-Retired skills live in `Workshop/~Archive - Skills/`. See there for superseded skill files and history.
+Retired skills live in `Workshop/_Archive - Skills/`. See there for superseded skill files and history.
 
 ## Workshop Skills (DW-Specific)
 

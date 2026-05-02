@@ -6,8 +6,8 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-04-25'
-version: '0.3'
+updated: '2026-04-27'
+version: '0.4'
 ---
 
 # Transcript Harvest Skill
@@ -52,11 +52,23 @@ Harvest content from transcripts (video, podcast, meeting, voice memo) into proj
 - Harvesting without checking project assignment -- content ends up in the wrong project docs or gets orphaned
 - Processing multiple sources without completing all 8 steps per source first (session log excepted -- that waits til end)
 
+## Routing Patterns
+
+### Research brief as harvest destination
+
+When a transcript contains a researcher's verbal walkthrough of their work -- describing what documents they found, what's in a folder, what seems high leverage -- the harvest output can be the research brief the researcher didn't have time to write. This is especially common in collaborative projects where one person does research and another does synthesis.
+
+The brief becomes a new file (not a patch to an existing doc) with: which documents were mentioned, which ones the researcher flagged as high leverage, and enough context for the next person or agent to know where to start. Tag with `priority: high` and `type: research-brief`.
+
+Example: Weave Session 24 harvested a Kaliya-Andrew call where Kaliya walked through her Exploring Funding research. The harvest output was `Exploring Funding - Research Brief.md` -- the brief Andrew had asked her to write, assembled from her verbal tour.
+
+This pattern applies when: (a) the transcript is someone describing research they've done, (b) no written brief exists yet, (c) the research is in a folder or set of documents that others need to navigate. The brief is a harvest destination alongside the usual synth docs.
+
 ## Principles
 
 - Treat each source as one atomic unit -- complete steps 1-7 before the next source (step 8 waits til session end)
 - Synthesize, don't transcribe. One idea per paragraph.
-- Preserve tensions and disagreements — don't flatten nuance.
+- Preserve tensions and disagreements -- don't flatten nuance.
 - Include speaker attribution where relevant.
 - Extract `lexicon_candidates` if the transcript contains novel language or framings.
 

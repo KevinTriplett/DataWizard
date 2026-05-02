@@ -1,7 +1,19 @@
 
-seed: 1.0.0
+seed: 1.1.0
 protocol: 1.7
 project_instructions: 3.5
+
+## What's New in 1.1.0
+- Meta-folder convention: `_` prefix replaces `~` for Sections, Archive, Infrastructure (D71)
+- `- ProjectName` suffix on meta-folders for vault-wide search disambiguation (D71)
+- Shells live in domain folders, not project root (D72)
+- No Roman numerals in section headers (D73)
+- Project-prefix convention for domain folders (D74)
+- Per-document session log naming: `0.01 Session Log - [Doc Name].md` (D75)
+- Protocol Summary v2.6 with clear shell + section architecture explanation
+- Vault Bootstrap folder template updated with new structure
+- Archiving protocol updated for `_Archive - ProjectName/`
+- Shell + section recommended phrasing added to Vault Bootstrap for 0.0 files
 
 ## What's New in 1.0.0
 - Local-first distribution: Seed installs directly into your vault

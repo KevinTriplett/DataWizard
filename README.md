@@ -18,6 +18,7 @@ The goal is not to read everything yourself. It's to build a system that reads f
 - Routes content into the right place in Obsidian automatically
 - Manages multi-project infrastructure with consistent conventions
 - Coordinates multiple AI agents working in the same vault
+- Saves and syncs your work with one keystroke (DW Save: Cmd+Shift+S)
 
 **Core principles:** local-first, markdown-native, modular pipelines, progressive enrichment, draft-then-approve collaboration.
 
@@ -96,7 +97,9 @@ Replace contents with (substituting your vault path):
 
 Before going further, make sure your vault is backed up. The recommended method is a private git repository.
 
-If you already have backups set up, skip ahead. If not, your Seed includes a setup guide at `_DataWizard/Seed/Guides/Git Backup Setup - Claude-Guided Walkthrough.md`. You can ask Claude to walk you through it after completing step 5.
+If you already have backups set up, skip ahead. If not, your Seed includes a comprehensive Git Guide at `_DataWizard/Seed/Guides/Git Guide.md` covering setup, daily workflow, safety, recovery, and local backups. You can ask Claude to walk you through it after completing step 5 — it has a git-onboarding skill designed for exactly this.
+
+As part of git setup, you'll configure **DW Save** (Cmd+Shift+S) — your one-keystroke save that commits and pushes your work to GitHub. See Git Guide Section 5.5.
 
 ### 5. Create a Claude Project
 
@@ -138,21 +141,27 @@ _DataWizard/Seed/
     Protocol Summary.md                   - Quick reference
     Content Type Taxonomy.md              - 20 content types for classification
   SKILLS.md                               - Available skills catalog
-  Skills/                                 - See SKILLS.md for details
+  Skills/                                 - See SKILLS.md for full catalog
     project-guidelines/SKILL.md
-    repo-research/SKILL.md
+    session-closer/SKILL.md
+    research-tracking/SKILL.md
+    tools-research/SKILL.md
+    design-harvest/SKILL.md
     transcript-harvest/SKILL.md
     document-harvest/SKILL.md
-    session-closer/SKILL.md
+    harvest-router/SKILL.md
+    git-onboarding/SKILL.md
   Agents/
     Harvest Agent.md                      - Content harvesting agent instructions
   Guides/
     Connecting Obsidian to Claude Desktop on Mac.md
-    Git Backup Setup - Claude-Guided Walkthrough.md
-    Vault Backup Setup Guide.md
+    Git Guide.md                          - Master git reference (shell + 9 sections)
+    Git Guide/                            - Section files for the Git Guide
     Vault Structure Guide.md
     Federation Guide.md
+    Filename Safety.md
     Editing the Claude Desktop Config.md
+    Harvest Workflow Guide.md
     Human Onboarding Doc Template.md
   Vault Config.md                         - User-specific paths and settings
 ```

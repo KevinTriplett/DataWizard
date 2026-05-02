@@ -59,8 +59,13 @@ known intermittent MCP issue.
    flag it as a candidate for the shell + sections pattern.
 8. SAFE CHARACTERS: In note titles, use plain hyphens (-)
    never em-dashes, and straight quotes never curly quotes.
-   In content, avoid these in headings and text you expect
-   to patch. They cause patch_note to fail on matching.
+   Never use Windows-invalid characters in filenames:
+   ? | * < > " \ : tab, non-breaking space (\xa0), or
+   carriage return. Collapse consecutive spaces to one.
+   Strip trailing whitespace before extensions. In content,
+   avoid em-dashes and curly quotes in headings and text
+   you expect to patch. They cause patch_note to fail.
+   See Seed/Guides/Filename Safety.md for the full map.
 9. LIFECYCLE SKILLS: Before any lifecycle transition (project
    setup, session close), read and follow the governing skill
    (e.g. project-guidelines, session-closer). Do not write
