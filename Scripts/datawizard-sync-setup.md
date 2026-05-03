@@ -83,7 +83,7 @@ Now Cmd+Shift+S in Obsidian = save + push + notification.
 
 ## Step 5: Set Up the Safety Net (Optional)
 
-This runs the sync automatically every 4 hours as a background safety net, catching anything you forgot to manually save.
+This runs the sync automatically every 2 hours as a background safety net, catching anything you forgot to manually save.
 
 ```bash
 cat > ~/Library/LaunchAgents/com.datawizard.sync.plist << 'EOF'
@@ -99,7 +99,7 @@ cat > ~/Library/LaunchAgents/com.datawizard.sync.plist << 'EOF'
         <string>/Users/YOURUSERNAME/Scripts/datawizard-sync.sh</string>
     </array>
     <key>StartInterval</key>
-    <integer>14400</integer>
+    <integer>7200</integer>
     <key>RunAtLoad</key>
     <true/>
     <key>StandardErrorPath</key>
