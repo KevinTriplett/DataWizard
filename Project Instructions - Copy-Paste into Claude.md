@@ -84,6 +84,12 @@ known intermittent MCP issue.
    resource. Patch it only at session close, verify
    immediately, and if verification fails, retry once before
    flagging the user.
+12. DOCUMENT METADATA: When writing to any file, bump the
+   updated: date. When creating or substantially updating
+   content documents, consider adding priority:
+   (high/medium/low) and maturity:
+   (draft/working/polished/canonical) to frontmatter.
+   See YAML Schema (Protocol Section 4) for definitions.
 
 ## Skills
 Seed Skills (general skills applicable to all projects) live
@@ -141,6 +147,8 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 ## What Changed in v3.6
 
 **MCP write verification (Working Rule 10).** At session close, instances verify all writes and patches landed using filesystem tools (Read/Glob), not obsidian:read_note which can return phantom content from cache. If context compaction is approaching and unverified writes risk falling out of context, verify before compaction rather than waiting. Only flag the user if verification fails. Addresses ghost write incidents observed during concurrent multi-instance sessions (May 2026).
+
+**Document metadata discipline (Working Rule 12).** Instances bump `updated:` on every file write and consider adding `priority:` and `maturity:` fields when creating or substantially updating content documents. Ensures new documents enter the vault with weighting signals for downstream content pipelines. See D76.
 
 **MCP concurrency (Working Rule 11).** The session log shell (0.2 file) is explicitly called out as a shared resource when multiple instances run on the same project. Instances patch it only at session close, verify immediately with filesystem tools, and retry once before escalating. Prevents the pattern where concurrent patches silently fail and are not caught until the next session.
 
