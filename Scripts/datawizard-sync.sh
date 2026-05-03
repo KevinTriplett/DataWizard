@@ -43,7 +43,7 @@ for DIR in "${PROJECTS[@]}"; do
     SYNCED_NAMES="$SYNCED_NAMES $NAME,"
   fi
 
-  git pull --rebase >> "$LOGFILE" 2>&1
+  git pull --no-rebase >> "$LOGFILE" 2>&1
   if [ $? -ne 0 ]; then
     ERRORS=$((ERRORS+1))
     osascript -e "display notification \"Sync conflict in $NAME. Open terminal to resolve.\" with title \"DW Sync Error\" sound name \"Basso\"" 2>/dev/null
