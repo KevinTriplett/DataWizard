@@ -109,7 +109,7 @@ cat > ~/Library/LaunchAgents/com.datawizard.sync.plist << 'EOF'
 EOF
 ```
 
-**Important:** Replace `YOURUSERNAME` in the plist with your actual macOS username.
+**Important:** Replace `YOURUSERNAME` in the plist with your actual macOS username. If copy-pasting from a chat interface, double-check the script path -- some tools convert filenames ending in `.sh` into clickable links, corrupting the path.
 
 Load it:
 
@@ -128,6 +128,29 @@ To stop it later:
 ```bash
 launchctl unload ~/Library/LaunchAgents/com.datawizard.sync.plist
 ```
+
+### Verifying the safety net is running
+
+The safety net runs silently in the background. If the plist has a bad path or the script is missing, it fails silently -- no notification, no error visible to you. Periodically check that it's actually working:
+
+```bash
+# Is the agent loaded?
+launchctl list | grep datawizard
+
+# Any errors from the last run?
+cat /tmp/datawizard-sync.err
+
+# Recent sync activity?
+tail -10 ~/.datawizard-sync.log
+```
+
+If `launchctl list` returns nothing, the agent isn't loaded. Reload it:
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.datawizard.sync.plist
+```
+
+If the error log shows "not found" or "No such file," check that the script path in the plist matches the actual location of `datawizard-sync.sh`.
 
 ## Step 6: Terminal Alias (Optional)
 
@@ -155,7 +178,7 @@ tail -20 ~/.datawizard-sync.log
 ```
 
 Common issues:
-- **"Sync conflict"**: You and a collaborator edited the same file between syncs. Open terminal, cd into the repo, and run `git status` to see what conflicted. Resolve manually, then `git add .`, `git rebase --continue`, `git push`.
+- **"Sync conflict"**: You and a collaborator edited the same file between syncs. Open terminal, cd into the repo, and run `git status` to see what conflicted. Resolve manually (see Merge Conflicts below), then `git add .`, `git commit -m "resolve merge conflict"`, `git push`.
 - **"Push failed"**: Usually a network issue or expired auth token. Try `gh auth status` to check.
 - **"not found"**: A path in your config file doesn't exist. Check `~/.datawizard-sync.conf`.
 
@@ -181,7 +204,7 @@ To resolve:
 
 ```bash
 git add .
-git rebase --continue
+git commit -m "resolve merge conflict"
 git push
 ```
 

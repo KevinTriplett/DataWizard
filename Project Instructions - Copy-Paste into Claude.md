@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.5
+# DW Project Instructions v3.6
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -70,6 +70,20 @@ known intermittent MCP issue.
    setup, session close), read and follow the governing skill
    (e.g. project-guidelines, session-closer). Do not write
    lifecycle artifacts from pattern-matching.
+10. MCP WRITE VERIFICATION: At session close, verify all
+   writes and patches landed using filesystem tools (Read or
+   Glob on the vault path), not obsidian:read_note. If
+   filesystem tools are unavailable, request vault access via
+   request_cowork_directory. If context compaction is
+   approaching and unverified writes risk falling out of
+   context, verify those writes before compaction rather than
+   waiting for session close. Flag to the user only if
+   verification fails.
+11. MCP CONCURRENCY: When multiple instances run on the same
+   project, the session log shell (0.2 file) is a shared
+   resource. Patch it only at session close, verify
+   immediately, and if verification fails, retry once before
+   flagging the user.
 
 ## Skills
 Seed Skills (general skills applicable to all projects) live
@@ -111,7 +125,7 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.5).*
+*Re-paste only when the Project Instructions version changes (currently v3.6).*
 
 ---
 
@@ -119,8 +133,16 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.5 | 2026-04-24 |
+| Project Instructions | v3.6 | 2026-05-03 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.6
+
+**MCP write verification (Working Rule 10).** At session close, instances verify all writes and patches landed using filesystem tools (Read/Glob), not obsidian:read_note which can return phantom content from cache. If context compaction is approaching and unverified writes risk falling out of context, verify before compaction rather than waiting. Only flag the user if verification fails. Addresses ghost write incidents observed during concurrent multi-instance sessions (May 2026).
+
+**MCP concurrency (Working Rule 11).** The session log shell (0.2 file) is explicitly called out as a shared resource when multiple instances run on the same project. Instances patch it only at session close, verify immediately with filesystem tools, and retry once before escalating. Prevents the pattern where concurrent patches silently fail and are not caught until the next session.
 
 ---
 
