@@ -1,0 +1,97 @@
+---
+title: MCP Reliability and Write Verification
+type: guide
+scope: seed
+created: '2026-05-03'
+updated: '2026-05-03'
+---
+# MCP Reliability and Write Verification
+
+> Guide for Claude instances using the Obsidian MCP (Local REST API) to write vault content. Covers known failure modes, verification protocol, and concurrency practices.
+
+## Known Issues
+
+As of May 2026, the Obsidian MCP has intermittent reliability issues when multiple Cowork instances access the same vault simultaneously. Three failure modes have been observed:
+
+**Ghost writes.** `write_note` returns "Successfully wrote note" but the file never appears on the filesystem. The MCP may then serve the ghost content back via `read_note` and `list_directory` from its cache, making it appear as though the write succeeded even on verification. This has been confirmed with `write_note`, `patch_note`, and `update_frontmatter` -- all three can return success without persisting.
+
+**Phantom reads.** `read_note` and `list_directory` return content for files that do not exist on the filesystem. This was observed when one instance read a full session log entry (with correct frontmatter and internally consistent content) for a file that was not present on disk. The phantom content was also visible in `list_directory` results.
+
+**Stale reads.** After a successful `patch_note`, a subsequent `read_note` on the same file may return the pre-patch version. This may overlap with the phantom read issue (the MCP serving cached pre-patch content).
+
+## What Triggers These Issues
+
+**Concurrent MCP access** is the confirmed trigger. All observed failures occurred on a day when 6+ Cowork instances were running simultaneously on the same vault, writing to the same project folder. Single-instance sessions have not exhibited these issues.
+
+**Git state interference** can compound the problem. If the vault contains a git repo in an unusual state (stuck rebase, detached HEAD), the MCP reads the filesystem working directory, which may not reflect the expected branch state. Files that are committed but not checked out will be invisible to the MCP.
+
+## Verification Protocol
+
+After any critical write operation (`write_note`, `patch_note`, `update_frontmatter`), verify the write landed using this hierarchy:
+
+### Tier 1: Filesystem Tools (Preferred)
+
+Use the `Read`, `Glob`, or `Grep` tools to check the file directly on the filesystem. These bypass the Obsidian MCP entirely and read the actual disk state.
+
+- **For `write_note`:** Use `Glob` to confirm the file exists at the expected path, then `Read` to spot-check content (e.g., verify the frontmatter title matches).
+- **For `patch_note`:** Use `Read` on the patched file and confirm the patched text is present.
+- **For `update_frontmatter`:** Use `Read` on the file and confirm the frontmatter field was updated.
+
+If filesystem tools cannot reach the vault (common in Cowork -- the vault path may not be connected), request access via `request_cowork_directory` at the start of the session. This is especially important when running concurrent instances.
+
+### Tier 2: Obsidian MCP Read-Back (Weaker)
+
+If filesystem tools are genuinely unavailable, use `obsidian:read_note` to verify. This is a weaker signal because the MCP can serve cached/phantom content. To improve reliability:
+
+- Wait briefly before the verification read (the cache may be time-limited).
+- Compare specific content details, not just "file exists."
+- Treat this as provisional verification, not confirmed.
+
+### Tier 3: User Verification (Escalation Only)
+
+If Tier 1 verification fails (file not found on filesystem after a write that returned success), retry the write once. If the retry also fails verification, flag the issue to the user. Do not silently retry more than once -- repeated ghost writes could indicate a deeper problem.
+
+## What to Verify
+
+Not every write needs full verification. Prioritize based on replaceability:
+
+**Always verify (high cost if lost):**
+- Session log section files (end-of-session writes)
+- Session log shell patches (shared file, concurrency risk)
+- Infrastructure file updates (0.x files, quest logs, action items)
+- New files that represent significant work (design docs, harvest outputs)
+
+**Spot-check (moderate cost):**
+- Frontmatter updates on existing files
+- Patches to content files during harvest work
+
+**Skip verification (low cost, easily re-done):**
+- Intermediate saves during iterative editing (the final save gets verified)
+- Tag operations via `manage_tags`
+
+## Concurrency Practices
+
+When multiple instances are running on the same project:
+
+**The session log shell is the shared hotspot.** Every instance patches `0.2 Session Log.md` (or equivalent) to add its session embed. This is the highest-risk file for concurrent write conflicts.
+
+- Patch the shell only at session close, not earlier.
+- Verify the patch landed using Tier 1 (filesystem) verification.
+- If the patch fails, re-read the current shell content (it may have been modified by another instance since you last read it), then retry the patch against the current content.
+
+**Session log section files are low-risk for collision.** Each instance writes a uniquely named file (date + session number + description). Even if two instances accidentally claim the same session number, the descriptions will differ, creating different filenames.
+
+**Content files can conflict if two instances harvest to the same destination.** If you know another instance is running and may be editing the same synth doc sections, coordinate via the user or avoid overlapping destinations.
+
+## Incident Reference
+
+These issues were diagnosed in DW Session 65 (2026-05-03). The investigation found:
+
+- 4 confirmed ghost writes across 4 separate Cowork instances on 2026-05-02
+- All affected session log writes or shell patches
+- All occurred during a period with 6+ concurrent instances
+- No content files (harvests, design docs, quest files) were lost -- only session documentation
+- Retrying the write after a failed verification succeeded in all cases
+- A separate git issue (stuck interactive rebase from a sync script using `--rebase`) compounded the problem by making committed files invisible in the working directory
+
+The sync script was fixed (`git pull --no-rebase`) and the MCP verification protocol was established to prevent recurrence.
