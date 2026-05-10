@@ -35,6 +35,13 @@ for DIR in "${PROJECTS[@]}"; do
   NAME=$(basename "$DIR")
   cd "$DIR" || { echo "$(date '+%Y-%m-%d %H:%M:%S') SKIP $DIR (not found)" >> "$LOGFILE"; ERRORS=$((ERRORS+1)); continue; }
 
+  # Branch guard: only sync repos on main
+  BRANCH=$(git branch --show-current)
+  if [ "$BRANCH" != "main" ]; then
+    echo "$(date '+%Y-%m-%d %H:%M:%S') SKIPPED $NAME -- on branch '$BRANCH', not main" >> "$LOGFILE"
+    continue
+  fi
+
   git add .
   if ! git diff --cached --quiet; then
     TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
