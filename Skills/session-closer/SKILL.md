@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-04-25'
-version: '1.4'
+updated: '2026-05-10'
+version: '1.5'
 ---
 
 # Session Closer Skill
@@ -51,6 +51,12 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 2. Write the new section file to the session log folder
 3. Patch the shell to add the embed reference for the new section
 
+> **Parallel instance check:** Before writing, re-list the session log
+> section folder and verify the target section number (e.g., 38.0)
+> doesn't already exist as a file. If another instance has written a
+> session with that number since orientation, increment to the next
+> available number. Multiple instances may work in parallel.
+
 > **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
 
 ### Step 3.5: Suggest final thread name
@@ -76,6 +82,47 @@ happens.
 A learning noted in the session log as "discovered X
 pattern" is far less useful than that same pattern written into
 the relevant skill or design doc with full context.
+
+### Step 3.7: Convention-change check
+
+**Ask yourself (and surface to the user if yes):**
+
+"Did this session establish or change any conventions, folder
+patterns, naming rules, or structural practices that differ from
+what the protocol docs currently say?"
+
+If yes, do one of:
+1. Update the relevant protocol docs now (Protocol Summary, Naming
+   Conventions, Vault Bootstrap, or whichever docs describe the
+   old convention), OR
+2. Add an explicit action item naming the *specific docs* that
+   need updating -- not just "update protocol" but "update Protocol
+   Summary Section X and Naming Conventions Section Y."
+
+If a Decision Log entry was written this session, verify its
+`Protocol updated:` flag is accurate.
+
+This step catches drift at the source. Five weeks of undocumented
+convention change (the _ prefix migration, S58-S63) is the pattern
+this prevents.
+
+### Step 3.8: Residual value check (harvest sessions)
+
+**For sessions that included harvest work**, before closing, re-scan
+each harvest source for remaining extractable value. Look for:
+threads you deprioritized during the main harvest pass, tangential
+insights worth capturing, content relevant to a different project
+than the primary harvest target, novel language or framings not yet
+flagged as lexicon candidates, and any tensions or disagreements
+you may have flattened. If you find more to extract, do another
+harvest pass before proceeding to infrastructure updates.
+
+This is not optional. Instances consistently underestimate residual
+value on first pass. The knowledge transfer check (3.6) asks whether
+findings got planted in the right docs -- this step asks whether
+you got everything out of the source material in the first place.
+
+> **Non-harvest sessions:** Skip this step entirely.
 
 Scan your own context for:
 - Findings that are only in chat, not yet in any vault file
