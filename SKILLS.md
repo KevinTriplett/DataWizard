@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-04-24'
+updated: '2026-05-19'
 ---
 
 # DataWizard Skills
@@ -23,6 +23,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **transcript-harvest** | Technique (stub) | Harvesting content from transcripts (video, podcast, meeting, voice memo) into project documents. |
 | **document-harvest** | Technique (stub) | Harvesting content from articles, clippings, and web content into project documents. |
 | **harvest-router** | Technique | Scanning the vault for unharvested content and routing it to the right projects. Moves files to correct content folders, sets routing YAML, appends action items. The upstream skill in the harvest pipeline -- it routes, transcript-harvest and document-harvest execute. |
+| **install-wizard** | Technique | Interactive post-install setup for new DataWizard users. Picks up where the README left off: verifies MCP connection (all tools), guides Project Instructions setup, explains git as the sync/collaboration layer, offers git onboarding. Triggers on: 'set up DataWizard', 'finish DataWizard setup', 'I just installed DataWizard'. |
 | **git-onboarding** | Technique | Walking a new collaborator through git setup for a vault or DW project. Gathers variables, guides through setup interactively, sets up DW Save (Cmd+Shift+S) with backup scheduling, and generates a project-specific onboarding guide. Uses the Git Guide (`Seed/Guides/Git Guide.md`) as reference. |
 
 ## Archived Skills

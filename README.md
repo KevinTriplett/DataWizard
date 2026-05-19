@@ -1,4 +1,3 @@
-
 # DataWizard
 
 > A local-first AI knowledge management system for Obsidian.
@@ -7,35 +6,69 @@
 
 ## What Is DataWizard?
 
-DataWizard teaches AI agents how to work in your Obsidian vault - reading, writing, organizing, and enriching your notes automatically.
+DataWizard teaches Claude how to work in your Obsidian vault -- reading, writing, organizing, and enriching your notes using consistent protocols. The goal is not to read everything yourself. It's to build a system that reads for you, remembers for you, and retrieves what matters when you need it.
 
-The goal is not to read everything yourself. It's to build a system that reads for you, remembers for you, and retrieves what matters when you need it.
+What it does: classifies notes by content type, enriches them with tags and metadata, processes transcripts into searchable companion notes, routes content into the right place, manages multi-project infrastructure, coordinates multiple AI agents in the same vault, and saves everything with one keystroke.
 
-**What it does:**
-- Classifies notes by content type (article, transcript, seed, entity, etc.)
-- Enriches notes with tags, themes, and metadata
-- Processes transcripts into segmented, searchable companion notes
-- Routes content into the right place in Obsidian automatically
-- Manages multi-project infrastructure with consistent conventions
-- Coordinates multiple AI agents working in the same vault
-- Saves and syncs your work with one keystroke (DW Save: Cmd+Shift+S)
-
-**Core principles:** local-first, markdown-native, modular pipelines, progressive enrichment, draft-then-approve collaboration.
+Core principles: local-first, markdown-native, modular pipelines, progressive enrichment, draft-then-approve collaboration.
 
 ---
 
-## Quick Start
+## Before You Start
 
-### 1. Install Obsidian
+Here's what we're going to do, step by step:
 
-Download from https://obsidian.md (free). Create a new vault or open an existing one.
+1. **Install Obsidian** -- the app where your notes live
+2. **Create a vault** -- a folder on your computer for your notes
+3. **Install the DataWizard Seed** -- protocols and skills that teach Claude how to work in your vault
+4. **Install Node.js** -- a runtime that powers the connection between Claude and Obsidian
+5. **Connect Claude to your vault** -- so Claude can read and write your notes
+6. **Finish setup with Claude** -- Claude will verify the connection, set up your project, and walk you through the rest
 
-### 2. Install the DataWizard Seed
+Steps 1-5 happen in this guide. Step 6 happens in a conversation with Claude after the connection is live.
 
-Open Terminal (Cmd + Space, type "Terminal", hit Enter) and run this command. Replace the path with your vault location:
+---
+
+## Step 1: Install Obsidian
+
+Download Obsidian from https://obsidian.md (free) and install it.
+
+---
+
+## Step 2: Create a Vault
+
+Open Obsidian. It will ask you to create or open a vault. Create a new vault.
+
+**Important: choose a local folder on your computer.** Do not put your vault in a cloud-synced folder (Dropbox, iCloud, Nextcloud, OneDrive, Google Drive). Cloud sync services can interfere with Obsidian's file indexing and cause files created outside Obsidian to not appear. Use a regular local folder -- for example, `/Users/yourname/My Vault` or `/Users/yourname/Documents/My Vault`.
+
+If you want cloud backup, DataWizard uses git for that (Claude will help you set it up later). Git is more reliable than file sync for a vault because it tracks changes intentionally rather than syncing everything continuously.
+
+---
+
+## Step 3: Find Your Vault Path
+
+You'll need the full path to your vault folder for the next steps. Here's how to find it:
+
+1. Open **Finder**
+2. Navigate to your vault folder
+3. Press **Cmd + Option + C** -- this copies the full path to your clipboard
+
+The path will look something like: `/Users/yourname/My Vault`
+
+Paste it somewhere you can grab it easily (a note, a text file, or just keep it on your clipboard). You'll need it twice: once to install the Seed, and once to connect Claude.
+
+---
+
+## Step 4: Install the DataWizard Seed
+
+The Seed is the core of DataWizard -- protocols, skills, and guides that teach Claude how to operate in your vault. It lives locally inside your vault so Claude can read it directly.
+
+Open **Terminal** (press Cmd + Space, type "Terminal", hit Enter). A window will appear with a blinking cursor.
+
+Paste this command, replacing `/Users/yourname/My Vault` with your actual vault path from Step 3:
 
 ```bash
-cd ~/path/to/your/vault && \
+cd "/Users/yourname/My Vault" && \
 curl -sL https://github.com/andrewalan11/DataWizard/archive/refs/heads/main.zip -o /tmp/dw-seed.zip && \
 unzip -qo /tmp/dw-seed.zip -d /tmp/dw-seed && \
 mkdir -p _DataWizard/Seed && \
@@ -44,74 +77,130 @@ rm -rf /tmp/dw-seed /tmp/dw-seed.zip && \
 echo "DataWizard Seed installed to _DataWizard/Seed/"
 ```
 
-To find your vault path: open Finder, navigate to your vault folder, press Cmd+Option+C to copy the full path.
+You should see "DataWizard Seed installed to _DataWizard/Seed/" in Terminal.
 
-You should see "DataWizard Seed installed" and a new `_DataWizard/Seed/` folder in your vault.
+**Note:** The `_DataWizard` folder won't appear in Obsidian's sidebar -- this is expected. Obsidian hides folders that start with an underscore. Claude can still read it fine through the connection we'll set up next.
 
-### 3. Set up MCP
+---
 
-MCP connects Claude to your Obsidian vault so it can read and write files directly. The full guide is in your Seed at `_DataWizard/Seed/Guides/Connecting Obsidian to Claude Desktop on Mac.md`, but here are the essential steps:
+## Step 5: Install Node.js
 
-**Check your Node.js version** (needed for MCP). In Terminal:
+Node.js powers the connection between Claude and your vault. Check if you already have it by running this in Terminal:
+
 ```bash
 node --version
 ```
-- "command not found" - install Node.js first: `brew install node` (install Homebrew from https://brew.sh if needed)
-- v24 or below - use Smithery (one command, easier)
-- v25 or above - use Manual Config (Smithery has a known bug on v25+)
 
-**Smithery (Node v24 and below):**
+If you see a version number (like `v20.11.0`), you're good -- skip to Step 6.
+
+If you see "command not found," install it:
+
+**First, check for Homebrew:**
+
 ```bash
-npx -y @smithery/cli install @bitbonsai/mcpvault --client claude
+brew --version
 ```
-When prompted, paste your vault path.
 
-**Manual Config (Node v25+):**
+If "command not found," install Homebrew first:
+
 ```bash
-open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-If the file doesn't exist:
+
+It will ask for your Mac password. When you type, nothing appears on screen -- that's normal. Just type your password and press Enter.
+
+**Important:** After Homebrew installs, it shows "Next steps" commands at the bottom. You must run those commands. They look like:
+
 ```bash
-mkdir -p ~/Library/Application\ Support/Claude && \
-echo '{}' > ~/Library/Application\ Support/Claude/claude_desktop_config.json && \
-open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json
-```
-Replace contents with (substituting your vault path):
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "npx",
-      "args": [
-        "@bitbonsai/mcpvault@latest",
-        "/Users/YOURUSERNAME/path/to/your/vault"
-      ]
-    }
-  }
-}
+echo >> /Users/YOURUSERNAME/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/YOURUSERNAME/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-**After either method:** Force Quit Claude Desktop (Apple menu - Force Quit - Claude) and reopen. Check Settings - Developer for a green "obsidian" badge.
+**Then install Node.js:**
 
-### 4. Back up your vault
+```bash
+brew install node
+```
 
-Before going further, make sure your vault is backed up. The recommended method is a private git repository.
+Verify it worked:
 
-If you already have backups set up, skip ahead. If not, your Seed includes a comprehensive Git Guide at `_DataWizard/Seed/Guides/Git Guide.md` covering setup, daily workflow, safety, recovery, and local backups. You can ask Claude to walk you through it after completing step 5 — it has a git-onboarding skill designed for exactly this.
+```bash
+node --version
+```
 
-As part of git setup, you'll configure **DW Save** (Cmd+Shift+S) — your one-keystroke save that commits and pushes your work to GitHub. See Git Guide Section 5.5.
+You should see a version number.
 
-### 5. Create a Claude Project
+---
 
-1. In Claude Desktop, create a new Project
-2. Go to Settings - Project Instructions
-3. Open `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md` in Obsidian
-4. Copy the block between the ``` fences and paste it into Project Instructions
-5. Fill in the Home folder line (e.g., `_DataWizard/`)
+## Step 6: Connect Claude to Your Vault
 
-### 6. Start working
+This step tells Claude Desktop where your vault is so it can read and write your notes. We'll do this by editing a configuration file.
 
-Open a conversation in your new Claude Project. Claude will orient itself by reading your Seed and project files, then it's ready to help you set up your first project, classify notes, or whatever you need.
+**If your config file already has content** (common if you use Claude Desktop features like Cowork), the command below will add the vault connection without overwriting your existing settings. If the file doesn't exist yet, it will create it.
+
+Paste this command into Terminal, replacing `/Users/yourname/My Vault` with your actual vault path:
+
+```bash
+CONFIG_FILE="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+VAULT_PATH="/Users/yourname/My Vault"
+
+mkdir -p "$(dirname "$CONFIG_FILE")"
+
+if [ ! -f "$CONFIG_FILE" ] || [ ! -s "$CONFIG_FILE" ]; then
+  echo "{}" > "$CONFIG_FILE"
+fi
+
+node -e "
+const fs = require('fs');
+const config = JSON.parse(fs.readFileSync('$CONFIG_FILE', 'utf8'));
+if (!config.mcpServers) config.mcpServers = {};
+config.mcpServers.obsidian = {
+  command: 'npx',
+  args: ['@bitbonsai/mcpvault@latest', '$VAULT_PATH']
+};
+fs.writeFileSync('$CONFIG_FILE', JSON.stringify(config, null, 2));
+console.log('Done! Obsidian MCP added to Claude Desktop config.');
+console.log('Vault path: $VAULT_PATH');
+"
+```
+
+You should see "Done! Obsidian MCP added to Claude Desktop config."
+
+**Now restart Claude Desktop:**
+
+1. Go to the **Apple menu** () in the top left of your screen
+2. Click **Force Quit**
+3. Select **Claude** and click **Force Quit**
+4. Reopen Claude Desktop
+
+**Verify it's connected:**
+
+1. In Claude Desktop, go to **Settings** (gear icon)
+2. Click **Developer**
+3. You should see **"obsidian"** listed with a green badge
+
+If you see the green badge, the connection is live. If not, see Troubleshooting below.
+
+**Tip:** Keep Obsidian running in the background whenever you're using Claude with your vault.
+
+---
+
+## Step 7: Finish Setup with Claude
+
+The connection is live. Now Claude can do the rest.
+
+Open a new conversation in Claude Desktop and say:
+
+> **"Set up DataWizard"**
+
+Claude will walk you through the rest of the setup interactively:
+- Verify that every tool in the connection works correctly
+- Help you create a Claude Project with DataWizard instructions
+- Explain how to keep things in sync and collaborate with others
+- Offer to set up git for backup and collaboration
+
+This is the last step. After this, you're up and running.
 
 ---
 
@@ -120,11 +209,12 @@ Open a conversation in your new Claude Project. Claude will orient itself by rea
 DataWizard checks for updates automatically. When you start a new conversation, Claude compares your local Seed version against the latest on GitHub. If there's an update available, it tells you what changed and asks if you want to update.
 
 To update manually at any time:
+
 ```bash
 bash _DataWizard/Seed/update_seed.sh
 ```
 
-This downloads the latest Seed and overwrites only the Seed files. Your project content (session logs, Workshop docs, action items) is never touched.
+This downloads the latest Seed and overwrites only the Seed files. Your project content (session logs, action items, workshop docs) is never touched.
 
 ---
 
@@ -133,34 +223,40 @@ This downloads the latest Seed and overwrites only the Seed files. Your project 
 ```
 _DataWizard/Seed/
   VERSION.md                              - Version numbers and update instructions
-  Project Instructions - Copy-Paste into Claude.md  - Project Instructions to paste into Claude
+  Project Instructions - Copy-Paste into Claude.md  - Instructions to paste into Claude
   README.md                               - This file
   update_seed.sh                          - Install/update script
+  SKILLS.md                               - Available skills catalog
   Protocols/
     DataWizard Universal Protocol.md      - Full AI operational rulebook
     Protocol Summary.md                   - Quick reference
-    Content Type Taxonomy.md              - 20 content types for classification
-  SKILLS.md                               - Available skills catalog
+    Content Type Taxonomy.md              - Content types for classification
   Skills/                                 - See SKILLS.md for full catalog
-    project-guidelines/SKILL.md
-    session-closer/SKILL.md
-    research-tracking/SKILL.md
-    tools-research/SKILL.md
-    design-harvest/SKILL.md
-    transcript-harvest/SKILL.md
-    document-harvest/SKILL.md
-    harvest-router/SKILL.md
-    git-onboarding/SKILL.md
+    install-wizard/SKILL.md               - Interactive post-install setup
+    project-guidelines/SKILL.md           - Creating and updating project docs
+    session-closer/SKILL.md               - End-of-session log and handoff
+    git-onboarding/SKILL.md               - Interactive git setup walkthrough
+    research-tracking/SKILL.md            - Tracking research to prevent duplicates
+    tools-research/SKILL.md               - Evaluating external tools and repos
+    design-harvest/SKILL.md               - Planting research into design docs
+    transcript-harvest/SKILL.md           - Harvesting transcripts into project docs
+    document-harvest/SKILL.md             - Harvesting articles into project docs
+    harvest-router/SKILL.md               - Routing content to the right project
   Agents/
     Harvest Agent.md                      - Content harvesting agent instructions
+  Scripts/
+    classify.py                           - Note classification script
+    segment_transcript.py                 - Transcript segmentation script
+    route_notes.py                        - Note routing script
+    claude-paths.sh                       - Path resolution utility
   Guides/
-    Connecting Obsidian to Claude Desktop on Mac.md
     Git Guide.md                          - Master git reference (shell + 9 sections)
     Git Guide/                            - Section files for the Git Guide
     Vault Structure Guide.md
     Federation Guide.md
     Filename Safety.md
     Editing the Claude Desktop Config.md
+    MCP Reliability and Write Verification.md
     Harvest Workflow Guide.md
     Human Onboarding Doc Template.md
   Vault Config.md                         - User-specific paths and settings
@@ -170,39 +266,46 @@ _DataWizard/Seed/
 
 ## For AI Agents
 
-If a user shares this README or the GitHub link with you, your job is to help them get DataWizard set up. Follow the Quick Start steps above.
+If a user shares this README or the GitHub link with you, help them get DataWizard set up. Follow the steps above.
 
-**Key points:**
+Key points:
 - The Seed should be installed locally in the vault, not read from GitHub
-- All protocols, skills, and guides are in `_DataWizard/Seed/` - read them via MCP
+- All protocols, skills, and guides are in `_DataWizard/Seed/` -- read them via MCP
 - The only GitHub fetch is VERSION.md for update checks during orientation
 - Always get user approval before writing to the vault
 - If the user already has a Seed installed, check if it needs updating before starting
-
-**If the Seed is already installed:**
-Read `_DataWizard/Seed/VERSION.md` locally and compare against the GitHub version. If an update is available, offer it before proceeding.
-
-**If the Seed is NOT installed:**
-Give the user the install command from step 2 above, customized with their vault path. Wait for them to confirm it worked, then continue with MCP setup.
+- After MCP is connected, load the `install-wizard` skill to complete setup interactively
+- MCP connection uses the `@bitbonsai/mcpvault` package -- this is the only supported method
 
 ---
 
 ## Troubleshooting
 
 **"No servers added" in Developer settings:**
-Check JSON syntax in the config file, verify the vault path exists, and Force Quit Claude Desktop (not just Cmd+Q).
+Check that the config command ran without errors. Open the config file to verify it looks correct:
+```bash
+cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+You should see an `mcpServers` section with your vault path. If not, run the Step 6 command again. Then Force Quit Claude Desktop (not just Cmd+Q) and reopen.
 
-**MCP server shows but isn't connecting:**
-Run `node --version` and `npx --version` in Terminal. Make sure Obsidian is running.
+**MCP server shows red / not connecting:**
+Run `node --version` and `npx --version` in Terminal to verify they work. Make sure Obsidian is running.
 
 **Permission errors:**
-System Settings - Privacy & Security - Files and Folders. Ensure Claude Desktop has access to your vault.
+Go to System Settings - Privacy and Security - Files and Folders. Ensure Claude Desktop has access to your vault directory.
 
 **Tools disappear mid-conversation:**
-Start a new conversation. Check that Obsidian is still running.
+Start a new conversation. Check that Obsidian is still running and the server shows green in Settings - Developer.
 
 **Seed install shows errors:**
-Run the install command again. If it persists, download the ZIP manually from https://github.com/andrewalan11/DataWizard and unzip into `_DataWizard/Seed/`.
+Run the install command from Step 4 again. If it persists, download the ZIP manually from https://github.com/andrewalan11/DataWizard and unzip into `_DataWizard/Seed/`.
+
+**Config file already had content and something broke:**
+The Step 6 command merges safely with existing config content. But if something went wrong, you can view your current config with:
+```bash
+cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+Check that the JSON is valid (matching braces, no trailing commas). You can paste it into https://jsonlint.com to verify. If it's broken, the simplest fix is to restore from a backup or rebuild it manually.
 
 ---
 
