@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-05-10'
-version: '1.5'
+updated: '2026-05-23'
+version: '1.6'
 ---
 
 # Session Closer Skill
@@ -134,6 +134,40 @@ Scan your own context for:
 
 If everything has been planted, say so and move on. If not,
 propose what still needs writing and where it goes.
+
+### Step 3.9: Metadata verification
+
+For each file modified this session (from the "Files updated" and "Files created" lists):
+
+1. Verify `updated:` reflects today's date (YYYY-MM-DD)
+2. Append this session's identifier to `edit_log:` (e.g., `"DW-S70 2026-05-23"`). Deduplicate -- if the session already appears, don't add it again.
+3. For shell files whose sections were edited: bump the shell's `updated` field (but no `edit_log` on shells)
+
+Use `update_frontmatter` for efficiency -- it merges without requiring a full re-read.
+
+**Scope:** `edit_log` is required on section files, recommended on infrastructure files (0.x) and standalone docs. Shell files are exempt -- they are assembly surfaces whose edit history is captured by their sections' logs. See Protocol Summary > edit_log Field for the full convention.
+
+This step catches metadata drift at the source rather than requiring periodic remediation passes.
+
+### Step 3.10: Section-shell sync check
+
+For each section file created or renamed this session, verify its parent shell contains a matching `![[filename]]` embed.
+
+1. Identify the parent shell from the section's `parent:` frontmatter field
+2. Read the shell and check that each new section filename appears in an `![[...]]` embed
+3. If any are missing, flag them and offer to add the embeds to the shell in the appropriate position
+
+This catches the most common drift pattern -- adding sections without updating the shell -- at the point of creation. Skip this step if no section files were created or renamed this session.
+
+### Step 3.11: Periodic project health audit
+
+Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"`). If the current session is 10+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
+
+"It's been [N] sessions since the last project health audit (or: no audit on record). Want me to run a DW review? It checks shell-section drift, YAML compliance, filename safety, and protocol conformance. Takes 5-10 minutes."
+
+If the user agrees, load and follow the `project-health-audit` skill. After the audit completes, update `last_health_audit:` in the project's 0.0 frontmatter to the current session identifier.
+
+If declined, note it and move on. The prompt will recur in another 10 sessions.
 
 ### Step 4: Update related infrastructure files
 

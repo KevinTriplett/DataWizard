@@ -120,6 +120,40 @@ Aim for 800-1200 tokens — dense but scannable, cheap to read every thread.
 - `highlighted_by_hand: true` — flag for notes where a human has manually highlighted key passages
 - `ai-generated` is a tag, not a content type. `generating_agent` is optional.
 
+### Section File YAML
+
+Section files (content files in `_Sections - ProjectName/` folders) require these frontmatter fields:
+- `title` — section title
+- `type` — typically matches parent document type or `project-doc`
+- `parent: "[[Shell Name]]"` — wikilink to parent shell
+- `section: N` — numeric prefix matching the filename
+- `created: YYYY-MM-DD` — date first written
+- `updated: YYYY-MM-DD` — date last modified
+- `edit_log` — cumulative list of sessions that modified this file (see below)
+
+### Date Format Convention
+
+All frontmatter dates use plain `YYYY-MM-DD` format. Do not use ISO datetime strings (`2026-05-22T00:00:00.000Z`). Plain dates are sufficient for DW's day-level tracking and are consistently parseable by Dataview.
+
+### edit_log Field
+
+A cumulative YAML list tracking every session that modified a file. The last entry is the last editor; the full list is the provenance trail.
+
+```yaml
+edit_log:
+  - "DW-S70 2026-05-23"
+  - "Andrew 2026-05-24"
+  - "WV-S45 2026-05-25"
+```
+
+- One entry per session (deduplicated). Append-only.
+- Agent edits: `"ProjectAbbrev-SNN YYYY-MM-DD"`. Human edits: `"Name YYYY-MM-DD"`.
+- **Section files**: Required. **Infrastructure files (0.x) and standalone docs**: Recommended.
+- **Shell files**: No edit_log — shells are assembly surfaces. The shell's `updated` field gets bumped when sections change, but it doesn't accumulate a log.
+- Updated at session close via the session-closer skill (Step 3.9).
+
+Design rationale: `Workshop/Design/YAML Metadata Protocol Decisions.md`
+
 ## Session Log Format
 ```
 ## YYYY-MM-DD — [Brief title]
@@ -202,32 +236,11 @@ These commands can be used in any thread at any time:
 | `DW review` | Audit the project against protocol. Offers scope options before starting. |
 | `DW status` | Check the Transcript Status Dashboard and report pending items |
 
-### DW Review — Tiered Audit
+### DW Review — Project Health Audit
 
-When a user types `DW review`, first re-read:
-1. `_DataWizard/Seed/Protocols/Protocol Summary.md`
-2. `_DataWizard/Seed/Vault Config.md`
-3. Your agent-specific instructions file (if applicable)
+When a user types `DW review`, load and follow the `project-health-audit` skill (`Seed/Skills/project-health-audit/SKILL.md`). The skill handles scope selection, audit execution, reporting, and record-keeping.
 
-Then ask the user what scope they want:
-
-| Scope | What it checks | Token cost |
-|---|---|---|
-| **Quick** | Filenames, folder structure, infrastructure file presence | Low |
-| **Standard** | Quick + frontmatter on all files (via `get_frontmatter`, not full reads) | Medium |
-| **Full** | Standard + content spot-checks on key files (shells, guidelines, MOC) | High |
-| **Incremental** | Only files modified since the last DW review date | Low-Medium |
-
-For incremental reviews, check the session log for the last `DW review` entry and only audit files modified after that date.
-
-After completing a review, log it in the session log:
-```
-## YYYY-MM-DD — DW Review (scope)
-[Summary of findings]
-**Status:** complete — [N] issues found, [M] fixed
-```
-
-Confirm to the user: "Updated — now running Protocol Summary v[X.X]. Review complete."
+The audit is also triggered automatically by the session-closer every ~10 sessions (Step 3.11). The `last_health_audit:` field in the project's 0.0 frontmatter tracks when the last audit ran.
 
 ## What NOT to Do
 - Don't put private content in shared folders
