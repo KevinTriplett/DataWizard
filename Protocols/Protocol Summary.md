@@ -33,7 +33,8 @@ updated: '2026-05-02'
 3. **Read 0.1 MOC** for file inventory and status overview.
 4. **Read session log** (0.2) - last 2-3 entries. The "What's next" section tells you where to pick up.
 5. **Read action items** if the file exists.
-6. **Ready to work** - read Seed docs as needed for specific tasks.
+6. **Write session stub** to session log section folder — create a section file with `status: in-progress`, the thread name, and a one-line focus description. Add the embed to the shell. This claims the session number, prevents collisions when multiple instances work in parallel, and gives team visibility into active sessions.
+7. **Ready to work** - read Seed docs as needed for specific tasks.
 
 ## Version Update Flow
 

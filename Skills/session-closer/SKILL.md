@@ -48,8 +48,8 @@ Follow the output format below. Write the full entry and present it in chat for 
 
 Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
 1. Re-read the session log shell to get the current section number and embed list
-2. Write the new section file to the session log folder
-3. Patch the shell to add the embed reference for the new section
+2. Write the new section file to the session log folder. **If a session stub was written during orientation** (a section file with `status: in-progress`), overwrite that file with the full entry — same section number, same filename slot. Rename the file to replace "in progress" with the final title. Do not create a second section file.
+3. Patch the shell to update the embed reference (replace the stub filename with the final filename). If no stub exists, add the embed as usual.
 
 > **Parallel instance check:** Before writing, re-list the session log
 > section folder and verify the target section number (e.g., 38.0)
