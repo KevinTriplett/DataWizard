@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-05-03'
+updated: '2026-05-25'
 ---
 # MCP Reliability and Write Verification
 
@@ -82,6 +82,17 @@ When multiple instances are running on the same project:
 **Session log section files are low-risk for collision.** Each instance writes a uniquely named file (date + session number + description). Even if two instances accidentally claim the same session number, the descriptions will differ, creating different filenames.
 
 **Content files can conflict if two instances harvest to the same destination.** If you know another instance is running and may be editing the same synth doc sections, coordinate via the user or avoid overlapping destinations.
+
+## Pattern from the Wild: Drift Detection on Apply and Undo
+
+The concurrency guidance above (re-read current content before retrying a patch) can be systematized into an explicit drift check. The open-source `istefox-dt-mcp` connector (DEVONthink 4 MCP server, MIT) implements a transferable version worth borrowing for any MCP-based batch-write workflow:
+
+- **Dry-run-by-default writes.** Every write defaults to `dry_run=true`: preview the change, get a `confirm_token`, then apply. Each apply is reversible via an `audit_id`, with an append-only SQLite audit log. This is the same dry-run-then-apply discipline DW uses for classify.py, independently arrived at by a separate project -- a useful external validation.
+- **3-state drift detection on undo.** Before reverting, the tool classifies each record as `no_drift` (safe), `already_reverted` (skip silently), or `hostile_drift` (externally modified after the apply -- skip and surface the diff rather than overwrite). An explicit `--force` overrides.
+
+The takeaway for DW: when an operation might be undone or re-applied later, record enough state at apply time to detect whether the target changed in the interim. For Obsidian MCP work this is the stronger version of the "re-read before retrying" rule -- compare against a captured snapshot and flag on unexpected drift instead of assuming the file is unchanged.
+
+*Source: Reddit r/devonthink (2026-05), `github.com/istefox/istefox-dt-mcp`. Evaluated DW Session 88 (Chunk 5 triage).*
 
 ## Incident Reference
 
