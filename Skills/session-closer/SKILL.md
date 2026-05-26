@@ -8,7 +8,7 @@ description: >-
   previous session.
 type: skill
 updated: '2026-05-26'
-version: '1.8'
+version: '1.9'
 ---
 
 # Session Closer Skill
@@ -191,6 +191,16 @@ Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning
 "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand by loading the meta-learning-review skill."
 
 This does not block session close -- it's a passive reminder in the handoff. If a meta-learning report already exists and hasn't been reviewed, mention that specifically.
+
+### Step 3.14: Content Interests staleness check
+
+Check the project's `0.0 Project Guidelines` frontmatter for `last_content_interests_review:` (format: `YYYY-MM-DD`). If 30+ days have passed since the last review, or if 10+ sessions have occurred since then, add a nudge to the "What's next" section:
+
+"Content Interests may need refreshing ([N] days since last review). Load the content-interests-review skill to check whether the project's routing signals still match its current direction."
+
+Also nudge if no `last_content_interests_review:` field exists and the project has a Content Interests section -- this means the field was never backfilled.
+
+This is a passive reminder in the handoff, not a blocker. The project instance that picks up the next session has the context to judge whether a review is actually needed -- time alone doesn't determine drift. If the project's direction hasn't changed, the instance can skip it and note why.
 
 ### Step 4: Update related infrastructure files
 

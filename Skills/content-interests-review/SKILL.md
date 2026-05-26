@@ -25,7 +25,8 @@ This skill detects that drift by comparing the 0.0's Content Interests against r
 - A project has no Content Interests section yet
 - The project's scope or direction has shifted significantly (new collaborators, new tools, new domains)
 - Before a Vault Project Map refresh
-- When the scheduled Content Interests audit flags a project as stale
+- During orientation, if `last_content_interests_review:` in the 0.0 frontmatter is 30+ days old or 10+ sessions back, and the project's direction appears to have shifted since then
+- The session-closer nudges this in "What's next" when thresholds are met (session-closer Step 3.14)
 - User says "update content interests," "what should we be flagging for this project," "review our routing info"
 
 ### When NOT to Use
@@ -165,5 +166,4 @@ For projects with multiple distinct domains, organize Content Interests into sho
 - **project-guidelines**: Defines the Content Interests format (Section 9). Use project-guidelines for creating a 0.0 from scratch; use this skill for reviewing and refreshing an existing Content Interests section.
 - **harvest-router**: Reads Content Interests to decide where flagged content goes. Accurate Content Interests directly improve routing quality.
 - **Vault Project Map**: The dynamic map embeds each project's Content Interests section. When you update Content Interests via this skill, the map auto-updates.
-- **session-closer**: A future version may include a periodic nudge for Content Interests review (similar to the health audit and meta-learning review nudges).
-- **Scheduled Content Interests audit** (planned): Will scan all projects and flag which ones need this skill run. This skill is the per-project executor; the scheduled task is the cross-project scanner.
+- **session-closer** (v1.9+): Step 3.14 checks `last_content_interests_review:` and nudges in "What's next" when thresholds are met (30+ days or 10+ sessions). The project instance judges whether a review is actually needed -- time alone doesn't determine drift.
