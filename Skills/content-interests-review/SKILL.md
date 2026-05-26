@@ -7,7 +7,7 @@ description: >-
   stale', or when a project's scope has shifted and its routing signals need
   refreshing. Also triggered by the scheduled Content Interests audit.
 type: skill
-version: '1.1'
+version: '1.3'
 updated: '2026-05-26'
 ---
 
@@ -30,7 +30,7 @@ This skill detects that drift by comparing the 0.0's Content Interests against r
 
 ### When NOT to Use
 
-- Creating a new 0.0 from scratch (use project-guidelines instead — it covers Section 9)
+- Creating a new 0.0 from scratch -- meaning the 0.0 file itself doesn't exist yet (use project-guidelines instead, it covers Section 9). If a 0.0 exists but has no Content Interests section, this skill is the right one.
 - Cross-project audit of all Content Interests (that's the scheduled task's job, not this skill)
 - Updating other sections of the 0.0 (use project-guidelines for structural updates)
 
@@ -53,7 +53,9 @@ If the 0.0 is missing or on a very old protocol version (below 1.6), flag that t
 
 ### Step 2: Read recent activity
 
-Read the project's last 5-10 session log entries (or all entries if fewer than 5 exist). You're looking for:
+Read the project's recent session log to understand current activity. For projects with a shell+sections session log architecture, start with the shell file -- it gives you section titles and date ranges for the full project history. Then read the last 2-3 section files for detail. For projects with a single session log file, read the last 5-10 entries (or all entries if fewer than 5 exist). For mature projects with 50+ sessions, the shell overview is more valuable than trying to read many individual entries -- you're looking for trajectory and active domains, not exhaustive detail.
+
+You're looking for:
 
 - **New tools, libraries, or technologies** the project has started using or evaluating
 - **New domains or topics** the project has expanded into
@@ -62,8 +64,11 @@ Read the project's last 5-10 session log entries (or all entries if fewer than 5
 - **Design decisions** that shifted the project's technical direction
 - **Completed work** that closed off areas (no longer need to flag content for solved problems)
 
+For projects with fewer than ~10 sessions, the session log alone may not reveal much. Lean more heavily on action items, quests, and design docs -- Content Interests may need to be more speculative, covering domains the project intends to explore but hasn't generated session activity in yet.
+
 Also read:
 - Action items file (open items reveal where the project is heading)
+- Quest log and active quests, if the project uses the quest system (quests show where the project is heading, not just where it's been -- often a better trajectory signal than the session log, especially for young projects)
 - Key design docs if they exist (especially recent additions or heavily-edited sections)
 - Decision log (last 3-5 entries) if one exists
 
@@ -97,7 +102,7 @@ Present the cleaned draft to the user with a brief explanation of what changed a
 Once the user approves (with any edits), patch the Content Interests section into the 0.0.
 
 - If a Content Interests section already exists, use patch_note to replace it
-- If no section exists, use patch_note to append it after the last existing section. Look for the last `## ` heading in the 0.0 and its content, or a version/footer line, and patch after that block. If unsure what to match against, read the last ~20 lines of the 0.0 to find a unique anchor string.
+- If no section exists, use patch_note to append it after the last existing section. Look for the last `## ` heading in the 0.0 and its content, or a version/footer line, and patch after that block. Use the final paragraph of the last section as your anchor -- a long, unique string unlikely to appear elsewhere in the file.
 - Bump the `updated:` date in the 0.0's frontmatter
 
 ### Step 7: Confirm and note
@@ -132,7 +137,7 @@ For projects with multiple distinct domains, organize Content Interests into sho
 
 **Remove solved problems.** If the project evaluated and chose a transcription service, stop flagging "transcription service comparisons." Flag the next frontier instead.
 
-**Keep it scannable.** Aim for 50-150 words for focused, single-domain projects. For projects that span multiple distinct domains (technical + funding + creative, for example), up to 250 words organized in thematic paragraphs is acceptable. The test is scannability, not word count -- a routing agent should be able to parse it in one pass.
+**Keep it scannable.** Aim for 50-150 words for focused, single-domain projects. For projects that span multiple distinct domains (technical + funding + creative, for example), up to 250 words organized in thematic paragraphs is acceptable. The test is scannability, not word count -- a routing agent should be able to parse it in one pass. If you're in the 150-200 range and every line earns its keep, you're fine -- don't trim for the sake of hitting a number.
 
 ### Examples
 
