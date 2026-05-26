@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.8
+# DW Project Instructions v3.9
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -135,13 +135,25 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 5. State the session number and propose a thread name.
    Format: ProjectAbbrev SNN - expected focus (no date).
    Base it on "What's next" and any user direction.
-6. Lifecycle transitions (project setup, session close)
+6. Create a session log stub to claim your session number.
+   List the session log section folder, determine the next
+   available section number, and write a minimal stub file:
+   "NN.0 Session NNN - in progress.md" with status:
+   in-progress in frontmatter and a Part of breadcrumb.
+   Add the embed to the session log shell. This gives
+   concurrent instances (including those on other users'
+   machines) immediate visibility that the number is taken.
+   Once the user confirms the session's direction, patch
+   the stub content with 1-2 lines describing the focus.
+   The session-closer overwrites this stub with the full
+   entry at session end.
+7. Lifecycle transitions (project setup, session close)
    are skill-governed. Read the skill before executing.
-7. Ready to work. Read Seed docs (protocols, taxonomy,
+8. Ready to work. Read Seed docs (protocols, taxonomy,
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.8).*
+*Re-paste only when the Project Instructions version changes (currently v3.9).*
 
 ---
 
@@ -149,8 +161,14 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.8 | 2026-05-26 |
+| Project Instructions | v3.9 | 2026-05-26 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.9
+
+**Session log stub in orientation (Step 6).** After stating the session number, instances now create a minimal stub section file ("NN.0 Session NNN - in progress.md") in the session log folder and add its embed to the shell. This claims the session number for concurrent instances, including those running on other users' machines. Once the user confirms the session's direction, the instance patches the stub with 1-2 lines of context. The session-closer (which already handled stubs) overwrites it with the full entry at session end. Existing Steps 6-7 renumbered to 7-8.
 
 ---
 

@@ -6,8 +6,8 @@ description: >-
   migration', 'write project guidelines', 'set up a new project', or any mention
   of 0.0 files needing creation or updates.
 type: skill
-version: '1.1'
-updated: '2026-03-28'
+version: '1.2'
+updated: '2026-05-26'
 ---
 
 # Project Guidelines Skill
@@ -43,7 +43,7 @@ You need a full picture of the project before drafting.
 
 Adapt depth to project complexity. Lightweight projects need only 1, 2, 6, 7, 8. Aim for 800-1200 tokens — dense, scannable, cheap to read every thread.
 
-**1. What this project is** — one paragraph. Name, purpose, scope, stage. Self-contained — someone reading only this understands the project.
+**1. What This Project Is** (use this exact header: `## What This Project Is`) — one paragraph. Name, purpose, scope, stage. Self-contained — someone reading only this understands the project. The standardized header enables the dynamic Vault Project Map to embed this section via `![[0.0 Project Guidelines - ProjectName#What This Project Is]]`.
 
 **2. Current state** — pointer only. "For what's active, read the session log and action items." Don't duplicate status — the 0.0 should be stable across sessions.
 
@@ -59,7 +59,7 @@ Adapt depth to project complexity. Lightweight projects need only 1, 2, 6, 7, 8.
 
 **8. Working conventions** — project-SPECIFIC rules only. Don't repeat universal protocol.
 
-**9. Content interests** — what a routing agent should flag for this project. "Flag if you see:" list. Be specific to the project's domain — "local TTS models for podcast production" not "AI tools."
+**9. Content Interests** (use this exact header: `## Content Interests`) — what a routing agent should flag for this project. "Flag if you see:" list. Be specific to the project's domain -- "local TTS models for podcast production" not "AI tools." The standardized header enables the dynamic Vault Project Map to embed this section. For detailed guidance on writing Content Interests, see the content-interests-review skill.
 
 The framing varies: tech interests, narrative interests, connection interests, research interests. Whatever fits the project.
 
@@ -73,6 +73,8 @@ updated: YYYY-MM-DD
 datawizard_protocol_version: "[current]"
 status: active
 ```
+
+**Filename:** `0.0 Project Guidelines - [Project Name].md` — always include the `- ProjectName` suffix to avoid wikilink ambiguity across projects. The dynamic Vault Project Map depends on unique filenames for its embed references.
 
 ## How to Draft
 
@@ -91,5 +93,5 @@ status: active
 
 ## Reference Implementation
 
-See `_DataWizard/0.0 Project Guidelines - DataWizard.md` for a complex project example.
+See `_DataWizard/_Infrastructure - DataWizard/0.0 Project Guidelines - DataWizard.md` for a complex project example.
 
