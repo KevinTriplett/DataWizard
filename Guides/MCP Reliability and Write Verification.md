@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-05-25'
+updated: '2026-05-26'
 ---
 # MCP Reliability and Write Verification
 

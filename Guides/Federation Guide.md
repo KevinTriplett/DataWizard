@@ -15,7 +15,7 @@ How to copy notes between vault locations (federation) efficiently.
 
 ## Why Federate?
 
-When a note in one location (e.g., `_Clippings/`) is relevant to a specific project (e.g., Metamorphic Media), the project needs its own copy so it can be modified independently — different YAML, different annotations, eventually different content in a shared vault context.
+When a note in one location (e.g., `_Intake/`) is relevant to a specific project (e.g., Metamorphic Media), the project needs its own copy so it can be modified independently — different YAML, different annotations, eventually different content in a shared vault context.
 
 Wikilinks are NOT federation. A wikilink says "this exists over there." A federated copy says "this now lives here too, and we track provenance between them."
 
@@ -30,9 +30,9 @@ The Claude instance generates a terminal command block. The user pastes it into 
 ```bash
 # Example: federate 3 clippings into a project folder
 cd ~/Vaults/Regen\ Vault && \
-cp "_Clippings/Source Article One.md" "_Metamorphic Media/Research/Source Article One.md" && \
-cp "_Clippings/Source Article Two.md" "_Metamorphic Media/Research/Source Article Two.md" && \
-cp "_Clippings/Source Article Three.md" "_Metamorphic Media/Research/Source Article Three.md" && \
+cp "_Intake/Source Article One.md" "_Metamorphic Media/Research/Source Article One.md" && \
+cp "_Intake/Source Article Two.md" "_Metamorphic Media/Research/Source Article Two.md" && \
+cp "_Intake/Source Article Three.md" "_Metamorphic Media/Research/Source Article Three.md" && \
 echo "Done — 3 files federated"
 ```
 
@@ -56,7 +56,7 @@ federated_to:
 
 **On the copy:**
 ```yaml
-federated_from: "[[_Clippings/Source Article One]]"
+federated_from: "[[_Intake/Source Article One]]"
 ```
 
 The instance may also update `type`, `tags`, `harvest_status`, or `harvest_for` on the copy to match the project context.

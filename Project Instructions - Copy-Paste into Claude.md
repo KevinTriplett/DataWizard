@@ -3,7 +3,7 @@ title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-04-02'
+updated: '2026-05-26'
 tags:
   - protocol
   - AI-collaboration
@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.7
+# DW Project Instructions v3.8
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -93,6 +93,11 @@ known intermittent MCP issue.
 13. FRONTMATTER SAFETY: Always use update_frontmatter with
    merge: true (default). merge: false deletes any omitted
    fields.
+14. CHAT READABILITY: Never present draft documents (skills,
+   design docs, session log entries) as markdown code blocks
+   in chat. Write directly to vault for review. For small
+   edits, describe changes in plain prose. Markdown in code
+   blocks doesn't wrap and is unreadable in chat.
 
 ## Skills
 Seed Skills (general skills applicable to all projects) live
@@ -110,6 +115,8 @@ Seed Skills:
   design-harvest: Planting research findings into design docs.
   transcript-harvest: Harvesting transcripts into project docs.
   document-harvest: Harvesting articles/clippings into project docs.
+  meta-learning-review: Reviewing session learnings and planting
+    them into skills, design docs, and protocol.
 
 See _DataWizard/Seed/SKILLS.md for full catalog.
 
@@ -134,7 +141,7 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.7).*
+*Re-paste only when the Project Instructions version changes (currently v3.8).*
 
 ---
 
@@ -142,8 +149,16 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.7 | 2026-05-26 |
+| Project Instructions | v3.8 | 2026-05-26 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.8
+
+**Chat readability (Working Rule 14).** Instances must never present draft documents (skills, design docs, session log entries) as markdown code blocks in chat. Markdown inside code fences doesn't wrap and extends past the viewing window, making review painful. Write directly to vault for review. Describe small edits in plain prose.
+
+**Meta-learning-review skill added to skills list.** New Seed skill for reviewing accumulated session learnings and planting them into skills, design docs, and protocol. Complements design-harvest (which plants external research findings). Triggered every 5-10 sessions via session-closer nudge or on demand. Session-closer v1.8 adds Step 3.13 for the cadence check.
 
 ---
 
