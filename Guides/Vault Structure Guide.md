@@ -24,7 +24,7 @@ DataWizard doesn't require a specific folder layout, but it works best when your
 ```
 Your Vault/
   _!nbox/              ← new captures land here (DataWizard processes this first)
-  _Clippings/          ← web clips (Obsidian Web Clipper)
+  _Intake/          ← web clips (Obsidian Web Clipper)
   _Companions/         ← AI-generated companion notes (mirrored subfolders)
   _Transcripts/        ← raw meeting/call transcripts
   _Voice Memos/        ← voice memo transcripts
@@ -44,7 +44,7 @@ Companion notes are AI-generated summaries, section maps, and key concept extrac
 ```
 _Companions/
   _Transcripts/        ← companions for notes in _Transcripts/
-  _Clippings/          ← companions for notes in _Clippings/
+  _Intake/          ← companions for notes in _Intake/
   _Meetings/           ← companions for notes in _Meetings/
 ```
 
@@ -183,7 +183,7 @@ Some folders should never be federated into shared project spaces:
 
 | Folder | Privacy level |
 |---|---|
-| `_Clippings/` | Private — personal web clips |
+| `_Intake/` | Private — personal web clips |
 | `_Transcripts/` | Private — raw meeting notes |
 | `_Meetings/` | Private — personal meeting notes |
 | `_X Project Local/` | Private — confidential project materials |

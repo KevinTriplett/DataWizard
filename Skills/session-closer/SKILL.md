@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-05-23'
-version: '1.6'
+updated: '2026-05-26'
+version: '1.8'
 ---
 
 # Session Closer Skill
@@ -168,6 +168,29 @@ Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:
 If the user agrees, load and follow the `project-health-audit` skill. After the audit completes, update `last_health_audit:` in the project's 0.0 frontmatter to the current session identifier.
 
 If declined, note it and move on. The prompt will recur in another 10 sessions.
+
+### Step 3.12: File size check
+
+Scan the "Files updated" and "Files created" lists for files
+that may be approaching MCP read limits. For any file you
+touched this session that you noticed was large or slow to
+read, check its size. Flag files approaching 50KB as
+candidates for shell + sections migration.
+
+If a file is already over 50KB and hasn't been sectioned,
+add an action item: "Section [filename] -- currently [size],
+exceeds MCP read limit."
+
+This catches growth before overflow. Skip if no large files
+were encountered this session.
+
+### Step 3.13: Meta-learning review nudge
+
+Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"`). If the current session is 5-10 sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
+
+"A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand by loading the meta-learning-review skill."
+
+This does not block session close -- it's a passive reminder in the handoff. If a meta-learning report already exists and hasn't been reviewed, mention that specifically.
 
 ### Step 4: Update related infrastructure files
 
