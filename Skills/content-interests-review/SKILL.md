@@ -7,7 +7,7 @@ description: >-
   stale', or when a project's scope has shifted and its routing signals need
   refreshing. Also triggered by the scheduled Content Interests audit.
 type: skill
-version: '1.3'
+version: '1.4'
 updated: '2026-05-26'
 ---
 
@@ -104,6 +104,7 @@ Once the user approves (with any edits), patch the Content Interests section int
 - If a Content Interests section already exists, use patch_note to replace it
 - If no section exists, use patch_note to append it after the last existing section. Look for the last `## ` heading in the 0.0 and its content, or a version/footer line, and patch after that block. Use the final paragraph of the last section as your anchor -- a long, unique string unlikely to appear elsewhere in the file.
 - Bump the `updated:` date in the 0.0's frontmatter
+- Set `last_content_interests_review:` to today's date in the 0.0's frontmatter (using `update_frontmatter` with merge: true). This field is separate from `updated:` -- it tracks when Content Interests were last reviewed, not when the 0.0 was last edited for any reason.
 
 ### Step 7: Confirm and note
 
