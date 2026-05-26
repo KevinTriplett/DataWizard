@@ -19,6 +19,8 @@ As of May 2026, the Obsidian MCP has intermittent reliability issues when multip
 
 **Stale reads.** After a successful `patch_note`, a subsequent `read_note` on the same file may return the pre-patch version. This may overlap with the phantom read issue (the MCP serving cached pre-patch content).
 
+**Frontmatter wipe via merge: false.** `update_frontmatter` with `merge: false` replaces the entire frontmatter -- any field you omit is deleted. Always use `merge: true` (the default) unless intentionally replacing the full schema. If you must use `merge: false`, re-read frontmatter first and include every field.
+
 ## What Triggers These Issues
 
 **Concurrent MCP access** is the confirmed trigger. All observed failures occurred on a day when 6+ Cowork instances were running simultaneously on the same vault, writing to the same project folder. Single-instance sessions have not exhibited these issues.

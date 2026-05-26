@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.6
+# DW Project Instructions v3.7
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -90,6 +90,9 @@ known intermittent MCP issue.
    (high/medium/low) and maturity:
    (draft/working/polished/canonical) to frontmatter.
    See YAML Schema (Protocol Section 4) for definitions.
+13. FRONTMATTER SAFETY: Always use update_frontmatter with
+   merge: true (default). merge: false deletes any omitted
+   fields.
 
 ## Skills
 Seed Skills (general skills applicable to all projects) live
@@ -131,7 +134,7 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.6).*
+*Re-paste only when the Project Instructions version changes (currently v3.7).*
 
 ---
 
@@ -139,8 +142,14 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.6 | 2026-05-03 |
+| Project Instructions | v3.7 | 2026-05-26 |
 | Seed | v1.0.0 | 2026-03-25 |
+
+---
+
+## What Changed in v3.7
+
+**Frontmatter safety (Working Rule 13).** Instances must use `update_frontmatter` with `merge: true` (the default). Using `merge: false` replaces the entire frontmatter, deleting any omitted fields. This caused accidental data loss in at least two sessions (S92, S95). One-line rule prevents the gotcha without requiring instances to read the MCP Reliability guide.
 
 ---
 
