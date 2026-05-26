@@ -6,7 +6,7 @@ description: >-
   migration', 'write project guidelines', 'set up a new project', or any mention
   of 0.0 files needing creation or updates.
 type: skill
-version: '1.2'
+version: '1.3'
 updated: '2026-05-26'
 ---
 
@@ -74,7 +74,7 @@ datawizard_protocol_version: "[current]"
 status: active
 ```
 
-**Filename:** `0.0 Project Guidelines - [Project Name].md` — always include the `- ProjectName` suffix to avoid wikilink ambiguity across projects. The dynamic Vault Project Map depends on unique filenames for its embed references.
+**Filename:** `0.0 Project Guidelines - [Project Name].md` — always include the `- ProjectName` suffix to avoid wikilink ambiguity across projects. The dynamic Vault Project Map depends on unique filenames for its embed references. If an existing 0.0 uses a different suffix than the project's folder name (e.g., an abbreviation or informal name), match the existing convention. Check other infrastructure files (0.2, action items) for the project's established naming pattern. Don't rename without asking.
 
 ## How to Draft
 
