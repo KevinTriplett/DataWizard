@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-05-26'
-version: '1.9'
+updated: '2026-05-27'
+version: '2.1'
 ---
 
 # Session Closer Skill
@@ -48,8 +48,9 @@ Follow the output format below. Write the full entry and present it in chat for 
 
 Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
 1. Re-read the session log shell to get the current section number and embed list
-2. Write the new section file to the session log folder. **If a session stub was written during orientation** (a section file with `status: in-progress`), overwrite that file with the full entry — same section number, same filename slot. Rename the file to replace "in progress" with the final title. Do not create a second section file.
-3. Patch the shell to update the embed reference (replace the stub filename with the final filename). If no stub exists, add the embed as usual.
+2. Write the new section file with the final title to the session log folder (e.g., `99.0 Session 113 - Brief Title.md`). Use the same section number as the stub.
+3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it.
+4. Patch the shell embed to reference the final filename. If the shell already embeds the stub filename, replace it with the final filename. If no stub existed, add the embed as usual.
 
 > **Parallel instance check:** Before writing, re-list the session log
 > section folder and verify the target section number (e.g., 38.0)
@@ -202,6 +203,30 @@ Also nudge if no `last_content_interests_review:` field exists and the project h
 
 This is a passive reminder in the handoff, not a blocker. The project instance that picks up the next session has the context to judge whether a review is actually needed -- time alone doesn't determine drift. If the project's direction hasn't changed, the instance can skip it and note why.
 
+### Step 3.15: Operator field and team flag prompt
+
+**Operator field (always).** Add `operator: FirstName` to the frontmatter of:
+- The session log section file (always)
+- Any content documents created or substantially updated this session
+
+Use the human operator's first name (e.g. `Andrew`, `Kaliya`, `Jay`). This field powers the "Recent Team Activity" section of the team dashboard and makes authorship queryable via Bases/Dataview.
+
+**Team flag prompt (multi-operator projects only).** If the project has more than one operator, present the user with a list of files created or substantially updated this session. Pre-select:
+- Any file created this session with `priority: high`
+- New synthesis documents, analyses, or research notes
+- Any file that substantially updates a shared canonical doc (design docs, strategy docs, etc.)
+
+Ask: "Which of these should be flagged for team attention -- meaning other operators should read it before their next session?"
+
+For each file the user selects:
+1. Add `team_attention: YYYY-MM-DD` (today's date) to its frontmatter
+2. Add `team_attention_by: FirstName` (the operator's first name)
+3. Ask for a one-line `team_attention_note`, or suggest a default based on the file title/context
+
+**On ungraceful session close** (context exhausted before the user can confirm): auto-flag any `priority: high` files created this session using `team_attention_by: "FirstName (auto)"`. The human can review and remove auto-flags in a subsequent session.
+
+**Solo operators:** Apply the `operator` field as usual. Skip the team flag prompt -- there are no other operators to notify. The field is still useful if the project gains team members later.
+
 ### Step 4: Update related infrastructure files
 
 Check whether the session produced work that belongs in other files:
@@ -223,6 +248,7 @@ parent: "[[0.2 Session Log - Project]]"
 section: N
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
+operator: FirstName
 datawizard_protocol_version: "1.7"
 ```
 
