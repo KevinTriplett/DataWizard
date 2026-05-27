@@ -22,7 +22,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v3.9
+# DW Project Instructions v4.0
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -98,6 +98,16 @@ known intermittent MCP issue.
    in chat. Write directly to vault for review. For small
    edits, describe changes in plain prose. Markdown in code
    blocks doesn't wrap and is unreadable in chat.
+15. TERMINAL COMMANDS: When file or folder operations
+   (moves, copies, deletions, renames) can't be done via
+   Obsidian MCP or system tools, generate a terminal
+   command for the user to run, followed by a verification
+   command to confirm it worked.
+16. FILESYSTEM FALLBACK: If obsidian:read_note overflows
+   on a large file, or you need direct file access that
+   MCP can't provide, use request_cowork_directory with
+   the vault path to get filesystem access. Don't waste
+   multiple attempts on MCP workarounds first.
 
 ## Skills
 Seed Skills (general skills applicable to all projects) live
@@ -121,20 +131,20 @@ Seed Skills:
 See _DataWizard/Seed/SKILLS.md for full catalog.
 
 ## Orientation (once per thread)
-1. Fetch VERSION.md from GitHub API:
-   https://api.github.com/repos/andrewalan11/DataWizard/contents/VERSION.md
-   The API returns JSON - decode the base64 "content" field.
-   Compare against local _DataWizard/Seed/VERSION.md.
-   Follow the instructions in VERSION.md for any mismatches
-   (Seed version, project instructions version).
-   If GitHub is unreachable, continue with local Seed.
+1. Read local _DataWizard/Seed/VERSION.md. Compare its
+   project_instructions value against the version in the
+   header of these instructions (e.g. "v4.0"). Ignore any
+   "-local" suffix. If local Seed has a newer version,
+   tell the user: "Your PI is v[yours] but your Seed has
+   v[local]. Copy the updated PI from the Seed into your
+   project settings." If your running PI is newer than the
+   Seed, that's normal - continue silently.
 2. Read 0.0 Project Guidelines in full (project context).
 3. Read 0.2 Session Log (last 2-3 entries only). The most
    recent "What's next" section tells you where to pick up.
 4. Read action items file if one exists.
-5. State the session number and propose a thread name.
-   Format: ProjectAbbrev SNN - expected focus (no date).
-   Base it on "What's next" and any user direction.
+5. State the project abbreviation and session number
+   (e.g. "DW S116").
 6. Create a session log stub to claim your session number.
    List the session log section folder, determine the next
    available section number, and write a minimal stub file:
@@ -153,7 +163,7 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v3.9).*
+*Re-paste only when the Project Instructions version changes (currently v4.0).*
 
 ---
 
@@ -161,8 +171,20 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v3.9 | 2026-05-26 |
-| Seed | v1.0.0 | 2026-03-25 |
+| Project Instructions | v4.0 | 2026-05-27 |
+| Seed | v1.1.0 | 2026-05-02 |
+
+---
+
+## What Changed in v4.0
+
+**Local-only version check (Step 1).** Orientation no longer fetches VERSION.md from GitHub. Instead, instances read the local Seed's VERSION.md and compare its `project_instructions` value against the running PI version. If the local Seed has a newer PI, the instance tells the user to re-paste. This eliminates the GitHub authorization prompt on every session start. Seed updates are handled separately via update_seed.sh or git sync.
+
+**Simplified session greeting (Step 5).** Instances now just state the project abbreviation and session number (e.g. "DW S116") without proposing a thread name.
+
+**Terminal command generation (Working Rule 15).** When file or folder operations can't be done via Obsidian MCP or system tools, instances generate a terminal command for the user to run plus a verification command to confirm it worked. Addresses the gap where folder renames, cross-vault moves, and deletions required manual user action with no guidance.
+
+**Filesystem fallback (Working Rule 16).** When obsidian:read_note overflows on large files or direct file access is needed, instances should use request_cowork_directory with the vault path rather than wrestling with MCP workarounds. Pattern validated in S89 (Research Tracking Index sectioning).
 
 ---
 

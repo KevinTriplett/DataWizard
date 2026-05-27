@@ -4,7 +4,7 @@ type: project-doc
 version: '2.6'
 status: active
 created: '2026-03-12'
-updated: '2026-05-02'
+updated: '2026-05-27'
 ---
 
 # DataWizard Protocol Summary (v2.6)
@@ -18,7 +18,7 @@ updated: '2026-05-02'
 - **Edits in chat first** — show proposed changes as plain text, then write
 - **Re-read before writing** — in shared projects using Relay Obsidian plugin or similar, always re-read the file immediately before writing (another user may have changed it). In solo work, re-read only if the file was last read many messages ago. YAML-only updates via `update_frontmatter` are safe without re-reading (it merges, not overwrites).
 - **Chunk large tasks.** Present each chunk, get approval, execute, check in before next chunk.
-- **Verify before retry.** Confirm success after any write/patch/move before attempting again.
+- **Verify before retry.** Confirm success after any write/patch/move before attempting again. For new files, use `list_directory` (not `read_note`). For patches, use `read_note` and search for the changed content. Retry once on failure, then alert the user.
 - **Ask when uncertain.** Wrong edits are harder to undo than clarifying questions.
 - **Load tools before using them.** MCP tools load lazily — if `patch_note` or another tool isn't in your tool list, run `tool_search` with a specific query (e.g., "obsidian patch note") to load it. Don't assume a tool is unavailable just because it didn't appear in the first batch.
 - **Harvest discipline.** Per source: segment with `##` headers → harvest → update source YAML. Complete all three before next source. Before harvesting from any transcript, check YAML for `segmented: true` — if missing or false, prompt the user to run segmentation first.
@@ -28,7 +28,7 @@ updated: '2026-05-02'
 
 *Note: This orientation flow is defined in the Project Instructions (v3.0). It's reproduced here for reference.*
 
-1. **Version check**: Fetch VERSION.md from GitHub, compare against local Seed. Follow VERSION.md instructions for mismatches.
+1. **Version check**: Read local _DataWizard/Seed/VERSION.md. Compare its project_instructions value against the running PI version. If the Seed has a newer PI, tell the user to re-paste from the Seed.
 2. **Read 0.0 Project Guidelines** in full (project context).
 3. **Read 0.1 MOC** for file inventory and status overview.
 4. **Read session log** (0.2) - last 2-3 entries. The "What's next" section tells you where to pick up.
@@ -38,18 +38,19 @@ updated: '2026-05-02'
 
 ## Version Update Flow
 
-Version update instructions now live in VERSION.md itself. When orientation detects a mismatch, VERSION.md tells the instance exactly what to do - whether to update the Seed (run update_seed.sh) or re-paste Project Instructions (fetch from GitHub).
+Version update instructions live in VERSION.md. Orientation compares the local Seed's PI version against the running PI. If the Seed is newer, the instance tells the user to re-paste from the Seed. Seed updates are handled separately via update_seed.sh or git sync -- not during orientation.
 
 ## Infrastructure Files
 | Prefix | File | Required |
 |---|---|---|
-| `!` | Action Items - Project Name | When needed (sorts to top of folder) |
 | 0.0 | Project Guidelines - Project Name | Always |
 | 0.1 | MOC - Project Name | Always |
 | 0.2 | Session Log - Project Name | Always |
 | 0.3 | Decision Log - Project Name | Always |
 | 0.4 | Harvest Log - Project Name | On first harvest |
+| 0.5 | Action Items - Project Name | When needed |
 | 0.6 | Related Notes - Project Name | Recommended |
+| 0.7 | Quest Log - Project Name | When needed |
 
 All infrastructure files MUST include the project name after a hyphen to be uniquely identifiable across the vault. Use plain hyphens (`-`), never em-dashes (`—`).
 
@@ -58,8 +59,6 @@ All 0.x infrastructure files MUST include in frontmatter:
 - `datawizard_protocol_version:` — the protocol version the file was last written or reviewed against (currently 1.7)
 
 For shared/collaborative projects (using Relay or shared folders), infrastructure files may live inside the shared workspace (e.g., `_Project/Project Shared/0.0 Project Guidelines - Project.md`) rather than at the project root, so collaborators can see them.
-
-The `!` prefix sorts files and folders to the top of any directory listing. Use it for action items (`! Action Items - Project Name.md`) and for master document folders (`! Master Documents/`).
 
 Content sections start at 1.0+. Never renumber existing sections.
 
