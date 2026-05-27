@@ -1,7 +1,7 @@
 
 seed: 1.1.0
 protocol: 1.7
-project_instructions: 3.9
+project_instructions: 4.0
 
 ## What's New in 1.1.0
 - Meta-folder convention: `_` prefix replaces `~` for Sections, Archive, Infrastructure (D71)
@@ -42,13 +42,10 @@ How instances handle version mismatches:
 
 ## If your Seed version doesn't match
 
-Compare the seed value above against your local
-_DataWizard/Seed/VERSION.md. If they don't match, tell
-the user what changed (read the What's New section) and ask:
-  "Your Seed is v[local] but v[current] is available.
-  Here's what's new: [summary]. Want to update?"
-
-If yes, tell them to run:
+Seed version mismatches are not checked during orientation.
+The Seed is updated separately via update_seed.sh or git
+sync. If a user suspects their Seed is out of date, tell
+them to run:
   bash _DataWizard/Seed/update_seed.sh
 
 If this is a fresh install and update_seed.sh doesn't exist
@@ -63,35 +60,30 @@ yet, give them the install command:
 
 ## If your Project Instructions version doesn't match
 
-Compare three values:
-- **GitHub PI version**: the project_instructions field in the
-  GitHub VERSION.md you fetched during orientation
+Compare two values:
 - **Local PI version**: the project_instructions field in your
-  local _DataWizard/Seed/VERSION.md
+  local _DataWizard/Seed/VERSION.md (this file)
 - **Running PI version**: the version in the header of your
-  pasted Project Instructions (e.g., "v3.9" or "v3.9-local";
+  pasted Project Instructions (e.g., "v4.0" or "v4.0-local";
   ignore the "-local" suffix)
 
 Handle each case:
 
-**GitHub > running (you're behind):** Tell the user:
-  "Your Project Instructions are v[running] but v[GitHub] is
-  available. Want me to fetch the latest so you can update?"
-If yes, fetch the full file from:
-  https://raw.githubusercontent.com/andrewalan11/DataWizard/main/COPY%20INTO%20CLAUDE%20PROJECT.md
-Print the paste block (between the ``` fences) in full so
-the user can copy it into Settings - Project Instructions.
+**Local > running (Seed has a newer PI):** Tell the user:
+  "Your Project Instructions are v[running] but your Seed has
+  v[local]. Copy the updated PI from
+  _DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md
+  into Settings - Project Instructions."
 Remind them to keep their Home folder line.
-If no, continue with current instructions.
 
-**Running > GitHub (you're ahead):** The user has pasted a
-newer PI version that hasn't been pushed to GitHub yet. This
-is normal -- it means the user updated locally. Do not flag
-this as an error. Continue with current instructions.
+**Running > local (user is ahead of Seed):** The user has
+pasted a newer PI version that hasn't been pushed to the
+Seed yet. This is normal. Continue with current instructions.
 
-**Local VERSION.md is stale:** If the local VERSION.md
-project_instructions field doesn't match the running PI
-version, update it silently using patch_note to keep it in
+**Running matches but local VERSION.md is stale:** If the
+local VERSION.md project_instructions field doesn't match
+the running PI version but the running PI is clearly newer,
+update VERSION.md silently using patch_note to keep it in
 sync. This prevents future instances from seeing a false
 mismatch.
 

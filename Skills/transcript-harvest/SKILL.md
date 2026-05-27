@@ -6,8 +6,8 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-04-27'
-version: '0.4'
+updated: '2026-05-27'
+version: '0.5'
 ---
 
 # Transcript Harvest Skill
@@ -51,6 +51,16 @@ Harvest content from transcripts (video, podcast, meeting, voice memo) into proj
 - Forgetting the Harvest Ledger -- source YAML is the truth, but the ledger is how humans and agents scan routing at a glance
 - Harvesting without checking project assignment -- content ends up in the wrong project docs or gets orphaned
 - Processing multiple sources without completing all 8 steps per source first (session log excepted -- that waits til end)
+- Using read-write-delete to relocate a transcript instead of `move_note` -- wastes tokens sending the entire body through the tool call for no content-level reason
+
+## Note Relocation
+
+When a transcript needs to move (e.g., from vault root to a project folder during harvest):
+
+1. Use `move_note` to relocate the file -- this is atomic, zero-token, and preserves wikilinks.
+2. Then use `update_frontmatter` or `patch_note` to add/update harvest metadata separately.
+
+Never read-write-delete to move a note. Transcripts can be thousands of words long and the content doesn't change during a move. This rule applies to all note relocations, not just transcripts.
 
 ## Routing Patterns
 
