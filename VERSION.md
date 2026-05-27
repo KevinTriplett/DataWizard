@@ -1,7 +1,7 @@
 
 seed: 1.1.0
 protocol: 1.7
-project_instructions: 3.5
+project_instructions: 3.9
 
 ## What's New in 1.1.0
 - Meta-folder convention: `_` prefix replaces `~` for Sections, Archive, Infrastructure (D71)
@@ -63,17 +63,36 @@ yet, give them the install command:
 
 ## If your Project Instructions version doesn't match
 
-Your version is in the header of your pasted instructions
-(e.g., "v2.8" or "v2.8-local"). Compare against the
-project_instructions value above (ignore "-local" suffix).
+Compare three values:
+- **GitHub PI version**: the project_instructions field in the
+  GitHub VERSION.md you fetched during orientation
+- **Local PI version**: the project_instructions field in your
+  local _DataWizard/Seed/VERSION.md
+- **Running PI version**: the version in the header of your
+  pasted Project Instructions (e.g., "v3.9" or "v3.9-local";
+  ignore the "-local" suffix)
 
-If they don't match, tell the user:
-  "Your Project Instructions are v[yours] but the current
-  version is v[current]. Want me to fetch the latest so
-  you can update?"
+Handle each case:
+
+**GitHub > running (you're behind):** Tell the user:
+  "Your Project Instructions are v[running] but v[GitHub] is
+  available. Want me to fetch the latest so you can update?"
 If yes, fetch the full file from:
   https://raw.githubusercontent.com/andrewalan11/DataWizard/main/COPY%20INTO%20CLAUDE%20PROJECT.md
 Print the paste block (between the ``` fences) in full so
 the user can copy it into Settings - Project Instructions.
 Remind them to keep their Home folder line.
 If no, continue with current instructions.
+
+**Running > GitHub (you're ahead):** The user has pasted a
+newer PI version that hasn't been pushed to GitHub yet. This
+is normal -- it means the user updated locally. Do not flag
+this as an error. Continue with current instructions.
+
+**Local VERSION.md is stale:** If the local VERSION.md
+project_instructions field doesn't match the running PI
+version, update it silently using patch_note to keep it in
+sync. This prevents future instances from seeing a false
+mismatch.
+
+**All match:** No action needed.
