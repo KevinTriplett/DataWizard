@@ -224,10 +224,11 @@ For each file the user selects:
 1. Add `flag: YYYY-MM-DD` (today's date) to its frontmatter
 2. Add `flag_by: FirstName` (the operator's first name)
 3. Ask for a one-line `flag_note`, or suggest a default based on the file title/context
+4. Add `flag_for:` as a YAML list of all other team operators (e.g. if Andrew flags it: `flag_for: [Kaliya, Jay, Kevin]`). The user can adjust the list if it's only relevant to specific people.
 
-**On ungraceful session close** (context exhausted before the user can confirm): auto-flag any `priority: high` files created this session using `flag_by: "FirstName (auto)"`. The human can review and remove auto-flags in a subsequent session.
+**On ungraceful session close** (context exhausted before the user can confirm): auto-flag any `priority: high` files created this session using `flag_by: "FirstName (auto)"` and `flag_for:` listing all other team operators. The human can review and remove auto-flags in a subsequent session.
 
-**Team read tracking (multi-operator projects only).** During orientation or at any point in the session when the operator reads a file that has a `flag` field set, add a read field to that file's frontmatter using the operator's initial: `read_a` (Andrew), `read_k` (Kaliya), `read_j` (Jay), `read_kv` (Kevin). Value is today's date (YYYY-MM-DD). Use `update_frontmatter` with `merge: true`. Only add the read field for the current operator -- never for other operators. This tracks who has seen the flagged item. When all known team operators have read fields on a flagged file, anyone can clear the `flag`, `flag_by`, and `flag_note` fields to remove it from the dashboard.
+**Team read dismiss (multi-operator projects only).** During orientation or at any point in the session when the operator reads a file that has a `flag_for` list containing their name, remove their name from the `flag_for` list using `update_frontmatter`. When the list is empty, all operators have seen the item -- anyone can then clear the `flag`, `flag_by`, `flag_note`, and `flag_for` fields to remove it from the dashboard entirely.
 
 **Solo operators:** Apply the `operator` field as usual. Skip the team flag prompt and team read tracking -- there are no other operators to notify. The field is still useful if the project gains team members later.
 
