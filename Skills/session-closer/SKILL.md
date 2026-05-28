@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-05-27'
-version: '2.1'
+updated: '2026-05-28'
+version: '2.2'
 ---
 
 # Session Closer Skill
@@ -162,7 +162,7 @@ This catches the most common drift pattern -- adding sections without updating t
 
 ### Step 3.11: Periodic project health audit
 
-Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"`). If the current session is 10+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
+Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
 
 "It's been [N] sessions since the last project health audit (or: no audit on record). Want me to run a DW review? It checks shell-section drift, YAML compliance, filename safety, and protocol conformance. Takes 5-10 minutes."
 
@@ -187,7 +187,7 @@ were encountered this session.
 
 ### Step 3.13: Meta-learning review nudge
 
-Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"`). If the current session is 5-10 sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
+Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
 
 "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand by loading the meta-learning-review skill."
 
@@ -357,6 +357,7 @@ The session title should capture the main theme in 3-8 words. Use plain hyphens,
 - **Learnings too vague.** "Learned about MCP tools" isn't searchable. "tool_search needs multi-word descriptive queries including the tool name; single words return nothing" is.
 - **Forgetting the "why."** A fresh instance doesn't know why a particular task matters. One sentence of framing prevents misunderstanding.
 - **Over-narrating "What happened."** This isn't a diary. Dense, scannable, focused on what a future reader needs to know.
+- **Following a stale "What's next" without re-evaluating.** If the previous session's "What's next" was written because that session was low on context (not because the items are the highest-value work), a fresh session should re-evaluate priorities rather than following the stale plan. The "What's next" reflects the best guess at the time -- a fresh context window with full project awareness may see a better path (S114).
 
 ## Relationship to Other Files
 

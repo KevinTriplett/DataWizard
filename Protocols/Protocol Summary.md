@@ -4,7 +4,7 @@ type: project-doc
 version: '2.6'
 status: active
 created: '2026-03-12'
-updated: '2026-05-27'
+updated: '2026-05-28'
 ---
 
 # DataWizard Protocol Summary (v2.6)
@@ -249,7 +249,9 @@ The audit is also triggered automatically by the session-closer every ~10 sessio
 - Don't add empty YAML fields as placeholders
 - Don't process files outside your project scope
 - Don't re-run expensive operations without checking YAML first
-- Don't use em-dashes (—), curly quotes, or other special characters in note titles — use plain hyphens (-) and straight quotes. Special characters cause patch and path-matching failures.
+- Don't use em-dashes, curly quotes, or other special characters in note titles -- use plain hyphens (-) and straight quotes. Special characters cause patch and path-matching failures.
+- **Use `move_note` for all file renames** -- it preserves wikilink backlinks automatically. Terminal `mv` does not update backlinks and should only be used for folder renames (no MCP equivalent) (S104, S116).
+- **Before folder renames, grep for path-based references.** Search vault content for the old folder path to identify docs needing post-rename patching. Historical references in session logs can be left as-is (S116).
 
 ---
 
