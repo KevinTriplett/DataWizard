@@ -7,8 +7,8 @@ description: >-
   report is ready for review. Also triggered by session-closer nudge when 5-10
   sessions have elapsed since last review.
 type: skill
-updated: '2026-05-26'
-version: '1.0'
+updated: '2026-05-28'
+version: '1.1'
 ---
 
 # Meta-Learning Review Skill
@@ -36,9 +36,9 @@ This is the interpretive complement to design-harvest. Design-harvest plants res
 
 ## Cadence
 
-The review-and-plant cycle targets every **5-10 sessions** per project. This keeps each review batch small enough to fully plant in one session while catching learnings before they go stale.
+The review-and-plant cycle targets every **30 sessions** per project. This gives enough time for meaningful patterns to accumulate while keeping each review batch manageable.
 
-The session-closer Step 3.11 (periodic health audit) provides the model: check a frontmatter field, compare against current session number, nudge if threshold exceeded. The meta-learning review uses the same pattern -- see Wiring below.
+The session-closer Step 3.13 (periodic meta-learning nudge) provides the trigger: check `last_meta_learning_review:` in 0.0 frontmatter, compare against current session number, nudge if 30+ sessions have elapsed.
 
 ### Backlog Mode
 
