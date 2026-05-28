@@ -5,6 +5,7 @@ created: '2026-05-28'
 updated: '2026-05-28'
 edit_log:
   - DW-S117 2026-05-28
+  - DW-S118 2026-05-28
 ---
 
 # Obsidian Bases Reference
@@ -17,7 +18,11 @@ The `order` array in a Bases view controls both **which columns appear** AND the
 
 ## Row Height
 
-Row height is controlled by the `--bases-table-row-height` CSS variable on `.bases-tbody`, set inline by JS at 30px. Override with `!important` in a CSS snippet, but only to a fixed value -- no dynamic row sizing. A bases-title-wrap.css snippet exists in the DataWizard project folder. (S111)
+**Use the built-in setting, not CSS.** Right-click the view name (e.g. "Drafts") in the Bases toolbar and select Row Height (short/medium/tall/extra tall). This is stored in the view YAML as `rowHeight: medium` and is portable -- team members opening the same file get the same row height.
+
+Medium works well for two-line titles. Text wrapping happens automatically at medium height and above.
+
+**Do not override row height via CSS.** Bases uses absolute positioning with virtual scrolling. CSS overrides to `--bases-table-row-height` or row positioning break the scroll engine, causing jitter and inability to scroll. This was extensively tested in S111 and S118 -- every CSS approach either failed to change row heights or broke scrolling. (S111, S118)
 
 ## Reliable Date Column
 
@@ -29,4 +34,12 @@ For collections with inconsistent `type` values (e.g., Weave transcripts with 3+
 
 ## Sort Directive
 
-`sort: - property: X, direction: desc` syntax exists but was not confirmed to affect default sort order in testing. May be silently ignored. Test before relying on it. (S111)
+The sort directive works and is stored in view YAML. Use uppercase `DESC` or `ASC`:
+
+```yaml
+sort:
+  - property: updated
+    direction: DESC
+```
+
+Setting this via the UI (click Sort in the toolbar) writes it into the YAML, making it portable. Earlier S111 testing was inconclusive, but S118 confirmed it works -- the dashboard renders with correct default sort order. (S111, S118)
