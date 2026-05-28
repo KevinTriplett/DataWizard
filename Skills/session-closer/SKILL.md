@@ -8,7 +8,7 @@ description: >-
   previous session.
 type: skill
 updated: '2026-05-28'
-version: '2.2'
+version: '2.4'
 ---
 
 # Session Closer Skill
@@ -170,6 +170,8 @@ If the user agrees, load and follow the `project-health-audit` skill. After the 
 
 If declined, note it and move on. The prompt will recur in another 10 sessions.
 
+**Silence rule:** Do not mention health audits in "What's next," during orientation, or anywhere outside this step. No "approaching threshold" or "getting close" language. The nudge exists only here, only when the threshold is met. Instances that pre-announce upcoming audits create noise across every session and every project.
+
 ### Step 3.12: File size check
 
 Scan the "Files updated" and "Files created" lists for files
@@ -219,13 +221,15 @@ Use the human operator's first name (e.g. `Andrew`, `Kaliya`, `Jay`). This field
 Ask: "Which of these should be flagged for team attention -- meaning other operators should read it before their next session?"
 
 For each file the user selects:
-1. Add `team_attention: YYYY-MM-DD` (today's date) to its frontmatter
-2. Add `team_attention_by: FirstName` (the operator's first name)
-3. Ask for a one-line `team_attention_note`, or suggest a default based on the file title/context
+1. Add `flag: YYYY-MM-DD` (today's date) to its frontmatter
+2. Add `flag_by: FirstName` (the operator's first name)
+3. Ask for a one-line `flag_note`, or suggest a default based on the file title/context
 
-**On ungraceful session close** (context exhausted before the user can confirm): auto-flag any `priority: high` files created this session using `team_attention_by: "FirstName (auto)"`. The human can review and remove auto-flags in a subsequent session.
+**On ungraceful session close** (context exhausted before the user can confirm): auto-flag any `priority: high` files created this session using `flag_by: "FirstName (auto)"`. The human can review and remove auto-flags in a subsequent session.
 
-**Solo operators:** Apply the `operator` field as usual. Skip the team flag prompt -- there are no other operators to notify. The field is still useful if the project gains team members later.
+**Team read tracking (multi-operator projects only).** During orientation or at any point in the session when the operator reads a file that has a `flag` field set, add a read field to that file's frontmatter using the operator's initial: `read_a` (Andrew), `read_k` (Kaliya), `read_j` (Jay), `read_kv` (Kevin). Value is today's date (YYYY-MM-DD). Use `update_frontmatter` with `merge: true`. Only add the read field for the current operator -- never for other operators. This tracks who has seen the flagged item. When all known team operators have read fields on a flagged file, anyone can clear the `flag`, `flag_by`, and `flag_note` fields to remove it from the dashboard.
+
+**Solo operators:** Apply the `operator` field as usual. Skip the team flag prompt and team read tracking -- there are no other operators to notify. The field is still useful if the project gains team members later.
 
 ### Step 4: Update related infrastructure files
 
