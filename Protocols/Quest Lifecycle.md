@@ -62,6 +62,16 @@ Standard dashboard views and their filters:
 - **Open:** `status == "open"` -- backlog
 - **All:** no status filter -- full inventory including complete and cancelled
 
+## Priority Levels
+
+| Priority | Meaning |
+|---|---|
+| `1` | Blocking other work or time-sensitive. Address soon. |
+| `2` | Important. Work when opportunity arises. |
+| `3` | Worth doing, no urgency. Pick up when the moment is right. |
+
+Priority is independent of status. An `active` quest can be P3 (being worked but not urgent), and an `open` quest can be P1 (hasn't started but should start soon).
+
 ## Required Frontmatter
 
 Quest files must include these fields for dashboard compatibility:
