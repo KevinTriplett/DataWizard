@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-05-28'
-version: '2.4'
+updated: '2026-05-29'
+version: '2.5'
 ---
 
 # Session Closer Skill
@@ -66,17 +66,17 @@ Suggest a final thread name for the session. Format: `checkmark ProjectAbbrev SN
 
 ### Step 3.6: Knowledge transfer check
 
-**Before moving to infrastructure updates, ask the user:**
+**Before moving to infrastructure updates, do a self-check.**
 
-"Is there anything else from this session that needs to be
-documented in more detail before we close? I want to make sure
-we've transferred the details of what we learned into the
-appropriate design docs, skills, and tracking files -- not just
-the session log."
+Scan the conversation for findings, decisions, or detailed
+context that exist only in chat and haven't been planted into
+the appropriate design docs, skills, or tracking files. The
+session log captures WHAT happened, but detailed findings belong
+in the docs where future work happens.
 
-This is not optional. The session log captures WHAT happened,
-but detailed findings belong in the docs where future work
-happens.
+This is not optional. Do not ask the user -- run the check
+yourself. If you find unplanted material, propose where it
+should go. If everything has been transferred, move on silently.
 
 > **Harvest sessions:** In a harvest session, the entire session is knowledge transfer -- every chunk writes findings into destination documents. The check is still valuable (use it to verify nothing remains only in chat), but recognize that harvest sessions are inherently knowledge-transfer-complete in a way that design or build sessions aren't.
 
