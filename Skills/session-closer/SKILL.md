@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-05-29'
-version: '2.5'
+updated: '2026-05-30'
+version: '2.7'
 ---
 
 # Session Closer Skill
@@ -66,23 +66,22 @@ Suggest a final thread name for the session. Format: `checkmark ProjectAbbrev SN
 
 ### Step 3.6: Knowledge transfer check
 
-**Before moving to infrastructure updates, do a self-check.**
+**Before moving to infrastructure updates, triage each learning from this session.**
 
-Scan the conversation for findings, decisions, or detailed
-context that exist only in chat and haven't been planted into
-the appropriate design docs, skills, or tracking files. The
-session log captures WHAT happened, but detailed findings belong
-in the docs where future work happens.
+For each finding, decision, or detailed context that emerged during the session, classify it:
 
-This is not optional. Do not ask the user -- run the check
-yourself. If you find unplanted material, propose where it
-should go. If everything has been transferred, move on silently.
+- **Session-log-only**: Routine or one-off (e.g., "tool X was slow today," "retried three times before patch landed"). No further planting needed.
+- **Design-doc**: Technical finding that future task-specific work needs. Identify the specific target doc and plant it there. Example: an edge case discovered during a build belongs in the relevant design doc, not just the session log.
+- **Skill-update**: Process improvement that should change how a skill works. Patch the skill now or add a specific action item naming the skill and what to change.
+- **Protocol-update**: Convention change that affects all projects. Handled by Step 3.7 (convention-change check) -- flag it there if not already caught.
 
-> **Harvest sessions:** In a harvest session, the entire session is knowledge transfer -- every chunk writes findings into destination documents. The check is still valuable (use it to verify nothing remains only in chat), but recognize that harvest sessions are inherently knowledge-transfer-complete in a way that design or build sessions aren't.
+**Planting verification.** For each learning classified as design-doc or skill-update, verify the content was actually written to the target before closing. Not just "did you think about it" but "confirm the patch landed." If planting hasn't happened yet, do it now or add a specific action item with the target file path.
 
-A learning noted in the session log as "discovered X
-pattern" is far less useful than that same pattern written into
-the relevant skill or design doc with full context.
+**Backlinks.** When a learning is planted in a design doc or skill, note where it went in the session log's Learnings section (e.g., "See Editorial Technical Notes > Frame Rate section for full detail"). This makes the session log a discovery record that points to where the substance lives.
+
+This is not optional. Do not ask the user -- run the triage yourself. If everything has been transferred, move on silently.
+
+> **Harvest sessions:** In a harvest session, the entire session is knowledge transfer -- every chunk writes findings into destination documents. The triage is still valuable (verify nothing remains only in chat), but recognize that harvest sessions are inherently knowledge-transfer-complete in a way that design or build sessions aren't.
 
 ### Step 3.7: Convention-change check
 
@@ -218,7 +217,9 @@ Use the human operator's first name (e.g. `Andrew`, `Kaliya`, `Jay`). This field
 - New synthesis documents, analyses, or research notes
 - Any file that substantially updates a shared canonical doc (design docs, strategy docs, etc.)
 
-Ask: "Which of these should be flagged for team attention -- meaning other operators should read it before their next session?"
+**In Cowork (AskUserQuestion available):** Use `AskUserQuestion` with `multiSelect: true` to present candidates as selectable options. Each option's `label` is the file's display name; `description` summarizes what changed this session. Pre-selected items should appear first in the options list with "(Recommended)" appended to the label. This lets the operator click rather than type. If the operator has indicated a preference against AskUserQuestion, fall back to the text-list approach below.
+
+**In Chat or when AskUserQuestion is unavailable:** Ask in prose: "Which of these should be flagged for team attention -- meaning other operators should read it before their next session?" List the candidates with numbered options for easy selection.
 
 For each file the user selects:
 1. Add `flag: YYYY-MM-DD` (today's date) to its frontmatter
