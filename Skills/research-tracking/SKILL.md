@@ -8,8 +8,8 @@ description: >-
   accumulating without a tracking system, or any time you are about to evaluate
   a tool, repo, framework, or external resource.
 type: skill
-updated: '2026-03-28'
-version: '1.1'
+updated: '2026-05-31'
+version: '1.2'
 ---
 
 # Research Tracking
@@ -60,6 +60,26 @@ was there any standout detail worth preserving?
 Check the tracking index before evaluating anything new. Look in both
 the Evaluated table (don't re-research) and the Queued for Review
 section (a queued item's trigger may now be active).
+
+### After Triage -- Queue High-Value Items
+
+When a triage batch produces Medium-High or High items at Light
+depth, add a "Queued for Deep Read" section to the RTI with:
+- Name and URL
+- Review Trigger (what design context would make this worth a
+  deep read -- e.g., "when D12 graph threshold becomes active")
+- Why (what specifically to investigate in the deep read)
+
+This closes the gap between triage (capturing what exists) and
+design harvest (applying what was learned). Without it, Light-
+depth findings sit in the RTI but never get pulled deeper.
+
+### Before Design Work
+
+When starting work on a design doc, check the RTI "Queued for
+Deep Read" sections for items whose review trigger matches the
+current design context. If matches exist, do the deep read first
+-- research is most valuable when it feeds live design decisions.
 
 ### After Research -- Single Target
 
