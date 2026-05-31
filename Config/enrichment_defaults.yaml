@@ -1,0 +1,122 @@
+# Enrichment Pipeline Default Policies
+# Each type maps to its baseline enrichment policy.
+# Absent types fall through to _default.
+#
+# Fields:
+#   harvest_depth: deep | standard | light
+#   lexicon_scan: true | false
+#   speaker_attribution: true | false
+#   cross_reference: true | false
+#   url_extraction: true | false
+#   segment: true | false
+#
+# Design doc: Workshop/Design/Enrichment Policy YAML Schema.md
+# Created: DW-S133 2026-05-31
+
+_default:
+  harvest_depth: standard
+  lexicon_scan: true
+  speaker_attribution: false
+  cross_reference: true
+  url_extraction: true
+  segment: false
+
+article:
+  harvest_depth: standard
+  lexicon_scan: true
+  speaker_attribution: false
+  cross_reference: true
+  url_extraction: true
+  segment: false
+
+podcast-transcript:
+  harvest_depth: standard
+  lexicon_scan: true
+  speaker_attribution: true
+  cross_reference: true
+  url_extraction: true
+  segment: true
+
+video-transcript:
+  harvest_depth: standard
+  lexicon_scan: true
+  speaker_attribution: true
+  cross_reference: true
+  url_extraction: true
+  segment: true
+
+meeting-transcript:
+  harvest_depth: light
+  lexicon_scan: false
+  speaker_attribution: true
+  cross_reference: false
+  url_extraction: false
+  segment: true
+
+voice-memo-transcript:
+  harvest_depth: light
+  lexicon_scan: false
+  speaker_attribution: false
+  cross_reference: false
+  url_extraction: false
+  segment: true
+
+reddit-save:
+  harvest_depth: light
+  lexicon_scan: false
+  speaker_attribution: false
+  cross_reference: false
+  url_extraction: true
+  segment: false
+
+seedpod:
+  harvest_depth: standard
+  lexicon_scan: true
+  speaker_attribution: false
+  cross_reference: true
+  url_extraction: true
+  segment: false
+
+document:
+  harvest_depth: standard
+  lexicon_scan: true
+  speaker_attribution: false
+  cross_reference: true
+  url_extraction: true
+  segment: false
+
+seed:
+  harvest_depth: light
+  lexicon_scan: true
+  speaker_attribution: false
+  cross_reference: false
+  url_extraction: false
+  segment: false
+
+event:
+  harvest_depth: light
+  lexicon_scan: false
+  speaker_attribution: false
+  cross_reference: false
+  url_extraction: false
+  segment: false
+
+# Signal override rules (processed in order, each can override specific fields)
+# Conditions are evaluated against source file YAML + content properties.
+# Explicit enrichment_policy: fields on the source file override everything.
+signal_overrides:
+  - condition: "highlighted_by_hand == true"
+    override:
+      harvest_depth: deep
+
+  - condition: "priority == high"
+    override:
+      harvest_depth: deep
+
+  - condition: "word_count > 10000"
+    override:
+      segment: true
+
+  - condition: "harvest_for length > 1"
+    override:
+      cross_reference: true
