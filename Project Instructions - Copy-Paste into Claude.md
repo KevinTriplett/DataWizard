@@ -19,7 +19,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 ## Paste This Into Project Instructions
 
 ```
-Home folder: ___________
+Obsidian Vault Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
 # DW Project Instructions v4.0
