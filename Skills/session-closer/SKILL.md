@@ -8,7 +8,7 @@ description: >-
   previous session.
 type: skill
 updated: '2026-06-01'
-version: '2.8'
+version: '2.9'
 ---
 
 # Session Closer Skill
@@ -184,11 +184,19 @@ were encountered this session.
 
 ### Step 3.12: Meta-learning review nudge
 
-Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
+Two independent triggers -- either one fires the nudge:
+
+**Trigger 1: Session count.** Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
 
 "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand by loading the meta-learning-review skill."
 
-This does not block session close -- it's a passive reminder in the handoff. If a meta-learning report already exists and hasn't been reviewed, mention that specifically.
+**Trigger 2: Pending report.** Check whether a report with `status: pending-review` exists in the project's Learning Reports folder. For full-convention projects: `{home}/Workshop - {ProjectName}/Learning Reports/`. For flat-structure projects: `{home}/Learning Reports/`. List the folder; if any file matching `Meta-Learning Report - *.md` exists, read its frontmatter and check for `status: pending-review`. If found, nudge regardless of session count:
+
+"A meta-learning scan report is waiting for review: [filename]. Load the meta-learning-review skill to review and plant the findings."
+
+This trigger exists because the nightly vault-wide scan (meta-learning-scan skill) may produce reports between sessions. Without this check, reports sit unnoticed until the 30-session threshold fires.
+
+This does not block session close -- it's a passive reminder in the handoff.
 
 ### Step 3.13: Content Interests staleness check
 
