@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-05-30'
-version: '2.7'
+updated: '2026-06-01'
+version: '2.8'
 ---
 
 # Session Closer Skill
@@ -60,11 +60,7 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 
 > **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
 
-### Step 3.5: Suggest final thread name
-
-Suggest a final thread name for the session. Format: `checkmark ProjectAbbrev SNN - brief description` (e.g., `√ DW S43 - Weave git migration final stage`). The checkmark prefix signals the session is complete. Base the description on what actually happened, not the provisional name from orientation.
-
-### Step 3.6: Knowledge transfer check
+### Step 3.5: Knowledge transfer check
 
 **Before moving to infrastructure updates, triage each learning from this session.**
 
@@ -73,7 +69,7 @@ For each finding, decision, or detailed context that emerged during the session,
 - **Session-log-only**: Routine or one-off (e.g., "tool X was slow today," "retried three times before patch landed"). No further planting needed.
 - **Design-doc**: Technical finding that future task-specific work needs. Identify the specific target doc and plant it there. Example: an edge case discovered during a build belongs in the relevant design doc, not just the session log.
 - **Skill-update**: Process improvement that should change how a skill works. Patch the skill now or add a specific action item naming the skill and what to change.
-- **Protocol-update**: Convention change that affects all projects. Handled by Step 3.7 (convention-change check) -- flag it there if not already caught.
+- **Protocol-update**: Convention change that affects all projects. Handled by Step 3.6 (convention-change check) -- flag it there if not already caught.
 
 **Planting verification.** For each learning classified as design-doc or skill-update, verify the content was actually written to the target before closing. Not just "did you think about it" but "confirm the patch landed." If planting hasn't happened yet, do it now or add a specific action item with the target file path.
 
@@ -83,7 +79,7 @@ This is not optional. Do not ask the user -- run the triage yourself. If everyth
 
 > **Harvest sessions:** In a harvest session, the entire session is knowledge transfer -- every chunk writes findings into destination documents. The triage is still valuable (verify nothing remains only in chat), but recognize that harvest sessions are inherently knowledge-transfer-complete in a way that design or build sessions aren't.
 
-### Step 3.7: Convention-change check
+### Step 3.6: Convention-change check
 
 **Ask yourself (and surface to the user if yes):**
 
@@ -106,7 +102,7 @@ This step catches drift at the source. Five weeks of undocumented
 convention change (the _ prefix migration, S58-S63) is the pattern
 this prevents.
 
-### Step 3.8: Residual value check (harvest sessions)
+### Step 3.7: Residual value check (harvest sessions)
 
 **For sessions that included harvest work**, before closing, re-scan
 each harvest source for remaining extractable value. Look for:
@@ -118,7 +114,7 @@ you may have flattened. If you find more to extract, do another
 harvest pass before proceeding to infrastructure updates.
 
 This is not optional. Instances consistently underestimate residual
-value on first pass. The knowledge transfer check (3.6) asks whether
+value on first pass. The knowledge transfer check (3.5) asks whether
 findings got planted in the right docs -- this step asks whether
 you got everything out of the source material in the first place.
 
@@ -135,7 +131,7 @@ Scan your own context for:
 If everything has been planted, say so and move on. If not,
 propose what still needs writing and where it goes.
 
-### Step 3.9: Metadata verification
+### Step 3.8: Metadata verification
 
 For each file modified this session (from the "Files updated" and "Files created" lists):
 
@@ -149,7 +145,7 @@ Use `update_frontmatter` for efficiency -- it merges without requiring a full re
 
 This step catches metadata drift at the source rather than requiring periodic remediation passes.
 
-### Step 3.10: Section-shell sync check
+### Step 3.9: Section-shell sync check
 
 For each section file created or renamed this session, verify its parent shell contains a matching `![[filename]]` embed.
 
@@ -159,7 +155,7 @@ For each section file created or renamed this session, verify its parent shell c
 
 This catches the most common drift pattern -- adding sections without updating the shell -- at the point of creation. Skip this step if no section files were created or renamed this session.
 
-### Step 3.11: Periodic project health audit
+### Step 3.10: Periodic project health audit
 
 Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
 
@@ -171,7 +167,7 @@ If declined, note it and move on. The prompt will recur in another 10 sessions.
 
 **Silence rule:** Do not mention health audits in "What's next," during orientation, or anywhere outside this step. No "approaching threshold" or "getting close" language. The nudge exists only here, only when the threshold is met. Instances that pre-announce upcoming audits create noise across every session and every project.
 
-### Step 3.12: File size check
+### Step 3.11: File size check
 
 Scan the "Files updated" and "Files created" lists for files
 that may be approaching MCP read limits. For any file you
@@ -186,7 +182,7 @@ exceeds MCP read limit."
 This catches growth before overflow. Skip if no large files
 were encountered this session.
 
-### Step 3.13: Meta-learning review nudge
+### Step 3.12: Meta-learning review nudge
 
 Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
 
@@ -194,7 +190,7 @@ Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning
 
 This does not block session close -- it's a passive reminder in the handoff. If a meta-learning report already exists and hasn't been reviewed, mention that specifically.
 
-### Step 3.14: Content Interests staleness check
+### Step 3.13: Content Interests staleness check
 
 Check the project's `0.0 Project Guidelines` frontmatter for `last_content_interests_review:` (format: `YYYY-MM-DD`). If 30+ days have passed since the last review, or if 10+ sessions have occurred since then, add a nudge to the "What's next" section:
 
@@ -204,7 +200,7 @@ Also nudge if no `last_content_interests_review:` field exists and the project h
 
 This is a passive reminder in the handoff, not a blocker. The project instance that picks up the next session has the context to judge whether a review is actually needed -- time alone doesn't determine drift. If the project's direction hasn't changed, the instance can skip it and note why.
 
-### Step 3.15: Operator field and team flag prompt
+### Step 3.14: Operator field and team flag prompt
 
 **Operator field (always).** Add `operator: FirstName` to the frontmatter of:
 - The session log section file (always)
@@ -241,6 +237,12 @@ Check whether the session produced work that belongs in other files:
 - **Harvest ledger**: If harvesting was done during the session, verify the Harvest Ledger was updated as part of the harvest checklist. If not, update `0.4 Harvest Ledger - [Project].md` now.
 
 Propose specific changes for each file. Get approval before writing.
+
+### Step 5: Suggest final thread name
+
+Suggest a final thread name for the session. Format: `checkmark ProjectAbbrev SNN - brief description` (e.g., `√ DW S43 - Weave git migration final stage`). The checkmark prefix signals the session is complete. Base the description on what actually happened, not the provisional name from orientation.
+
+This step is intentionally last. The thread name is the signal that all session-close work is complete -- the user copies it, and the session is done.
 
 ## Output Format
 
