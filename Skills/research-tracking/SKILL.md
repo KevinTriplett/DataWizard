@@ -8,8 +8,8 @@ description: >-
   accumulating without a tracking system, or any time you are about to evaluate
   a tool, repo, framework, or external resource.
 type: skill
-updated: '2026-05-31'
-version: '1.2'
+updated: '2026-06-01'
+version: '1.3'
 ---
 
 # Research Tracking
@@ -60,6 +60,14 @@ was there any standout detail worth preserving?
 Check the tracking index before evaluating anything new. Look in both
 the Evaluated table (don't re-research) and the Queued for Review
 section (a queued item's trigger may now be active).
+
+### Before Triage -- Categorize Large Link Sets
+
+When triaging a link batch over ~100 items, categorize before triaging. Group links by topic (graph DBs, RDF tools, agent memory, etc.) and triage per-category. This enables two efficiency patterns:
+
+1. **Uniform relevance filter.** When a relevance question applies equally to all items in a category (e.g., "does DW use RDF?" for 22 Rust RDF libraries), batch-assess the entire category without individual searches. S129 applied this to save significant time on the ARK TG triage.
+
+2. **Priority ordering.** Triage high-relevance categories first. If context runs out, low-relevance categories are the ones that get deferred. S128-S130 triaged 204 links across 8 categories using this approach.
 
 ### After Triage -- Queue High-Value Items
 

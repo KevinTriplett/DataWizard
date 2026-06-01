@@ -6,8 +6,8 @@ description: >-
   migration', 'write project guidelines', 'set up a new project', or any mention
   of 0.0 files needing creation or updates.
 type: skill
-version: '1.4'
-updated: '2026-05-26'
+version: '1.5'
+updated: '2026-06-01'
 ---
 
 # Project Guidelines Skill
@@ -91,6 +91,7 @@ last_content_interests_review: YYYY-MM-DD  # set to created date if Content Inte
 - **Generic Content Interests.** "AI tools" doesn't help routing. "Obsidian plugins for YAML manipulation and bulk operations" does.
 - **Copying universal protocol into section 8.** "Write to vault" is universal — don't repeat it here.
 - **Empty placeholder sections.** If it doesn't apply, omit it.
+- **Splitting a project prematurely.** When "should this be its own project?" arises, test against portability: if the work should ship with the Seed for any DW user, it belongs in DW regardless of the operational friction it causes for the builder. Intake/routing felt like a separate project (S123) but failed the portability test -- it's core DW functionality, not a standalone concern (D80, S124).
 
 ## Reference Implementation
 
