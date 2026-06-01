@@ -2,10 +2,11 @@
 title: Obsidian Bases Reference
 type: project-doc
 created: '2026-05-28'
-updated: '2026-05-28'
+updated: '2026-06-01'
 edit_log:
   - DW-S117 2026-05-28
   - DW-S118 2026-05-28
+  - DW-S138 2026-06-01
 ---
 
 # Obsidian Bases Reference
@@ -14,7 +15,9 @@ Quick reference for Bases behaviors discovered during DW dashboard builds.
 
 ## Column Control
 
-The `order` array in a Bases view controls both **which columns appear** AND their **left-to-right sequence**. Properties not listed in `order` don't appear as columns at all. The `properties` section with `displayName` only sets header labels, not visibility. (S111)
+The `order` array in a Bases view controls both **which columns appear** AND their **left-to-right sequence**. Properties not listed in `order` don't appear as columns at all. The `properties` section with `displayName` has **no effect on column headers** -- headers always show the raw frontmatter field name. The only way to get short column headers is to use short field names. (S111, S119)
+
+**columnSize caution:** Column widths set by Obsidian (via manual column drag in the UI) are stored in YAML and work correctly. However, instance-written `columnSize` values can cause rendering issues including blocked scrolling. Let the user set column widths manually. (S119)
 
 ## Row Height
 
@@ -43,3 +46,7 @@ sort:
 ```
 
 Setting this via the UI (click Sort in the toolbar) writes it into the YAML, making it portable. Earlier S111 testing was inconclusive, but S118 confirmed it works -- the dashboard renders with correct default sort order. (S111, S118)
+
+## Multi-View UX
+
+Bases views with multiple tabs (e.g., Active/Open/All) appear as a **dropdown menu** when clicking the view name, not as inline tabs. Users may not discover additional views without guidance -- include a usage note in dashboard files that mentions clicking the view name to switch. (S119)
