@@ -7,9 +7,9 @@ description: >-
   project', 'check project health', or automatically via session-closer every
   ~10 sessions.
 type: skill
-version: '1.0'
+version: '1.1'
 created: '2026-05-23'
-updated: '2026-05-23'
+updated: '2026-06-01'
 ---
 
 # Project Health Audit Skill
@@ -167,7 +167,25 @@ For each finding, classify as:
 - **Auto-fixable**: Mechanical fixes the agent can apply (add missing YAML field, rename file, update embed). Offer to apply these with user approval.
 - **Needs judgment**: Issues that require human decision (where to insert a missing embed in a shell's narrative order, whether a partial migration should be completed, etc.). Add these to the project's action items file.
 
-### Step 6: Update audit record
+### Step 6: Log audit results
+
+After fixes are applied, append a row to the project's Health Audit Log (`0.8 Health Audit Log - ProjectName.md`). If the file doesn't exist yet, create it following the format in DW's log as a template.
+
+Record these columns per audit:
+
+| Date | Session | Scope | Infra | Drift | YAML | Filenames | Protocol | Total | Auto-fixed | Judgment | Notes |
+
+- **Infra/Drift/YAML/Filenames/Protocol**: Issue counts per category
+- **Total**: Sum of all issues
+- **Auto-fixed**: Issues resolved mechanically during the audit
+- **Judgment**: Issues requiring human decision
+- **Notes**: Brief summary of the dominant issue types
+
+Include a **Trend Notes** section below the table when patterns emerge across audits (e.g., a category consistently improving or a recurring issue type).
+
+This log enables cross-audit trend analysis. Without it, audit results are buried in session log narratives and hard to compare.
+
+### Step 7: Update audit record
 
 After the audit completes, update the project's 0.0 frontmatter:
 ```yaml
@@ -240,4 +258,5 @@ The goal is to complete the audit in one session. If the project is genuinely to
 - **Session-closer Step 3.10**: Per-session lightweight section-shell sync check (catches drift at creation time)
 - **Session-closer Step 3.11**: The periodic trigger that invokes this skill every ~10 sessions
 - **Protocol Summary > DW Review**: Points to this skill
+- **Health Audit Log** (`0.8 Health Audit Log - ProjectName.md`): Cumulative record of audit results for trend analysis
 - **Feature requests resolved**: Shell-Sections Drift Detection, Protocol Transition Audit
