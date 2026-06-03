@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-01'
-version: '2.9'
+updated: '2026-06-03'
+version: '3.0'
 ---
 
 # Session Closer Skill
@@ -240,11 +240,23 @@ For each file the user selects:
 ### Step 4: Update related infrastructure files
 
 Check whether the session produced work that belongs in other files:
-- **Action items**: Check off completed items, add new ones. Optional but recommended.
+- **Action items**: Check off completed items, add new ones. Optional but recommended. See the triage guidance below when the backlog needs cleanup.
 - **Decision log**: If decisions were made during the session (agreements, vision refinements, commitments, technical choices, scope changes), they belong as separate entries in the Decision Log. Note them in "What happened" and point to the Decision Log entry.
 - **Harvest ledger**: If harvesting was done during the session, verify the Harvest Ledger was updated as part of the harvest checklist. If not, update `0.4 Harvest Ledger - [Project].md` now.
 
 Propose specific changes for each file. Get approval before writing.
+
+#### Action items triage guidance
+
+Session-close action item updates are incremental -- check off what's done, add what's new. But every ~30 sessions (matching the health audit cadence), the action items file benefits from a full triage pass. When doing a triage:
+
+1. **Work in reverse-chronological order.** Start from the most recent items and work backwards. The newest items represent the current state of play, which makes it easy to spot older items that have been overtaken by events.
+
+2. **Group by conversation partner** when the project involves recurring calls with the same people. Action items from calls with the same person overlap heavily -- grouping by partner makes duplicates immediately visible and produces a cleaner, more actionable list.
+
+3. **Expect ~1/3 staleness.** Roughly a third of accumulated action items will be stale -- not explicitly resolved, just no longer relevant. This is normal. Flag them for removal rather than carrying them forward indefinitely.
+
+Full triage is a periodic activity, not a session-close requirement. The session-closer's job is incremental maintenance; the triage patterns above apply when the backlog has grown unwieldy. (RW S9, S142)
 
 ### Step 5: Suggest final thread name
 
