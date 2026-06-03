@@ -7,8 +7,8 @@ description: >-
   report is ready for review. Also triggered by session-closer nudge when 5-10
   sessions have elapsed since last review.
 type: skill
-updated: '2026-05-28'
-version: '1.1'
+updated: '2026-06-03'
+version: '1.2'
 ---
 
 # Meta-Learning Review Skill
@@ -69,6 +69,7 @@ For each verified learning, assign a disposition:
 - **Already done.** The learning is already reflected in the target doc. Mark it in the report and move on. No write needed.
 - **Ready to plant.** The learning is verified, the target doc exists, and the change is straightforward. Proceed to Step 4.
 - **Needs discussion.** The learning implies a design decision or convention change that shouldn't be made unilaterally. Surface it to the user. If resolved, plant it. If not, create an action item.
+- **Cross-project (DW Workshop).** The learning targets DW Seed infrastructure -- a Seed skill, protocol doc, PI working rule, or Seed guide -- but the current project is not DW itself. These items belong as feature requests or skill requests in the DW Workshop, not planted directly into the current project's docs. Proceed to Step 4.5.
 - **Deferred.** The learning is valid but the target doc doesn't exist yet, or the change is complex enough to warrant its own session. Create an action item with enough context that a future instance can act on it. For complex items, write an accompanying note with the full analysis.
 
 ### Step 3.5: Present planting plan for approval
@@ -93,6 +94,39 @@ Common destination types:
 
 3. **Frame for the reader.** A skill reader wants "what do I do differently." A design doc reader wants "what does this mean for the architecture." Same learning, different framing. Match the target doc's voice and density.
 4. **Include provenance.** Reference the session(s) where the learning originated, so the trail is traceable. A lightweight inline reference (e.g., "(S85, S86)") is sufficient.
+
+### Step 4.5: File cross-project items in DW Workshop
+
+For each learning classified as **Cross-project (DW Workshop)** in Step 3:
+
+1. **Determine the filing type.** If the learning targets a specific skill's behavior or workflow, file it as a Skill Request. If it targets protocol, PI, working rules, or general infrastructure, file it as a Feature Request.
+
+2. **Check for duplicates.** List `_DataWizard/Workshop - DataWizard/Feature Requests/` (and `Skill Requests/` if it exists). Scan filenames for obvious overlap. If an existing FR/SR covers the same topic, append the new finding to that file rather than creating a duplicate.
+
+3. **Create the FR/SR note** in `_DataWizard/Workshop - DataWizard/Feature Requests/` using this format:
+
+```yaml
+---
+title: "[Brief descriptive title]"
+type: feature-request
+status: open
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+requested_by: "[Operator] / Claude ([Project] meta-learning review)"
+target_skill: "[skill name, if applicable]"
+tags: [feature-request, relevant-tags]
+source_session: "[ProjectAbbrev SNN]"
+priority: medium
+---
+```
+
+Body sections: `## Problem` (what the learning revealed), `## Proposed Changes` (specific changes to the target), `## Target` (exact file path of the Seed skill or doc), `## Source` (session and context where the learning originated).
+
+4. **Mark the item in the report** (or working list) as "filed to DW Workshop" with the filename of the new FR/SR.
+
+**When running inside DW itself:** Skip this step. Learnings targeting DW infrastructure can be planted directly via Step 4 since you're already in the right project.
+
+**Batch filing.** If multiple learnings target the same skill or doc, consolidate them into a single FR/SR with multiple proposed changes rather than filing one per learning. This matches the pattern discovered in RW S9 where 8 of 23 learnings all targeted DW Seed skills. (S142)
 
 ### Step 5: Update the review trail
 
