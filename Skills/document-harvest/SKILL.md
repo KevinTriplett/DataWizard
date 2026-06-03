@@ -7,8 +7,8 @@ description: >-
   pending, or hand-highlighted documents. NOT for transcripts - use
   transcript-harvest instead.
 type: skill
-updated: '2026-04-25'
-version: '0.2'
+updated: '2026-06-03'
+version: '0.3'
 ---
 
 # Document Harvest Skill
@@ -56,6 +56,22 @@ Harvest content from non-transcript sources — articles, clippings, research do
 - Synthesize, don't copy. One idea per paragraph.
 - Preserve tensions and disagreements -- don't flatten nuance.
 - Extract `lexicon_candidates` if the source contains novel language or framings.
+
+## Three-Tier Pattern for Complex Web Resources
+
+When documenting a substantial external web resource -- a platform, community archive, toolkit, or any source complex enough that a single note can't capture it -- use a three-tier structure instead of one monolithic doc:
+
+1. **Overview doc** -- what it is, why it matters, who's behind it. The elevator pitch. Stable over time, rarely needs updating.
+2. **Catalog doc** -- full inventory of contents (sections, resources, tools available). Factual and comprehensive. Changes when the resource updates.
+3. **Mapping doc** -- how the resource connects to our specific project context. This is the analytical layer: what's relevant, what aligns, what diverges. Project-specific, highest editorial effort, and the most valuable of the three.
+
+The mapping doc answers "so what?" for the project. The overview and catalog are reference material; the mapping is working material.
+
+**When to use this pattern:** Not every external link needs three docs. Use it when the resource is complex enough that "what is it," "what does it contain," and "how does it relate to us" are each substantial enough to warrant their own note. A single blog post doesn't qualify; a multi-section platform with dozens of resources does.
+
+**Naming convention:** Use a shared prefix so the three docs cluster together (e.g., `ToGather - Overview.md`, `ToGather - Resource Catalog.md`, `ToGather - ReWoven Mapping.md`).
+
+This pattern emerged from RW S11 (documenting the ToGather platform) and was filed as a DW feature request. (S142)
 
 ## See Also
 
