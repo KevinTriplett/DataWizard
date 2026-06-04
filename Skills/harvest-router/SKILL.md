@@ -354,3 +354,7 @@ stack. Just identify which files need it and give the user the commands.
 - tools-research skill — for evaluating external tools (not vault content)
 - `_DataWizard/Workshop/Triage/Cowork Task - Reddit Tech Triage.md` —
   the Reddit-specific triage workflow (precursor to this skill)
+- content-interest-scan skill — bulk scanning of material pools against
+  project Content Interests. Complement: harvest-router routes individual
+  files on demand, content-interest-scan does systematic bulk scans and
+  nightly incremental checks.

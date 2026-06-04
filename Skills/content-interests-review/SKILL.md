@@ -167,3 +167,4 @@ For projects with multiple distinct domains, organize Content Interests into sho
 - **harvest-router**: Reads Content Interests to decide where flagged content goes. Accurate Content Interests directly improve routing quality.
 - **Vault Project Map**: The dynamic map embeds each project's Content Interests section. When you update Content Interests via this skill, the map auto-updates.
 - **session-closer** (v1.9+): Step 3.14 checks `last_content_interests_review:` and nudges in "What's next" when thresholds are met (30+ days or 10+ sessions). The project instance judges whether a review is actually needed -- time alone doesn't determine drift.
+- **content-interest-scan**: Scans material pools against what this skill produces. The scanner consumes Content Interests as its matching filter -- well-structured, specific interests yield precise matches; vague interests match too broadly. When updating Content Interests, consider scannability.

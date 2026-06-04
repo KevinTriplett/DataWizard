@@ -71,6 +71,8 @@ For each finding, decision, or detailed context that emerged during the session,
 - **Skill-update**: Process improvement that should change how a skill works. Patch the skill now or add a specific action item naming the skill and what to change.
 - **Protocol-update**: Convention change that affects all projects. Handled by Step 3.6 (convention-change check) -- flag it there if not already caught.
 
+**Insight-capture awareness.** If the insight-capture skill was invoked mid-session, its report lists what was planted and where. Use that as a starting point -- verify nothing additional surfaced since the capture ran, rather than doing a full from-scratch triage. If no insight-capture was run, do the full triage as usual.
+
 **Planting verification.** For each learning classified as design-doc or skill-update, verify the content was actually written to the target before closing. Not just "did you think about it" but "confirm the patch landed." If planting hasn't happened yet, do it now or add a specific action item with the target file path.
 
 **Backlinks.** When a learning is planted in a design doc or skill, note where it went in the session log's Learnings section (e.g., "See Editorial Technical Notes > Frame Rate section for full detail"). This makes the session log a discovery record that points to where the substance lives.
