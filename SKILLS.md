@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-05-26'
+updated: '2026-06-04'
 ---
 
 # DataWizard Skills
