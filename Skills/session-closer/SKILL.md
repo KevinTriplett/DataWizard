@@ -7,7 +7,7 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-03'
+updated: '2026-06-04'
 version: '3.0'
 ---
 
