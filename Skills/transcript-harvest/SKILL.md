@@ -6,8 +6,8 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-05-27'
-version: '0.5'
+updated: '2026-06-08'
+version: '0.6'
 ---
 
 # Transcript Harvest Skill
@@ -73,6 +73,40 @@ The brief becomes a new file (not a patch to an existing doc) with: which docume
 Example: Weave Session 24 harvested a Kaliya-Andrew call where Kaliya walked through her Exploring Funding research. The harvest output was `Exploring Funding - Research Brief.md` -- the brief Andrew had asked her to write, assembled from her verbal tour.
 
 This pattern applies when: (a) the transcript is someone describing research they've done, (b) no written brief exists yet, (c) the research is in a folder or set of documents that others need to navigate. The brief is a harvest destination alongside the usual synth docs.
+
+## Document Structure Lock
+
+When harvest output requires creating a substantial new document (reconciliation paper, research overview, multi-section analysis, research brief), lock the file structure with the user before writing begins. Use AskUserQuestion (if available) or ask in prose. Key decisions to lock:
+
+- **Document type and posture** -- research brief vs. synthesis doc vs. design doc? Descriptive vs. prescriptive vs. exploratory?
+- **Section structure** -- what sections does the user expect? Flat or nested? How granular?
+- **Audience** -- is this for the operator, the team, or external readers?
+- **Scope ceiling** -- what's explicitly out of scope? Where should you stop?
+
+This applies to new file creation only. Patching existing docs with harvest extracts doesn't need a structure lock -- the structure already exists.
+
+Rationale: document structure, posture, and scope ceiling are expensive to reverse after writing. Locking them upfront with explicit choices prevents rework. (Source: WV-S86 via FR)
+
+## Batch Mode
+
+When processing large transcript batches (total word count exceeding ~50k words, typically 15+ sources), single-agent sequential processing exceeds context capacity and degrades quality. Use parallel subagent extraction instead.
+
+**When to use batch mode:**
+- Total word count of routed transcripts exceeds ~50k words
+- More than ~10 transcripts need harvesting in one session
+- Sources are long-form (conference panels, multi-hour meetings, lecture series)
+
+**Setup:**
+- Divide sources into subsets of ~3 files each
+- Each subagent receives: its file subset, the project's Content Interests, exact citation format requirements (`[[NoteTitle#Section Header|YYYY-MM-DD -- Section Name]]`), and the list of destination documents
+- Subagents run in parallel, each completing Steps 1-6 for their files
+
+**Coordination:**
+- A coordinator agent merges results across subagents and deduplicates cross-references
+- Citation anchors (section headers, timestamps) must be preserved through the merge -- verify anchors resolve after merge
+- The coordinator handles Steps 7-8 (Harvest Ledger, session log) for the full batch
+
+**Validated:** WV-S91 (Katapult batch, 15 transcripts, 5 parallel agents, ~3 files each). Parallel extraction preserved citation fidelity and produced higher-quality extracts than sequential processing under context pressure.
 
 ## Principles
 
