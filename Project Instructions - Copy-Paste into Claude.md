@@ -3,11 +3,13 @@ title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-05-26'
+updated: '2026-06-08'
 tags:
   - protocol
   - AI-collaboration
   - DataWizard
+edit_log:
+  - DW-S158 2026-06-08
 ---
 
 # DataWizard - Copy Into Claude Project
@@ -22,7 +24,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Obsidian Vault Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v4.0
+# DW Project Instructions v4.1
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -69,7 +71,27 @@ known intermittent MCP issue.
 9. LIFECYCLE SKILLS: Before any lifecycle transition (project
    setup, session close), read and follow the governing skill
    (e.g. project-guidelines, session-closer). Do not write
-   lifecycle artifacts from pattern-matching.
+   lifecycle artifacts from pattern-matching. If the skill
+   file returns "File not found", check whether the Seed
+   folder exists (list_directory on _DataWizard/Seed/). If
+   the Seed folder exists but the skill is missing, the Seed
+   is stale - tell the user to run: bash
+   _DataWizard/Seed/update_seed.sh. If the Seed folder
+   itself is missing or unreachable, do NOT attempt a
+   fallback or pattern-match. Stop and tell the user: "The
+   DW Seed is not available in this session. Session close
+   requires the session-closer skill. Either mount the Seed
+   folder (_DataWizard/Seed/) as an additional directory, or
+   install it locally:" and provide the install command:
+   cd ~/path/to/vault && curl -sL
+   https://github.com/andrewalan11/DataWizard/archive/
+   refs/heads/main.zip -o /tmp/dw-seed.zip && unzip -qo
+   /tmp/dw-seed.zip -d /tmp/dw-seed && mkdir -p
+   _DataWizard/Seed && cp -R /tmp/dw-seed/DataWizard-main/*
+   _DataWizard/Seed/ && rm -rf /tmp/dw-seed
+   /tmp/dw-seed.zip
+   Do not proceed with session close until the skill is
+   accessible.
 10. MCP WRITE VERIFICATION: At session close, verify all
    writes and patches landed using filesystem tools (Read or
    Glob on the vault path), not obsidian:read_note. If
@@ -163,7 +185,7 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v4.0).*
+*Re-paste only when the Project Instructions version changes (currently v4.1).*
 
 ---
 
@@ -171,8 +193,14 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v4.0 | 2026-05-27 |
+| Project Instructions | v4.1 | 2026-06-08 |
 | Seed | v1.1.0 | 2026-05-02 |
+
+---
+
+## What Changed in v4.1
+
+**Seed-access hard stop (Working Rule 9).** Lifecycle skills (session-closer, project-guidelines) now have a mandatory Seed-access check. If the skill file returns "File not found", the instance diagnoses whether the Seed is stale (folder exists, skill missing -- run update_seed.sh) or absent (folder missing -- install from GitHub). In neither case does the instance attempt to pattern-match a session close. This prevents the drift pattern where Seed-less sessions produce incomplete session logs missing required fields (like `operator`), which then become templates for future pattern-matching, compounding the problem.
 
 ---
 
