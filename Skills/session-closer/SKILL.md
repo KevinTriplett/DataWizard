@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-04'
-version: '3.0'
+updated: '2026-06-08'
+version: '3.1'
 ---
 
 # Session Closer Skill
@@ -43,6 +43,21 @@ Scan the conversation for:
 Follow the output format below. Write the full entry and present it in chat for user approval. **Present the "What's next" section separately in chat** so the user can review and confirm the plan for next session before it gets written to the vault.
 
 > **Harvest sessions:** For sessions that are primarily harvest work, the session log entry may already be partially written as part of the end-of-harvest checklist (which includes a session log update). In that case, the session closer adds Learnings and What's Next to the existing entry rather than writing a full entry from scratch. Check whether a partial entry already exists before drafting.
+
+### Step 2.5: Frontmatter validation
+
+Before presenting the draft, verify all required frontmatter fields are present. Required fields for session log entries:
+
+- `title` (format: "Session N - Brief Title")
+- `type: project-doc`
+- `parent` (wikilink to the session log shell)
+- `section` (section number in the shell)
+- `created` (YYYY-MM-DD)
+- `updated` (YYYY-MM-DD)
+- `operator` (human operator's first name -- see Step 3.14)
+- `datawizard_protocol_version`
+
+If any field is missing from the draft, add it before proceeding. Do not present a draft with missing required fields. This is especially important for `operator`, which powers team dashboards and authorship queries but is easy to omit when pattern-matching from older session logs that predate this requirement.
 
 ### Step 3: Get approval and write
 

@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-06-04'
+updated: '2026-06-08'
 ---
 
 # DataWizard Skills
@@ -38,6 +38,8 @@ The knowledge-focused skills form a lifecycle chain. Each covers a different sou
 tools-research (evaluate external things) → research-tracking (prevent duplicate work) → design-harvest (plant research into design docs) → insight-capture (plant mid-session synthesis into permanent homes) → meta-learning-review (plant accumulated operational learnings) → session-closer Step 3.5 (verify everything transferred)
 
 content-interest-scan and harvest-router feed the upstream end by surfacing unrouted content. content-interests-review keeps the routing signals current so the whole chain stays calibrated. S149.
+
+**Protocol nudges** are lightweight behavioral triggers embedded at specific moments in the lifecycle -- session-closer nudges for health audit (every ~10 sessions), meta-learning review (every 5-10 sessions), and Content Interests staleness (30 days / 10 sessions). insight-capture has its own nudge for instances to offer mid-session when rich context is loaded. These nudges are not a separate skill but a pattern: a brief conditional check at a decision point that surfaces the right skill at the right time. S149, S157.
 
 ## Archived Skills
 
