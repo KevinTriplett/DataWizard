@@ -7,8 +7,10 @@ description: >-
   report is ready for review. Also triggered by session-closer nudge when 5-10
   sessions have elapsed since last review.
 type: skill
-updated: '2026-06-03'
-version: '1.2'
+updated: '2026-06-08'
+version: '1.3'
+edit_log:
+  - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
 ---
 
 # Meta-Learning Review Skill
@@ -123,6 +125,8 @@ priority: medium
 Body sections: `## Problem` (what the learning revealed), `## Proposed Changes` (specific changes to the target), `## Target` (exact file path of the Seed skill or doc), `## Source` (session and context where the learning originated).
 
 4. **Mark the item in the report** (or working list) as "filed to DW Workshop" with the filename of the new FR/SR.
+
+**Expected effort.** Cross-project items tend to be small, concrete skill patches rather than large design efforts -- good candidates for opportunistic resolution in light sessions. (S143)
 
 **When running inside DW itself:** Skip this step. Learnings targeting DW infrastructure can be planted directly via Step 4 since you're already in the right project.
 
