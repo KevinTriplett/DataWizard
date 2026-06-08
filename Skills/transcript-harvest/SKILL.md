@@ -8,6 +8,8 @@ description: >-
 type: skill
 updated: '2026-06-08'
 version: '0.6'
+edit_log:
+  - DW-S158 2026-06-08
 ---
 
 # Transcript Harvest Skill

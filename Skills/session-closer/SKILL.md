@@ -8,7 +8,9 @@ description: >-
   previous session.
 type: skill
 updated: '2026-06-08'
-version: '3.1'
+version: '3.2'
+edit_log:
+  - DW-S158 2026-06-08
 ---
 
 # Session Closer Skill
@@ -58,6 +60,20 @@ Before presenting the draft, verify all required frontmatter fields are present.
 - `datawizard_protocol_version`
 
 If any field is missing from the draft, add it before proceeding. Do not present a draft with missing required fields. This is especially important for `operator`, which powers team dashboards and authorship queries but is easy to omit when pattern-matching from older session logs that predate this requirement.
+
+### Step 2.6: Active quest threads
+
+Read the previous session's "Active quest threads" section (if it exists). For each thread:
+- If work was done on it this session, update its status and remaining work
+- If no work was done, carry it forward unchanged
+- If it was completed this session, remove it
+- If a new multi-session workstream emerged this session, add it
+
+Each thread entry includes: a bold numbered name, session history in parentheses (which sessions touched it), 2-3 sentences on remaining work, and key doc paths. This section lives after "What's next" in the output format.
+
+If the previous session has no quest threads section (pre-S158 entries), scan the last 5-7 session logs to identify active threads and bootstrap the section. This is a one-time cost -- subsequent sessions just carry forward and update.
+
+The quest threads section prevents long-running workstreams from falling off the radar when they aren't the active focus. "What's next" is the immediate handoff; quest threads are the broader map of parallel work.
 
 ### Step 3: Get approval and write
 
@@ -359,6 +375,20 @@ Adapt detail to the work type:
 - Build/migration: what spec to follow, what success looks like
 - Design: what prior decisions constrain the space, what the deliverable is
 - Debugging: what's broken, what was tried, where the evidence is
+
+### Active quest threads
+
+Threads of ongoing work across recent sessions. Included so future
+instances don't lose sight of parallel workstreams. See Step 2.6 for
+how to maintain this section.
+
+**1. Thread name** (S-range, e.g. S152-S157)
+Remaining work summary. Key doc: `path/to/spec.md`.
+
+**2. Thread name** (S-range)
+Remaining work summary. Key doc: `path/to/spec.md`.
+
+[Repeat for each active thread. Remove when completed.]
 ```
 
 ## Structured Format for Complex Sessions
