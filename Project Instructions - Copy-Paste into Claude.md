@@ -3,13 +3,14 @@ title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-06-08'
+updated: '2026-06-09'
 tags:
   - protocol
   - AI-collaboration
   - DataWizard
 edit_log:
   - DW-S158 2026-06-08
+  - DW-S161 2026-06-09
 ---
 
 # DataWizard - Copy Into Claude Project
@@ -24,7 +25,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Obsidian Vault Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v4.1
+# DW Project Instructions v4.2
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -106,12 +107,14 @@ known intermittent MCP issue.
    resource. Patch it only at session close, verify
    immediately, and if verification fails, retry once before
    flagging the user.
-12. DOCUMENT METADATA: When writing to any file, bump the
+12. DOCUMENT METADATA: When creating a new file, include
+   birth metadata: type, created, updated, operator, and
+   edit_log (see YAML Schema Section 4 for the full
+   contract). When writing to any existing file, bump the
    updated: date. When creating or substantially updating
    content documents, consider adding priority:
    (high/medium/low) and maturity:
    (draft/working/polished/canonical) to frontmatter.
-   See YAML Schema (Protocol Section 4) for definitions.
 13. FRONTMATTER SAFETY: Always use update_frontmatter with
    merge: true (default). merge: false deletes any omitted
    fields.
@@ -170,8 +173,9 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 6. Create a session log stub to claim your session number.
    List the session log section folder, determine the next
    available section number, and write a minimal stub file:
-   "NN.0 Session NNN - in progress.md" with status:
-   in-progress in frontmatter and a Part of breadcrumb.
+   "NN.0 Session NNN - in progress.md" with full birth
+   metadata (type, created, updated, operator, edit_log,
+   status: in-progress) and a Part of breadcrumb.
    Add the embed to the session log shell. This gives
    concurrent instances (including those on other users'
    machines) immediate visibility that the number is taken.
@@ -185,7 +189,7 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v4.1).*
+*Re-paste only when the Project Instructions version changes (currently v4.2).*
 
 ---
 
@@ -193,8 +197,14 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v4.1 | 2026-06-08 |
+| Project Instructions | v4.2 | 2026-06-09 |
 | Seed | v1.1.0 | 2026-05-02 |
+
+---
+
+## What Changed in v4.2
+
+**Creation-time metadata contract (Working Rule 12, Step 6).** New files must include "birth metadata" at creation time: type, created, updated, operator, and edit_log. Previously, operator and edit_log were only added during session close (session-closer Step 3.14/3.8). If a session never closed -- context exhaustion, team members skipping close -- those files had no authorship or provenance trail. Now session close verifies birth metadata rather than applying it for the first time. Step 6 (orientation stub) updated to include full birth metadata. Canonical spec: YAML Schema Section 4 "Creation-Time Metadata Contract".
 
 ---
 

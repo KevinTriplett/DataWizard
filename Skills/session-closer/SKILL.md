@@ -7,11 +7,12 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-08'
-version: '3.3'
+updated: '2026-06-09'
+version: '3.4'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
+  - DW-S161 2026-06-09
 ---
 
 # Session Closer Skill
@@ -171,9 +172,10 @@ propose what still needs writing and where it goes.
 
 For each file modified this session (from the "Files updated" and "Files created" lists):
 
-1. Verify `updated:` reflects today's date (YYYY-MM-DD)
-2. Append this session's identifier to `edit_log:` (e.g., `"DW-S70 2026-05-23"`). Deduplicate -- if the session already appears, don't add it again.
-3. For shell files whose sections were edited: bump the shell's `updated` field (but no `edit_log` on shells)
+1. Verify birth metadata is present (type, created, updated, operator, edit_log). Birth metadata should already exist from creation time (Working Rule 12); if any field is missing, add it now as a fallback.
+2. Verify `updated:` reflects today's date (YYYY-MM-DD)
+3. Append this session's identifier to `edit_log:` (e.g., `"DW-S70 2026-05-23"`). Deduplicate -- if the session already appears, don't add it again.
+4. For shell files whose sections were edited: bump the shell's `updated` field (but no `edit_log` on shells)
 
 Use `update_frontmatter` for efficiency -- it merges without requiring a full re-read.
 
@@ -246,7 +248,7 @@ This is a passive reminder in the handoff, not a blocker. The project instance t
 
 ### Step 3.14: Operator field and team flag prompt
 
-**Operator field (always).** Add `operator: FirstName` to the frontmatter of:
+**Operator field (always).** Verify `operator: FirstName` is present in the frontmatter of the following files. Birth metadata (Working Rule 12) should have set this at creation time; if missing, add it now as a fallback:
 - The session log section file (always)
 - Any content documents created or substantially updated this session
 
