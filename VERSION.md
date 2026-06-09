@@ -1,7 +1,7 @@
 
 seed: 1.1.0
 protocol: 1.7
-project_instructions: 4.1
+project_instructions: 4.2
 
 ## What's New in 1.1.0
 - Meta-folder convention: `_` prefix replaces `~` for Sections, Archive, Infrastructure (D71)
