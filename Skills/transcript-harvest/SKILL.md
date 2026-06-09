@@ -6,10 +6,13 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-06-08'
-version: '0.6'
+updated: '2026-06-09'
+version: '0.7'
 edit_log:
   - DW-S158 2026-06-08
+  - >-
+    MMM meta-learning plant 2026-06-09: added Step 4 (check existing vault
+    sources), Step 6 (triage multi-topic), renumbered
 ---
 
 # Transcript Harvest Skill
@@ -37,11 +40,13 @@ Harvest content from transcripts (video, podcast, meeting, voice memo) into proj
 1. **Check source YAML** — read `harvest_status`. If already `harvested`, confirm with user before re-harvesting.
 2. **Check project assignment** — look for `harvest_for` in the transcript's YAML. If missing but the transcript has a `fathom_id`, look it up in `_DataWizard/Workshop/Fathom Meeting Index.md` and check the Project column. If the index has a project assignment, add `harvest_for` to the transcript's YAML before proceeding. If neither the YAML nor the index has a project, ask the user which project this transcript belongs to. Do not harvest without knowing the destination project.
 3. **Check segmentation** — look for `segmented: true` in YAML. If missing, the transcript needs `##` section headers first. Either run `segment_transcript.py` or add headers manually.
-4. **Read the transcript** — understand the full content before extracting anything.
-5. **Harvest into destination docs** — synthesize relevant content into project documents. Use citation format: `([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]])`. Don't transcribe — synthesize.
-6. **Update source YAML** -- set `harvest_status`, `harvested_into` (with section-level anchors), `harvest_date`, and `harvest_notes`. For re-harvests, append to `harvested_into` and convert `harvest_date` to an array (most recent last). Or set `harvest_status: reviewed` with `harvest_notes` explaining why nothing was harvested.
-7. **Update Harvest Ledger** -- add or update a row in `0.4 Harvest Ledger - [Project].md` with source, harvest date, destinations, and agent.
-8. **Session log** -- add harvest details to `0.2 Session Log.md` at the end of the session as part of normal session logging -- not after each individual source.
+4. **Check for existing vault sources** -- before declaring any referenced source inaccessible (paywalled, offline, video-only), search `_Clippings/` and `_Transcripts/` for existing copies. YouTube auto-transcripts, previously clipped articles, and federated documents are easy to overlook and may already be in the vault. In MMM S07, a DISI talk initially dismissed as "YouTube-only" was already in `_Clippings/` as a full transcript and turned out to be the most project-relevant source of the entire batch.
+5. **Read the transcript** — understand the full content before extracting anything.
+6. **Triage multi-topic sources** -- if the transcript covers multiple topics or threads, surface the topic list to the user and offer to skip stale or low-relevance items before writing. This keeps the harvest lean and avoids over-capturing content the user has already moved past. Especially valuable for chat-style transcripts and multi-meeting catch-up conversations where some threads may be outdated by harvest time.
+7. **Harvest into destination docs** — synthesize relevant content into project documents. Use citation format: `([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]])`. Don't transcribe — synthesize.
+8. **Update source YAML** -- set `harvest_status`, `harvested_into` (with section-level anchors), `harvest_date`, and `harvest_notes`. For re-harvests, append to `harvested_into` and convert `harvest_date` to an array (most recent last). Or set `harvest_status: reviewed` with `harvest_notes` explaining why nothing was harvested.
+9. **Update Harvest Ledger** -- add or update a row in `0.4 Harvest Ledger - [Project].md` with source, harvest date, destinations, and agent.
+10. **Session log** -- add harvest details to `0.2 Session Log.md` at the end of the session as part of normal session logging -- not after each individual source.
 
 ## Common Mistakes
 
@@ -52,7 +57,8 @@ Harvest content from transcripts (video, podcast, meeting, voice memo) into proj
 - Skipping `harvest_notes` -- the "commit message" is the most valuable part, especially for `reviewed` or partial harvests
 - Forgetting the Harvest Ledger -- source YAML is the truth, but the ledger is how humans and agents scan routing at a glance
 - Harvesting without checking project assignment -- content ends up in the wrong project docs or gets orphaned
-- Processing multiple sources without completing all 8 steps per source first (session log excepted -- that waits til end)
+- Processing multiple sources without completing all 10 steps per source first (session log excepted -- that waits til end)
+- Declaring a referenced source inaccessible without checking `_Clippings/` and `_Transcripts/` first -- existing vault copies are easy to overlook
 - Using read-write-delete to relocate a transcript instead of `move_note` -- wastes tokens sending the entire body through the tool call for no content-level reason
 
 ## Note Relocation
@@ -101,18 +107,18 @@ When processing large transcript batches (total word count exceeding ~50k words,
 **Setup:**
 - Divide sources into subsets of ~3 files each
 - Each subagent receives: its file subset, the project's Content Interests, exact citation format requirements (`[[NoteTitle#Section Header|YYYY-MM-DD -- Section Name]]`), and the list of destination documents
-- Subagents run in parallel, each completing Steps 1-6 for their files
+- Subagents run in parallel, each completing Steps 1-9 for their files
 
 **Coordination:**
 - A coordinator agent merges results across subagents and deduplicates cross-references
 - Citation anchors (section headers, timestamps) must be preserved through the merge -- verify anchors resolve after merge
-- The coordinator handles Steps 7-8 (Harvest Ledger, session log) for the full batch
+- The coordinator handles Step 10 (session log) for the full batch
 
 **Validated:** WV-S91 (Katapult batch, 15 transcripts, 5 parallel agents, ~3 files each). Parallel extraction preserved citation fidelity and produced higher-quality extracts than sequential processing under context pressure.
 
 ## Principles
 
-- Treat each source as one atomic unit -- complete steps 1-7 before the next source (step 8 waits til session end)
+- Treat each source as one atomic unit -- complete steps 1-9 before the next source (step 10 waits til session end)
 - Synthesize, don't transcribe. One idea per paragraph.
 - Preserve tensions and disagreements -- don't flatten nuance.
 - Include speaker attribution where relevant.
