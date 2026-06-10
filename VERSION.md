@@ -46,7 +46,7 @@ Seed version mismatches are not checked during orientation.
 The Seed is updated separately via update_seed.sh or git
 sync. If a user suspects their Seed is out of date, tell
 them to run:
-  bash _DataWizard/Seed/update_seed.sh
+  bash _DataWizard/Seed/Scripts/update_seed.sh
 
 If this is a fresh install and update_seed.sh doesn't exist
 yet, give them the install command:
@@ -54,7 +54,7 @@ yet, give them the install command:
   curl -sL https://github.com/andrewalan11/DataWizard/archive/refs/heads/main.zip -o /tmp/dw-seed.zip && \
   unzip -qo /tmp/dw-seed.zip -d /tmp/dw-seed && \
   mkdir -p _DataWizard/Seed && \
-  cp -R /tmp/dw-seed/DataWizard-main/* _DataWizard/Seed/ && \
+  cp -R /tmp/dw-seed/DataWizard-main/. _DataWizard/Seed/ && \
   rm -rf /tmp/dw-seed /tmp/dw-seed.zip && \
   echo "DataWizard Seed installed to _DataWizard/Seed/"
 

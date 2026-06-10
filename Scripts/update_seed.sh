@@ -111,8 +111,9 @@ if [ "$FRESH_INSTALL" = false ] && [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
 fi
 
 # --- Copy to Seed directory ---
+# Trailing /. (not /*) so dotfiles like .gitignore are included
 mkdir -p "$SEED_DIR"
-cp -R "$TMP_DIR/DataWizard-main/"* "$SEED_DIR/"
+cp -R "$TMP_DIR/DataWizard-main/." "$SEED_DIR/"
 
 # --- Cleanup ---
 rm -rf "$TMP_DIR" "$TMP_ZIP"
