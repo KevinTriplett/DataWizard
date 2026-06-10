@@ -4,7 +4,7 @@ type: project-doc
 version: '2.6'
 status: active
 created: '2026-03-12'
-updated: '2026-05-28'
+updated: '2026-06-11'
 ---
 
 # DataWizard Protocol Summary (v2.6)
@@ -164,6 +164,8 @@ Design rationale: `Workshop/Design/YAML Metadata Protocol Decisions.md`
 [2-6 bullet points for the next session, written as a
 briefing for a fresh instance with no prior context]
 ```
+
+Session log section files include `seed_version:` in frontmatter -- the Seed version from `_DataWizard/Seed/VERSION.md` at the time of the session. This makes team Seed currency visible and queryable across session logs.
 Most recent first. LLMs: read last 2-3 entries only — the "What's next" section tells you where to pick up. **Update once per session** — at the end or at a natural break point. Don't log after every step.
 
 **Writing a good "What's next":** Write it as if briefing a new team member who has read the 0.0 but nothing else. Include: specific file paths to read (not just topic names), why this work matters and how it connects to the larger arc, what depends on what (sequence matters), and which items are the main focus vs side tasks. The goal is that a fresh instance reading "What's next" can jump straight into productive work without needing a separate handoff message from the user.

@@ -7,13 +7,14 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-10'
-version: '3.5'
+updated: '2026-06-11'
+version: '3.6'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
   - DW-S161 2026-06-09
   - DW-S167 2026-06-10
+  - DW-S168 2026-06-11
 ---
 
 # Session Closer Skill
@@ -90,9 +91,10 @@ Before presenting the draft, verify all required frontmatter fields are present.
 - `created` (YYYY-MM-DD)
 - `updated` (YYYY-MM-DD)
 - `operator` (human operator's first name -- see Step 3.14)
-- `datawizard_protocol_version`
+- `datawizard_protocol_version` (the `protocol:` value from `_DataWizard/Seed/VERSION.md`, read during orientation)
+- `seed_version` (the `seed:` value from the same VERSION.md)
 
-If any field is missing from the draft, add it before proceeding. Do not present a draft with missing required fields. This is especially important for `operator`, which powers team dashboards and authorship queries but is easy to omit when pattern-matching from older session logs that predate this requirement.
+Both version fields are read from VERSION.md during orientation -- never hardcode them from template examples. If any field is missing from the draft, add it before proceeding. Do not present a draft with missing required fields. This is especially important for `operator`, which powers team dashboards and authorship queries but is easy to omit when pattern-matching from older session logs that predate this requirement. `seed_version` makes team Seed currency visible -- when scanning session logs, a stale Seed version is immediately apparent.
 
 ### Step 2.6: Active quest threads
 
@@ -347,7 +349,8 @@ section: N
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 operator: FirstName
-datawizard_protocol_version: "1.7"
+datawizard_protocol_version: "[protocol: from VERSION.md]"
+seed_version: "[seed: from VERSION.md]"
 ```
 
 **Frontmatter (multi-operator):**
@@ -359,7 +362,8 @@ section: "WV_2026-06-10_AA_01"
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 operator: FirstName
-datawizard_protocol_version: "1.7"
+datawizard_protocol_version: "[protocol: from VERSION.md]"
+seed_version: "[seed: from VERSION.md]"
 ```
 
 **Content structure:**
