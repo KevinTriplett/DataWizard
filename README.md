@@ -72,7 +72,7 @@ cd "/Users/yourname/My Vault" && \
 curl -sL https://github.com/andrewalan11/DataWizard/archive/refs/heads/main.zip -o /tmp/dw-seed.zip && \
 unzip -qo /tmp/dw-seed.zip -d /tmp/dw-seed && \
 mkdir -p _DataWizard/Seed && \
-cp -R /tmp/dw-seed/DataWizard-main/* _DataWizard/Seed/ && \
+cp -R /tmp/dw-seed/DataWizard-main/. _DataWizard/Seed/ && \
 rm -rf /tmp/dw-seed /tmp/dw-seed.zip && \
 echo "DataWizard Seed installed to _DataWizard/Seed/"
 ```
@@ -206,12 +206,10 @@ This is the last step. After this, you're up and running.
 
 ## Updating
 
-DataWizard checks for updates automatically. When you start a new conversation, Claude compares your local Seed version against the latest on GitHub. If there's an update available, it tells you what changed and asks if you want to update.
-
-To update manually at any time:
+Seed updates are user-initiated -- orientation checks your local Seed's VERSION.md but does not contact GitHub. To update at any time:
 
 ```bash
-bash _DataWizard/Seed/update_seed.sh
+bash _DataWizard/Seed/Scripts/update_seed.sh
 ```
 
 This downloads the latest Seed and overwrites only the Seed files. Your project content (session logs, action items, workshop docs) is never touched.
@@ -225,7 +223,6 @@ _DataWizard/Seed/
   VERSION.md                              - Version numbers and update instructions
   Project Instructions - Copy-Paste into Claude.md  - Instructions to paste into Claude
   README.md                               - This file
-  update_seed.sh                          - Install/update script
   SKILLS.md                               - Available skills catalog
   Protocols/
     DataWizard Universal Protocol.md      - Full AI operational rulebook
@@ -245,6 +242,7 @@ _DataWizard/Seed/
   Agents/
     Harvest Agent.md                      - Content harvesting agent instructions
   Scripts/
+    update_seed.sh                        - Install/update script
     classify.py                           - Note classification script
     segment_transcript.py                 - Transcript segmentation script
     route_notes.py                        - Note routing script
@@ -271,7 +269,7 @@ If a user shares this README or the GitHub link with you, help them get DataWiza
 Key points:
 - The Seed should be installed locally in the vault, not read from GitHub
 - All protocols, skills, and guides are in `_DataWizard/Seed/` -- read them via MCP
-- The only GitHub fetch is VERSION.md for update checks during orientation
+- Orientation reads the local Seed's VERSION.md only -- no GitHub fetch. Updates run via Scripts/update_seed.sh when the user asks
 - Always get user approval before writing to the vault
 - If the user already has a Seed installed, check if it needs updating before starting
 - After MCP is connected, load the `install-wizard` skill to complete setup interactively
