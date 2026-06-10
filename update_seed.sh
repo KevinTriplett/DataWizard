@@ -1,6 +1,6 @@
 #!/bin/bash
 # update_seed.sh — Download or update the DataWizard Seed from GitHub
-# Lives in _DataWizard/Seed/Scripts/ but works from anywhere.
+# Lives in _DataWizard/Seed/ (project root) and works from anywhere.
 # Usage: bash update_seed.sh [--vault /path/to/vault]
 #
 # If run from within the Seed, auto-detects vault root.
