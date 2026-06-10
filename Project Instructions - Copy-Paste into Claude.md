@@ -3,7 +3,7 @@ title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-06-09'
+updated: '2026-06-10'
 tags:
   - protocol
   - AI-collaboration
@@ -11,6 +11,7 @@ tags:
 edit_log:
   - DW-S158 2026-06-08
   - DW-S161 2026-06-09
+  - DW-S167 2026-06-10
 ---
 
 # DataWizard - Copy Into Claude Project
@@ -25,7 +26,7 @@ Paste the block below into **Settings - Project Instructions** for every Claude 
 Obsidian Vault Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
-# DW Project Instructions v4.2
+# DW Project Instructions v4.3
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -168,28 +169,36 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 3. Read 0.2 Session Log (last 2-3 entries only). The most
    recent "What's next" section tells you where to pick up.
 4. Read action items file if one exists.
-5. State the project abbreviation and session number
-   (e.g. "DW S116").
-6. Create a session log stub to claim your session number.
-   List the session log section folder, determine the next
-   available section number, and write a minimal stub file:
-   "NN.0 Session NNN - in progress.md" with full birth
-   metadata (type, created, updated, operator, edit_log,
-   status: in-progress) and a Part of breadcrumb.
-   Add the embed to the session log shell. This gives
-   concurrent instances (including those on other users'
-   machines) immediate visibility that the number is taken.
-   Once the user confirms the session's direction, patch
-   the stub content with 1-2 lines describing the focus.
-   The session-closer overwrites this stub with the full
-   entry at session end.
+5. State the project abbreviation and session identifier.
+   Solo-operator: "DW S116". Multi-operator: use the
+   composite format from the session-closer skill's
+   Session Identifier Format section (e.g.
+   "WV_2026-06-10_AA_01").
+6. Create a session log stub to claim your session ID.
+   List the session log section folder and determine the
+   next available identifier. Solo-operator: next
+   sequential section number; stub file named
+   "NN.0 Session NNN - in progress.md". Multi-operator:
+   list files matching today's date and your initials
+   (e.g. PROJ_YYYY-MM-DD_INITIALS_*), pick the next NN;
+   stub file named
+   "PROJ_YYYY-MM-DD_INITIALS_NN - in progress.md".
+   Include full birth metadata (type, created, updated,
+   operator, edit_log, status: in-progress) and a Part
+   of breadcrumb. Add the embed to the session log shell.
+   This gives concurrent instances (including those on
+   other users' machines) immediate visibility that the
+   ID is taken. Once the user confirms the session's
+   direction, patch the stub content with 1-2 lines
+   describing the focus. The session-closer overwrites
+   this stub with the full entry at session end.
 7. Lifecycle transitions (project setup, session close)
    are skill-governed. Read the skill before executing.
 8. Ready to work. Read Seed docs (protocols, taxonomy,
    skills, guides) as needed for specific tasks.
 ```
 
-*Re-paste only when the Project Instructions version changes (currently v4.2).*
+*Re-paste only when the Project Instructions version changes (currently v4.3).*
 
 ---
 
@@ -197,8 +206,14 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v4.2 | 2026-06-09 |
+| Project Instructions | v4.3 | 2026-06-10 |
 | Seed | v1.1.0 | 2026-05-02 |
+
+---
+
+## What Changed in v4.3
+
+**Multi-operator session ID format (Steps 5-6).** Multi-operator projects now use composite session identifiers: `PROJ_YYYY-MM-DD_INITIALS_NN` (e.g., `WV_2026-06-10_AA_01`). Solo-operator projects keep sequential numbering unchanged. Steps 5 and 6 updated with conditional logic for both formats. The session-closer skill (v3.5) has the full Session Identifier Format reference section. Each multi-operator project's 0.0 Project Guidelines should include an operator registry mapping names to initials.
 
 ---
 

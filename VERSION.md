@@ -1,7 +1,7 @@
 
 seed: 1.1.1
 protocol: 1.7
-project_instructions: 4.2
+project_instructions: 4.3
 
 ## NOTICE - Seed git history rewritten 2026-06-10 (instances: read this)
 

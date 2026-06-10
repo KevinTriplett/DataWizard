@@ -7,12 +7,13 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-09'
-version: '3.4'
+updated: '2026-06-10'
+version: '3.5'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
   - DW-S161 2026-06-09
+  - DW-S167 2026-06-10
 ---
 
 # Session Closer Skill
@@ -118,10 +119,11 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 4. Patch the shell embed to reference the final filename. If the shell already embeds the stub filename, replace it with the final filename. If no stub existed, add the embed as usual.
 
 > **Parallel instance check:** Before writing, re-list the session log
-> section folder and verify the target section number (e.g., 38.0)
-> doesn't already exist as a file. If another instance has written a
-> session with that number since orientation, increment to the next
-> available number. Multiple instances may work in parallel.
+> section folder and verify the target identifier doesn't already exist
+> as a file. Solo-operator: check the section number (e.g., 38.0).
+> Multi-operator: check the session ID (e.g., `WV_2026-06-10_AA_01`).
+> If another instance has claimed it since orientation, increment to
+> the next available number. Multiple instances may work in parallel.
 
 > **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
 
@@ -225,7 +227,7 @@ This catches the most common drift pattern -- adding sections without updating t
 
 ### Step 3.10: Periodic project health audit
 
-Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). If the current session is 30+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
+Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). To determine the gap: solo-operator projects can subtract session numbers; multi-operator projects must list the session log folder and count files dated after the reference session's date. If the current session is 30+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
 
 "It's been [N] sessions since the last project health audit (or: no audit on record). Want me to run a DW review? It checks shell-section drift, YAML compliance, filename safety, and protocol conformance. Takes 5-10 minutes."
 
@@ -254,7 +256,7 @@ were encountered this session.
 
 Two independent triggers -- either one fires the nudge:
 
-**Trigger 1: Session count.** Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
+**Trigger 1: Session count.** Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). To determine the gap: solo-operator projects can subtract session numbers; multi-operator projects must list the session log folder and count files dated after the reference session's date. If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
 
 "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand by loading the meta-learning-review skill."
 
@@ -334,9 +336,9 @@ This step is intentionally last. The thread name is the signal that all session-
 
 ## Output Format
 
-The entry is a section file in the session log folder (e.g., `0.2 Session Log - Project/13.0 Session 29 - Brief Title.md`).
+The entry is a section file in the session log folder. Solo-operator example: `0.2 Session Log - Project/13.0 Session 29 - Brief Title.md`. Multi-operator example: `Session Log - Weave Project/WV_2026-06-10_AA_01 - Brief Title.md`.
 
-**Frontmatter:**
+**Frontmatter (solo-operator):**
 ```yaml
 title: "Session N - Brief Descriptive Title"
 type: project-doc
@@ -348,12 +350,25 @@ operator: FirstName
 datawizard_protocol_version: "1.7"
 ```
 
+**Frontmatter (multi-operator):**
+```yaml
+title: "WV_2026-06-10_AA_01 - Brief Descriptive Title"
+type: project-doc
+parent: "[[0.2 Session Log]]"
+section: "WV_2026-06-10_AA_01"
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+operator: FirstName
+datawizard_protocol_version: "1.7"
+```
+
 **Content structure:**
 
 ```markdown
 *Part of the [[0.2 Session Log - Project]]*
 
-## Session N: YYYY-MM-DD (Brief Title)
+## Session N: YYYY-MM-DD (Brief Title)          ← solo-operator
+## WV_2026-06-10_AA_01: Brief Title              ← multi-operator
 
 ### What happened
 
@@ -382,7 +397,7 @@ routing-heuristic, harvest-pattern
 
 If no learnings this session, write: "No new learnings this session."
 
-### What's next (Session N+1)
+### What's next
 
 [Write this as if briefing a new team member who has read the 0.0 but nothing
 else. This section is the handoff — it must be specific enough that the next
@@ -417,10 +432,10 @@ Threads of ongoing work across recent sessions. Included so future
 instances don't lose sight of parallel workstreams. See Step 2.6 for
 how to maintain this section.
 
-**1. Thread name** (S-range, e.g. S152-S157)
+**1. Thread name** (session range, e.g. S152-S157 or WV_2026-06-01_AA_01 through WV_2026-06-10_JC_02)
 Remaining work summary. Key doc: `path/to/spec.md`.
 
-**2. Thread name** (S-range)
+**2. Thread name** (session range)
 Remaining work summary. Key doc: `path/to/spec.md`.
 
 [Repeat for each active thread. Remove when completed.]
