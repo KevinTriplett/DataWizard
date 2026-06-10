@@ -1,7 +1,55 @@
 
-seed: 1.1.0
+seed: 1.1.1
 protocol: 1.7
 project_instructions: 4.2
+
+## NOTICE - Seed git history rewritten 2026-06-10 (instances: read this)
+
+On 2026-06-10 the Seed repo's git history was rewritten to remove a
+user-specific config file (security hygiene). All commit hashes changed.
+
+**Claude instances: surface this notice to your user if their Seed is a
+git clone.** Check: does `_DataWizard/Seed/.git` exist? If NOT (they
+installed via the zip / update_seed.sh), no action is needed -- updates
+work normally. If it IS a git repo, their next `git pull` will fail with
+"refusing to merge unrelated histories" or report divergent branches.
+Help them recover:
+
+1. Check for local-only commits first:
+   `cd "<vault>/_DataWizard/Seed" && git fetch origin && git log --oneline main --not origin/main`
+   If that lists commits, save those changes before proceeding (copy the
+   affected files aside or `git stash`).
+2. Reset to the rewritten history:
+   `git reset --hard origin/main`
+   This is safe for `Vault Config.md` (untracked/gitignored -- it is
+   not touched).
+3. Done. Normal pulls work again.
+
+**Never** use `git pull --allow-unrelated-histories` or any merge-based
+recovery here -- merging reattaches the old history that the rewrite
+removed. Reset, don't merge.
+
+Also in this update: `update_seed.sh` moved from `Seed/Scripts/` to the
+Seed root (`_DataWizard/Seed/update_seed.sh`) to match the path the
+Project Instructions reference. Zip-install users who updated previously
+may have a stale copy at `Seed/Scripts/update_seed.sh` -- it can be
+deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
+Design, edit its plist to point at the new root path.
+
+This notice can be removed from VERSION.md after 2026-09.
+
+## What's New in 1.1.1
+- SECURITY: .gitignore now excludes Telegram harvester artifacts
+  (Scripts/.env, Scripts/*.session, Scripts/output/) and
+  task-manager-config.md (user-specific paths)
+- task-manager-config.md removed from the repo and its history
+  (history rewrite -- see NOTICE above)
+- update_seed.sh moved to Seed root and vault-root detection fixed;
+  install commands now copy dotfiles correctly (cp ... /. not /*)
+- README updating/orientation claims corrected (no GitHub fetch during
+  orientation; updates are user-initiated)
+- Telegram Harvesting guide: credential notes must live outside
+  git-tracked folders (e.g. a vault-root _Private/ folder)
 
 ## What's New in 1.1.0
 - Meta-folder convention: `_` prefix replaces `~` for Sections, Archive, Infrastructure (D71)
@@ -46,7 +94,7 @@ Seed version mismatches are not checked during orientation.
 The Seed is updated separately via update_seed.sh or git
 sync. If a user suspects their Seed is out of date, tell
 them to run:
-  bash _DataWizard/Seed/Scripts/update_seed.sh
+  bash _DataWizard/Seed/update_seed.sh
 
 If this is a fresh install and update_seed.sh doesn't exist
 yet, give them the install command:
