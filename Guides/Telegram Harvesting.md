@@ -2,13 +2,15 @@
 title: Telegram Harvesting
 type: guide
 created: '2026-05-31'
-updated: '2026-05-31'
+updated: '2026-06-10'
 status: active
 tags:
   - protocol
   - harvesting
   - DataWizard
   - telegram
+edit_log:
+  - DW-S163 2026-06-10
 ---
 
 # Telegram Harvesting

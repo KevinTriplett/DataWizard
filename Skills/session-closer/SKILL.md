@@ -32,6 +32,36 @@ Writes the session log entry at the end of every work session. The session log e
 - Mid-session status updates (just talk in chat)
 - Updating action items only (do that as part of closing, or separately)
 
+## Session Identifier Format
+
+Session identifiers vary by project type. Check the project's 0.0 Project Guidelines -- if it lists multiple operators, use multi-operator format.
+
+**Solo-operator projects:** Sequential numbering.
+- Session ID: `S{N}` (e.g., `S113`)
+- File name: `NN.0 Session N - Brief Title.md` (e.g., `99.0 Session 113 - Brief Title.md`)
+- Heading: `## Session N: YYYY-MM-DD (Brief Title)`
+- Frontmatter title: `"Session N - Brief Title"`
+- Frontmatter section: `N` (integer)
+- Edit log entry: `ProjectAbbrev-S{N} YYYY-MM-DD` (e.g., `DW-S113 2026-06-10`)
+- Thread name: `checkmark ProjectAbbrev SNN - description`
+
+**Multi-operator projects:** Composite ID encoding project, date, operator, and daily sequence.
+- Format: `PROJ_YYYY-MM-DD_INITIALS_NN`
+- `PROJ` -- project abbreviation (e.g., `WV` for Weave)
+- `YYYY-MM-DD` -- session date
+- `INITIALS` -- operator's initials from the operator registry in 0.0 Project Guidelines
+- `NN` -- daily sequence number, always two digits, starting at `01`, present even for the first session of the day
+- File name: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix, no section number)
+- Heading: `## WV_2026-06-10_AA_01: Brief Title`
+- Frontmatter title: `"WV_2026-06-10_AA_01 - Brief Title"`
+- Frontmatter section: `"WV_2026-06-10_AA_01"` (the full session ID as a string)
+- Edit log entry: `WV_2026-06-10_AA_01` (date is embedded, no need to repeat)
+- Thread name: `checkmark WV_2026-06-10_AA_01 - description`
+
+To claim a session ID during orientation, list the session log folder for files matching today's date and your initials (e.g., `WV_2026-06-10_AA_*`), and pick the next NN.
+
+Throughout this skill, examples use solo-operator format. For multi-operator projects, substitute the corresponding format from this section.
+
 ## How to Close a Session
 
 ### Step 1: Review the session
@@ -52,10 +82,10 @@ Follow the output format below. Write the full entry and present it in chat for 
 
 Before presenting the draft, verify all required frontmatter fields are present. Required fields for session log entries:
 
-- `title` (format: "Session N - Brief Title")
+- `title` (see Session Identifier Format section for the format -- solo-operator: "Session N - Brief Title"; multi-operator: "PROJ_YYYY-MM-DD_INITIALS_NN - Brief Title")
 - `type: project-doc`
 - `parent` (wikilink to the session log shell)
-- `section` (section number in the shell)
+- `section` (solo-operator: section number in the shell; multi-operator: the full session ID string)
 - `created` (YYYY-MM-DD)
 - `updated` (YYYY-MM-DD)
 - `operator` (human operator's first name -- see Step 3.14)
@@ -83,7 +113,7 @@ The quest threads section prevents long-running workstreams from falling off the
 
 Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
 1. Re-read the session log shell to get the current section number and embed list
-2. Write the new section file with the final title to the session log folder (e.g., `99.0 Session 113 - Brief Title.md`). Use the same section number as the stub.
+2. Write the new section file with the final title to the session log folder. Solo-operator: `99.0 Session 113 - Brief Title.md` (use section number as prefix). Multi-operator: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix). See Session Identifier Format for full details.
 3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it.
 4. Patch the shell embed to reference the final filename. If the shell already embeds the stub filename, replace it with the final filename. If no stub existed, add the embed as usual.
 
@@ -174,7 +204,7 @@ For each file modified this session (from the "Files updated" and "Files created
 
 1. Verify birth metadata is present (type, created, updated, operator, edit_log). Birth metadata should already exist from creation time (Working Rule 12); if any field is missing, add it now as a fallback.
 2. Verify `updated:` reflects today's date (YYYY-MM-DD)
-3. Append this session's identifier to `edit_log:` (e.g., `"DW-S70 2026-05-23"`). Deduplicate -- if the session already appears, don't add it again.
+3. Append this session's identifier to `edit_log:` (solo-operator: `"DW-S70 2026-05-23"`; multi-operator: `"WV_2026-06-10_AA_01"` -- date is embedded in the ID). Deduplicate -- if the session already appears, don't add it again.
 4. For shell files whose sections were edited: bump the shell's `updated` field (but no `edit_log` on shells)
 
 Use `update_frontmatter` for efficiency -- it merges without requiring a full re-read.
@@ -195,7 +225,7 @@ This catches the most common drift pattern -- adding sections without updating t
 
 ### Step 3.10: Periodic project health audit
 
-Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
+Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). If the current session is 30+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
 
 "It's been [N] sessions since the last project health audit (or: no audit on record). Want me to run a DW review? It checks shell-section drift, YAML compliance, filename safety, and protocol conformance. Takes 5-10 minutes."
 
@@ -224,7 +254,7 @@ were encountered this session.
 
 Two independent triggers -- either one fires the nudge:
 
-**Trigger 1: Session count.** Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"`). If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
+**Trigger 1: Session count.** Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
 
 "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand by loading the meta-learning-review skill."
 
@@ -298,7 +328,7 @@ Full triage is a periodic activity, not a session-close requirement. The session
 
 ### Step 5: Suggest final thread name
 
-Suggest a final thread name for the session. Format: `checkmark ProjectAbbrev SNN - brief description` (e.g., `√ DW S43 - Weave git migration final stage`). The checkmark prefix signals the session is complete. Base the description on what actually happened, not the provisional name from orientation.
+Suggest a final thread name for the session. Solo-operator format: `checkmark ProjectAbbrev SNN - brief description` (e.g., `√ DW S43 - Weave git migration final stage`). Multi-operator format: `checkmark PROJ_YYYY-MM-DD_INITIALS_NN - description` (e.g., `√ WV_2026-06-10_AA_01 - session ID convention update`). The checkmark prefix signals the session is complete. Base the description on what actually happened, not the provisional name from orientation.
 
 This step is intentionally last. The thread name is the signal that all session-close work is complete -- the user copies it, and the session is done.
 
