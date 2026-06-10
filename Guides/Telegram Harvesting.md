@@ -44,7 +44,8 @@ Alternatively, set `TG_API_ID` and `TG_API_HASH` as environment variables.
 **Security notes:**
 - These are app-level credentials, not your account password. They identify your app to Telegram's API.
 - User authentication (phone + one-time code) happens on first run and is cached in a `.session` file.
-- Do not commit `.env` or `.session` files to git. Add them to `.gitignore`.
+- Do not commit `.env` or `.session` files to git. The Seed's `.gitignore` excludes `Scripts/.env`, `Scripts/*.session`, and `Scripts/output/` (added DW-S163).
+- Keep any note recording these credentials OUT of git-tracked vault folders. Use a gitignored private folder (e.g. a vault-root `_Private/`) or a password manager.
 
 ## First Run - Authentication
 

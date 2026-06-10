@@ -34,9 +34,9 @@ done
 # Auto-detect from script location if not specified
 if [ -z "$VAULT_ROOT" ]; then
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  # Script lives at _DataWizard/Seed/Scripts/update_seed.sh
-  # Vault root is 3 levels up
-  VAULT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+  # Script lives at _DataWizard/Seed/update_seed.sh
+  # Vault root is 2 levels up
+  VAULT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 fi
 
 SEED_DIR="$VAULT_ROOT/_DataWizard/Seed"
