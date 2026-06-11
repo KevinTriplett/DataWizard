@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-06-09'
+updated: '2026-06-10'
 ---
 # MCP Reliability and Write Verification
 
@@ -103,6 +103,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **`move_note` does NOT auto-update wikilinks.** When you rename or relocate a note via `move_note`, Obsidian's MCP does not update wikilinks in other files that reference the moved note. After any rename or move, you must manually search the vault for references to the old path/name and patch them. Search vault-wide, not just within the current project -- wikilinks without paths can resolve across projects. (Source: MMM S08)
 
 **Short-name embeds are more resilient than full-path embeds.** `![[4.0 The Ecosystem]]` is safer than `![[_Metamorphic Media/Metamorphic Media Shared/Metamorphic Media - Vision Document/4.0 The Ecosystem]]`. When content is reorganized, full-path embeds break silently. Worse, Obsidian may resolve a broken full-path embed to a same-named file in a different project -- the MMM Vision shell was embedding Flow Funding's `4.0 The Ecosystem` instead of its own because the full path had gone stale. Short-name embeds resolve by filename proximity, which is more resilient to reorganization. Use short-name embeds unless disambiguation is genuinely needed (multiple files with the same name across the vault). (Source: MMM S08)
+
+**`search_notes` can false-negative on exact titles.** A search for an exact note title can return content matches in other files while missing the note itself, even when the file exists and `list_directory` shows it. During an MMM link audit, searching "Foraging in High-Dimensional Data @ DISI" returned files that *mention* the phrase but not `_Clippings/Foraging in High-Dimensional Data @ DISI 2025.md` itself -- leading to a false "broken link" finding that was only caught by a later `list_directory` on `_Clippings/`. Rule: before reporting a wikilink as broken or a file as missing, verify with `list_directory` on the expected folder (or a filesystem `Glob`), not search alone. Search confirms presence; it cannot confirm absence. (Source: MMM S12)
 
 ## Incident Reference
 
