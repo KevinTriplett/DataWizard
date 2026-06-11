@@ -197,7 +197,7 @@ Most recent first. LLMs: read last 2-3 entries only — the "What's next" sectio
 ## Companion Notes
 - AI-generated summaries/section maps for source notes
 - Live in `_Companions/` with mirrored subfolders (`_Companions/_Transcripts/`, `_Companions/_Clippings/`, etc.)
-- Named: `Source Title — Companion.md`
+- Named: `c_Source Title.md` (`c_` prefix, no space - D83)
 - YAML: `type: companion`, `source_transcript:` or `source_note:` as wikilink
 - Contain section maps, key people/projects, per-section summaries
 - Do NOT contain cross-conversation analysis (that belongs in design docs)

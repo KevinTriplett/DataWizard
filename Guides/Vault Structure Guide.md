@@ -2,7 +2,7 @@
 title: Vault Structure Guide
 type: document
 created: '2026-03-07'
-updated: '2026-03-07'
+updated: '2026-06-11'
 status: active
 tags:
   - DataWizard
@@ -50,7 +50,7 @@ _Companions/
 
 **Why mirrored subfolders?** It keeps companions discoverable — you always know where to find a companion note based on where its source lives. It also keeps the source folders clean (transcripts with transcripts, companions with companions).
 
-**Naming convention:** `Source Note Title — Companion.md`. Example: `2025-10-22 Michael Garfield — Companion.md`
+**Naming convention:** `c_Source Note Title.md` (`c_` prefix, no space - D83). Example: `c_2025-10-22 Michael Garfield.md`
 
 **What companions contain:**
 - Section map with timestamps (for transcripts)
