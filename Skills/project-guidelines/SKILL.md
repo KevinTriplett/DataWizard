@@ -7,7 +7,7 @@ description: >-
   of 0.0 files needing creation or updates.
 type: skill
 version: '1.5'
-updated: '2026-06-01'
+updated: '2026-06-12'
 ---
 
 # Project Guidelines Skill
@@ -95,5 +95,5 @@ last_content_interests_review: YYYY-MM-DD  # set to created date if Content Inte
 
 ## Reference Implementation
 
-See `_DataWizard/_Infrastructure - DataWizard/0.0 Project Guidelines - DataWizard.md` for a complex project example.
+Maintainer-vault example (not shipped with the Seed -- skip if absent): `_DataWizard/_Infrastructure - DataWizard/0.0 Project Guidelines - DataWizard.md`, a complex project's 0.0.
 

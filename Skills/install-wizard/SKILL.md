@@ -7,8 +7,8 @@ description: >-
   'I just installed DataWizard', 'verify my MCP connection', or any context
   where a new user has just connected MCP and needs to complete setup.
 type: skill
-version: '1.0'
-updated: '2026-05-19'
+version: '1.1'
+updated: '2026-06-12'
 ---
 # Install Wizard Skill
 
@@ -144,21 +144,20 @@ Do NOT continue past this step until all tools are verified.
 
 This is the most important step. Project Instructions are THE mechanism that makes DataWizard work -- they tell Claude how to operate in your vault, what protocols to follow, what skills are available, and how to orient itself at the start of every conversation. Any Claude Project that has these instructions will operate with DW protocols and practices.
 
-### 5a: Print the Project Instructions
+### 5a: Point to the Project Instructions
 
-Read `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md` via MCP. Extract the content between the ``` fences and print it in full for the user.
+Read `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md` via MCP so you know its contents, but do NOT print the instructions into chat -- they are long, unreadable in chat, and a chat copy goes stale. Direct the user to copy them from the file itself. Note: Obsidian's sidebar hides underscore-prefixed folders, so guide them to the file via Finder and a text editor. Only if the user cannot reach the file is printing the fenced block an acceptable fallback.
 
 Tell the user:
 
-> "Here are your Project Instructions. You'll paste these into a Claude Project in a moment. But first, let me explain what they do:
->
-> These instructions teach Claude how to work in your vault. They tell it where your files are, what conventions to follow, what skills it has, and how to pick up where the last conversation left off. Every conversation you start in a Claude Project with these instructions will have DataWizard's full capabilities.
->
-> You can create multiple Claude Projects with the same instructions -- one per project in your vault, for example. Each project just needs a different 'Home folder' line pointing to that project's root folder.
->
-> The instructions also live in your Seed at:
+> "Your Project Instructions live in your Seed at:
 > `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md`
-> so you can always find them later."
+>
+> In a moment you'll open that file and copy the block between the ``` fences. Open it via Finder with any text editor -- Obsidian's sidebar hides the _DataWizard folder, so you won't find it there. But first, let me explain what the instructions do:
+>
+> They teach Claude how to work in your vault. They tell it where your files are, what conventions to follow, what skills it has, and how to pick up where the last conversation left off. Every conversation you start in a Claude Project with these instructions will have DataWizard's full capabilities.
+>
+> You can create multiple Claude Projects with the same instructions -- one per project in your vault, for example. Each project just needs a different 'Obsidian Vault Home folder' line pointing to that project's root folder."
 
 ### 5b: Guide the paste
 
@@ -168,8 +167,8 @@ Walk the user through these steps one at a time. Pause after each. Adjust detail
 2. "Give your project a name -- something like 'My Vault' or the name of your first project."
 3. "Click the gear icon next to the project name to open settings."
 4. "Find the 'Project Instructions' field."
-5. "Paste the instructions block I just printed above."
-6. "Find the line that says `Home obsidian vault folder:` and fill in your project's home folder path. For your first project, this is probably `_DataWizard/` or whatever folder you want Claude to focus on."
+5. "Paste the instructions block you copied from the file."
+6. "Find the line that says `Obsidian Vault Home folder:` and fill in your project's home folder path. For your first project, this is probably `_DataWizard/` or whatever folder you want Claude to focus on."
 7. "Click 'Save' or close the settings panel."
 
 **Check in:** Ask the user to confirm they've pasted the instructions and set the home folder. If they're unsure about the home folder path, help them decide based on their vault structure.

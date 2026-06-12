@@ -3,7 +3,7 @@ type: project-doc
 title: START HERE For Humans — Template
 status: active
 created: '2026-03-10'
-updated: '2026-03-23'
+updated: '2026-06-12'
 tags:
   - protocol
   - AI-collaboration
@@ -51,7 +51,7 @@ Use this template when creating a `START HERE - For Humans.md` for a new project
 
 ## For Your AI — Copy Into Project Instructions
 
-Paste this block into your LLM's project settings (Claude Project Instructions, or equivalent). This is the only setup your AI needs. For the latest version, see `_DataWizard/Seed/COPY INTO CLAUDE PROJECT.md`.
+Paste this block into your LLM's project settings (Claude Project Instructions, or equivalent). This is the only setup your AI needs. For the latest version, see `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md`.
 
 [Paste the current instructions block from COPY INTO CLAUDE PROJECT.md here]
 ```
