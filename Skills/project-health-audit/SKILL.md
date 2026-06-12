@@ -12,7 +12,7 @@ updated: '2026-06-12'
 operator: Andrew
 edit_log:
   - >-
-    DW-S178 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
+    DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
     J1-J6, D84/D87/D88/D92/D93 updates, manual fallback appendix
 ---
 
@@ -20,7 +20,7 @@ edit_log:
 
 ## Overview
 
-Periodic audit of a DW project's structural health. Since dw_lint v1 (S178), the audit has two halves with a clean division of labor:
+Periodic audit of a DW project's structural health. Since dw_lint v1 (S179), the audit has two halves with a clean division of labor:
 
 - **Machine half — dw_lint.** Filename safety, birth metadata, section contracts, shell-section sync, link resolution, heading hazards, stale paths, type validity, companion naming, 0.x slot conformance, archive naming. Lint finds these faster and more completely than any hand pass. The audit CONSUMES the lint report; it never re-derives machine findings by hand.
 - **Judgment half — this skill.** Everything that needs a human-or-agent decision: is the infrastructure complete for what this project does, is the MOC fresh, should a partial migration be finished, where does a missing embed belong, what do the lint findings mean and where should they route.
