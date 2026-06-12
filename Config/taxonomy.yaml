@@ -1,0 +1,181 @@
+# DataWizard Content Type Taxonomy - machine-readable canon
+#
+# Consumers: classify.py, dw_lint.py, enrichment pipeline, MOC generator.
+# Human-readable companion doc: Seed/Protocols/Content Type Taxonomy.md
+# This file is the canonical source for type VALIDITY; the .md doc carries
+# the full prose signals and the classifier decision tree.
+#
+# Instance extensions: this shipped file must not reference instance-local
+# types (D89). Instances extend via an overlay file - see `overlay` below.
+#
+# Created: DW-S178 2026-06-12 (P2, per D89/D84)
+
+meta:
+  taxonomy_version: "2.7"
+  schema_version: 1
+  source_doc: "Seed/Protocols/Content Type Taxonomy.md"
+  decisions: [D83, D84, D89, D92]
+
+# ---------------------------------------------------------------------------
+# Content types - source material the enrichment pipeline processes
+# ---------------------------------------------------------------------------
+content_types:
+  article:
+    description: "Prose content - essays, blog posts, reports, opinion pieces, academic writing"
+    signals: "Narrative paragraphs, byline/author, publication date, no product/service offerings"
+  entity:
+    description: "Organization, company, collective, project, or initiative homepage; persistent, not time-bounded"
+    signals: "About-us language, mission statement, team listings, programs, calls to action; no specific event dates"
+  event:
+    description: "Clipped event listing - gathering, conference, festival with specific dates, location, program"
+    signals: "URL + specific dates + physical location + agenda/lineup/speakers; registration links"
+    yaml_additions: [event_date, event_location]
+  person:
+    description: "Individual's personal page, profile, bio, portfolio"
+    signals: "Biographical language, headshot, role/title, personal projects"
+  document:
+    description: "Purposefully constructed working doc - proposals, pitches, strategy docs, plans"
+    signals: "Constructed toward a specific goal or audience; no publication intent; project-specific"
+  video-transcript:
+    description: "Transcript of a public video (YouTube, Vimeo, similar); public/published content"
+    signals: "YouTube/Vimeo URL, timestamps, speaker labels, lecture or conversational structure"
+  podcast-transcript:
+    description: "Transcript of a published podcast episode"
+    signals: "Podcast/RSS URL, show + episode structure, host-guest dynamic"
+    yaml_additions: [show, episode]
+  meeting-transcript:
+    description: "Raw transcript from a personal meeting (Fathom or similar); private"
+    signals: "Fathom URL, speaker labels with emails, conversational tone, action items"
+  voice-memo-transcript:
+    description: "Transcript of a personal voice memo (Whisper); single speaker"
+    signals: "No URL, single or no speaker labels, stream-of-consciousness, transcription artifacts"
+  meeting-note:
+    description: "Personal notes taken during or after a meeting (not raw transcript)"
+    signals: "Date-prefixed filenames, informal bullets, personal observations, no Fathom URL"
+  seedpod:
+    description: "Multi-idea personal note - multiple distinct ideas separated by line breaks"
+    signals: "No meaningful URL, multiple ideas, informal tone, line breaks between ideas"
+    enrichment_note: "Tags and themes only; no companion note"
+  seed:
+    description: "Raw idea, observation, question, or fragment; title often IS the content"
+    signals: "1-3 lines or under 300 chars, no URL/source, reads like a thought"
+    enrichment_note: "Tags and themes in YAML only; no companion note"
+  garden:
+    description: "Synthesis note clustering related seeds/seedpods into a coherent project concept; intermediate stage between raw seeds and DW-bootstrapped projects"
+    signals: "Links to multiple seeds/seedpods, synthesis narrative, stage field, lives in a project folder or _Gardens/"
+    yaml_additions: [stage, gardeners]
+    enrichment_note: "Not enriched by the standard pipeline - gardens ARE a synthesis output"
+  resource:
+    description: "Reference material, frameworks, foundational documents, methodology docs"
+    signals: "Informational/educational tone, not time-bound, not project-specific"
+  resource-list:
+    description: "Curated collection of links to other resources"
+    signals: "Dominated by URLs, list structure, minimal prose per item"
+  multi-part:
+    description: "One chapter/section of a larger work"
+    signals: "Numbered titles, shared source domain/author, sequential content"
+    yaml_additions: [series, chapter]
+  video:
+    description: "A video page (YouTube/Vimeo); transcript appended to note body when available"
+    signals: "YouTube/Vimeo URL or embed; any content length"
+    yaml_additions: [has_transcript, transcript_date]
+    classifier_rule: "Any note with a YouTube or Vimeo URL -> video, always; no LLM needed"
+  companion:
+    description: "AI-generated enrichment of a source note, created by the pipeline; includes corpus-mode companions (marked by corpus_context field)"
+    signals: "source field in YAML, lives in _Companions/ or a corpus folder, c_ filename prefix"
+    enrichment_note: "Never enriched further - these ARE the enrichment output"
+  message:
+    description: "Asynchronous communication to/from a specific person - voice note, audio or text message"
+    signals: "Directed at a specific person, one-directional, often transcribed from audio message"
+
+# ---------------------------------------------------------------------------
+# Infrastructure types - DW project machinery, not pipeline source material
+# (scoped list per D89; one-liners, not full taxonomy entries)
+# ---------------------------------------------------------------------------
+infrastructure_types:
+  project-doc: "Project infrastructure - 0.x files, session log sections, action items, trackers"
+  design-doc: "Design documents, build plans, specs, architecture notes"
+  research-note: "Research findings, tool evaluations, deep-read notes"
+  feature-request: "Feature request filed against DW or a project"
+  bug-report: "Bug report"
+  skill-request: "Request for a new or changed skill"
+  skill: "SKILL.md files and skill definitions"
+  guide: "How-to and onboarding guides"
+  guide-section: "Section file of a sectioned guide (shell + sections pattern)"
+  quest: "Quest files (TMS)"
+  protocol: "Protocol documents"
+  scan-report: "Vault scans, audits, lint reports, triage worklists"
+  processing-report: "Pipeline/enrichment run reports"
+  config: "Machine-readable or config-carrying docs"
+  dashboard: "Dashboard and embed surfaces"
+
+# ---------------------------------------------------------------------------
+# Retired types - hard renames from taxonomy history; replacement is canonical
+# ---------------------------------------------------------------------------
+retired:
+  concept: "tags: [concept]"
+  capture: seedpod
+  reference: resource
+  meeting: meeting-note
+  summary: companion
+  AIsummary: companion
+  AI: "tag: ai-generated"
+  AI_generated: "tag: ai-generated"
+  AI-written: "tag: ai-generated"
+  transcript: video-transcript
+  voice-memo: voice-memo-transcript
+  event-capture: seedpod
+  corpus-source: companion   # S178: was only ever a skill-template slip; corpus mode is marked by corpus_context, not type
+
+# ---------------------------------------------------------------------------
+# Fold map - observed synonym drift -> canonical target (migrate on touch;
+# lint suggests, never auto-renames)
+# ---------------------------------------------------------------------------
+fold_map:
+  research: research-note
+  research-doc: research-note
+  research-stub: research-note
+  triage-report: scan-report
+  enrichment-processing-report: processing-report
+  batch-status: processing-report
+  design: design-doc
+  design-notes: design-doc
+  build-plan: design-doc
+  analysis: design-doc
+  workshop-note: project-doc
+  quest-index: project-doc
+
+# Ambiguous low-count types - lint reports these at info level for human
+# review on touch; no fold target assigned yet
+review_types:
+  - utility
+  - test-artifact
+  - skill-reference
+  - feedback
+  - prompt-template
+  - corpus-registry
+
+# ---------------------------------------------------------------------------
+# Folder routing hints (classifier shortcuts; full tree in the .md doc)
+# ---------------------------------------------------------------------------
+folder_routing:
+  "_Transcripts/": meeting-transcript
+  "_Meetings/": meeting-note
+  "_Companions/": companion
+  "_Gardens/": garden
+
+# ---------------------------------------------------------------------------
+# Instance overlay mechanism (D89)
+# ---------------------------------------------------------------------------
+# Instances extend the taxonomy WITHOUT editing this shipped file.
+# Default overlay path, relative to the vault: the DW project home's
+# Config folder, e.g.:
+#   Workshop - <ProjectName>/Config/taxonomy_local.yaml
+# Consumers (classify.py, dw_lint.py) merge the overlay over this base:
+#   - overlay MAY add content_types, infrastructure_types, fold_map entries,
+#     and enrichment_policies for its own types
+#   - overlay MAY NOT remove or redefine shipped types (lint flags this)
+# Worked example: reddit-save, documented in
+#   Workshop/Design/Enrichment Policy YAML Schema.md (instance overlay section)
+overlay:
+  default_path: "Config/taxonomy_local.yaml"   # relative to the project home folder
