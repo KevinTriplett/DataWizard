@@ -8,7 +8,7 @@ status: active
 operator: Andrew
 edit_log:
   - >-
-    DW-S178 2026-06-12 - v2.7: garden admitted (D89), infrastructure types
+    DW-S179 2026-06-12 - v2.7: garden admitted (D89), infrastructure types
     section, corpus-source retired, taxonomy.yaml machine canon pointer
 ---
 
@@ -24,7 +24,7 @@ edit_log:
 - Values are lowercase with hyphens: `meeting-note`, `video-transcript`, `seedpod`
 - Single value only — no comma-separated types
 - All pipeline outputs referencing vault notes use `[[wikilinks]]`
-- New `type:` values are admitted to `taxonomy.yaml` (or the instance overlay) BEFORE use. Skill output templates that stamp `type:` are the observed drift surface: one template line minted 106 files of an undesigned type before lint caught it (S178). When writing or reviewing a skill that creates files, check its template's `type:` against the taxonomy.
+- New `type:` values are admitted to `taxonomy.yaml` (or the instance overlay) BEFORE use. Skill output templates that stamp `type:` are the observed drift surface: one template line minted 106 files of an undesigned type before lint caught it (S179). When writing or reviewing a skill that creates files, check its template's `type:` against the taxonomy.
 
 ---
 
@@ -204,7 +204,7 @@ An asynchronous communication — voice note, audio message, or text message sen
 | `transcript` | `video-transcript` | Renamed for explicit *-transcript family convention |
 | `voice-memo` | `voice-memo-transcript` | Renamed for explicit *-transcript family convention |
 | `event-capture` | `seedpod` | Renamed — broader concept than events |
-| `corpus-source` | `companion` | Never designed; was a corpus-enrichment skill template slip. Corpus mode is marked by `corpus_context:`, not type (S178) |
+| `corpus-source` | `companion` | Never designed; was a corpus-enrichment skill template slip. Corpus mode is marked by `corpus_context:`, not type (S179) |
 
 ---
 

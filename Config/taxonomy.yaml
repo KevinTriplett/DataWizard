@@ -8,7 +8,7 @@
 # Instance extensions: this shipped file must not reference instance-local
 # types (D89). Instances extend via an overlay file - see `overlay` below.
 #
-# Created: DW-S178 2026-06-12 (P2, per D89/D84)
+# Created: DW-S179 2026-06-12 (P2, per D89/D84)
 
 meta:
   taxonomy_version: "2.7"
@@ -125,7 +125,7 @@ retired:
   transcript: video-transcript
   voice-memo: voice-memo-transcript
   event-capture: seedpod
-  corpus-source: companion   # S178: was only ever a skill-template slip; corpus mode is marked by corpus_context, not type
+  corpus-source: companion   # S179: was only ever a skill-template slip; corpus mode is marked by corpus_context, not type
 
 # ---------------------------------------------------------------------------
 # Fold map - observed synonym drift -> canonical target (migrate on touch;
