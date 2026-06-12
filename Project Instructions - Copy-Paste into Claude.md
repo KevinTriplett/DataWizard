@@ -3,7 +3,7 @@ title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-06-10'
+updated: '2026-06-12'
 tags:
   - protocol
   - AI-collaboration
@@ -12,6 +12,7 @@ edit_log:
   - DW-S158 2026-06-08
   - DW-S161 2026-06-09
   - DW-S167 2026-06-10
+  - DW-S177 2026-06-12
 ---
 
 # DataWizard - Copy Into Claude Project
@@ -207,7 +208,7 @@ See _DataWizard/Seed/SKILLS.md for full catalog.
 | What | Version | Last changed |
 |---|---|---|
 | Project Instructions | v4.3 | 2026-06-10 |
-| Seed | v1.1.0 | 2026-05-02 |
+| Seed | v1.1.1 | 2026-06-10 |
 
 ---
 

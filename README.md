@@ -220,45 +220,20 @@ This downloads the latest Seed and overwrites only the Seed files. Your project 
 
 ```
 _DataWizard/Seed/
-  VERSION.md                              - Version numbers and update instructions
-  Project Instructions - Copy-Paste into Claude.md  - Instructions to paste into Claude
-  README.md                               - This file
-  update_seed.sh                          - Install/update script
-  SKILLS.md                               - Available skills catalog
-  Protocols/
-    DataWizard Universal Protocol.md      - Full AI operational rulebook
-    Protocol Summary.md                   - Quick reference
-    Content Type Taxonomy.md              - Content types for classification
-  Skills/                                 - See SKILLS.md for full catalog
-    install-wizard/SKILL.md               - Interactive post-install setup
-    project-guidelines/SKILL.md           - Creating and updating project docs
-    session-closer/SKILL.md               - End-of-session log and handoff
-    git-onboarding/SKILL.md               - Interactive git setup walkthrough
-    research-tracking/SKILL.md            - Tracking research to prevent duplicates
-    tools-research/SKILL.md               - Evaluating external tools and repos
-    design-harvest/SKILL.md               - Planting research into design docs
-    transcript-harvest/SKILL.md           - Harvesting transcripts into project docs
-    document-harvest/SKILL.md             - Harvesting articles into project docs
-    harvest-router/SKILL.md               - Routing content to the right project
-  Agents/
-    Harvest Agent.md                      - Content harvesting agent instructions
-  Scripts/
-    classify.py                           - Note classification script
-    segment_transcript.py                 - Transcript segmentation script
-    route_notes.py                        - Note routing script
-    claude-paths.sh                       - Path resolution utility
-  Guides/
-    Git Guide.md                          - Master git reference (shell + 9 sections)
-    Git Guide/                            - Section files for the Git Guide
-    Vault Structure Guide.md
-    Federation Guide.md
-    Filename Safety.md
-    Editing the Claude Desktop Config.md
-    MCP Reliability and Write Verification.md
-    Harvest Workflow Guide.md
-    Human Onboarding Doc Template.md
-  Vault Config.md                         - User-specific paths and settings
+  README.md              - This file
+  VERSION.md             - Version numbers and update instructions
+  Project Instructions - Copy-Paste into Claude.md - Instructions to paste into Claude
+  update_seed.sh         - Install/update script
+  SKILLS.md              - Skills catalog (the authoritative list of all skills)
+  Protocols/             - Operating rules: Universal Protocol, Protocol Summary, Content Type Taxonomy, Quest Lifecycle
+  Skills/                - One folder per skill; SKILLS.md is the catalog
+  Agents/                - Agent instruction files
+  Scripts/               - Classification, segmentation, routing, sync, and converter scripts
+  Config/                - Default configuration (enrichment_defaults.yaml)
+  Guides/                - Setup and reference guides (Git Guide, Filename Safety, Federation Guide, and more)
 ```
+
+One file you may see referenced that is NOT in the shipped Seed: `Vault Config.md` (user-specific paths and settings). It is gitignored by design -- each vault keeps its own. If a guide or skill asks for it and it doesn't exist yet, create it at `_DataWizard/Seed/Vault Config.md` with the paths it asks about.
 
 ---
 
