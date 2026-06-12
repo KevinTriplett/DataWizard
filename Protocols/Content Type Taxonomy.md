@@ -24,6 +24,7 @@ edit_log:
 - Values are lowercase with hyphens: `meeting-note`, `video-transcript`, `seedpod`
 - Single value only — no comma-separated types
 - All pipeline outputs referencing vault notes use `[[wikilinks]]`
+- New `type:` values are admitted to `taxonomy.yaml` (or the instance overlay) BEFORE use. Skill output templates that stamp `type:` are the observed drift surface: one template line minted 106 files of an undesigned type before lint caught it (S178). When writing or reviewing a skill that creates files, check its template's `type:` against the taxonomy.
 
 ---
 

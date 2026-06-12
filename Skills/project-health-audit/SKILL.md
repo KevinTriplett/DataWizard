@@ -1,196 +1,125 @@
 ---
 name: project-health-audit
 description: >-
-  Systematic audit of a DW project against protocol conventions. Checks
-  shell-section drift, YAML compliance, filename safety, infrastructure
-  completeness, and protocol conformance. Triggers on: 'DW review', 'audit this
-  project', 'check project health', or automatically via session-closer every
-  ~10 sessions.
+  Judgment-half audit of a DW project: consumes the dw_lint report for machine
+  findings, then checks infrastructure completeness, MOC freshness, shell
+  narrative order, and routes findings. Triggers on: 'DW review', 'audit this
+  project', 'check project health', or via session-closer periodic thresholds.
 type: skill
-version: '1.1'
+version: '2.0'
 created: '2026-05-23'
-updated: '2026-06-01'
+updated: '2026-06-12'
+operator: Andrew
+edit_log:
+  - >-
+    DW-S178 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
+    J1-J6, D84/D87/D88/D92/D93 updates, manual fallback appendix
 ---
 
 # Project Health Audit Skill
 
 ## Overview
 
-Systematic audit of a DW project against protocol conventions. Checks shell-section drift, YAML compliance, filename safety, infrastructure completeness, and protocol conformance. Produces a structured report with prioritized action items.
+Periodic audit of a DW project's structural health. Since dw_lint v1 (S178), the audit has two halves with a clean division of labor:
 
-This skill is the formalized version of the `DW review` command. It can be invoked manually ("run a DW review," "audit this project") or triggered automatically by the session-closer every ~10 sessions.
+- **Machine half — dw_lint.** Filename safety, birth metadata, section contracts, shell-section sync, link resolution, heading hazards, stale paths, type validity, companion naming, 0.x slot conformance, archive naming. Lint finds these faster and more completely than any hand pass. The audit CONSUMES the lint report; it never re-derives machine findings by hand.
+- **Judgment half — this skill.** Everything that needs a human-or-agent decision: is the infrastructure complete for what this project does, is the MOC fresh, should a partial migration be finished, where does a missing embed belong, what do the lint findings mean and where should they route.
+
+If the vault has no lint tooling (adopter without Python), use the Manual Fallback appendix at the bottom.
 
 ## When to Use
 
-- When the session-closer prompts for a periodic audit (Step 3.11)
+- When the session-closer's periodic thresholds prompt for an audit (cadence lives in the session-closer thresholds table — the single home per D88; this skill quotes no numbers)
 - When the user requests `DW review` or "audit this project"
-- After a major restructure, migration, or protocol version bump
+- After a major restructure, migration, or Seed version bump
 - When onboarding a new project to DW conventions
 
 ### When NOT to Use
 
 - For mid-session spot checks on a single file (just read it)
 - For content quality review (this checks structure, not substance)
+- To re-check things lint already checks (read the report instead)
+
+## Step 0: Get Machine Findings
+
+1. Locate the project's lint tooling. DW instance: `Workshop - <Project>/Scripts/dw_lint.py` with `lint_config.yaml` beside it. Reports land in `Workshop - <Project>/Lint Reports/`.
+2. If the newest lint report is less than ~24h old (nightly task output), use it. Otherwise run fresh:
+   `python3 "<...>/Scripts/dw_lint.py" --root "<vault>/_<Project>" --session <ProjectAbbrev-SNN>`
+3. Read the report's summary table and Errors section in full; read warning sections selectively (the per-check counts tell you where to look).
+4. No lint tooling available → Manual Fallback appendix.
 
 ## Audit Scope Tiers
 
-Ask the user which scope they want before starting:
+Ask the user which scope they want before starting. Tiers now govern judgment depth — the machine half is the same lint report regardless.
 
-| Scope | What it checks | Token cost | When to use |
-|---|---|---|---|
-| **Quick** | Infrastructure files, folder structure, filename safety | Low | Routine periodic check |
-| **Standard** | Quick + frontmatter on all files (via `get_frontmatter`), shell-section sync | Medium | Default for 10-session periodic audits |
-| **Full** | Standard + content spot-checks on key files, broken embed detection | High | After major restructures or migrations |
-| **Incremental** | Only files modified since the last audit | Low-Medium | Between full audits when drift is suspected |
+| Scope | Judgment checks run | When to use |
+|---|---|---|
+| **Quick** | J1, J2 | Routine periodic check |
+| **Standard** | J1-J4 | Default for periodic audits |
+| **Full** | J1-J6 | After major restructures or migrations |
+| **Incremental** | J3, J4 on files changed since last audit | Between full audits when drift is suspected |
 
-For the automatic 10-session trigger from session-closer, default to **Standard** unless the user requests otherwise.
+For audits triggered by session-closer thresholds, default to **Standard**.
 
-## Audit Categories
+## Judgment Checks
 
-### Category 1: Infrastructure File Presence
+### J1: Infrastructure Completeness (D84 three-tier registry)
 
-Check that the project has these required files:
+Lint's G2 checks slot NAMING; this check asks whether the project HAS what it needs:
 
-- `0.0 Project Guidelines - ProjectName.md` -- required
-- `0.1 MOC - ProjectName.md` -- required
-- `0.2 Session Log - ProjectName.md` -- required
-- `0.3 Decision Log - ProjectName.md` -- required
-- `0.4 Harvest Log - ProjectName.md` -- required after first harvest
-- `! Action Items - ProjectName.md` -- recommended
+- **Fixed core 0.0-0.5** (required in every project): Project Guidelines, MOC, Session Log, Decision Log, Harvest Log (required after first harvest), Action Items. All live in `_Infrastructure - ProjectName/`.
+- **Reserved standard 0.6-0.13** (only if the project uses the capability): 0.6 Registry, 0.7 Quest Log, 0.8 Health Audit Log, 0.9 Quest Dashboard, 0.10 Team Dashboard, 0.11 content-interest scan log.
+- Judgment call: a project doing harvesting without a 0.4, or a team project without a 0.10, is a gap; a solo project without a 0.10 is fine.
 
-Verify each file's frontmatter includes `updated:` and `datawizard_protocol_version:`.
+Frontmatter on infrastructure files: `updated:` and `edit_log:` present. (Do NOT require `datawizard_protocol_version` — retired per D93; drop the pin when touching a file that has one.)
 
-### Category 2: Shell-Section Drift
+### J2: MOC Regeneration Freshness (D92)
 
-For each shell file (files containing `![[...]]` embeds with a corresponding sections folder):
+The 0.1 MOC is generated by `dw_moc.py`, never hand-maintained. Check its frontmatter `generated_at:` stamp:
 
-1. **List the sections folder** to get all files on disk
-2. **Parse the shell** to extract all `![[filename]]` embed references
-3. **Compare and report:**
-   - **Missing embeds**: Section files in folder but NOT embedded in shell. This is the most common drift -- sections added but shell never updated.
-   - **Broken embeds**: Embeds in shell that don't resolve to any file in the sections folder. Usually caused by renames or deletes.
-   - **Full-path embeds**: Embeds using `![[path/to/file]]` instead of `![[filename]]`. Anti-pattern that breaks when folders move.
-   - **Non-section files**: Files in the sections folder that don't follow N.N numbering (e.g., `_Harvest Log`, `0.01 Session Log`). Informational only -- these are expected auxiliary files, not drift.
+- Stale relative to recent project activity (e.g. many sessions since regeneration, or major folder restructures after the stamp) → regenerate:
+  `python3 "<...>/Scripts/dw_moc.py" --root "<vault>/_<Project>" --project <Project> --session <ProjectAbbrev-SNN> --write`
+- A MOC without `generated: true` frontmatter is a pre-D92 hand-curated relic → archive it and generate.
 
-**Sections folder inference:** Given a shell at `path/Shell Name.md`, check:
-1. `path/Shell Name/` (sibling folder with same name)
-2. `_Sections - ProjectName/Shell Name/` (protocol standard location)
-3. If neither exists, the shell may not use the sections pattern -- skip it
+### J3: Shell Narrative Order and Partial Migrations
 
-### Category 3: YAML Compliance
+Lint C4 reports WHAT is out of sync (missing/duplicate/orphan embeds). The judgment half:
 
-Check frontmatter on project files using `get_frontmatter` (no full reads needed):
+- Where in the shell's narrative order does a missing embed belong?
+- Shells with inline content besides embeds: complete the migration or intentionally hybrid?
+- Section files that should be split or merged (size, topic drift).
 
-**All files:**
-- `type:` present and lowercase
-- `updated:` present and in YYYY-MM-DD format (not ISO datetime `T00:00:00.000Z`)
-- `created:` present and in YYYY-MM-DD format
+### J4: Lint Report Triage Routing
 
-**Section files** (files with `parent:` and `section:` in frontmatter):
-- `parent:` is a wikilink (`"[[Shell Name]]"`)
-- `section:` matches the numeric prefix in the filename
-- `edit_log:` present (required on section files per YAML Metadata Protocol)
+For each lint finding class, decide the route:
 
-**Infrastructure files (0.x):**
-- `datawizard_protocol_version:` present
-- `edit_log:` present (recommended)
+- **Fix now** (mechanical, <5 min, this session) — apply with user approval
+- **Action item** (batch-sized) — add to 0.5 with the lint report linked as the worklist
+- **Phase-routed** (belongs to a planned cleanup phase) — verify the phase pointer exists; do not duplicate
+- **Accept** (intentional deviation) — record why in the audit log Notes column
 
-**Files with harvest-related YAML:**
-- `harvest_status:` uses valid values (absent, `pending`, `reviewed`, `harvested`)
-- `harvest_for:` entries are wikilinks
-- `harvested_into:` entries are wikilinks
+### J5: Content Spot-Checks (Full scope)
 
-### Category 4: Filename Safety
+Read 3-5 key files (0.0, newest session entry, one section file, one recently-modified doc) and judge: does the content match the structure's claims? Is 0.0's Current State actually current?
 
-Scan filenames for violations of the cross-platform safety rules:
+### J6: Date Consistency (Full scope, advisory)
 
-- Em-dashes (`--`) -- should be plain hyphens (`-`)
-- Curly quotes -- should be straight quotes
-- Characters forbidden on Windows: `? | * < > " \ :`
-- Tab characters, non-breaking spaces, carriage returns
-- Consecutive spaces
-- Trailing whitespace before extension
+Flag files where YAML `updated:` is more than ~30 days older than filesystem mtime — suggests edits outside DW sessions. Git operations reset mtimes, so advisory only; frontmatter dates are authoritative.
 
-Reference: `Seed/Guides/Filename Safety.md`
+## How to Run
 
-### Category 5: Protocol Conformance
+1. **Scope** — ask the user (default Standard for threshold-triggered audits). For Incremental, use `last_health_audit:` in 0.0 frontmatter as the cutoff.
+2. **Step 0** — get the lint report (above).
+3. **Boundaries** — read 0.0 for folder structure. Skip `xArchive - ProjectName/` folders (D87 naming) unless explicitly directed.
+4. **Judgment checks** for the chosen tier. Use `get_frontmatter` / `list_directory` over full reads wherever possible.
+5. **Report** in chat using the output format below.
+6. **Route actions** per J4. Auto-fixable items: offer to apply now. Judgment items: 0.5 action items.
+7. **Log** — append a row to `0.8 Health Audit Log - ProjectName.md` (create from DW's as template if absent):
 
-Check for patterns that indicate stale or non-compliant conventions:
+   | Date | Session | Scope | Lint E/W/I | Judgment issues | Auto-fixed | Routed | Notes |
 
-- **Stale meta-folder prefixes**: Folders using `~` prefix instead of `_` (pre-v1.1.0 convention)
-- **Roman numerals in section headers**: Section files using `## III.` instead of `## 3.` (retired convention)
-- **Broken L-series references**: Embeds referencing `L.00` or `L.01` files (retired LLM Collaboration Protocol)
-- **Missing project name suffix**: Infrastructure files or meta-folders without `- ProjectName` suffix
-- **Shell files with inline content**: Shells that contain actual content instead of only `![[embed]]` references (partial migration)
-
-### Category 6: Date Consistency (Full scope only)
-
-For files with both YAML `updated:` and filesystem modification dates:
-
-- Flag files where YAML `updated` is more than 30 days older than filesystem mtime. This suggests edits happened outside a DW session (human edits, plugin changes, git operations) without updating YAML.
-
-Note: Git operations reset filesystem timestamps, so this check is advisory, not definitive. Frontmatter dates are authoritative per protocol.
-
-## How to Run the Audit
-
-### Step 1: Determine scope
-
-Ask the user for the desired scope tier (Quick, Standard, Full, or Incremental). For periodic audits triggered by session-closer, default to Standard.
-
-For Incremental scope, check the `last_health_audit:` field in the project's 0.0 frontmatter to determine the cutoff date. Only audit files with `updated:` dates after the last audit date, plus any files flagged in the previous audit report that weren't fixed.
-
-### Step 2: Identify project boundaries
-
-Read the project's 0.0 to understand folder structure. Identify:
-- Project root folder
-- All domain folders (e.g., `Workshop/`, `Quests/`)
-- Meta-folders (`_Sections - ProjectName/`, `_Archive - ProjectName/`, `_Infrastructure - ProjectName/`)
-- Excluded folders (`xArchive` -- skip unless explicitly directed to audit old content)
-
-### Step 3: Run category checks
-
-Execute the relevant categories for the chosen scope:
-- **Quick**: Categories 1, 4, 5
-- **Standard**: Categories 1, 2, 3, 4, 5
-- **Full**: Categories 1, 2, 3, 4, 5, 6
-- **Incremental**: Categories 2, 3, 4 on modified files only
-
-Use `get_frontmatter` and `list_directory` for most checks. Only use `read_note` when content inspection is needed (shell embed parsing, protocol conformance content checks). This keeps token cost manageable for large projects.
-
-### Step 4: Generate report
-
-Present the report in chat using the output format below. Group findings by category with severity indicators.
-
-### Step 5: Propose action items
-
-For each finding, classify as:
-- **Auto-fixable**: Mechanical fixes the agent can apply (add missing YAML field, rename file, update embed). Offer to apply these with user approval.
-- **Needs judgment**: Issues that require human decision (where to insert a missing embed in a shell's narrative order, whether a partial migration should be completed, etc.). Add these to the project's action items file.
-
-### Step 6: Log audit results
-
-After fixes are applied, append a row to the project's Health Audit Log (`0.8 Health Audit Log - ProjectName.md`). If the file doesn't exist yet, create it following the format in DW's log as a template.
-
-Record these columns per audit:
-
-| Date | Session | Scope | Infra | Drift | YAML | Filenames | Protocol | Total | Auto-fixed | Judgment | Notes |
-
-- **Infra/Drift/YAML/Filenames/Protocol**: Issue counts per category
-- **Total**: Sum of all issues
-- **Auto-fixed**: Issues resolved mechanically during the audit
-- **Judgment**: Issues requiring human decision
-- **Notes**: Brief summary of the dominant issue types
-
-Include a **Trend Notes** section below the table when patterns emerge across audits (e.g., a category consistently improving or a recurring issue type).
-
-This log enables cross-audit trend analysis. Without it, audit results are buried in session log narratives and hard to compare.
-
-### Step 7: Update audit record
-
-After the audit completes, update the project's 0.0 frontmatter:
-```yaml
-last_health_audit: "ProjectAbbrev-SNN"
-```
+   Add a **Trend Notes** line below the table when a pattern emerges across audits.
+8. **Update audit record** — set `last_health_audit: "ProjectAbbrev-SNN"` in the project's 0.0 frontmatter.
 
 ## Output Format
 
@@ -200,63 +129,43 @@ last_health_audit: "ProjectAbbrev-SNN"
 **Project:** [Name]
 **Scope:** [Quick | Standard | Full | Incremental]
 **Date:** YYYY-MM-DD (Session ProjectAbbrev-SNN)
-**Protocol target:** v1.7
+**Lint report:** [[Lint Report YYYY-MM-DD HHMM]] - E/W/I counts, delta vs previous
 
-### Summary
+### Machine findings (from lint)
+- Errors: [summary + routing decision per class]
+- Top warning classes: [counts + routing]
 
-| Category | Checked | Issues | Auto-fixable |
-|---|---|---|---|
-| Infrastructure | Y | 0 | - |
-| Shell-Section Drift | Y | 3 | 1 |
-| YAML Compliance | Y | 12 | 10 |
-| Filename Safety | Y | 2 | 2 |
-| Protocol Conformance | Y | 1 | 0 |
-| Date Consistency | - | - | - |
+### Judgment findings
+- J1 Infrastructure: [...]
+- J2 MOC freshness: generated_at YYYY-MM-DD - [fresh | regenerate]
+- J3 Shells: [...]
+- [J5/J6 if Full]
 
-### Findings
-
-#### Shell-Section Drift
-
-**[Shell Name]** (path/to/shell.md)
-- MISSING EMBED: `15.0 New Section.md` exists in folder, not embedded in shell
-- BROKEN EMBED: `![[Old Section.md]]` -- file not found in sections folder
-- Sections in folder: 24 | Embedded in shell: 22 | Drift: 2
-
-#### YAML Compliance
-
-- 8 section files missing `edit_log` field
-- 3 files using ISO datetime format instead of YYYY-MM-DD
-- 1 infrastructure file missing `datawizard_protocol_version`
-
-[...additional categories...]
-
-### Recommended Actions
-
-**Auto-fixable (apply now?):**
-1. Add `edit_log: []` to 8 section files
-2. Convert 3 ISO dates to YYYY-MM-DD
-3. Rename 2 files with em-dashes
-
-**Needs judgment (added to action items):**
-1. Insert `![[15.0 New Section.md]]` in [Shell] -- where in the narrative order?
-2. Complete shell migration for [Doc Name] -- shell still has inline content
+### Actions
+**Applied now:** [...]
+**Routed to 0.5:** [...]
+**Phase-routed (already planned):** [...]
+**Accepted deviations:** [...]
 ```
 
 ## Handling Large Projects
 
-For projects with 50+ files, the audit may be too large for a single pass. In that case:
+The lint report scales fine — judgment checks are the constraint. For projects with many shells or 100+ files, run J1/J2 plus J4 routing in one session and schedule J3/J5 for a follow-up rather than degrading the judgment quality.
 
-1. Run Category 1 (infrastructure) and Category 4 (filenames) first -- these are fast
-2. Run Category 2 (drift) on shells only -- the highest-value check
-3. Run Category 3 (YAML) in batches of 20 files using `get_frontmatter`
-4. Present intermediate findings if context is getting long
+## Manual Fallback (no lint tooling)
 
-The goal is to complete the audit in one session. If the project is genuinely too large (100+ files across many folders), suggest splitting into domain-level audits across sessions.
+For vaults without Python tooling, hand-run the old mechanical categories, condensed:
+
+1. **Infrastructure presence** — J1 list above.
+2. **Shell-section sync** — for each shell: list the sections folder, parse `![[...]]` embeds, compare both directions.
+3. **YAML compliance** — `type:` lowercase and valid; `created:`/`updated:` in YYYY-MM-DD; section files have `parent:` + `edit_log:`; harvest fields use valid values and wikilinks.
+4. **Filename safety** — no `? | * < > " \ :`, tab, NBSP, CR, em-dashes, curly quotes, consecutive spaces, trailing space before extension (see `Seed/Guides/Filename Safety.md`).
+5. **Stale conventions** — `~`-prefix meta-folders, Roman-numeral section headers, `_Archive - ` folder naming (D87: xArchive), missing `- ProjectName` suffixes, shells with inline content.
 
 ## Related
 
-- **Session-closer Step 3.10**: Per-session lightweight section-shell sync check (catches drift at creation time)
-- **Session-closer Step 3.11**: The periodic trigger that invokes this skill every ~10 sessions
-- **Protocol Summary > DW Review**: Points to this skill
-- **Health Audit Log** (`0.8 Health Audit Log - ProjectName.md`): Cumulative record of audit results for trend analysis
-- **Feature requests resolved**: Shell-Sections Drift Detection, Protocol Transition Audit
+- **dw_lint.py** (`Workshop - <Project>/Scripts/`) — the machine half; nightly scheduled task writes daily reports
+- **dw_moc.py** — MOC generator (D92); J2 checks its freshness
+- **session-closer thresholds table** — the single home for audit cadence (D88)
+- **Health Audit Log** (`0.8 Health Audit Log - ProjectName.md`) — cumulative trend record
+- **Decisions:** D84 (0.x tiers), D87 (xArchive), D88 (cadence home), D92 (generated MOC), D93 (version pins retired)
