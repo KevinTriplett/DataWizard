@@ -12,6 +12,10 @@
 #
 # Design doc: Workshop/Design/Enrichment Policy YAML Schema.md
 # Created: DW-S133 2026-05-31
+#
+# Instance-local types (e.g. reddit-save) do NOT belong in this shipped
+# file (D89). Their policies live in the instance taxonomy overlay - see
+# Seed/Config/taxonomy.yaml `overlay` section. Updated: DW-S178 2026-06-12
 
 _default:
   harvest_depth: standard
@@ -60,14 +64,6 @@ voice-memo-transcript:
   cross_reference: false
   url_extraction: false
   segment: true
-
-reddit-save:
-  harvest_depth: light
-  lexicon_scan: false
-  speaker_attribution: false
-  cross_reference: false
-  url_extraction: true
-  segment: false
 
 seedpod:
   harvest_depth: standard
