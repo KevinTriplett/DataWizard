@@ -6,13 +6,14 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-06-09'
-version: '0.7'
+updated: '2026-06-13'
+version: '0.8'
 edit_log:
   - DW-S158 2026-06-08
   - >-
     MMM meta-learning plant 2026-06-09: added Step 4 (check existing vault
     sources), Step 6 (triage multi-topic), renumbered
+  - 'DW-S182 2026-06-13: folded Protocol 8.0 (segmentation, chunk-and-route, lexicon criteria); repointed See Also to post-demolition homes'
 ---
 
 # Transcript Harvest Skill
@@ -47,6 +48,45 @@ Harvest content from transcripts (video, podcast, meeting, voice memo) into proj
 8. **Update source YAML** -- set `harvest_status`, `harvested_into` (with section-level anchors), `harvest_date`, and `harvest_notes`. For re-harvests, append to `harvested_into` and convert `harvest_date` to an array (most recent last). Or set `harvest_status: reviewed` with `harvest_notes` explaining why nothing was harvested.
 9. **Update Harvest Ledger** -- add or update a row in `0.4 Harvest Ledger - [Project].md` with source, harvest date, destinations, and agent.
 10. **Session log** -- add harvest details to `0.2 Session Log.md` at the end of the session as part of normal session logging -- not after each individual source.
+
+## Segmentation (before you harvest)
+
+Transcripts are the densest, highest-value content type in many vaults, but structurally noisy. Three properties make them distinct: topic shifts mid-stream (the raw transcript has no headers marking where topics change, so companion citations can't deep-link to specific moments), speaker-attributed ideas (who said something matters - preserve attribution, don't smooth it away), and high lexicon density (specialized language in its most authentic, unrehearsed form).
+
+**Segment before extracting anything** (Workflow Step 3). Add `##` section headers at major topic shifts - without headers there are no anchor targets for deep-link citations.
+
+Format:
+```
+## Section Name (@timestamp if available)
+```
+
+Good headers (specific, navigable):
+- `## Threshold Design and Overflow Logic (@14:23)`
+- `## Simon's Tension Around Ownership`
+- `## Bonding Curves as Coordination Mechanism (@22:15)`
+
+Bad headers (too generic):
+- `## Discussion`
+- `## Part 3`
+- `## Continued`
+
+Add headers on a first read-through, before extracting content. For very short transcripts (under ~1,000 words) headers may not be necessary - use judgment.
+
+## Chunk and Route
+
+1. **First pass: read the whole source** before routing anything.
+2. **Second pass: identify chunks.** A chunk is a contiguous passage addressing one project topic. A single section may contain multiple chunks; one chunk may span multiple sections if they stay on one topic.
+3. **Route each chunk to the most specific destination section** by title. When uncertain, read the first paragraph of a candidate section to confirm fit.
+4. **Multi-topic chunks:** put primary content in the most specific section; add a brief cross-reference from the other. Don't duplicate full paragraphs.
+5. **Draft all placements for human review** before writing anything to the vault.
+
+## What Makes a Good Lexicon Candidate
+
+When harvesting from transcripts, watch for a phrase or framing that:
+- Is a specific phrase or framing, not a vague topic
+- Says something in a distinctive way (not generic)
+- Has a clear claim or idea embedded in it
+- Could stand alone as a meme-seed with the right context
 
 ## Common Mistakes
 
@@ -126,9 +166,8 @@ When processing large transcript batches (total word count exceeding ~50k words,
 
 ## See Also
 
-- [[Harvest Workflow Guide]] -- full walkthrough with examples and edge cases
-- Protocol Section 5 (YAML Schema) -- harvest field definitions
-- Protocol Section 7 (Harvest Checklist) -- the 3-step post-harvest checklist
-- Protocol Section 8 (Editorial Principles)
-- Protocol Section 9 (Transcript Preparation)
-- Protocol Section 10 (Citations and Source Tags)
+- [[Harvest Workflow Guide]] -- full walkthrough, edge cases, and the 3-step end-of-harvest checklist
+- [[YAML Schema]] -- harvest field definitions
+- [[Editorial Principles]] -- synthesis guidance
+- [[Conventions Registry]] -- citation format and source tags
+- Segmentation and lexicon criteria: see the sections above (folded in from the retired Universal Protocol transcript-prep section)

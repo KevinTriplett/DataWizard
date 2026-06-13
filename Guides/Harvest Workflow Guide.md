@@ -2,8 +2,11 @@
 title: Harvest Workflow Guide
 type: guide
 created: '2026-04-25'
-updated: '2026-04-25'
+updated: '2026-06-13'
+operator: Andrew
 status: active
+edit_log:
+  - 'DW-S182 2026-06-13: folded Protocol 6.0 completion note; repointed cross-refs to post-demolition homes'
 tags:
   - protocol
   - harvesting
@@ -77,7 +80,7 @@ Use wikilink citations with section anchors: `([[Source Title#Section Header|YYY
 
 ## After the Harvest -- The 3-Step Checklist
 
-A harvest is not complete until all three steps are done for each source. Treat each source as one atomic unit -- complete all steps before moving to the next source.
+A harvest is not complete until all three steps are done for each source. Treat each source as one atomic unit -- complete all steps before moving to the next source. If context runs out mid-harvest, note the incomplete state in the session log and flag it to the human.
 
 ### Step 1: Update Source YAML
 
@@ -167,7 +170,7 @@ Sources with `harvest_for: [ProjectA, ProjectB]` need harvest into each project'
 
 ### Companion-only enrichment
 
-A companion note (`c_` prefix) is a separate AI-generated note containing enrichment output -- summaries, tags, themes, lexicon candidates -- for a source file. Companions live in `_Companions/` with mirrored subfolder structure and are created by the enrichment pipeline. Source files are never modified except for YAML updates and transcript section headers; all synthesis goes in the companion. See the Companion Notes section of your project's 0.0 Guidelines or Protocol Section 5 (YAML Schema) for the full companion note architecture.
+A companion note (`c_` prefix) is a separate AI-generated note containing enrichment output -- summaries, tags, themes, lexicon candidates -- for a source file. Companions live in `_Companions/` with mirrored subfolder structure and are created by the enrichment pipeline. Source files are never modified except for YAML updates and transcript section headers; all synthesis goes in the companion. See the Companion notes entry in the [[Conventions Registry]] (or the [[YAML Schema]]) for the full companion note architecture.
 
 When the pipeline creates a companion note but no manual harvest into project docs happens, the source YAML still gets updated (`harvested_into` includes the `c_` link, `harvest_status: harvested`). But the ledger does NOT get a row -- the ledger tracks project-document routing, not companion creation.
 
@@ -178,9 +181,8 @@ The `companion:` field on source files and the `c_` entry in `harvested_into` ar
 ## Related Documents
 
 - [[Harvest Provenance Architecture]] -- full design rationale
-- Protocol Section 5 (YAML Schema) -- field definitions
-- Protocol Section 6 (Log Discipline) -- ledger rules
-- Protocol Section 7 (Harvest Checklist) -- the 3-step checklist
-- Protocol Section 8 (Editorial Principles) -- synthesis guidance
-- transcript-harvest skill -- workflow for transcript sources
+- [[YAML Schema]] -- field definitions
+- [[Editorial Principles]] -- synthesis guidance
+- [[Conventions Registry]] -- ledger/log-discipline conventions and citation format
+- transcript-harvest skill -- workflow for transcript sources (now includes segmentation and lexicon criteria)
 - document-harvest skill -- workflow for non-transcript sources
