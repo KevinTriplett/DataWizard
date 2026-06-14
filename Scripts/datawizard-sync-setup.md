@@ -81,6 +81,8 @@ This lets you "save" your work to git from inside Obsidian.
 
 Now Cmd+Shift+S in Obsidian = save + push + notification.
 
+Note for developers: [a fork of this plugin](https://github.com/kalliopeargentina/obsidian-shellcommands) enables keyring access for secrets like API keys and credentials.
+
 ## Step 5: Set Up the Safety Net (Optional)
 
 This runs the sync automatically every 2 hours as a background safety net, catching anything you forgot to manually save.
