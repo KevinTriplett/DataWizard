@@ -8,6 +8,7 @@ priority: high
 maturity: working
 edit_log:
   - DW-S181 2026-06-13
+  - 'DW-S182 2026-06-13: clarified archiving banner placement for frontmatter files'
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -108,7 +109,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
 - **How:**
   1. Move the file with `obsidian:move_note` so wikilinks update automatically. Do **not** leave it in place with just a notice - it must move.
   2. **Keep the original filename** so existing wikilinks still resolve.
-  3. Add a banner at the top: `> ⚠️ **Archived (YYYY-MM-DD).** Superseded by [[New File]]. Retained for historical reference.`
+  3. Add a banner at the top of the body: `> ⚠️ **Archived (YYYY-MM-DD).** Superseded by [[New File]]. Retained for historical reference.` For files with YAML frontmatter, insert it *after* the closing `---` (e.g. via `patch_note` in front of the first body line); prepending raw text pushes the frontmatter below line 1 and breaks it.
   4. Note the archive in the session log; remove the file from active MOC listings.
 - **Filename exception:** if the replacement reuses the same filename (e.g., a regenerated file), the archived copy must be renamed to avoid collision; add the reason in parentheses, e.g. `0.1 MOC - ProjectName (hand-curated, superseded SNNN).md`.
 - **Don't archive:** files that are merely old but still active; files you only moved; content outside your project scope (flag those to the human).

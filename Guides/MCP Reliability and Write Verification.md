@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-06-10'
+updated: '2026-06-13'
 ---
 # MCP Reliability and Write Verification
 
@@ -105,6 +105,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **Short-name embeds are more resilient than full-path embeds.** `![[4.0 The Ecosystem]]` is safer than `![[_Metamorphic Media/Metamorphic Media Shared/Metamorphic Media - Vision Document/4.0 The Ecosystem]]`. When content is reorganized, full-path embeds break silently. Worse, Obsidian may resolve a broken full-path embed to a same-named file in a different project -- the MMM Vision shell was embedding Flow Funding's `4.0 The Ecosystem` instead of its own because the full path had gone stale. Short-name embeds resolve by filename proximity, which is more resilient to reorganization. Use short-name embeds unless disambiguation is genuinely needed (multiple files with the same name across the vault). (Source: MMM S08)
 
 **`search_notes` can false-negative on exact titles.** A search for an exact note title can return content matches in other files while missing the note itself, even when the file exists and `list_directory` shows it. During an MMM link audit, searching "Foraging in High-Dimensional Data @ DISI" returned files that *mention* the phrase but not `_Clippings/Foraging in High-Dimensional Data @ DISI 2025.md` itself -- leading to a false "broken link" finding that was only caught by a later `list_directory` on `_Clippings/`. Rule: before reporting a wikilink as broken or a file as missing, verify with `list_directory` on the expected folder (or a filesystem `Glob`), not search alone. Search confirms presence; it cannot confirm absence. (Source: MMM S12)
+
+**Sandbox bash cannot delete files on the vault FUSE mount.** From the Cowork sandbox, `rm`/unlink fails with "Operation not permitted" on the Regen Vault (a FUSE mount -- `.fuse_hidden*` files are the tell), though `touch`, create, `mv`/rename, and truncate-write all work. To archive or relocate vault files, use `obsidian:move_note` (it runs with Obsidian's full filesystem access), not bash `cp`+`rm` (which aborts at the first delete). When stamping an archive banner on a file with YAML frontmatter, insert it AFTER the closing `---` (e.g. `patch_note` in front of the first body line) -- prepending breaks the frontmatter. (Source: DW S182)
 
 ## Incident Reference
 
