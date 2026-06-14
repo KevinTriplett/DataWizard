@@ -9,7 +9,7 @@ scope: seed
 
 > **This is the Multi-Project setup for DW Save.** For an overview of DW Save (what it is, Single vs Multi-Project, backup scheduling guidance), see Git Guide Section 5.5. This guide covers the Multi-Project path only -- use it when your vault contains multiple separate git repos that all need to sync with one keystroke.
 
-This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs your shared git repos via git. It replaces Obsidian Relay with direct git sync through GitHub. "Shared repos" means any repo inside your vault that pushes to GitHub -- collaborative projects (like ReWoven, Weave) and the DW Seed itself.
+This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs your shared git repos via git. It replaces Obsidian Relay with direct git sync through GitHub. "Shared repos" means any repo inside your vault that pushes to GitHub -- collaborative projects (for example, a shared book or a team knowledge base) and the DW Seed itself.
 
 ## What It Does
 
@@ -169,12 +169,12 @@ source ~/.zshrc
 
 Then just type `dwsync` anytime.
 
-For more aliases, you can instead  `source "~/ObsidianNoSync/_DataWizard/Scripts/datawizard-aliases.sh"` inside `.zshrc` and gain the following shortcuts:
-* alias dwsync="bash ~/Scripts/datawizard-sync.sh"
-* alias dwstop='launchctl unload "$DW_PLIST" && echo "DW auto-sync stopped"'
-* alias dwstart='launchctl load "$DW_PLIST" && echo "DW auto-sync started"'
-* alias dwstatus: check status of auto-sync (0 = )
-
+For more aliases, you can instead add `source "/path/to/your/vault/_DataWizard/Seed/Scripts/datawizard-aliases.sh"` inside `.zshrc` and gain the following shortcuts:
+* dwsync: manual sync
+* dwstop: stop auto-sync
+* dwstart: start auto-sync
+* dwstatus: check status of auto-sync
+* dwlog: view last 20 lines of log for errors (see below)
 
 ## Notifications
 
@@ -223,6 +223,8 @@ git push
 
 In practice, conflicts should be rare. The shell + sections architecture means collaborators are usually in different files even when working on the same document. If you are on a call together, just say "I am editing X, hold off on that one."
 
+You can also ask Claude to help you resolve the conflict, particularly if it's not obvious what needs to be revised.
+
 ## Rollback and Recovery
 
 Git keeps full version history. You can restore any file to any previous state.
@@ -249,7 +251,7 @@ git push --force
 
 If a collaborator does not use DataWizard, they can sync using the Obsidian Git community plugin instead of this script. They clone the repo, open it as a standalone Obsidian vault, and configure the plugin for auto-sync. See the relevant project's onboarding doc for details.
 
-## For Claude Instances
+## Instructions for LLM
 
 If a user asks you to help set up sync for a new project, the steps are:
 1. Initialize git in the shared project folder
