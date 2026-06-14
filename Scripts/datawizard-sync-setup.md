@@ -70,22 +70,26 @@ You should see a macOS notification: either "DW Saved" with project names, "Ever
 
 This lets you "save" your work to git from inside Obsidian.
 
+***Tip:** copy-paste these steps somewhere you can read them if opening the Settings panel hides them.*
+
 1. In Obsidian, go to Settings > Community Plugins > Browse
 2. Search for **Shell commands** > Install > Enable
-3. Go to Settings > Shell commands > New command
+3. Go to plugin Settings > Shell commands > New command
 4. Paste: `bash ~/Scripts/datawizard-sync.sh`
-5. Set the alias to: `DW Save`
-6. Close that panel, go to Settings > Hotkeys
-7. Search for `DW Save`
-8. Set the hotkey to **Cmd+Shift+S**
+5. Click the gear button
+6. Set the alias to: `DW Save`
+7. Close that panel, go to Settings > Hotkeys
+8. Search for `DW Save`
+9. Click the plus button and set the hotkey to **Cmd+Shift+S**
+10. Close the Settings panel
 
-Now Cmd+Shift+S in Obsidian = save + push + notification.
+Now Cmd+Shift+S in Obsidian will: save + push + notification.
 
-Note for developers: [a fork of this plugin](https://github.com/kalliopeargentina/obsidian-shellcommands) enables keyring access for secrets like API keys and credentials.
+*Note for developers: [a fork of this plugin](https://github.com/kalliopeargentina/obsidian-shellcommands) enables keyring access for secrets like API keys and credentials.*
 
 ## Step 5: Set Up the Safety Net (Optional)
 
-This runs the sync automatically every 2 hours as a background safety net, catching anything you forgot to manually save.
+This runs the sync automatically every 2 hours as a background safety net, catching anything you forgot to manually save. Change the `<integer>7200</integer>` to change the amount of time (in seconds) between automatic syncs.
 
 ```bash
 cat > ~/Library/LaunchAgents/com.datawizard.sync.plist << 'EOF'
@@ -164,6 +168,13 @@ source ~/.zshrc
 ```
 
 Then just type `dwsync` anytime.
+
+For more aliases, you can instead  `source "~/ObsidianNoSync/_DataWizard/Scripts/datawizard-aliases.sh"` inside `.zshrc` and gain the following shortcuts:
+* alias dwsync="bash ~/Scripts/datawizard-sync.sh"
+* alias dwstop='launchctl unload "$DW_PLIST" && echo "DW auto-sync stopped"'
+* alias dwstart='launchctl load "$DW_PLIST" && echo "DW auto-sync started"'
+* alias dwstatus: check status of auto-sync (0 = )
+
 
 ## Notifications
 
