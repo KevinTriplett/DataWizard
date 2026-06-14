@@ -8,6 +8,7 @@ priority: high
 maturity: working
 edit_log:
   - DW-S182 2026-06-13
+  - DW-S183 2026-06-14
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.

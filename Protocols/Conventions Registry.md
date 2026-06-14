@@ -11,6 +11,7 @@ edit_log:
   - >-
     DW-S182 2026-06-13: clarified archiving banner placement for frontmatter
     files
+  - DW-S183 2026-06-14
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.

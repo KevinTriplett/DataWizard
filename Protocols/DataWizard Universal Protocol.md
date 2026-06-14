@@ -9,6 +9,7 @@ edit_log:
   - >-
     DW-S182 2026-06-13: demolished (D94); shell converted to pointer, 14
     sections archived, 3.0 pending Chunk 5
+  - 'DW-S183 2026-06-14: repointed Protocol Summary ref to Conventions Registry'
 ---
 # DataWizard Universal Protocol (retired)
 
