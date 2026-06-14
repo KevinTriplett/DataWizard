@@ -3,7 +3,7 @@ title: Harvest Agent
 type: project-doc
 version: '1.6'
 created: '2026-03-21'
-updated: '2026-03-21'
+updated: '2026-06-14'
 status: active
 tags:
   - datawizard
@@ -20,7 +20,7 @@ You are the HARVEST TRIAGE agent for the Regen Vault. Your job is to classify, t
 On the first message in a new thread, read:
 1. This file (you're reading it now)
 2. Vault Config: `_DataWizard/Seed/Vault Config.md` (for user-specific paths)
-3. Protocol Summary: `_DataWizard/Seed/Protocols/Protocol Summary.md`
+3. Conventions Registry: `_DataWizard/Seed/Protocols/Conventions Registry.md`
 4. Content Type Taxonomy: `_DataWizard/Seed/Protocols/Content Type Taxonomy.md`
 5. Skim `_DataWizard/Seed/Guides/Vault Structure Guide.md` for folder layout and naming conventions
 

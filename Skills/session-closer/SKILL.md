@@ -7,7 +7,7 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-11'
+updated: '2026-06-14'
 version: '3.6'
 edit_log:
   - DW-S158 2026-06-08
@@ -159,12 +159,11 @@ patterns, naming rules, or structural practices that differ from
 what the protocol docs currently say?"
 
 If yes, do one of:
-1. Update the relevant protocol docs now (Protocol Summary, Naming
-   Conventions, Vault Bootstrap, or whichever docs describe the
-   old convention), OR
+1. Update the relevant protocol docs now (the Conventions Registry,
+   YAML Schema, or whichever docs describe the old convention), OR
 2. Add an explicit action item naming the *specific docs* that
-   need updating -- not just "update protocol" but "update Protocol
-   Summary Section X and Naming Conventions Section Y."
+   need updating -- not just "update protocol" but "update the
+   Conventions Registry's X entry and the YAML Schema's Y field."
 
 If a Decision Log entry was written this session, verify its
 `Protocol updated:` flag is accurate.
@@ -213,7 +212,7 @@ For each file modified this session (from the "Files updated" and "Files created
 
 Use `update_frontmatter` for efficiency -- it merges without requiring a full re-read.
 
-**Scope:** `edit_log` is required on section files, recommended on infrastructure files (0.x) and standalone docs. Shell files are exempt -- they are assembly surfaces whose edit history is captured by their sections' logs. See Protocol Summary > edit_log Field for the full convention.
+**Scope:** `edit_log` is required on section files, recommended on infrastructure files (0.x) and standalone docs. Shell files are exempt -- they are assembly surfaces whose edit history is captured by their sections' logs. See the [[YAML Schema]] edit_log section for the full convention.
 
 This step catches metadata drift at the source rather than requiring periodic remediation passes.
 

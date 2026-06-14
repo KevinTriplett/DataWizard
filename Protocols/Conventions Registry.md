@@ -2,13 +2,15 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-13'
+updated: '2026-06-14'
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
   - DW-S181 2026-06-13
-  - 'DW-S182 2026-06-13: clarified archiving banner placement for frontmatter files'
+  - >-
+    DW-S182 2026-06-13: clarified archiving banner placement for frontmatter
+    files
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -90,6 +92,22 @@ The `_` prefix sorts active meta-folders to the top and is shell-safe (no escapi
 For the full cross-platform character map (forbidden characters, replacements, sanitization), see the **Filename Safety guide** - that is the one home for filename character rules. This entry covers structure and numbering only.
 
 **Example:** a research doc that outgrows one file becomes shell `Research Notes.md` plus `_Sections - ProjectName/Research Notes/1.0 Background.md`, `2.0 Findings.md`.
+
+---
+
+## Shell and section architecture
+
+**Rule:** large documents split into a *shell* (assembly surface) plus *section files* (content).
+
+- The **shell** contains only `![[embed]]` references - never edit it directly. Section files hold the content - always edit those.
+- Section files live in `_Sections - ProjectName/<ShellName>/`, a subfolder mirroring the shell's name. Section folders are siblings of shell folders, not children.
+- Shells live in the domain folder appropriate to their content; lightweight projects may keep a shell at the project root.
+- Numbering starts at `1.0` (`0.x` is reserved for infrastructure files). Section headers use plain numeric prefixes matching the filenames - no Roman numerals.
+- Section YAML carries `parent: "[[Shell Name]]"` and `section: N` (matching the filename prefix); each section file opens with `*Part of the [[Shell Name]]*`.
+- **5+ sections** in a document - create the section subfolder rather than leaving the files loose.
+- Empty folders can't be deleted via MCP (the vault FUSE mount blocks it); when files are moved out, the human deletes the empty folder manually in Obsidian.
+
+**Example:** `0.2 Session Log - DataWizard.md` is a shell of `![[...]]` embeds; each entry is a file in `_Sections - DataWizard/Session Log/`, numbered from `1.0`.
 
 ---
 
@@ -239,6 +257,7 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 
 - **Bulk vault edits:** for batch YAML or filename changes, use MCP tools (`obsidian:update_frontmatter`, `obsidian:move_note`) directly rather than Obsidian plugins. Full rationale: Decision Log **D44**.
 - **Check `harvest_status` before reading a source:** before harvesting or processing a source file, read its `harvest_status` (and related provenance YAML) first, so already-processed material isn't re-harvested. A cheap guard against duplicate work in the pipeline.
+- **Git push before batch ops:** before running any script that bulk-moves or modifies vault files, commit and push first. `git checkout .` is then the undo if a batch run goes wrong.
 
 ---
 

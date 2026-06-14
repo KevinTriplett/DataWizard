@@ -2,7 +2,7 @@
 title: DataWizard Universal Protocol
 type: protocol
 created: '2026-03-07'
-updated: '2026-06-13'
+updated: '2026-06-14'
 operator: Andrew
 status: active
 edit_log:
@@ -42,4 +42,4 @@ edit_log:
 - [[Content Type Taxonomy]] - `type:` values
 - [[Quest Lifecycle]] - quest states and transitions
 
-See also: [[Protocol Summary]] (to be shrunk in P3 Chunk 3).
+The former [[Protocol Summary]] quick-reference was archived (S183, D99); its role is now covered by the [[Conventions Registry]] and the Project Instructions.

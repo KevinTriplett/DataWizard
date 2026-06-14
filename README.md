@@ -225,7 +225,7 @@ _DataWizard/Seed/
   Project Instructions - Copy-Paste into Claude.md - Instructions to paste into Claude
   update_seed.sh         - Install/update script
   SKILLS.md              - Skills catalog (the authoritative list of all skills)
-  Protocols/             - Operating rules: Universal Protocol, Protocol Summary, Content Type Taxonomy, Quest Lifecycle
+  Protocols/             - Operating rules: Conventions Registry, YAML Schema, Editorial Principles, Anti-Patterns, Content Type Taxonomy, Quest Lifecycle
   Skills/                - One folder per skill; SKILLS.md is the catalog
   Agents/                - Agent instruction files
   Scripts/               - Classification, segmentation, routing, sync, and converter scripts
