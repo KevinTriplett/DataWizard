@@ -25,7 +25,9 @@ Here's what we're going to do, step by step:
 5. **Connect Claude to your vault** -- so Claude can read and write your notes
 6. **Finish setup with Claude** -- Claude will verify the connection, set up your project, and walk you through the rest
 
-Steps 1-5 happen in this guide. Step 6 happens in a conversation with Claude after the connection is live.
+Steps 1-6 happen in this guide. Step 7 happens in a conversation with Claude after the connection is live.
+
+**You don't need any coding, terminal, or git experience.** Every step below is copy-and-paste, and Claude handles the technical parts for you. If you *are* comfortable with the command line or git, feel free to adapt these steps -- nothing here requires doing it exactly this way.
 
 ---
 
@@ -41,7 +43,7 @@ Open Obsidian. It will ask you to create or open a vault. Create a new vault.
 
 **Important: choose a local folder on your computer.** Do not put your vault in a cloud-synced folder (Dropbox, iCloud, Nextcloud, OneDrive, Google Drive). Cloud sync services can interfere with Obsidian's file indexing and cause files created outside Obsidian to not appear. Use a regular local folder -- for example, `/Users/yourname/My Vault` or `/Users/yourname/Documents/My Vault`.
 
-If you want cloud backup, DataWizard uses git for that (Claude will help you set it up later). Git is more reliable than file sync for a vault because it tracks changes intentionally rather than syncing everything continuously.
+If you want cloud backup, just ask Claude to set it up when you're ready -- it handles everything for you. (DataWizard uses git under the hood, which saves changes more reliably than continuous file sync. You don't need to know git to benefit from it; if you already do, you're welcome to set up backup your own way.)
 
 ---
 
@@ -85,7 +87,7 @@ You should see "DataWizard Seed installed to _DataWizard/Seed/" in Terminal.
 
 ## Step 5: Install Node.js
 
-Node.js powers the connection between Claude and your vault. Check if you already have it by running this in Terminal:
+Node.js powers the `mcp-remote` bridge that connects Claude Desktop to the Local REST API plugin (Step 6). Check if you already have it by running this in Terminal:
 
 ```bash
 node --version
@@ -135,21 +137,27 @@ You should see a version number.
 
 ## Step 6: Connect Claude to Your Vault
 
-This step tells Claude Desktop where your vault is so it can read and write your notes. We'll do this by editing a configuration file.
+Claude reaches your vault through the **Local REST API & MCP Server** Obsidian plugin, which exposes your vault over both a REST API and a built-in MCP (Model Context Protocol) server. Your LLM client connects to that MCP server.
 
-**If your config file already has content** (common if you use Claude Desktop features like Cowork), the command below will add the vault connection without overwriting your existing settings. If the file doesn't exist yet, it will create it.
+> This replaces the older `@bitbonsai/mcpvault` method and any separate "MCP server + REST API plugin" combo -- the Local REST API plugin now provides both in one.
 
-Paste this command into Terminal, replacing `/Users/yourname/My Vault` with your actual vault path:
+### 6a. Install the Local REST API & MCP Server plugin
+
+1. In Obsidian: **Settings -> Community plugins -> Browse**
+2. Search for **Local REST API & MCP Server** (by *coddingtonbear*), then **Install -> Enable**
+3. Open **Settings -> Local REST API & MCP Server** and **copy your API Key** -- you'll need it below
+4. Note the ports it shows: **27123 (HTTP)** and **27124 (HTTPS)**. The HTTPS cert is self-signed and many Operating Systems reject it, so these instructions use the **HTTP** port `27123` on localhost (safe, since it never leaves your machine).
+
+### 6b. Connect Claude Desktop
+
+Claude Desktop talks to the plugin through the `mcp-remote` bridge (this is why Node.js was installed in Step 5). Paste this into Terminal, replacing `YOUR_API_KEY` with the key from step 6a:
 
 ```bash
 CONFIG_FILE="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-VAULT_PATH="/Users/yourname/My Vault"
+API_KEY="YOUR_API_KEY"
 
 mkdir -p "$(dirname "$CONFIG_FILE")"
-
-if [ ! -f "$CONFIG_FILE" ] || [ ! -s "$CONFIG_FILE" ]; then
-  echo "{}" > "$CONFIG_FILE"
-fi
+if [ ! -f "$CONFIG_FILE" ] || [ ! -s "$CONFIG_FILE" ]; then echo "{}" > "$CONFIG_FILE"; fi
 
 node -e "
 const fs = require('fs');
@@ -157,32 +165,33 @@ const config = JSON.parse(fs.readFileSync('$CONFIG_FILE', 'utf8'));
 if (!config.mcpServers) config.mcpServers = {};
 config.mcpServers.obsidian = {
   command: 'npx',
-  args: ['@bitbonsai/mcpvault@latest', '$VAULT_PATH']
+  args: [
+    'mcp-remote@latest',
+    'http://127.0.0.1:27123/mcp/',
+    '--header',
+    'Authorization: Bearer $API_KEY'
+  ]
 };
 fs.writeFileSync('$CONFIG_FILE', JSON.stringify(config, null, 2));
 console.log('Done! Obsidian MCP added to Claude Desktop config.');
-console.log('Vault path: $VAULT_PATH');
 "
 ```
 
-You should see "Done! Obsidian MCP added to Claude Desktop config."
+Then **Quit and reopen Claude Desktop** (Obsidian menu -> Quit, don't just close the window), and verify under **Settings -> Developer** that **obsidian** shows as running/green.
 
-**Now restart Claude Desktop:**
+**Tip:** Obsidian must be running for the connection to work -- the Local REST API server only runs while Obsidian is open.
 
-1. Go to the **Apple menu** () in the top left of your screen
-2. Click **Force Quit**
-3. Select **Claude** and click **Force Quit**
-4. Reopen Claude Desktop
+### 6c. Connect a different LLM / MCP client
 
-**Verify it's connected:**
+*Most people connect Claude Desktop (6b) and can skip this section -- it's here for those who want to use a different MCP-capable client.*
 
-1. In Claude Desktop, go to **Settings** (gear icon)
-2. Click **Developer**
-3. You should see **"obsidian"** listed with a green badge
+Any MCP-capable client connects to the same endpoint. Two patterns:
 
-If you see the green badge, the connection is live. If not, see Troubleshooting below.
+- **Stdio clients (most desktop apps, e.g. Claude Desktop):** run the bridge
+  `npx mcp-remote@latest http://127.0.0.1:27123/mcp/ --header "Authorization: Bearer YOUR_API_KEY"`
+- **Clients that support remote HTTP MCP directly:** point them at `http://127.0.0.1:27123/mcp/` and send header `Authorization: Bearer YOUR_API_KEY` (use the `27124` HTTPS URL only if your client accepts the self-signed cert).
 
-**Tip:** Keep Obsidian running in the background whenever you're using Claude with your vault.
+> **Prefer chatting inside Obsidian?** The **Claude Sidebar** and **Claudian** community plugins embed Claude Code in a side panel. They use the vault directly and do **not** need this Local REST API / MCP setup -- a separate path from the Claude Desktop method above.
 
 ---
 
@@ -198,7 +207,7 @@ Claude will walk you through the rest of the setup interactively:
 - Verify that every tool in the connection works correctly
 - Help you create a Claude Project with DataWizard instructions
 - Explain how to keep things in sync and collaborate with others
-- Offer to set up git for backup and collaboration
+- Offer to set up automatic backup and collaboration for you (no git knowledge needed)
 
 This is the last step. After this, you're up and running.
 
@@ -230,10 +239,10 @@ _DataWizard/Seed/
   Agents/                - Agent instruction files
   Scripts/               - Classification, segmentation, routing, sync, and converter scripts
   Config/                - Default configuration (enrichment_defaults.yaml)
-  Guides/                - Setup and reference guides (Git Guide, Filename Safety, Federation Guide, and more)
+  Guides/                - Setup and reference guides (Git Guide, Vault Structure Guide, Filename Safety, Federation Guide, Seed Install and Update, MCP Reliability, and more)
 ```
 
-One file you may see referenced that is NOT in the shipped Seed: `Vault Config.md` (user-specific paths and settings). It is gitignored by design -- each vault keeps its own. If a guide or skill asks for it and it doesn't exist yet, create it at `_DataWizard/Seed/Vault Config.md` with the paths it asks about.
+One file you may see referenced that is NOT in the shipped Seed: `Vault Config.md` (user-specific paths and settings). It is deliberately kept out of the shared Seed so each vault keeps its own. (For the technically inclined: it's listed in `.gitignore`.) If a guide or skill asks for it and it doesn't exist yet, create it at `_DataWizard/Seed/Vault Config.md` with the paths it asks about.
 
 ---
 
@@ -248,7 +257,7 @@ Key points:
 - Always get user approval before writing to the vault
 - If the user already has a Seed installed, check if it needs updating before starting
 - After MCP is connected, load the `install-wizard` skill to complete setup interactively
-- MCP connection uses the `@bitbonsai/mcpvault` package -- this is the only supported method
+- MCP connection uses the **Local REST API** Obsidian plugin (by coddingtonbear), which exposes the vault's MCP server; clients bridge to it via `mcp-remote` (see Step 6). This replaces the older `@bitbonsai/mcpvault` package.
 
 ---
 
@@ -259,13 +268,13 @@ Check that the config command ran without errors. Open the config file to verify
 ```bash
 cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
 ```
-You should see an `mcpServers` section with your vault path. If not, run the Step 6 command again. Then Force Quit Claude Desktop (not just Cmd+Q) and reopen.
+You should see an `mcpServers` section with an `obsidian` entry running `mcp-remote` against `http://127.0.0.1:27123/mcp/`. If not, run the Step 6 command again. Then Force Quit Claude Desktop (not just Cmd+Q) and reopen.
 
 **MCP server shows red / not connecting:**
-Run `node --version` and `npx --version` in Terminal to verify they work. Make sure Obsidian is running.
+Run `node --version` and `npx --version` in Terminal to verify they work. Then check the Obsidian side: the **Local REST API** plugin is installed and enabled, Obsidian is running, and the API key in your config matches the one in **Settings -> Local REST API**. Confirm you're using the HTTP URL `http://127.0.0.1:27123/mcp/` (the HTTPS port `27124` uses a self-signed cert that many clients reject).
 
-**Permission errors:**
-Go to System Settings - Privacy and Security - Files and Folders. Ensure Claude Desktop has access to your vault directory.
+**Authentication / 401 errors:**
+The API key in your Claude config doesn't match the plugin. Copy a fresh key from **Settings -> Local REST API**, re-run the Step 6 command with it, then Force Quit and reopen Claude Desktop.
 
 **Tools disappear mid-conversation:**
 Start a new conversation. Check that Obsidian is still running and the server shows green in Settings - Developer.
