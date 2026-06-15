@@ -9,7 +9,7 @@ scope: seed
 
 > **This is the Multi-Project setup for DW Save.** For an overview of DW Save (what it is, Single vs Multi-Project, backup scheduling guidance), see Git Guide Section 5.5. This guide covers the Multi-Project path only -- use it when your vault contains multiple separate git repos that all need to sync with one keystroke.
 
-This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs your shared git repos via git. It replaces Obsidian Relay with direct git sync through GitHub. "Shared repos" means any repo inside your vault that pushes to GitHub -- collaborative projects (like ReWoven, Weave) and the DW Seed itself.
+This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs your shared git repos via git. It replaces Obsidian Relay with direct git sync through GitHub. "Shared repos" means any repo inside your vault that pushes to GitHub -- collaborative projects (for example, a shared book or a team knowledge base) and the DW Seed itself.
 
 ## What It Does
 
@@ -70,20 +70,26 @@ You should see a macOS notification: either "DW Saved" with project names, "Ever
 
 This lets you "save" your work to git from inside Obsidian.
 
+***Tip:** copy-paste these steps somewhere you can read them if opening the Settings panel hides them.*
+
 1. In Obsidian, go to Settings > Community Plugins > Browse
 2. Search for **Shell commands** > Install > Enable
-3. Go to Settings > Shell commands > New command
+3. Go to plugin Settings > Shell commands > New command
 4. Paste: `bash ~/Scripts/datawizard-sync.sh`
-5. Set the alias to: `DW Save`
-6. Close that panel, go to Settings > Hotkeys
-7. Search for `DW Save`
-8. Set the hotkey to **Cmd+Shift+S**
+5. Click the gear button
+6. Set the alias to: `DW Save`
+7. Close that panel, go to Settings > Hotkeys
+8. Search for `DW Save`
+9. Click the plus button and set the hotkey to **Cmd+Shift+S**
+10. Close the Settings panel
 
-Now Cmd+Shift+S in Obsidian = save + push + notification.
+Now Cmd+Shift+S in Obsidian will: save + push + notification.
+
+*Note for developers: [a fork of this plugin](https://github.com/kalliopeargentina/obsidian-shellcommands) enables keyring access for secrets like API keys and credentials.*
 
 ## Step 5: Set Up the Safety Net (Optional)
 
-This runs the sync automatically every 2 hours as a background safety net, catching anything you forgot to manually save.
+This runs the sync automatically every 2 hours as a background safety net, catching anything you forgot to manually save. Change the `<integer>7200</integer>` to change the amount of time (in seconds) between automatic syncs.
 
 ```bash
 cat > ~/Library/LaunchAgents/com.datawizard.sync.plist << 'EOF'
@@ -163,6 +169,13 @@ source ~/.zshrc
 
 Then just type `dwsync` anytime.
 
+For more aliases, you can instead add `source "/path/to/your/vault/_DataWizard/Seed/Scripts/datawizard-aliases.sh"` inside `.zshrc` and gain the following shortcuts:
+* dwsync: manual sync
+* dwstop: stop auto-sync
+* dwstart: start auto-sync
+* dwstatus: check status of auto-sync
+* dwlog: view last 20 lines of log for errors (see below)
+
 ## Notifications
 
 - **"DW Saved"** + project names + Pop sound -- you pushed changes successfully
@@ -210,6 +223,8 @@ git push
 
 In practice, conflicts should be rare. The shell + sections architecture means collaborators are usually in different files even when working on the same document. If you are on a call together, just say "I am editing X, hold off on that one."
 
+You can also ask Claude to help you resolve the conflict, particularly if it's not obvious what needs to be revised.
+
 ## Rollback and Recovery
 
 Git keeps full version history. You can restore any file to any previous state.
@@ -236,7 +251,7 @@ git push --force
 
 If a collaborator does not use DataWizard, they can sync using the Obsidian Git community plugin instead of this script. They clone the repo, open it as a standalone Obsidian vault, and configure the plugin for auto-sync. See the relevant project's onboarding doc for details.
 
-## For Claude Instances
+## Instructions for LLM
 
 If a user asks you to help set up sync for a new project, the steps are:
 1. Initialize git in the shared project folder
