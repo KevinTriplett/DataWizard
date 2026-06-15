@@ -230,7 +230,7 @@ _DataWizard/Seed/
   Agents/                - Agent instruction files
   Scripts/               - Classification, segmentation, routing, sync, and converter scripts
   Config/                - Default configuration (enrichment_defaults.yaml)
-  Guides/                - Setup and reference guides (Git Guide, Filename Safety, Federation Guide, and more)
+  Guides/                - Setup and reference guides (Git Guide, Filename Safety, Federation Guide, Cowork Scheduled Tasks, and more)
 ```
 
 One file you may see referenced that is NOT in the shipped Seed: `Vault Config.md` (user-specific paths and settings). It is gitignored by design -- each vault keeps its own. If a guide or skill asks for it and it doesn't exist yet, create it at `_DataWizard/Seed/Vault Config.md` with the paths it asks about.
