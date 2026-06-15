@@ -1,87 +1,46 @@
 ---
 title: DataWizard Universal Protocol
-type: project-doc
+type: protocol
 created: '2026-03-07'
-updated: '2026-03-23'
+updated: '2026-06-14'
+operator: Andrew
 status: active
-tags:
-  - protocol
-  - AI-collaboration
-  - DataWizard
-version: '1.7'
+edit_log:
+  - >-
+    DW-S182 2026-06-13: demolished (D94); shell converted to pointer, 14
+    sections archived, 3.0 pending Chunk 5
+  - 'DW-S183 2026-06-14: repointed Protocol Summary ref to Conventions Registry'
 ---
+# DataWizard Universal Protocol (retired)
 
+> ⚠️ **Demolished S182 (2026-06-13, D94).** The 15-section monolithic protocol has been retired. Every convention now lives in a single dedicated home (one convention, one home). The original sections are archived under `xArchive - DataWizard/DataWizard Universal Protocol/`.
 
-# DataWizard Universal Protocol
+## Where each section went
 
-**Version 1.7 — 2026-03-23**
+| Former section | New home |
+|---|---|
+| 1.0 Overview & Tools, 2.0 Orientation | Project Instructions + [[Conventions Registry]] |
+| 3.0 Working Principles | Pending fold into a PI companion note (Chunk 5 / PI v4.4) |
+| 4.0 YAML Schema | [[YAML Schema]] |
+| 5.0 Log Discipline | [[Conventions Registry]] |
+| 6.0 Harvest Checklist | [[Harvest Workflow Guide]] |
+| 7.0 Editorial Principles | [[Editorial Principles]] |
+| 8.0 Transcript Preparation | transcript-harvest skill |
+| 9.0 Citations & Source Tags | [[Conventions Registry]] |
+| 10.0 Federation & Coordination | [[Federation Guide]] (coordination rule -> [[Anti-Patterns]]) |
+| 11.0 File Handling | [[Conventions Registry]] + [[Document Converter Guide]] |
+| 12.0 Anti-Patterns | [[Anti-Patterns]] |
+| 13.0 Naming Conventions | [[Conventions Registry]] |
+| 14.0 Archiving | [[Conventions Registry]] |
+| 15.0 Vault Bootstrap | project-guidelines skill + [[Conventions Registry]] |
 
-> *A note to the LLM: You are a valuable part of the team! The humans on the team appreciate your diligent work and helpful input. Thank you!*
+## The current Protocols set
 
-*This is the master protocol for AI agents working in any DataWizard-managed vault. It is vault-agnostic — all vault-specific context lives in the START HERE file. Follow these rules everywhere.*
+- [[Conventions Registry]] - structural and formatting conventions (the keystone)
+- [[YAML Schema]] - frontmatter field definitions
+- [[Editorial Principles]] - synthesis and writing craft
+- [[Anti-Patterns]] - what not to do
+- [[Content Type Taxonomy]] - `type:` values
+- [[Quest Lifecycle]] - quest states and transitions
 
-*If this doc contradicts a project-specific instructions file, the project-specific file takes precedence for that project. If the contradiction seems like an error, flag it to the vault owner.*
-
----
-
-![[1.0 Overview and Tools]]
-
----
-
-![[2.0 Orientation and Working Sessions]]
-
----
-
-![[3.0 Working Principles]]
-
----
-
-![[4.0 YAML Schema]]
-
----
-
-![[5.0 Log Discipline]]
-
----
-
-![[6.0 Harvest Checklist]]
-
----
-
-![[7.0 Editorial Principles]]
-
----
-
-![[8.0 Transcript Preparation]]
-
----
-
-![[9.0 Citations and Source Tags]]
-
----
-
-![[10.0 Federation and Coordination]]
-
----
-
-![[11.0 File Handling and Processing]]
-
----
-
-![[12.0 Anti-Patterns]]
-
----
-
-![[13.0 Naming Conventions]]
-
----
-
-![[14.0 Archiving]]
-
----
-
-![[15.0 Vault Bootstrap]]
-
----
-
-*DataWizard Universal Protocol. Vault-agnostic — do not add vault-specific details to this file.*
+The former [[Protocol Summary]] quick-reference was archived (S183, D99); its role is now covered by the [[Conventions Registry]] and the Project Instructions.

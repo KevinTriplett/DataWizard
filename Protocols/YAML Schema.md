@@ -2,12 +2,13 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-13'
+updated: '2026-06-14'
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
   - DW-S182 2026-06-13
+  - DW-S183 2026-06-14
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -237,5 +238,27 @@ generating_agent: Andrew / Claude
 - Web clippings - the original author is human, AI just captured the content
 
 **The `generating_agent` field is optional but recommended.** Use the format `Operator / Agent` (e.g. `Jay Cousins / Gemini`, `Andrew / Claude`). If the agent is unknown (e.g. an imported doc where you know AI wrote it but not which model), just use the `ai-generated` tag without `generating_agent`.
+
+### Date Format
+
+All frontmatter dates use plain `YYYY-MM-DD`. Do not use ISO datetime strings (`2026-05-22T00:00:00.000Z`) - plain dates are sufficient for DW's day-level tracking and parse consistently in Dataview.
+
+### The edit_log Field
+
+A cumulative YAML list tracking every session that modified a file. The last entry is the last editor; the full list is the provenance trail.
+
+```yaml
+edit_log:
+  - "DW-S70 2026-05-23"
+  - "Andrew 2026-05-24"
+  - "WV-S45 2026-05-25"
+```
+
+- One entry per session (deduplicated). Append-only.
+- Agent edits: `"ProjectAbbrev-SNN YYYY-MM-DD"`. Human edits: `"Name YYYY-MM-DD"`.
+- **Section files:** required. **Infrastructure files (0.x) and standalone docs:** recommended. **Shell files:** none - shells are assembly surfaces; their `updated` field bumps when sections change, but they do not accumulate a log.
+- Updated at session close via the session-closer (Step 3.9).
+
+Design rationale: `Workshop/Design/YAML Metadata Protocol Decisions.md`.
 
 *Extracted from the DataWizard Universal Protocol (section 4.0) in the S182 demolition (D94). Structural and formatting conventions live in the [[Conventions Registry]].*
