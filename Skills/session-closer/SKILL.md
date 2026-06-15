@@ -7,7 +7,7 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-14'
+updated: '2026-06-15'
 version: '3.6'
 edit_log:
   - DW-S158 2026-06-08
@@ -16,6 +16,7 @@ edit_log:
   - DW-S167 2026-06-10
   - DW-S168 2026-06-11
   - DW-S183 2026-06-14 - repointed archived Protocol Summary refs (D99)
+  - DW-S186 2026-06-15
 ---
 
 # Session Closer Skill
@@ -112,6 +113,8 @@ If the previous session has no quest threads section (pre-S158 entries), scan th
 **Deduplication rule.** Do not include a thread that is already a Priority item or side task in "What's next." Quest threads exist for workstreams that are NOT the immediate focus -- things the next instance might forget about because they're not on the priority list. If every active thread is already covered in "What's next," omit the quest threads section entirely.
 
 The quest threads section prevents long-running workstreams from falling off the radar when they aren't the active focus. "What's next" is the immediate handoff; quest threads are the background map of parallel work that isn't currently prioritized.
+
+**Side-quest sessions.** When the session was a side quest (frontmatter `stream: side-quest`), its continuation belongs here as a named thread -- and its "What's next" must carry the *main arc* forward unchanged rather than the tangent. See the `side-quest` skill.
 
 ### Step 3: Get approval and write
 

@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-06-12'
+updated: '2026-06-15'
 ---
 
 # DataWizard Skills
@@ -17,6 +17,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 |---|---|---|
 | **project-guidelines** (v1.4) | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. Handles existing filename conventions gracefully. Includes `last_content_interests_review:` in new 0.0 templates. |
 | **session-closer** (v3.6) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Periodic threshold nudges for health audit, meta-learning review, and Content Interests staleness -- cadence numbers live in the skill's thresholds step (single source). Insight-capture-aware knowledge transfer check. |
+| **side-quest** (v1.0) | Technique | Tracking a tangent from the project's current arc as a parallel stream in the session log. Routes a side quest's continuation into "Active quest threads" and protects the main arc's "What's next" from being overwritten, so parallel streams don't collide under concurrency. Triggers on: "let's go on a side quest," "continue the [X] side quest." |
 | **research-tracking** | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |
 | **tools-research** | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Batch mode includes harvest pre-filtering and two-speed processing. References research-tracking. |
 | **design-harvest** | Technique | Turning research findings into design doc updates, skill refinements, roadmap additions, and guideline improvements. The interpretive bridge between research (facts) and living docs (architecture). Includes target-section overlap check before planting. Completes the research lifecycle: tools-research (evaluate) -> research-tracking (track) -> design-harvest (integrate). |
