@@ -8,7 +8,7 @@ description: >-
   of flagged items, or any link or resource that needs investigation. Covers
   both single-target deep dives and batch triage passes.
 type: skill
-updated: '2026-03-28'
+updated: '2026-06-15'
 version: '1.2'
 ---
 
@@ -106,6 +106,11 @@ budget across the read. If you have to choose between reading one more
 section and writing the synthesis of what you've already read, write the
 synthesis. Unread sections can be read later; cross-section patterns
 can't be reconstructed.
+
+**Fetching repos in sandboxed environments (e.g. Cowork).** GitHub API
+calls and tree-page web fetches return empty in the sandbox; a shallow
+`git clone --depth 1` into the working environment is the reliable way
+to pull a small repo's files for a deep read. (DW S166)
 
 ## The Research Loop
 

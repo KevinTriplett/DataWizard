@@ -8,7 +8,7 @@ description: >-
   update living docs, or any time research has produced findings that should
   change how the project works.
 type: skill
-updated: '2026-03-28'
+updated: '2026-06-15'
 version: '1.2'
 ---
 
@@ -203,6 +203,12 @@ research surfaced but that doesn't belong inline in a design doc.
 - **Losing the source trail.** Every finding added to a design doc
   should be traceable back to the research that produced it.
   Include a "See also: [[Research Note]]" or inline reference.
+- **Drafting a cross-project design doc without checking the other
+  side.** Before writing a design doc for a need that spans projects,
+  check whether the other project's instance is already capturing the
+  requirements. A parallel instance may be writing the spec
+  concurrently (Jay's Mycelial CRM FR was authored by a parallel Weave
+  instance mid-session, S166). Coordinate before drafting.
 
 ## See Also
 

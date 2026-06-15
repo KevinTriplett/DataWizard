@@ -8,12 +8,15 @@ description: >-
 type: skill
 version: '2.0'
 created: '2026-05-23'
-updated: '2026-06-12'
+updated: '2026-06-15'
 operator: Andrew
 edit_log:
   - >-
     DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
     J1-J6, D84/D87/D88/D92/D93 updates, manual fallback appendix
+  - >-
+    DW-S185 2026-06-15 - subagent delegation context note (Handling Large
+    Projects)
 ---
 
 # Project Health Audit Skill
@@ -151,6 +154,8 @@ Flag files where YAML `updated:` is more than ~30 days older than filesystem mti
 ## Handling Large Projects
 
 The lint report scales fine — judgment checks are the constraint. For projects with many shells or 100+ files, run J1/J2 plus J4 routing in one session and schedule J3/J5 for a follow-up rather than degrading the judgment quality.
+
+When delegating review across parallel subagents (S163 covered ~183K words in one session this way), each agent's prompt must carry the current-state context it needs to judge staleness: active versions, recent pivots, and the conventions in force. An agent reading a doc without knowing the current Seed version or a recent architecture decision cannot tell stale from current, and will either miss real drift or flag intentional changes as errors. Give every delegated agent the same orientation a fresh session would get.
 
 ## Manual Fallback (no lint tooling)
 

@@ -7,7 +7,9 @@ description: >-
   where a collaborator needs git setup and project orientation.
 type: skill
 version: '1.1'
-updated: '2026-05-02'
+updated: '2026-06-14'
+edit_log:
+  - DW-S184 2026-06-14 - repointed Git Registry ref to 0.6 Registry
 ---
 
 # Git Onboarding Skill
