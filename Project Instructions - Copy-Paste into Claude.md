@@ -3,7 +3,7 @@ title: Project Instructions - Copy-Paste into Claude
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-06-12'
+updated: '2026-06-14'
 tags:
   - protocol
   - AI-collaboration
@@ -28,6 +28,15 @@ Obsidian Vault Home folder: ___________
 (fill in the vault-relative path, e.g. _MyProject/)
 
 # DW Project Instructions v4.3
+
+## Repo Layout
+This vault uses the DataWizard repo directly - there is no
+Seed/ subfolder. Wherever these instructions, or any skill,
+protocol, or guide, reference _DataWizard/Seed/ , read it as
+_DataWizard/ (e.g. _DataWizard/Seed/Skills/ means
+_DataWizard/Skills/ ; _DataWizard/Seed/VERSION.md means
+_DataWizard/VERSION.md). Updates come via git, not
+update_seed.sh: cd _DataWizard && git pull.
 
 ## Tools
 You have Obsidian MCP tools. Use them directly - never ask
@@ -75,24 +84,19 @@ known intermittent MCP issue.
    setup, session close), read and follow the governing skill
    (e.g. project-guidelines, session-closer). Do not write
    lifecycle artifacts from pattern-matching. If the skill
-   file returns "File not found", check whether the Seed
-   folder exists (list_directory on _DataWizard/Seed/). If
-   the Seed folder exists but the skill is missing, the Seed
-   is stale - tell the user to run: bash
-   _DataWizard/Seed/update_seed.sh. If the Seed folder
-   itself is missing or unreachable, do NOT attempt a
-   fallback or pattern-match. Stop and tell the user: "The
-   DW Seed is not available in this session. Session close
-   requires the session-closer skill. Either mount the Seed
-   folder (_DataWizard/Seed/) as an additional directory, or
-   install it locally:" and provide the install command:
-   cd ~/path/to/vault && curl -sL
-   https://github.com/andrewalan11/DataWizard/archive/
-   refs/heads/main.zip -o /tmp/dw-seed.zip && unzip -qo
-   /tmp/dw-seed.zip -d /tmp/dw-seed && mkdir -p
-   _DataWizard/Seed && cp -R /tmp/dw-seed/DataWizard-main/*
-   _DataWizard/Seed/ && rm -rf /tmp/dw-seed
-   /tmp/dw-seed.zip
+   file returns "File not found", check whether the DW repo
+   is present (list_directory on _DataWizard/Skills/). If the
+   repo is present but the skill is missing, the repo is out
+   of date - tell the user to update it: cd _DataWizard &&
+   git pull. If _DataWizard/ itself is missing or
+   unreachable, do NOT attempt a fallback or pattern-match.
+   Stop and tell the user: "The DataWizard repo is not
+   available in this session. Session close requires the
+   session-closer skill. Mount the _DataWizard/ folder as an
+   additional directory, or clone it into the vault:" and
+   provide the clone command:
+   cd ~/path/to/vault && git clone
+   https://github.com/andrewalan11/DataWizard.git _DataWizard
    Do not proceed with session close until the skill is
    accessible.
 10. MCP WRITE VERIFICATION: At session close, verify all
