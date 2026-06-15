@@ -7,7 +7,9 @@ description: >-
   where a collaborator needs git setup and project orientation.
 type: skill
 version: '1.1'
-updated: '2026-05-02'
+updated: '2026-06-14'
+edit_log:
+  - DW-S184 2026-06-14 - repointed Git Registry ref to 0.6 Registry
 ---
 
 # Git Onboarding Skill
@@ -37,7 +39,7 @@ Uses the consolidated Git Guide (`Seed/Guides/Git Guide.md` and its sections in 
 1. Read this skill fully
 2. Read the Git Guide shell (`Seed/Guides/Git Guide.md`) for the section overview
 3. Read the project's 0.0 Project Guidelines (for folder structure, working conventions, repo info)
-4. Check the Git Registry (`0.6 Git Registry.md`) for existing repo details
+4. Check the 0.6 Registry (Git Repositories section) for existing repo details
 5. If an onboarding guide already exists for this project, read it to understand what's been done
 
 ## Gather Variables

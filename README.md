@@ -234,12 +234,12 @@ _DataWizard/Seed/
   Project Instructions - Copy-Paste into Claude.md - Instructions to paste into Claude
   update_seed.sh         - Install/update script
   SKILLS.md              - Skills catalog (the authoritative list of all skills)
-  Protocols/             - Operating rules: Universal Protocol, Protocol Summary, Content Type Taxonomy, Quest Lifecycle
+  Protocols/             - Operating rules: Conventions Registry, YAML Schema, Editorial Principles, Anti-Patterns, Content Type Taxonomy, Quest Lifecycle
   Skills/                - One folder per skill; SKILLS.md is the catalog
   Agents/                - Agent instruction files
   Scripts/               - Classification, segmentation, routing, sync, and converter scripts
   Config/                - Default configuration (enrichment_defaults.yaml)
-  Guides/                - Setup and reference guides (Git Guide, Vault Structure Guide, Filename Safety, Federation Guide, Seed Install and Update, MCP Reliability, and more)
+  Guides/                - Setup and reference guides (Git Guide, Vault Structure Guide, Filename Safety, Federation Guide, Seed Install and Update, MCP Reliability, Cowork Scheduled Tasks, and more)
 ```
 
 One file you may see referenced that is NOT in the shipped Seed: `Vault Config.md` (user-specific paths and settings). It is deliberately kept out of the shared Seed so each vault keeps its own. (For the technically inclined: it's listed in `.gitignore`.) If a guide or skill asks for it and it doesn't exist yet, create it at `_DataWizard/Seed/Vault Config.md` with the paths it asks about.

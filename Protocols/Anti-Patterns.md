@@ -26,6 +26,8 @@ Explicit anti-patterns. If you catch yourself doing any of these, stop.
 
 **Don't assume your context is current.** If the session log shows recent activity by another agent, re-read affected files before editing. Stale reads lead to overwrites.
 
+**Don't write to a shared document from two agents at once.** When multiple instances might touch the same file, coordinate through the human (or claim it via a session-log stub) rather than writing simultaneously - concurrent writes clobber each other. The S178/S179 stub collision is the cautionary case.
+
 **Don't re-run expensive operations without checking.** Before running LLM classification or enrichment on a file, check its YAML first. If it already has a valid `type:` or `harvest_status:`, it may not need reprocessing.
 
 **Don't rewrite massive files when you only need to edit a section.** If a file is too large for surgical edits via patch, check with the user about chunking it into shell + sections first. Full-file rewrites of large documents risk accidentally dropping content.

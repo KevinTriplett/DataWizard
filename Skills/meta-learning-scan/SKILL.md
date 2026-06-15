@@ -12,7 +12,9 @@ description: >-
 type: skill
 version: '1.2'
 created: '2026-06-01'
-updated: '2026-06-01'
+updated: '2026-06-15'
+edit_log:
+  - DW-S185 2026-06-15 - platform/environment routing hint (Step 4 Deferred)
 ---
 
 # Meta-Learning Scan
@@ -104,6 +106,8 @@ For each learning, provide a **suggested disposition**:
 - **Needs discussion** -- The learning implies a design decision or convention change that shouldn't be made unilaterally. Flag it with a note about what makes it non-obvious.
 
 - **Deferred** -- The learning is valid but the target doc doesn't exist yet, or the context for planting isn't ripe (e.g., a pattern discovered from a first experiment that should be validated by a second).
+
+When a deferred learning is a platform or environment behavior (scheduled-task quirks, MCP reliability, sandbox limits), suggest the environment-guide cluster (`Cowork Scheduled Tasks`, `MCP Reliability and Write Verification`, `Editing the Claude Desktop Config`) as its target rather than labeling it homeless -- these are the most rot-prone learnings and benefit from a standing home. (S185)
 
 **Lightweight verification for "ready to plant" items:** When suggesting a target doc, check whether the doc exists and (if feasible within context budget) whether the learning is already reflected there. This saves time during the review step. Don't spend more than ~20% of context on verification -- the review skill does thorough verification anyway.
 
