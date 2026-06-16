@@ -11,8 +11,9 @@ alias dwsync="bash ~/Scripts/datawizard-sync.sh"
 alias dwstop='launchctl unload "$DW_PLIST" && echo "DW auto-sync stopped"'
 alias dwstart='launchctl load "$DW_PLIST" && echo "DW auto-sync started"'
 alias dwstatus='launchctl list | grep datawizard || echo "DW auto-sync not loaded"'
+alias dwlog='tail -20 ~/.datawizard-sync.log'
 
-# If you have a fork of the DataWizard repo, this alias will: 
+# optional: If you have a fork of the DataWizard repo, this alias will: 
 #   1. pull the upstream repo into your fork 
 #   2. merge into local, preserving local edits
 #   3. push back into your fork
@@ -21,5 +22,5 @@ alias dwstatus='launchctl list | grep datawizard || echo "DW auto-sync not loade
 # [remote "upstream"]
 #     url = https://github.com/andrewalan11/DataWizard.git
 #     fetch = +refs/heads/*:refs/remotes/upstream/*
-DW_REPO="$HOME/ObsidianNoSync/_DataWizard"
-alias dwpull='git -C "$DW_REPO" fetch upstream && git -C "$DW_REPO" merge upstream/main && git -C "$DW_REPO" push origin main'
+# DW_REPO="$HOME/[PATH_TO_YOUR_VAULT]/_DataWizard"
+# alias dwpull='git -C "$DW_REPO" fetch upstream && git -C "$DW_REPO" merge upstream/main && git -C "$DW_REPO" push origin main'

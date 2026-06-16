@@ -7,12 +7,13 @@ description: >-
   pending, or hand-highlighted documents. NOT for transcripts - use
   transcript-harvest instead.
 type: skill
-updated: '2026-06-09'
+updated: '2026-06-13'
 version: '0.4'
 edit_log:
   - >-
     MMM meta-learning plant 2026-06-09: added Step 3 (triage before fetching),
     renumbered
+  - 'DW-S182 2026-06-13: repointed See Also to post-demolition homes (D94)'
 ---
 
 # Document Harvest Skill
@@ -81,8 +82,8 @@ This pattern emerged from RW S11 (documenting the ToGather platform) and was fil
 
 ## See Also
 
-- [[Harvest Workflow Guide]] -- full walkthrough with examples and edge cases
+- [[Harvest Workflow Guide]] -- full walkthrough, edge cases, and the 3-step end-of-harvest checklist
 - transcript-harvest skill -- parallel skill for transcript sources
-- Protocol Section 5 (YAML Schema) -- harvest field definitions
-- Protocol Section 7 (Harvest Checklist) -- the 3-step post-harvest checklist
-- Protocol Section 8 (Editorial Principles)
+- [[YAML Schema]] -- harvest field definitions
+- [[Editorial Principles]] -- synthesis guidance
+- [[Conventions Registry]] -- citation format
