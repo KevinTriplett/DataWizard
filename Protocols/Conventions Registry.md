@@ -2,16 +2,16 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-14'
+updated: '2026-06-21'
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
   - DW-S181 2026-06-13
-  - >-
-    DW-S182 2026-06-13: clarified archiving banner placement for frontmatter
-    files
+  - "DW-S182 2026-06-13: clarified archiving banner placement for frontmatter
+    files"
   - DW-S183 2026-06-14
+  - "DW-S191 2026-06-21: move_note wikilink claim corrected"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -126,7 +126,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
 
 - **Where:** the project's `xArchive - ProjectName/` (or a vault-root `xArchive/` for vault-level files).
 - **How:**
-  1. Move the file with `obsidian:move_note` so wikilinks update automatically. Do **not** leave it in place with just a notice - it must move.
+  1. Move the file with `obsidian:move_note`, then fix references by hand. **`move_note` does NOT reliably update wikilinks** (proven 3x, S189: an MOC list entry, a `related:` frontmatter field, and a manifest table row all kept the old name). After the move, grep the literal old filename vault-wide and fix every reference - `[[wikilinks]]`, frontmatter `related:` fields, and list entries; lint's broken-link check confirms. (Full behavior: [[MCP Reliability and Write Verification]] guide.) Do **not** leave the file in place with just a notice - it must move.
   2. **Keep the original filename** so existing wikilinks still resolve.
   3. Add a banner at the top of the body: `> ⚠️ **Archived (YYYY-MM-DD).** Superseded by [[New File]]. Retained for historical reference.` For files with YAML frontmatter, insert it *after* the closing `---` (e.g. via `patch_note` in front of the first body line); prepending raw text pushes the frontmatter below line 1 and breaks it.
   4. Note the archive in the session log; remove the file from active MOC listings.

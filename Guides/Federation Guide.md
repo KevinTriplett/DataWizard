@@ -7,6 +7,9 @@ tags:
   - datawizard
   - protocol
   - federation
+updated: 2026-06-21
+edit_log:
+  - "DW-S191 2026-06-21: folded Protocol 10.0 full-copies rule"
 ---
 
 # Federation Guide
@@ -18,6 +21,16 @@ How to copy notes between vault locations (federation) efficiently.
 When a note in one location (e.g., `_Clippings/`) is relevant to a specific project (e.g., Metamorphic Media), the project needs its own copy so it can be modified independently — different YAML, different annotations, eventually different content in a shared vault context.
 
 Wikilinks are NOT federation. A wikilink says "this exists over there." A federated copy says "this now lives here too, and we track provenance between them."
+
+## Core rule: full copies only
+
+Always federate full copies. Never create a summarized or trimmed version of a source file - if a file is too large for an AI context window, that is a human workflow task, not a reason to degrade the copy. When a source is too large for context:
+
+1. Ask the human to duplicate the note in Obsidian (a fast, single operation).
+2. The human places the full copy in the appropriate project folder.
+3. The AI works from the full copy, reading it in sections if needed.
+
+This is why federation is always a copy, never a `mv` (see the command rules under The Pattern). (Folds the core federation rule from the demolished Protocol 10.0; D94.)
 
 ## The Pattern
 
