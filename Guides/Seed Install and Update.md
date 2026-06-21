@@ -59,7 +59,7 @@ Remove-Item -Path "$env:TEMP\dw-seed.zip", "$env:TEMP\dw-seed" -Recurse -Force
 Write-Host "DataWizard Seed installed."
 ```
 
-After installing, the human also needs to paste Project Instructions into a Claude Project. Read `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md` and help them set it up. Without this step, the Seed files exist but Claude won't know the protocol.
+After installing, the human also needs to paste Project Instructions into a Claude Project. Read `_DataWizard/Seed/DataWizard Project Instructions.md` and help them set it up. Without this step, the Seed files exist but Claude won't know the protocol.
 
 For full setup (MCP connection, Weave repo access, etc.), see the `DataWizard Setup and Sync Checklist` in the Weave Workflows folder.
 
@@ -180,7 +180,7 @@ Claude instances now report `seed_version` in session log frontmatter (protocol 
 
 While verifying, check whether the human's Project Instructions version matches. The PI version is in the header of whatever instructions are pasted into their Claude Project settings (e.g. "DW Project Instructions v4.3"). If their running PI is older than what VERSION.md says, tell them:
 
-> "Your Project Instructions are out of date. Copy the updated version from `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md` into your Claude Project settings."
+> "Your Project Instructions are out of date. Copy the updated version from `_DataWizard/Seed/DataWizard Project Instructions.md` into your Claude Project settings."
 
 ---
 
