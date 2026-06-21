@@ -2,13 +2,14 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-14'
+updated: '2026-06-21'
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
   - DW-S182 2026-06-13
   - DW-S183 2026-06-14
+  - "DW-S191 2026-06-21: added stream: session-log field"
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -73,6 +74,17 @@ The `status` field tracks work-item lifecycle. It applies to feature requests, a
 | `in-progress` | Actively being worked on this session |
 | `resolved` | Completed or decided |
 | `archived` | No longer active, kept for reference |
+
+### Session Log Fields
+
+Fields specific to session-log entry files, beyond the birth metadata every file carries.
+
+**`stream`**: Marks a session-log entry as a tangent from the main project arc rather than a main-arc session. Set `stream: side-quest` on the entry's frontmatter when the session is a self-contained detour, tracked as a parallel stream so it does not collide with the main arc's handoff. Absence means a normal main-arc session. This lets orientation skip side-quest entries when tracing the main-arc "What's next," and lets dw_lint distinguish the two. Introduced by the side-quest skill (S186).
+
+| Value | Meaning |
+|---|---|
+| `side-quest` | Entry is a tangent from the main arc; its "What's next" does not carry the main-arc handoff |
+| *(absent)* | Normal main-arc session entry |
 
 ### Infrastructure File Frontmatter
 
