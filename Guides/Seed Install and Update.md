@@ -2,7 +2,7 @@
 title: Seed Install and Update
 type: guide
 created: '2026-06-11'
-updated: '2026-06-11'
+updated: '2026-06-18'
 operator: Andrew
 audience: Claude instances helping DataWizard users
 purpose: >-
@@ -10,6 +10,7 @@ purpose: >-
   DataWizard Seed
 edit_log:
   - DW-S168 2026-06-11
+  - DW-S189 2026-06-18
 ---
 # Seed Install and Update
 

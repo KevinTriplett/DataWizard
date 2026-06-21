@@ -7,8 +7,10 @@ description: >-
   'I just installed DataWizard', 'verify my MCP connection', or any context
   where a new user has just connected MCP and needs to complete setup.
 type: skill
-version: '1.1'
-updated: '2026-06-12'
+version: '1.2'
+updated: '2026-06-18'
+edit_log:
+  - DW-S189 2026-06-18 - repointed to renamed/de-fenced PI (v4.4)
 ---
 # Install Wizard Skill
 
