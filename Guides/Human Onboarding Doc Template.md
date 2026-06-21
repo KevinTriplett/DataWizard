@@ -3,11 +3,13 @@ type: project-doc
 title: START HERE For Humans — Template
 status: active
 created: '2026-03-10'
-updated: '2026-06-12'
+updated: '2026-06-18'
 tags:
   - protocol
   - AI-collaboration
   - DataWizard
+edit_log:
+  - DW-S189 2026-06-18
 ---
 
 # START HERE - For Humans — Template
