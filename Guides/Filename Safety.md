@@ -2,12 +2,14 @@
 title: Filename Safety - Cross-Platform Character Map
 type: guide
 created: '2026-04-30'
-updated: '2026-04-30'
+updated: '2026-06-18'
 status: active
 tags:
   - protocol
   - naming-conventions
   - DataWizard
+edit_log:
+  - DW-S189 2026-06-18
 ---
 
 # Filename Safety - Cross-Platform Character Map
@@ -34,6 +36,7 @@ These characters must never appear in filenames:
 | `"` | Double quote | Windows-invalid |
 | `\` | Backslash | Windows path separator |
 | `:` | Colon | Windows drive separator |
+| `/` | Forward slash | Path separator on all platforms |
 | tab | Tab character | Cross-platform hazard, common PDF artifact |
 | `\xa0` | Non-breaking space | Invisible, breaks matching and git |
 | `\r` | Carriage return | Invisible, breaks matching |
@@ -62,6 +65,7 @@ When sanitizing an existing filename, apply these replacements in order:
 | `"` | (remove) | |
 | `\` | `-` | |
 | `:` | ` -` | Preserves "Title: Subtitle" as "Title - Subtitle" |
+| `/` | `-` | Path separator on all platforms |
 | `\xa0` | space | Then collapse consecutive spaces |
 | `\r` | (remove) | |
 | consecutive spaces | single space | Apply after all other replacements |

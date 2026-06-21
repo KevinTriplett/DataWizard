@@ -1,7 +1,7 @@
 
 seed: 1.1.1
 protocol: 1.8
-project_instructions: 4.3
+project_instructions: 4.4
 
 ## NOTICE - Seed git history rewritten 2026-06-10 (instances: read this)
 
@@ -120,7 +120,7 @@ Handle each case:
 **Local > running (Seed has a newer PI):** Tell the user:
   "Your Project Instructions are v[running] but your Seed has
   v[local]. Copy the updated PI from
-  _DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md
+  _DataWizard/Seed/DataWizard Project Instructions.md
   into Settings - Project Instructions."
 Remind them to keep their Home folder line.
 

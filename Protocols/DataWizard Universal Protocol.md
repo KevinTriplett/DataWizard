@@ -20,7 +20,7 @@ edit_log:
 | Former section | New home |
 |---|---|
 | 1.0 Overview & Tools, 2.0 Orientation | Project Instructions + [[Conventions Registry]] |
-| 3.0 Working Principles | Pending fold into a PI companion note (Chunk 5 / PI v4.4) |
+| 3.0 Working Principles | [[Working Principles]] (PI v4.4 companion, refreshed S189) |
 | 4.0 YAML Schema | [[YAML Schema]] |
 | 5.0 Log Discipline | [[Conventions Registry]] |
 | 6.0 Harvest Checklist | [[Harvest Workflow Guide]] |

@@ -146,12 +146,12 @@ This is the most important step. Project Instructions are THE mechanism that mak
 
 ### 5a: Point to the Project Instructions
 
-Read `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md` via MCP so you know its contents, but do NOT print the instructions into chat -- they are long, unreadable in chat, and a chat copy goes stale. Direct the user to copy them from the file itself. Note: Obsidian's sidebar hides underscore-prefixed folders, so guide them to the file via Finder and a text editor. Only if the user cannot reach the file is printing the fenced block an acceptable fallback.
+Read `_DataWizard/Seed/DataWizard Project Instructions.md` via MCP so you know its contents, but do NOT print the instructions into chat -- they are long, unreadable in chat, and a chat copy goes stale. Direct the user to copy them from the file itself. Note: Obsidian's sidebar hides underscore-prefixed folders, so guide them to the file via Finder and a text editor. Only if the user cannot reach the file is printing the file's contents an acceptable fallback.
 
 Tell the user:
 
 > "Your Project Instructions live in your Seed at:
-> `_DataWizard/Seed/Project Instructions - Copy-Paste into Claude.md`
+> `_DataWizard/Seed/DataWizard Project Instructions.md`
 >
 > In a moment you'll open that file and copy the block between the ``` fences. Open it via Finder with any text editor -- Obsidian's sidebar hides the _DataWizard folder, so you won't find it there. But first, let me explain what the instructions do:
 >
