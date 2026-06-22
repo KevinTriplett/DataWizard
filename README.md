@@ -231,7 +231,7 @@ This downloads the latest Seed and overwrites only the Seed files. Your project 
 _DataWizard/Seed/
   README.md              - This file
   VERSION.md             - Version numbers and update instructions
-  Project Instructions - Copy-Paste into Claude.md - Instructions to paste into Claude
+  DataWizard Project Instructions.md - Instructions to paste into Claude (or @import for Claude Code)
   update_seed.sh         - Install/update script
   SKILLS.md              - Skills catalog (the authoritative list of all skills)
   Protocols/             - Operating rules: Conventions Registry, YAML Schema, Editorial Principles, Anti-Patterns, Content Type Taxonomy, Quest Lifecycle

@@ -7,13 +7,16 @@ description: >-
   report is ready for review. Also triggered by session-closer nudge when 5-10
   sessions have elapsed since last review.
 type: skill
-updated: '2026-06-15'
-version: '1.3'
+updated: '2026-06-22'
+version: '1.3.2'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
-  - >-
-    DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
+  - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
     Deferred)
+  - DW-S195 2026-06-22 - rewired Step 3 to point at the named Platform and
+    Environment Behaviors cluster (GUIDES.md)
+  - DW-S196 2026-06-22 - repointed step refs to the renamed periodic threshold
+    checks step (session-closer v4.0 renumber)
 ---
 
 # Meta-Learning Review Skill
@@ -43,7 +46,7 @@ This is the interpretive complement to design-harvest. Design-harvest plants res
 
 The review-and-plant cycle targets every **30 sessions** per project. This gives enough time for meaningful patterns to accumulate while keeping each review batch manageable.
 
-The session-closer Step 3.13 (periodic meta-learning nudge) provides the trigger: check `last_meta_learning_review:` in 0.0 frontmatter, compare against current session number, nudge if 30+ sessions have elapsed.
+The session-closer periodic threshold checks step (meta-learning nudge) provides the trigger: check `last_meta_learning_review:` in 0.0 frontmatter, compare against current session number, nudge if 30+ sessions have elapsed.
 
 ### Backlog Mode
 
@@ -77,7 +80,7 @@ For each verified learning, assign a disposition:
 - **Cross-project (DW Workshop).** The learning targets DW Seed infrastructure -- a Seed skill, protocol doc, PI working rule, or Seed guide -- but the current project is not DW itself. These items belong as feature requests or skill requests in the DW Workshop, not planted directly into the current project's docs. Proceed to Step 4.5.
 - **Deferred.** The learning is valid but the target doc doesn't exist yet, or the change is complex enough to warrant its own session. Create an action item with enough context that a future instance can act on it. For complex items, write an accompanying note with the full analysis.
 
-Platform and environment behaviors are the most common members of the deferred class -- and the most likely to rot. Content learnings self-plant in-session because they have an obvious home (the relevant design doc); platform gotchas (scheduled-task behavior, MCP quirks, sandbox limits) have no design doc, so they accumulate here review after review. Before deferring a platform or environment learning, prefer giving it a home in the environment-guide cluster (`Cowork Scheduled Tasks`, `MCP Reliability and Write Verification`, `Editing the Claude Desktop Config`) -- creating a guide if the cluster does not cover it -- over leaving it homeless. (S185)
+Platform and environment behaviors are the most common members of the deferred class -- and the most likely to rot. Content learnings self-plant in-session because they have an obvious home (the relevant design doc); platform gotchas (scheduled-task behavior, MCP quirks, sandbox limits) have no design doc, so they accumulate here review after review. Before deferring a platform or environment learning, give it a home in the **Platform and Environment Behaviors** guide cluster -- the standing home for these gotchas; see `Seed/GUIDES.md` for the current members -- by extending a cluster guide, or adding a new guide to the cluster if none fits, rather than leaving it homeless. (S185, named S195)
 
 ### Step 3.5: Present planting plan for approval
 
@@ -93,7 +96,7 @@ For each approved learning:
 2. **Write the learning where future instances will find it during task-specific work.** This is the core principle: plant in the document that gets read when the relevant task is being done, not in a general reference doc.
 
 Common destination types:
-- **Skill step:** Add operational guidance to an existing skill's workflow (e.g., "Step 3.12: file size check" added to session-closer)
+- **Skill step:** Add operational guidance to an existing skill's workflow (e.g., "Step 3.11: file size check" added to session-closer)
 - **Design doc section:** Add validated pattern, gap, or refinement to an architecture or design document (same mechanics as design-harvest Step 3)
 - **PI working rule:** Add a new rule or refine an existing one when the learning affects every session (high bar -- same as design-harvest's guidance on 0.0 updates)
 - **Protocol section:** Update protocol docs when conventions or procedures have evolved
@@ -157,7 +160,7 @@ Present the review results to the user:
 
 ### Session-closer integration
 
-The session-closer's periodic check mechanism (Step 3.11 model) applies here. Add a check that reads `last_meta_learning_review:` from the project's 0.0 frontmatter, compares against the current session number, and adds a nudge to the "What's next" section if 5-10 sessions have elapsed.
+The session-closer's periodic threshold checks step applies here. Add a check that reads `last_meta_learning_review:` from the project's 0.0 frontmatter, compares against the current session number, and adds a nudge to the "What's next" section if 5-10 sessions have elapsed.
 
 The nudge should read: "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand."
 

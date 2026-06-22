@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-15'
-version: '3.6'
+updated: '2026-06-22'
+version: '4.0'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -17,6 +17,9 @@ edit_log:
   - DW-S168 2026-06-11
   - DW-S183 2026-06-14 - repointed archived Protocol Summary refs (D99)
   - DW-S186 2026-06-15
+  - "DW-S196 2026-06-22 - v4.0 ceremony diet: D88 thresholds table, D98
+    session-lite tier, D93 protocol-version drop, orphan 3.7 + Step 2.5 edit_log
+    fixes, S179 stub guard, renumber"
 ---
 
 # Session Closer Skill
@@ -68,6 +71,15 @@ Throughout this skill, examples use solo-operator format. For multi-operator pro
 
 ## How to Close a Session
 
+### Step 0: Choose the close tier
+
+Pick **lite** or **full**, and state which you chose (D98).
+
+- **Lite close** -- for sessions with no new conventions, no harvest, and few file touches. Do only: the log entry (What happened / Learnings-if-any / What's next), frontmatter validation (Step 2.5), write + embed (Step 3, including the section-shell sync), metadata verification (Step 3.8), and the thread name (Step 5). Skip the knowledge-transfer / convention / residual triage (Steps 3.5-3.7), the periodic threshold checks (Step 3.10), the file-size check (Step 3.11), and the team-flag prompt (Step 3.12) -- the lite preconditions make these no-ops. You may still check off an action item you completed.
+- **Full close** -- everything below. Use it whenever the session established or changed a convention, did harvest, made decisions, or touched many files.
+
+When in doubt, go full. State the chosen tier in one line before proceeding (e.g. "Closing S196 as a full close -- touched the closer skill plus several infra files").
+
 ### Step 1: Review the session
 
 Scan the conversation for:
@@ -92,11 +104,11 @@ Before presenting the draft, verify all required frontmatter fields are present.
 - `section` (solo-operator: section number in the shell; multi-operator: the full session ID string)
 - `created` (YYYY-MM-DD)
 - `updated` (YYYY-MM-DD)
-- `operator` (human operator's first name -- see Step 3.14)
-- `datawizard_protocol_version` (the `protocol:` value from `_DataWizard/Seed/VERSION.md`, read during orientation)
-- `seed_version` (the `seed:` value from the same VERSION.md)
+- `operator` (human operator's first name -- see Step 3.12)
+- `seed_version` (the `seed:` value from `_DataWizard/Seed/VERSION.md`, read during orientation)
+- `edit_log` (this session's identifier, e.g. `"DW-S196 2026-06-22"` -- required on section files)
 
-Both version fields are read from VERSION.md during orientation -- never hardcode them from template examples. If any field is missing from the draft, add it before proceeding. Do not present a draft with missing required fields. This is especially important for `operator`, which powers team dashboards and authorship queries but is easy to omit when pattern-matching from older session logs that predate this requirement. `seed_version` makes team Seed currency visible -- when scanning session logs, a stale Seed version is immediately apparent.
+`seed_version` is read from VERSION.md during orientation -- never hardcode it from template examples. The former `datawizard_protocol_version` pin is retired per D93; do not add it. If any field is missing from the draft, add it before proceeding. Do not present a draft with missing required fields. This is especially important for `operator`, which powers team dashboards and authorship queries but is easy to omit when pattern-matching from older session logs that predate this requirement. `seed_version` makes team Seed currency visible -- when scanning session logs, a stale Seed version is immediately apparent.
 
 ### Step 2.6: Active quest threads
 
@@ -121,7 +133,7 @@ The quest threads section prevents long-running workstreams from falling off the
 Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
 1. Re-read the session log shell to get the current section number and embed list
 2. Write the new section file with the final title to the session log folder. Solo-operator: `99.0 Session 113 - Brief Title.md` (use section number as prefix). Multi-operator: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix). See Session Identifier Format for full details.
-3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it.
+3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): **first confirm the stub is yours** -- match its focus line and `operator` to this session. Never delete or overwrite a parallel instance's in-progress stub (the S178/S179 collision); if the content doesn't match your session, leave it and claim the next available identifier. Once confirmed yours, delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it.
 4. Patch the shell embed to reference the final filename. If the shell already embeds the stub filename, replace it with the final filename. If no stub existed, add the embed as usual.
 
 > **Parallel instance check:** Before writing, re-list the session log
@@ -130,6 +142,8 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 > Multi-operator: check the session ID (e.g., `WV_2026-06-10_AA_01`).
 > If another instance has claimed it since orientation, increment to
 > the next available number. Multiple instances may work in parallel.
+> Compare stub *content*, not just filenames -- match the focus line
+> to your session before reusing or replacing any in-progress stub.
 
 > **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
 
@@ -194,17 +208,6 @@ you got everything out of the source material in the first place.
 
 > **Non-harvest sessions:** Skip this step entirely.
 
-Scan your own context for:
-- Findings that are only in chat, not yet in any vault file
-- Patterns described in Learnings that should also live in a
-  skill or design doc
-- Tool evaluations discussed but not added to the tracking index
-- Design implications mentioned but not planted in design docs
-- Decisions made but not logged in the decision log
-
-If everything has been planted, say so and move on. If not,
-propose what still needs writing and where it goes.
-
 ### Step 3.8: Metadata verification
 
 For each file modified this session (from the "Files updated" and "Files created" lists):
@@ -230,17 +233,23 @@ For each section file created or renamed this session, verify its parent shell c
 
 This catches the most common drift pattern -- adding sections without updating the shell -- at the point of creation. Skip this step if no section files were created or renamed this session.
 
-### Step 3.10: Periodic project health audit
+### Step 3.10: Periodic threshold checks (full closes only)
 
-Check the project's `0.0 Project Guidelines` frontmatter for `last_health_audit:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). To determine the gap: solo-operator projects can subtract session numbers; multi-operator projects must list the session log folder and count files dated after the reference session's date. If the current session is 30+ sessions past the last audit, or if no audit has ever been recorded, prompt the user:
+> **Lite closes skip this step** (see Step 0). Run it only in a full close.
 
-"It's been [N] sessions since the last project health audit (or: no audit on record). Want me to run a DW review? It checks shell-section drift, YAML compliance, filename safety, and protocol conformance. Takes 5-10 minutes."
+Check the project's `0.0 Project Guidelines` frontmatter against the cadence table below. This step is the **single home** for these cadence numbers (D88) -- SKILLS.md, the PI, and other docs describe the nudges without quoting numbers. None of these block session close.
 
-If the user agrees, load and follow the `project-health-audit` skill. After the audit completes, update `last_health_audit:` in the project's 0.0 frontmatter to the current session identifier.
+| Check | Frontmatter field | Threshold | On trigger |
+|---|---|---|---|
+| Project health audit | `last_health_audit` | 30+ sessions since, or never recorded | Prompt: "It's been [N] sessions since the last health audit (or: none on record). Want me to run a DW review?" If yes, load `project-health-audit`; after it runs, stamp `last_health_audit` to the current session ID. |
+| Meta-learning review | `last_meta_learning_review` | 30+ sessions since, or never recorded | Nudge in "What's next": "A meta-learning review is due ([N] sessions since last). Load the meta-learning-review skill." |
+| Content Interests | `last_content_interests_review` | 30+ days since, OR 10+ sessions since, OR field absent | Nudge in "What's next": "Content Interests may need refreshing ([N] days). Load content-interests-review." |
 
-If declined, note it and move on. The prompt will recur in another 10 sessions.
+**Gap arithmetic:** solo-operator projects subtract session numbers; multi-operator projects list the session-log folder and count files dated after the reference session.
 
-**Silence rule:** Do not mention health audits in "What's next," during orientation, or anywhere outside this step. No "approaching threshold" or "getting close" language. The nudge exists only here, only when the threshold is met. Instances that pre-announce upcoming audits create noise across every session and every project.
+**Meta-learning pending-report trigger (independent of the table).** Regardless of session count, list the Learning Reports folder (`{home}/Workshop - {ProjectName}/Learning Reports/` for full-convention projects; `{home}/Learning Reports/` for flat). If any `Meta-Learning Report - *.md` has `status: pending-review`, nudge: "A meta-learning scan report is waiting for review: [filename]." This catches reports the nightly scan produces between sessions.
+
+**Silence rule (health audit).** Do not mention the health audit in "What's next," during orientation, or anywhere outside this step -- no "approaching threshold" or "getting close" language. The audit nudge exists only here, only when the threshold is met. (The meta-learning and content-interests nudges, by contrast, are designed to land in "What's next" when their thresholds fire.)
 
 ### Step 3.11: File size check
 
@@ -257,33 +266,7 @@ exceeds MCP read limit."
 This catches growth before overflow. Skip if no large files
 were encountered this session.
 
-### Step 3.12: Meta-learning review nudge
-
-Two independent triggers -- either one fires the nudge:
-
-**Trigger 1: Session count.** Check the project's `0.0 Project Guidelines` frontmatter for `last_meta_learning_review:` (format: `"ProjectAbbrev-SNN"` for solo-operator, or `"PROJ_YYYY-MM-DD_INITIALS_NN"` for multi-operator). To determine the gap: solo-operator projects can subtract session numbers; multi-operator projects must list the session log folder and count files dated after the reference session's date. If the current session is 30+ sessions past the last review, or if no review has ever been recorded, add a nudge to the "What's next" section:
-
-"A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand by loading the meta-learning-review skill."
-
-**Trigger 2: Pending report.** Check whether a report with `status: pending-review` exists in the project's Learning Reports folder. For full-convention projects: `{home}/Workshop - {ProjectName}/Learning Reports/`. For flat-structure projects: `{home}/Learning Reports/`. List the folder; if any file matching `Meta-Learning Report - *.md` exists, read its frontmatter and check for `status: pending-review`. If found, nudge regardless of session count:
-
-"A meta-learning scan report is waiting for review: [filename]. Load the meta-learning-review skill to review and plant the findings."
-
-This trigger exists because the nightly vault-wide scan (meta-learning-scan skill) may produce reports between sessions. Without this check, reports sit unnoticed until the 30-session threshold fires.
-
-This does not block session close -- it's a passive reminder in the handoff.
-
-### Step 3.13: Content Interests staleness check
-
-Check the project's `0.0 Project Guidelines` frontmatter for `last_content_interests_review:` (format: `YYYY-MM-DD`). If 30+ days have passed since the last review, or if 10+ sessions have occurred since then, add a nudge to the "What's next" section:
-
-"Content Interests may need refreshing ([N] days since last review). Load the content-interests-review skill to check whether the project's routing signals still match its current direction."
-
-Also nudge if no `last_content_interests_review:` field exists and the project has a Content Interests section -- this means the field was never backfilled.
-
-This is a passive reminder in the handoff, not a blocker. The project instance that picks up the next session has the context to judge whether a review is actually needed -- time alone doesn't determine drift. If the project's direction hasn't changed, the instance can skip it and note why.
-
-### Step 3.14: Operator field and team flag prompt
+### Step 3.12: Operator field and team flag prompt
 
 **Operator field (always).** Verify `operator: FirstName` is present in the frontmatter of the following files. Birth metadata (Working Rule 12) should have set this at creation time; if missing, add it now as a fallback:
 - The session log section file (always)
@@ -352,7 +335,6 @@ section: N
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 operator: FirstName
-datawizard_protocol_version: "[protocol: from VERSION.md]"
 seed_version: "[seed: from VERSION.md]"
 ```
 
@@ -365,7 +347,6 @@ section: "WV_2026-06-10_AA_01"
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 operator: FirstName
-datawizard_protocol_version: "[protocol: from VERSION.md]"
 seed_version: "[seed: from VERSION.md]"
 ```
 

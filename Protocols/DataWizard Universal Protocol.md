@@ -2,7 +2,7 @@
 title: DataWizard Universal Protocol
 type: protocol
 created: '2026-03-07'
-updated: '2026-06-14'
+updated: '2026-06-18'
 operator: Andrew
 status: active
 edit_log:
@@ -10,6 +10,7 @@ edit_log:
     DW-S182 2026-06-13: demolished (D94); shell converted to pointer, 14
     sections archived, 3.0 pending Chunk 5
   - 'DW-S183 2026-06-14: repointed Protocol Summary ref to Conventions Registry'
+  - 'DW-S189 2026-06-18: repointed 3.0 row to Working Principles companion'
 ---
 # DataWizard Universal Protocol (retired)
 
@@ -20,7 +21,7 @@ edit_log:
 | Former section | New home |
 |---|---|
 | 1.0 Overview & Tools, 2.0 Orientation | Project Instructions + [[Conventions Registry]] |
-| 3.0 Working Principles | Pending fold into a PI companion note (Chunk 5 / PI v4.4) |
+| 3.0 Working Principles | [[Working Principles]] (PI v4.4 companion, refreshed S189) |
 | 4.0 YAML Schema | [[YAML Schema]] |
 | 5.0 Log Discipline | [[Conventions Registry]] |
 | 6.0 Harvest Checklist | [[Harvest Workflow Guide]] |
