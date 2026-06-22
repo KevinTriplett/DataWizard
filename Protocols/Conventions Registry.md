@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-21'
+updated: '2026-06-22'
 operator: Andrew
 priority: high
 maturity: working
@@ -12,6 +12,7 @@ edit_log:
     files"
   - DW-S183 2026-06-14
   - "DW-S191 2026-06-21: move_note wikilink claim corrected"
+  - "DW-S197 2026-06-22: added action-items priority tiers (Urgent)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -243,6 +244,14 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 - **Quests** carry `priority: 1 | 2 | 3` (1 = highest), per the Quest Lifecycle protocol.
 
 **Example:** this registry is `priority: high`, `maturity: working`. A quest backlog item is `priority: 2`.
+
+---
+
+## Action-items priority tiers
+
+**Rule:** the 0.5 Action Items file orders work by urgency tier, top to bottom: **Urgent** (drop everything - address next session at the latest; use sparingly) -> **This Session / Next Session** (the hot list) -> **Soon** (~2-5 sessions out; sub-tiered P1 / P2 / P3, P1 highest) -> **Blocked / Waiting** (note the blocker) -> **Done** (dated, with brief resolution; archive when long). An item's tier is its section; the inline `!!` / `!` markers are an optional secondary signal, not a replacement. **Urgent** is distinct from the Seed Assessment Action Plan's P0-P6 phase labels - those are project-overhaul phases, a different axis from backlog urgency.
+
+**Example:** the S197 session-claiming-collision fix sits under Urgent; a 5-sessions-out idea sits under Soon / P3.
 
 ---
 
