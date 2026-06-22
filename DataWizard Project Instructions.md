@@ -15,13 +15,13 @@ edit_log:
   - DW-S177 2026-06-12
   - DW-S189 2026-06-18
 ---
-# DataWizard Project Instructions
+# DataWizard Project Instructions v4.4
 
-**Human operator - enter your project home folder here:**
 
-`Project home folder: __________`
 
-(The folder where this project's 0.0 / 0.2 / 0.5 files live, e.g. `_DataWizard/`. Cowork: fill this in after pasting the file into Settings - Project Instructions. Claude Code / Sidecar: instead declare it in your vault-root `CLAUDE.md` above the `@import`.)
+`Project home folder: **Human operator - enter your project home folder here:**
+
+(The obsidian vault folder where this project's 0.0 / 0.2 / 0.5 files live, e.g. `_DataWizard/`. Cowork: fill this in after pasting the file into Settings - Project Instructions. Claude Code / Sidecar: instead declare it in your vault-root `CLAUDE.md` above the `@import`.)
 
 ---
 
