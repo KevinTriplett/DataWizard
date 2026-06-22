@@ -89,6 +89,8 @@ When multiple instances are running on the same project:
 
 **Session log section files are low-risk for collision.** Each instance writes a uniquely named file (date + session number + description). Even if two instances accidentally claim the same session number, the descriptions will differ, creating different filenames.
 
+**Claiming a session number under concurrency: go above, don't back-fill.** List the section folder before claiming, and take the next number above the highest existing entry *and* above any `in-progress` stub another instance has already claimed -- even if that leaves a gap. A burned number is harmless; reusing one, or back-filling a gap that sits below a live higher-numbered session, invites cross-references that point at the wrong session. Observed S195: S192 was complete, S193 had been burned, and an in-progress S194 side quest was live -- the main-arc thread claimed S195 rather than back-filling S193. (DW S195)
+
 **Content files can conflict if two instances harvest to the same destination.** If you know another instance is running and may be editing the same synth doc sections, coordinate via the user or avoid overlapping destinations.
 
 ## Pattern from the Wild: Drift Detection on Apply and Undo

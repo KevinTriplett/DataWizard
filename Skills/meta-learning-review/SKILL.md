@@ -8,13 +8,15 @@ description: >-
   sessions have elapsed since last review.
 type: skill
 updated: '2026-06-22'
-version: '1.3.1'
+version: '1.3.2'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
     Deferred)
   - DW-S195 2026-06-22 - rewired Step 3 to point at the named Platform and
     Environment Behaviors cluster (GUIDES.md)
+  - DW-S196 2026-06-22 - repointed step refs to the renamed periodic threshold
+    checks step (session-closer v4.0 renumber)
 ---
 
 # Meta-Learning Review Skill
@@ -44,7 +46,7 @@ This is the interpretive complement to design-harvest. Design-harvest plants res
 
 The review-and-plant cycle targets every **30 sessions** per project. This gives enough time for meaningful patterns to accumulate while keeping each review batch manageable.
 
-The session-closer Step 3.13 (periodic meta-learning nudge) provides the trigger: check `last_meta_learning_review:` in 0.0 frontmatter, compare against current session number, nudge if 30+ sessions have elapsed.
+The session-closer periodic threshold checks step (meta-learning nudge) provides the trigger: check `last_meta_learning_review:` in 0.0 frontmatter, compare against current session number, nudge if 30+ sessions have elapsed.
 
 ### Backlog Mode
 
@@ -94,7 +96,7 @@ For each approved learning:
 2. **Write the learning where future instances will find it during task-specific work.** This is the core principle: plant in the document that gets read when the relevant task is being done, not in a general reference doc.
 
 Common destination types:
-- **Skill step:** Add operational guidance to an existing skill's workflow (e.g., "Step 3.12: file size check" added to session-closer)
+- **Skill step:** Add operational guidance to an existing skill's workflow (e.g., "Step 3.11: file size check" added to session-closer)
 - **Design doc section:** Add validated pattern, gap, or refinement to an architecture or design document (same mechanics as design-harvest Step 3)
 - **PI working rule:** Add a new rule or refine an existing one when the learning affects every session (high bar -- same as design-harvest's guidance on 0.0 updates)
 - **Protocol section:** Update protocol docs when conventions or procedures have evolved
@@ -158,7 +160,7 @@ Present the review results to the user:
 
 ### Session-closer integration
 
-The session-closer's periodic check mechanism (Step 3.11 model) applies here. Add a check that reads `last_meta_learning_review:` from the project's 0.0 frontmatter, compares against the current session number, and adds a nudge to the "What's next" section if 5-10 sessions have elapsed.
+The session-closer's periodic threshold checks step applies here. Add a check that reads `last_meta_learning_review:` from the project's 0.0 frontmatter, compares against the current session number, and adds a nudge to the "What's next" section if 5-10 sessions have elapsed.
 
 The nudge should read: "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand."
 
