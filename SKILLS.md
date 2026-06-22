@@ -2,12 +2,12 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-06-15'
+updated: '2026-06-22'
 ---
 
 # DataWizard Skills
 
-Portable skills included in the Seed. Each skill is a folder containing a `SKILL.md` file with instructions that load when triggered.
+Portable skills included in the Seed. Each skill is a folder containing a `SKILL.md` file with instructions that load when triggered. For how-to and reference guides (including the Platform and Environment Behaviors cluster), see `GUIDES.md`.
 
 For how skills work in DW's architecture, see the [Agent and Skills Architecture](https://github.com/andrewalan11/DataWizard) design docs in `Workshop/Design/`.
 

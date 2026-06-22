@@ -3,13 +3,17 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-06-21'
+updated: '2026-06-22'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
+  - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
+    (pointer)
 ---
 # MCP Reliability and Write Verification
 
 > Guide for Claude instances using the Obsidian MCP (Local REST API) to write vault content. Covers known failure modes, verification protocol, and concurrency practices.
+>
+> Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
 
 ## Known Issues
 

@@ -1,12 +1,18 @@
 ---
 title: Editing the Claude Desktop Config
-type: project-doc
+type: guide
 created: '2026-03-21'
-updated: '2026-03-21'
+updated: '2026-06-22'
 status: active
+scope: seed
+edit_log:
+  - "DW-S195 2026-06-22 - normalized to type: guide, added scope: seed; joined
+    the Platform and Environment Behaviors cluster"
 ---
 
 # Editing the Claude Desktop Config
+
+> Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
 
 The Claude Desktop config file controls which MCP servers Claude can use — Obsidian access, filesystem access, Fathom transcripts, and any other tools. You'll need to edit it when adding new MCP servers or granting Claude access to new folders.
 

@@ -7,13 +7,14 @@ description: >-
   report is ready for review. Also triggered by session-closer nudge when 5-10
   sessions have elapsed since last review.
 type: skill
-updated: '2026-06-15'
-version: '1.3'
+updated: '2026-06-22'
+version: '1.3.1'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
-  - >-
-    DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
+  - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
     Deferred)
+  - DW-S195 2026-06-22 - rewired Step 3 to point at the named Platform and
+    Environment Behaviors cluster (GUIDES.md)
 ---
 
 # Meta-Learning Review Skill
@@ -77,7 +78,7 @@ For each verified learning, assign a disposition:
 - **Cross-project (DW Workshop).** The learning targets DW Seed infrastructure -- a Seed skill, protocol doc, PI working rule, or Seed guide -- but the current project is not DW itself. These items belong as feature requests or skill requests in the DW Workshop, not planted directly into the current project's docs. Proceed to Step 4.5.
 - **Deferred.** The learning is valid but the target doc doesn't exist yet, or the change is complex enough to warrant its own session. Create an action item with enough context that a future instance can act on it. For complex items, write an accompanying note with the full analysis.
 
-Platform and environment behaviors are the most common members of the deferred class -- and the most likely to rot. Content learnings self-plant in-session because they have an obvious home (the relevant design doc); platform gotchas (scheduled-task behavior, MCP quirks, sandbox limits) have no design doc, so they accumulate here review after review. Before deferring a platform or environment learning, prefer giving it a home in the environment-guide cluster (`Cowork Scheduled Tasks`, `MCP Reliability and Write Verification`, `Editing the Claude Desktop Config`) -- creating a guide if the cluster does not cover it -- over leaving it homeless. (S185)
+Platform and environment behaviors are the most common members of the deferred class -- and the most likely to rot. Content learnings self-plant in-session because they have an obvious home (the relevant design doc); platform gotchas (scheduled-task behavior, MCP quirks, sandbox limits) have no design doc, so they accumulate here review after review. Before deferring a platform or environment learning, give it a home in the **Platform and Environment Behaviors** guide cluster -- the standing home for these gotchas; see `Seed/GUIDES.md` for the current members -- by extending a cluster guide, or adding a new guide to the cluster if none fits, rather than leaving it homeless. (S185, named S195)
 
 ### Step 3.5: Present planting plan for approval
 

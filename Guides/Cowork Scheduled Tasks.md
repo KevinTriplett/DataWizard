@@ -3,15 +3,18 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: '2026-06-15'
+updated: '2026-06-22'
 operator: Andrew
 edit_log:
-  - >-
-    DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
+  - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
     scheduled-task learnings)
+  - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
+    (pointer)
 ---
 
 # Cowork Scheduled Tasks
+
+> Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
 
 Operational guidance for running DataWizard automation as Cowork scheduled tasks (the nightly meta-learning and content-interest scans, hourly enrichment batches, and similar). These are platform behaviors learned from running real scheduled tasks; design task prompts and cadences around them.
 
