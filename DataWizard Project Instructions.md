@@ -3,7 +3,7 @@ title: DataWizard Project Instructions
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-06-18'
+updated: '2026-06-23'
 tags:
   - protocol
   - AI-collaboration
@@ -14,8 +14,9 @@ edit_log:
   - DW-S167 2026-06-10
   - DW-S177 2026-06-12
   - DW-S189 2026-06-18
+  - DW-S198 2026-06-23
 ---
-# DataWizard Project Instructions v4.4
+# DataWizard Project Instructions v4.5
 
 
 
@@ -25,7 +26,7 @@ edit_log:
 
 ---
 
-**Version:** v4.4 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
+**Version:** v4.5 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
 
 This is the DataWizard behavioral contract, consumed two ways: pasted into Cowork's Settings - Project Instructions, or `@import`ed from a vault-root `CLAUDE.md` (Claude Code / Sidecar). Heed the tool appendix for your surface (`## Cowork tools` or `## Claude Code tools`) and ignore the other. The Seed itself always lives at `_DataWizard/Seed/`.
 
@@ -37,7 +38,7 @@ If `obsidian:read_note` returns "File not found" for a path that `obsidian:list_
 
 ## Working Rules
 
-1. WRITE TO VAULT: New content as .md - never draft markdown in chat. Share plan first, get approval, then write.
+1. WRITE TO VAULT: New content as .md - never draft markdown in chat. Share plan first, get approval, then write. Exception: the orientation session-claim stub is written unconditionally, before any human interaction - it is claim ceremony, not content (Orientation Step 3).
 2. EDITS: Show specific changes in chat first. Never reprint the whole document. Once approved, write to vault.
 3. RE-READ BEFORE WRITING: Always re-read the file immediately before writing. Another user or agent may have changed it.
 4. CHUNK: Break multi-step plans into chunks. Present each, get approval, execute, check in before next. User may override this pattern upon request.
@@ -63,10 +64,15 @@ Skills live in `_DataWizard/Seed/Skills/` (portable Seed skills) and in the proj
 
 1. Read local `_DataWizard/Seed/VERSION.md`. Compare its `project_instructions` value against the version in this file's header. Ignore any "-local" suffix. If local Seed has a newer version, tell the user: "Your PI is v[yours] but your Seed has v[local]. Copy the updated PI from the Seed into your project settings." If the running PI is newer, that's normal - continue silently. If the running PI version already matches VERSION.md's `project_instructions` value, silently resolve any open "re-paste PI" action item - detect the state, don't wait for the human to report the paste.
 2. Read 0.0 Project Guidelines in your home folder in full (project context).
-3. Read 0.2 Session Log (last 2-3 entries only). The most recent "What's next" section tells you where to pick up.
-4. Read action items file if one exists.
-5. State the project abbreviation and session identifier. Solo-operator: "DW S116". Multi-operator: use the composite format from the session-closer skill's Session Identifier Format section (e.g. "WV_2026-06-10_AA_01").
-6. Create a session log stub to claim your session ID. List the session log section folder and determine the next available identifier. Solo-operator: next sequential section number; stub file named "NN.0 Session NNN - in progress.md". Multi-operator: list files matching today's date and your initials (e.g. PROJ_YYYY-MM-DD_INITIALS_*), pick the next NN; stub file named "PROJ_YYYY-MM-DD_INITIALS_NN - in progress.md". Include full birth metadata (type, created, updated, operator, edit_log, status: in-progress) and a Part of breadcrumb. Add the embed to the session log shell. Once the user confirms the session's direction, patch the stub content with 1-2 lines describing the focus. The session-closer overwrites this stub with the full entry at session end.
+3. Claim your session ID before your first message to the user - this is claim ceremony, exempt from the share-plan-first / approval rule (Working Rule 1) and any "approval before creating" preference, which govern content, not the claim. Sequence (verify-after-claim, safe under parallel threads):
+   a. List the session log section folder; take the next free identifier - above the highest entry AND above any in-progress sibling stub (go above, don't back-fill). Stub file: solo-operator "NN.0 Session NNN - in progress.md"; multi-operator "PROJ_YYYY-MM-DD_INITIALS_NN - in progress.md" (pick the next NN for today + your initials).
+   b. Write the stub with full birth metadata (type, created, updated, operator, edit_log, status: in-progress), a Part of breadcrumb, and a `claim_id` (a short random token unique to this claim).
+   c. Re-read the stub and check `claim_id`: yours means the claim holds; not yours means a sibling won the slot, so increment to the next free identifier and repeat from (b).
+   d. Do not add the embed to the session log shell yet - the session-closer adds it at close (and strips `claim_id`).
+   Once the user confirms the session's direction (Step 6), patch the stub with 1-2 lines describing the focus. The session-closer overwrites this stub with the full entry at session end.
+4. Read 0.2 Session Log (last 2-3 entries only). The most recent "What's next" section tells you where to pick up.
+5. Read action items file if one exists.
+6. State the project abbreviation and session identifier, then present orientation and confirm the session's direction with the user. Solo-operator identifier: "DW S116". Multi-operator: use the composite format from the session-closer skill's Session Identifier Format section (e.g. "WV_2026-06-10_AA_01").
 7. Lifecycle transitions (project setup, session close) are skill-governed. Read the skill before executing.
 8. Ready to work. Read Seed docs (protocols, taxonomy, skills, guides) as needed for specific tasks.
 

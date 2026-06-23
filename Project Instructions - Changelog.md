@@ -3,13 +3,14 @@ title: Project Instructions - Changelog
 type: project-doc
 status: active
 created: '2026-06-18'
-updated: '2026-06-18'
+updated: '2026-06-23'
 operator: Andrew
 tags:
   - protocol
   - DataWizard
 edit_log:
   - DW-S189 2026-06-18
+  - DW-S198 2026-06-23
 ---
 # Project Instructions - Changelog
 
@@ -19,8 +20,18 @@ Version history for the DataWizard Project Instructions (`DataWizard Project Ins
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v4.4 | 2026-06-18 |
+| Project Instructions | v4.5 | 2026-06-23 |
 | Seed | v1.1.1 | 2026-06-10 |
+
+---
+
+## What Changed in v4.5
+
+**Collision-safe session claiming (Orientation Step 3, verify-after-claim).** Session claiming is now collision-evident under concurrent threads. The claim moved earlier - to a new Step 3, right after reading 0.0 (the last input the stub needs) - and now happens before the instance's first message to the user. The claim sequence stamps the stub with a `claim_id`, re-reads it to confirm the slot is yours, and auto-increments to the next free identifier if a sibling won the race; the shell embed is deferred to session close (so only the closer touches the 0.2 shell). Old Steps 3-5 (read 0.2, read action items, state identifier) shift to 4-6; Step 6 now also confirms the session direction with the user.
+
+**Working Rule 1 carve-out.** The orientation session-claim stub is explicitly exempt from the share-plan-first / approval-before-writing rule - it is claim ceremony, not content. This resolves the confusion that left an unclaimed window when an instance deferred the claim to honor an approval preference; with parallel threads that window is a real race. Content (skills, design docs, the session entry, vault edits) still requires a shared plan and approval.
+
+**Companion Seed changes.** YAML Schema documents the `claim_id` stub field (ephemeral, stripped at close); session-closer v4.1 adds the shell embed at close and strips `claim_id`; the MCP Reliability guide's Concurrency Practices updates from "go above" to "verify-after-claim, then go above," with the simultaneous-claim case called out. Source: the S196/S197 simultaneous session-claim collision; design in `Session Claiming Under Concurrency.md`. (DW S198)
 
 ---
 

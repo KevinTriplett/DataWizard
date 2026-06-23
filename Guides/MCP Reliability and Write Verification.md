@@ -3,11 +3,14 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-06-22'
+updated: '2026-06-23'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
     (pointer)
+  - DW-S198 2026-06-23 - verify-after-claim session-claiming rule
+  - DW-S199 2026-06-23 - sandbox SQLite-write limitation (disk I/O error on FUSE
+    mount)
 ---
 # MCP Reliability and Write Verification
 
@@ -89,7 +92,12 @@ When multiple instances are running on the same project:
 
 **Session log section files are low-risk for collision.** Each instance writes a uniquely named file (date + session number + description). Even if two instances accidentally claim the same session number, the descriptions will differ, creating different filenames.
 
-**Claiming a session number under concurrency: go above, don't back-fill.** List the section folder before claiming, and take the next number above the highest existing entry *and* above any `in-progress` stub another instance has already claimed -- even if that leaves a gap. A burned number is harmless; reusing one, or back-filling a gap that sits below a live higher-numbered session, invites cross-references that point at the wrong session. Observed S195: S192 was complete, S193 had been burned, and an in-progress S194 side quest was live -- the main-arc thread claimed S195 rather than back-filling S193. (DW S195)
+**Claiming a session number under concurrency: verify-after-claim, then go above.** Two safeguards for two cases:
+
+- *Simultaneous claims* (neither thread has written its stub when both list the folder) defeat any look-before-you-leap rule. Make the claim collision-evident: stamp the stub with a short random `claim_id`, write it, then re-read it from disk. If the on-disk `claim_id` is not yours, you lost the race -- increment to the next free identifier and rewrite. This promotes the S197 manual recovery into the protocol (PI Orientation Step 3).
+- *Sequential near-collisions* (you can see the other thread's stub): take the next number above the highest existing entry *and* above any `in-progress` stub another instance has claimed -- even if that leaves a gap. A burned number is harmless; reusing one, or back-filling a gap below a live higher-numbered session, invites cross-references that point at the wrong session. (Observed S195: S192 complete, S193 burned, an in-progress S194 side quest live -- the main-arc thread claimed S195.)
+
+Pair both with **deferring the shell embed to session close** -- only the closer touches the 0.2 shell, once -- which removes the second collision surface. Grounding: the S196/S197 simultaneous collision was caught only because post-write verification re-read the stub. Full design: [[Session Claiming Under Concurrency]]. (DW S195, S197)
 
 **Content files can conflict if two instances harvest to the same destination.** If you know another instance is running and may be editing the same synth doc sections, coordinate via the user or avoid overlapping destinations.
 
@@ -115,6 +123,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **`search_notes` can false-negative on exact titles.** A search for an exact note title can return content matches in other files while missing the note itself, even when the file exists and `list_directory` shows it. During an MMM link audit, searching "Foraging in High-Dimensional Data @ DISI" returned files that *mention* the phrase but not `_Clippings/Foraging in High-Dimensional Data @ DISI 2025.md` itself -- leading to a false "broken link" finding that was only caught by a later `list_directory` on `_Clippings/`. Rule: before reporting a wikilink as broken or a file as missing, verify with `list_directory` on the expected folder (or a filesystem `Glob`), not search alone. Search confirms presence; it cannot confirm absence. (Source: MMM S12)
 
 **Sandbox bash cannot delete files on the vault FUSE mount.** From the Cowork sandbox, `rm`/unlink fails with "Operation not permitted" on the Regen Vault (a FUSE mount -- `.fuse_hidden*` files are the tell), though `touch`, create, `mv`/rename, and truncate-write all work. To archive or relocate vault files, use `obsidian:move_note` (it runs with Obsidian's full filesystem access), not bash `cp`+`rm` (which aborts at the first delete). When stamping an archive banner on a file with YAML frontmatter, insert it AFTER the closing `---` (e.g. `patch_note` in front of the first body line) -- prepending breaks the frontmatter. (Source: DW S182)
+
+**Sandbox bash cannot write SQLite databases on the vault FUSE mount.** Plain file create/overwrite/truncate works (above), but opening a SQLite db on the mount for writing fails with `sqlite3.OperationalError: disk I/O error` -- FUSE does not support the byte-range locking and journaling (`-wal`/`-shm`/`-journal`) SQLite needs. Reads are fine: copy the db to a sandbox-writable dir (e.g. the outputs folder) and read the copy. Consequence: any SQLite-backed tool (e.g. `dw_ops.db`) must run its **writes natively on the user's machine**, never from the Cowork sandbox; a sandbox session participates by queueing changes (markdown / intake) for a native process to ingest. Verified S199 by probe -- bash `CREATE`/`OVERWRITE` ok, `rm` and SQLite write both fail. (Source: DW S199)
 
 **Git working-tree ops fail from the sandbox; run them in Terminal.** Because the sandbox can create but not delete or overwrite files on the vault FUSE mount (above), any git operation that touches the working tree or index - `pull`, `checkout`, `branch`, `commit`, even `git status` when there are uncommitted changes - fails partway and leaves stale lock files it cannot unlink (`.git/index.lock`, `.git/ORIG_HEAD.lock`, `.git/objects/maintenance.lock`), sometimes plus a stray untracked file and harmless `tmp_obj_*` cruft from a fetch. Read-only inspection on a clean tree (`git log`, `git status` with no changes, `git fetch` for inspection) is fine. Run all working-tree git ops via a Terminal command on the user's Mac (Working Rule 15) or via DW Save; if a sandbox attempt already left locks, the recovery command removes the lock files first, then runs the real op. (Source: DW S188, S189)
 

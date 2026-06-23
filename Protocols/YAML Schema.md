@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-21'
+updated: '2026-06-23'
 operator: Andrew
 priority: high
 maturity: working
@@ -10,6 +10,7 @@ edit_log:
   - DW-S182 2026-06-13
   - DW-S183 2026-06-14
   - "DW-S191 2026-06-21: added stream: session-log field"
+  - "DW-S198 2026-06-23: added claim_id stub field"
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -85,6 +86,8 @@ Fields specific to session-log entry files, beyond the birth metadata every file
 |---|---|
 | `side-quest` | Entry is a tangent from the main arc; its "What's next" does not carry the main-arc handoff |
 | *(absent)* | Normal main-arc session entry |
+
+**`claim_id`**: A short random token (e.g. a 6-8 char hex nonce) stamped on a session-log *stub* at claim time to make session-claiming collision-evident under concurrency. After writing the stub, the claiming instance re-reads it and checks `claim_id`: if the on-disk value is not the one it wrote, a parallel instance won the slot, so it claims the next free identifier instead (PI Orientation Step 3, verify-after-claim). Ephemeral - present only while `status: in-progress`; the session-closer strips it when it overwrites the stub with the full entry at close. Design: [[Session Claiming Under Concurrency]].
 
 ### Infrastructure File Frontmatter
 

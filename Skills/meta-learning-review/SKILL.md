@@ -4,11 +4,11 @@ description: >-
   Use to review accumulated session learnings and plant them into skills, design
   docs, and protocol. Triggers on: 'review learnings', 'meta-learning review',
   'what have we learned recently', 'plant learnings', or when a meta-learning
-  report is ready for review. Also triggered by session-closer nudge when 5-10
-  sessions have elapsed since last review.
+  report is ready for review. Also triggered by the session-closer's periodic
+  threshold nudge when a review is due.
 type: skill
-updated: '2026-06-22'
-version: '1.3.2'
+updated: '2026-06-23'
+version: '1.3.3'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -17,6 +17,8 @@ edit_log:
     Environment Behaviors cluster (GUIDES.md)
   - DW-S196 2026-06-22 - repointed step refs to the renamed periodic threshold
     checks step (session-closer v4.0 renumber)
+  - "DW-S198 2026-06-23 - D88 sweep: dropped 5-10 session cadence quotes, defer
+    to session-closer threshold step"
 ---
 
 # Meta-Learning Review Skill
@@ -32,7 +34,7 @@ This is the interpretive complement to design-harvest. Design-harvest plants res
 ## When to Use
 
 - When a meta-learning report has been generated (by scheduled task or manually) and is ready for review
-- When the session-closer nudge fires (5-10 sessions since last review)
+- When the session-closer's periodic threshold nudge fires (a review is due)
 - When the user says "review learnings," "what have we learned recently," or "plant learnings"
 - On demand, when the user wants to review recent session learnings without a pre-generated report
 
@@ -44,9 +46,9 @@ This is the interpretive complement to design-harvest. Design-harvest plants res
 
 ## Cadence
 
-The review-and-plant cycle targets every **30 sessions** per project. This gives enough time for meaningful patterns to accumulate while keeping each review batch manageable.
+The review-and-plant cycle runs on a periodic per-project cadence -- long enough for meaningful patterns to accumulate while keeping each review batch manageable. The cadence number lives in one place, the session-closer's periodic threshold checks step (D88), so this skill does not restate it.
 
-The session-closer periodic threshold checks step (meta-learning nudge) provides the trigger: check `last_meta_learning_review:` in 0.0 frontmatter, compare against current session number, nudge if 30+ sessions have elapsed.
+That step provides the trigger: it checks `last_meta_learning_review:` in 0.0 frontmatter against the current session number and nudges when a review is due.
 
 ### Backlog Mode
 
@@ -160,7 +162,7 @@ Present the review results to the user:
 
 ### Session-closer integration
 
-The session-closer's periodic threshold checks step applies here. Add a check that reads `last_meta_learning_review:` from the project's 0.0 frontmatter, compares against the current session number, and adds a nudge to the "What's next" section if 5-10 sessions have elapsed.
+The session-closer's periodic threshold checks step applies here. It reads `last_meta_learning_review:` from the project's 0.0 frontmatter, compares against the current session number, and adds a nudge to the "What's next" section when a review is due (the cadence threshold lives in that step -- D88).
 
 The nudge should read: "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand."
 

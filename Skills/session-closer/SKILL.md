@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-22'
-version: '4.0'
+updated: '2026-06-23'
+version: '4.1'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -20,6 +20,8 @@ edit_log:
   - "DW-S196 2026-06-22 - v4.0 ceremony diet: D88 thresholds table, D98
     session-lite tier, D93 protocol-version drop, orphan 3.7 + Step 2.5 edit_log
     fixes, S179 stub guard, renumber"
+  - "DW-S198 2026-06-23 - v4.1: defer shell embed to close + strip claim_id
+    (verify-after-claim)"
 ---
 
 # Session Closer Skill
@@ -133,8 +135,8 @@ The quest threads section prevents long-running workstreams from falling off the
 Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
 1. Re-read the session log shell to get the current section number and embed list
 2. Write the new section file with the final title to the session log folder. Solo-operator: `99.0 Session 113 - Brief Title.md` (use section number as prefix). Multi-operator: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix). See Session Identifier Format for full details.
-3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): **first confirm the stub is yours** -- match its focus line and `operator` to this session. Never delete or overwrite a parallel instance's in-progress stub (the S178/S179 collision); if the content doesn't match your session, leave it and claim the next available identifier. Once confirmed yours, delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it.
-4. Patch the shell embed to reference the final filename. If the shell already embeds the stub filename, replace it with the final filename. If no stub existed, add the embed as usual.
+3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): **first confirm the stub is yours** -- match its `claim_id` to the one you stamped at orientation (or, if absent, its focus line and `operator`). Never delete or overwrite a parallel instance's in-progress stub (the S178/S179 collision); if it isn't yours, leave it and claim the next available identifier. Once confirmed yours, delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it. The final entry does not carry `claim_id` -- it is a claim-time field only (see [[YAML Schema]] Session Log Fields).
+4. Add the session embed to the shell. Under verify-after-claim (PI Orientation Step 3) the stub is NOT embedded at claim, so you are normally adding the embed fresh at close -- patch it into the shell in reverse-chronological position. (Legacy fallback: if an older workflow already left a stub embed in the shell, replace it with the final filename rather than adding a duplicate.)
 
 > **Parallel instance check:** Before writing, re-list the session log
 > section folder and verify the target identifier doesn't already exist
@@ -142,8 +144,9 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 > Multi-operator: check the session ID (e.g., `WV_2026-06-10_AA_01`).
 > If another instance has claimed it since orientation, increment to
 > the next available number. Multiple instances may work in parallel.
-> Compare stub *content*, not just filenames -- match the focus line
-> to your session before reusing or replacing any in-progress stub.
+> Compare stub *content*, not just filenames -- match the `claim_id`
+> (or focus line) to your session before reusing or replacing any
+> in-progress stub.
 
 > **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
 
