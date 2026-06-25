@@ -128,6 +128,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 
 **Git working-tree ops fail from the sandbox; run them in Terminal.** Because the sandbox can create but not delete or overwrite files on the vault FUSE mount (above), any git operation that touches the working tree or index - `pull`, `checkout`, `branch`, `commit`, even `git status` when there are uncommitted changes - fails partway and leaves stale lock files it cannot unlink (`.git/index.lock`, `.git/ORIG_HEAD.lock`, `.git/objects/maintenance.lock`), sometimes plus a stray untracked file and harmless `tmp_obj_*` cruft from a fetch. Read-only inspection on a clean tree (`git log`, `git status` with no changes, `git fetch` for inspection) is fine. Run all working-tree git ops via a Terminal command on the user's Mac (Working Rule 15) or via DW Save; if a sandbox attempt already left locks, the recovery command removes the lock files first, then runs the real op. (Source: DW S188, S189)
 
+**`patch_note` does not match inside YAML frontmatter.** `patch_note` operates only on the markdown body, not the frontmatter block. A patch whose `oldString` targets a frontmatter field (e.g. a skill's `description:`, or any `key: value` line above the closing `---`) returns `matchCount: 0` / "String not found" even when the text is visibly present. Use `update_frontmatter` (merge: true) for frontmatter edits; reserve `patch_note` for body content. (Source: DW S198)
+
 ## Incident Reference
 
 These issues were diagnosed in DW Session 65 (2026-05-03). The investigation found:
