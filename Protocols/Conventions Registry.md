@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-22'
+updated: '2026-06-25'
 operator: Andrew
 priority: high
 maturity: working
@@ -13,6 +13,8 @@ edit_log:
   - DW-S183 2026-06-14
   - "DW-S191 2026-06-21: move_note wikilink claim corrected"
   - "DW-S197 2026-06-22: added action-items priority tiers (Urgent)"
+  - "DW-S201 2026-06-25: block-ID citations promoted to standard (header-first,
+    harvest-driven lazy stamping, glyph display)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -142,7 +144,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
 
 ## Citation format
 
-**Rule:** cite with a trailing parenthetical wikilink whose anchor deep-links to a `##` heading in the source:
+**Rule:** cite with a trailing parenthetical wikilink whose anchor deep-links to a `##` heading (or a `^block-id`) in the source:
 
 ```
 ([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]])
@@ -164,7 +166,14 @@ Rules: citations go at the **end** of a statement; one per claim is usually enou
 
 **Source tags (optional):** for documents that cite many sources repeatedly, register short uppercase tags (`[MAR3]`, `[SP]`) in the project's source-reference doc and use them inline. Tags supplement wikilink citations, they don't replace them. Adopt only when full wikilinks become unwieldy.
 
-**Block-ID variant (canonization candidate):** for corpus and RAG contexts that need a stable per-block anchor, an Obsidian block ID (`^block-id`) can serve as the citation anchor instead of a `##` heading, surviving re-segmentation. Not yet a vault-wide standard - under test and flagged for promotion.
+**Block-ID anchors (standard).** Section (`##`) anchors are the default granularity. When a citation must point at a *specific paragraph or transcript turn* - the breadcrumb from a synthesis or harvest claim back to its exact source - that block gets an Obsidian block ID and the citation targets it:
+
+```
+([[SourceFileName#^b7|§]])        document block (glyph display)
+([[SourceFileName#^t15|@22:15]])  transcript turn (timestamp display)
+```
+
+Conventions: `^bN` for document blocks, `^tN` for transcript turns. The visible label is a `§` glyph for blocks and the `@mm:ss` timestamp for transcript turns; multiple blocks in one bullet repeat the glyph, each its own link (`(§, §)`). Blocks are stamped **on cite, not in bulk** - during enrichment or harvest, only where something actually references them - so sources accumulate IDs only where they have been cited, and header-less prose (bold dividers, no `##`) goes straight to block-level. Assign the next unused integer per file; never renumber, and never re-stamp a block that already has an ID (re-stamping breaks live citations - S173). IDs are sparse, so `^b9` is a stable handle, not "the 9th block." Block IDs are hidden in Obsidian reading mode and are the human breadcrumb layer; where a RAG index exists a block ID aligns with its chunk coordinate, but the index computes full coordinates independently. Whole-section synthesis uses the section-anchor form. Full spec: [[Citation Mechanism - Block-Level Provenance]].
 
 **Example:** `regenerative finance shifts the unit of account ([[2026-03-04 Strategy Call#Unit of Account|2026-03-04 — Unit of Account]] — Jordan).`
 
