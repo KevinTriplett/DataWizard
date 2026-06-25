@@ -1,49 +1,48 @@
 ---
 name: block-stamper
-description: >-
-  Stamp sequential block IDs (^bN for articles, ^tN for transcripts) on source
-  file paragraphs, making them addressable for citations, harvest provenance,
-  and RAG indexing. Use before enrichment, before harvesting, or when preparing
-  files for block-level citation. Triggers on: 'stamp block IDs', 'prepare for
-  enrichment', 'add block references', or called as prerequisite by
-  corpus-enrichment, transcript-harvest, document-harvest skills.
+description: "Stamp a block ID (^bN documents, ^tN transcripts) on a source
+  paragraph or transcript turn at the moment a citation points to it -- on-cite,
+  not in bulk (S201 canon). Idempotent: reuse an existing ID, else assign the
+  next unused integer; never re-stamp or renumber. Called by corpus-enrichment,
+  transcript-harvest, document-harvest when they cite a passage. Triggers on:
+  'stamp block ids', 'add a citation anchor', 'stamp this block'."
 type: skill
-version: '1.0'
-created: '2026-06-11'
-updated: '2026-06-11'
+version: "1.1"
+created: 2026-06-11
+updated: 2026-06-25
 edit_log:
   - DW-S166 2026-06-11
+  - "DW-S202 2026-06-25 - reframed bulk -> on-cite stamping (S201 canon):
+    next-unused-integer, partial-is-normal, bulk demoted to legacy"
 ---
-
 # Block Stamper Skill
 
 **Status:** Active (Seed)
 
 ## Overview
 
-Stamp sequential block IDs on source file paragraphs, making every substantive paragraph addressable via Obsidian's native `^block-id` syntax. Block IDs serve as citation targets for companion notes, harvest destinations, and RAG chunk coordinates.
+Stamp a block ID on a source-file paragraph or transcript turn so it becomes addressable via Obsidian's native `^block-id` syntax -- giving a citation a clickable breadcrumb back to the exact passage.
 
-This is a utility skill -- it modifies source files in preparation for downstream skills (corpus-enrichment, transcript-harvest, document-harvest) that cite specific passages.
+**Stamping is on-cite, not in bulk (S201 canon).** A block gets an ID only when something actually cites it -- during enrichment or harvest -- so sources accumulate IDs sparsely, only where they have been referenced. This is a utility skill: the downstream skills (corpus-enrichment, transcript-harvest, document-harvest) call it at the moment they cite a passage. A whole-document pre-stamp is retained as an optional legacy mode (see Bulk Pre-Stamp below). Citation canon: [[Conventions Registry]]. Full spec: [[Citation Mechanism - Block-Level Provenance]].
 
 ## When to Use
 
-- Before enriching an article (corpus-enrichment skill requires block IDs for citations)
-- Before harvesting a transcript or document that needs block-level provenance
-- When preparing source files for RAG indexing
-- User says "stamp this file", "add block IDs", "prepare for enrichment"
-- Called by other skills as a prerequisite step
+- At cite time -- an enrichment or harvest pass references a specific paragraph or transcript turn that has no ID yet
+- Called by corpus-enrichment, transcript-harvest, or document-harvest as a stamp-on-cite step
+- User says "stamp this block", "add a citation anchor here", "give this paragraph a block ID"
+- (Legacy) a deliberate whole-file pre-stamp -- rarely needed; see Bulk Pre-Stamp (Legacy) below
 
 ### When NOT to Use
 
-- File already has block IDs (check first -- this skill is idempotent but should skip already-stamped files)
-- File is a companion note, MOC, infrastructure file, or any non-source content
+- The target block already carries an ID -- reuse it, never re-stamp (re-stamping breaks live citations, S173)
+- The target is a section header (already addressable via `[[File#Header]]`), a companion note, MOC, infrastructure file, or any non-source content
 - File is in an archive folder
 
 ## Before You Start
 
 1. Read this skill fully.
 2. Determine the content type of the source file (article, transcript, or voice memo). This determines the block ID prefix.
-3. Read the source file to check whether it already has block IDs.
+3. Locate the specific block being cited and check whether it already has an ID.
 
 ## Content Type Detection
 
@@ -78,11 +77,11 @@ When in doubt, use `^b` (article default).
 
 ### Numbering
 
-- Sequential, whole-document numbering starting at 1
-- Articles: `^b1`, `^b2`, `^b3`, ...
-- Transcripts: `^t1`, `^t2`, `^t3`, ...
-- Block IDs are appended at the **end of the paragraph's last line**, separated by a space
+- **Next unused integer in the file** -- scan for existing `^bN`/`^tN`, assign the highest + 1. Under on-cite stamping IDs are *sparse*, so `^b9` is a stable handle, not "the 9th block."
+- Articles: `^b1`, `^b2`, `^b3`, ... Transcripts: `^t1`, `^t2`, `^t3`, ...
+- Block IDs are appended at the **end of the paragraph's (or turn's) last line**, separated by a space
 - One block ID per paragraph -- never mid-paragraph
+- **Never renumber** to fill gaps -- IDs are permanent handles
 
 ### Placement
 
@@ -109,61 +108,39 @@ For list items with substantive claims:
 
 ### Idempotency
 
-- **Never re-stamp an already-stamped paragraph.** Before stamping, check if the file contains any `^b` or `^t` patterns at end of lines.
-- If the file is fully stamped (every substantive paragraph has an ID), skip it entirely and report "already stamped."
-- If the file is partially stamped (some paragraphs have IDs, some don't), this is unusual -- report it to the user rather than attempting a partial stamp. Partial stamps suggest a previous interrupted run or manual editing.
-- Block IDs are assigned once and never renumbered. If content is later inserted, new paragraphs get the next available number (not renumbered to fill gaps).
+- **Never re-stamp a block that already has an ID.** Before stamping the target paragraph/turn, check whether its last line already ends with a `^bN`/`^tN`; if so, reuse that ID and stop.
+- **Partial stamping is the normal state, not an error.** Under on-cite stamping most files are sparsely stamped (only cited blocks carry IDs). Never "complete" a file or flag it as unusual for being partly stamped.
+- Block IDs are assigned once and never renumbered. New stamps always take the next unused integer in the file (never reused, never back-filled).
 
-## The Stamping Process
+## The Stamping Process (on-cite)
 
-### Step 1: Read the file
+You are stamping **one block** -- the paragraph or transcript turn a citation is about to point at.
 
-Read the full source file. If it's large (>10K words), use filesystem Read in multiple passes if obsidian MCP overflows.
+### Step 1: Locate the target block
 
-### Step 2: Check for existing block IDs
+From the citing pass, identify the exact source paragraph or transcript turn being cited. Read enough of the source to find it unambiguously (filesystem Read as fallback if the file is large and the MCP overflows).
 
-Scan the content for patterns matching `\^[bt]\d+` at end of lines. If found:
-- If every substantive paragraph already has one: report "already stamped" and skip.
-- If only some do: report "partially stamped -- needs review" and skip.
+### Step 2: Check whether it's already stamped
 
-### Step 3: Identify substantive paragraphs
+Look at the end of the block's last line. If it already ends with a `^bN`/`^tN`, **reuse that ID** in the citation -- do not add another. Done.
 
-Walk through the file line by line. Identify paragraph boundaries (blank lines separate paragraphs). For each paragraph, apply the "what gets a block ID" and "what does NOT" rules above.
+### Step 3: Pick the prefix and the next integer
 
-For transcripts, each speaker turn (starting with `**Name**:`) is one block regardless of how many lines it spans.
+Prefix by content type (`^b` document, `^t` transcript -- see Content Type Detection above). Scan the file for existing `\^[bt]\d+` IDs and take the next unused integer (highest + 1; never reuse, never back-fill).
 
-### Step 4: Assign block IDs
+### Step 4: Append the ID
 
-Number substantive paragraphs sequentially. Append the block ID at the end of each paragraph's last line, separated by a space.
+Add ` ^bN` (a space, then the caret ID) at the very end of the block's last line, after all content and punctuation. Use `patch_note` with the block's last line as a unique oldString -> the same line + ` ^bN`. Never touch frontmatter or headers.
 
-### Step 5: Write back
+### Step 5: Verify
 
-Write the stamped content back to the source file. Preserve all frontmatter exactly as-is -- only the body content changes.
-
-**For Obsidian MCP:** Use `obsidian:write_note` with the stamped content body. Be careful to preserve existing frontmatter by including it in the write.
-
-**For filesystem:** Use the Write tool to overwrite the file with the complete content (frontmatter + stamped body).
-
-**Important:** If the file has special characters in the filename (curly quotes, full-width parentheses, etc.) that cause obsidian MCP tools to fail, fall back to filesystem tools using the full absolute path.
-
-### Step 6: Verify
-
-After writing, read the file back and confirm block IDs are present. Count the number of IDs stamped.
-
-### Step 7: Report
-
-Report to the calling skill or user:
-- Filename
-- Content type detected
-- Block prefix used
-- Number of blocks stamped
-- Any edge cases or concerns (e.g., bold-text "headers" that aren't real markdown headers, unusually short file)
+Re-read the line, confirm the ID is present, and confirm the citation `[[File#^bN]]` resolves. Report the file, the block, the prefix, and the ID assigned (new or reused).
 
 ## Edge Cases
 
 **Bold-text section dividers:** Some sources use `**Bold Text**` as section dividers instead of `## Markdown Headers`. These are NOT paragraphs and should NOT get block IDs. However, they also aren't addressable via `[[File#Header]]` (Obsidian only resolves real markdown headers). Block IDs on surrounding paragraphs become the only citation path for these sections. Note this in the report.
 
-**Very short files (<200 words):** Still stamp them. Even 3-4 block IDs are useful for citation precision.
+**Very short files (<200 words):** Still stampable. Even a few block IDs are useful for citation precision.
 
 **Files with no substantive paragraphs:** Possible for very thin clippings (just a title and a link). Report "no substantive content to stamp" and skip.
 
@@ -173,24 +150,24 @@ Report to the calling skill or user:
 
 - **Stamping headers.** Headers are already addressable. Don't add block IDs to them.
 - **Stamping inside YAML.** Never touch frontmatter content.
-- **Re-stamping.** Always check for existing IDs first.
+- **Re-stamping.** Always check the target block for an existing ID first; reuse it.
 - **Renumbering.** Block IDs are permanent. Never renumber to fill gaps.
 - **Putting block ID on the wrong line.** It goes on the LAST line of a multi-line paragraph, not the first.
 - **Forgetting the space.** `text^b1` won't resolve in Obsidian. Must be `text ^b1` with a space before the caret.
 - **Stamping companion notes.** Only stamp source files, never companions or other DW infrastructure.
+- **"Completing" a sparse file.** Under on-cite stamping, a file with only some blocks stamped is correct, not unfinished. Don't fill in the rest.
 
-## Batch Processing
+## Bulk Pre-Stamp (Legacy, Optional)
 
-When stamping multiple files (e.g., as a pre-step in overnight enrichment):
+The original model stamped *every* substantive paragraph in a file up front, before enrichment. **This is superseded by on-cite stamping (S201)** and should not be the default -- it created the bulk re-stamp failure mode (S173) and clutters sources with unused IDs. Use it only for a deliberate, one-off full pre-stamp when explicitly requested.
 
-1. Process files one at a time -- read, stamp, write, verify before moving to the next
-2. Report a summary after the batch: files processed, total blocks stamped, any files skipped and why
-3. If a file fails to stamp (write error, special character issue), log the failure and continue with the next file
+If pre-stamping a whole file: walk it paragraph by paragraph applying the What Gets / What Does Not rules, assign the next unused integer to each unstamped substantive block (never re-stamp, never renumber), then verify. When stamping a batch, process files one at a time (stamp, verify, next) and report a per-batch summary (files processed, blocks stamped, files skipped and why).
 
 ## See Also
 
+- [[Conventions Registry]] -- the citation-format canon (on-cite stamping, glyph display)
 - [[Citation Mechanism - Block-Level Provenance]] -- full design doc for the citation system
-- corpus-enrichment skill -- primary consumer; uses block IDs for companion citations
-- transcript-harvest skill -- uses block IDs for harvest destination citations
-- document-harvest skill -- uses block IDs for harvest destination citations
-- [[Rabbit Whole RAG - Corpus Architecture]] -- RAG layer uses block IDs as chunk coordinates
+- corpus-enrichment skill -- primary consumer; stamps + cites blocks in companion notes
+- transcript-harvest skill -- stamps + cites turns in harvest destinations
+- document-harvest skill -- stamps + cites blocks in harvest destinations
+- [[Rabbit Whole RAG - Corpus Architecture]] -- RAG layer computes chunk coordinates independently; a block ID aligns with a chunk where one is stamped (decoupled, S201)
