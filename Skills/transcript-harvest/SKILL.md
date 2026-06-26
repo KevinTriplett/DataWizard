@@ -6,14 +6,16 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-06-13'
-version: '0.8'
+updated: '2026-06-25'
+version: '0.9'
 edit_log:
   - DW-S158 2026-06-08
-  - >-
-    MMM meta-learning plant 2026-06-09: added Step 4 (check existing vault
-    sources), Step 6 (triage multi-topic), renumbered
-  - 'DW-S182 2026-06-13: folded Protocol 8.0 (segmentation, chunk-and-route, lexicon criteria); repointed See Also to post-demolition homes'
+  - "MMM meta-learning plant 2026-06-09: added Step 4 (check existing vault
+    sources), Step 6 (triage multi-topic), renumbered"
+  - "DW-S182 2026-06-13: folded Protocol 8.0 (segmentation, chunk-and-route,
+    lexicon criteria); repointed See Also to post-demolition homes"
+  - "DW-S202 2026-06-25: added Block-Level Citations section (stamp-on-cite,
+    ^tN/@mm:ss) pointing at block-stamper + Conventions Registry"
 ---
 
 # Transcript Harvest Skill
@@ -87,6 +89,16 @@ When harvesting from transcripts, watch for a phrase or framing that:
 - Says something in a distinctive way (not generic)
 - Has a clear claim or idea embedded in it
 - Could stand alone as a meme-seed with the right context
+
+## Block-Level Citations (stamp-on-cite)
+
+Section anchors (the `## Section Header` citations in Step 7) are the default. When a harvest claim points at a **specific transcript turn** rather than a whole section, cite the turn directly with a block ID:
+
+- Stamp as you cite: use the block-stamper skill to give that turn an ID (reuse the existing one if present; otherwise the next unused `^tN`), then link to it. Don't pre-stamp the whole transcript -- stamping is the act of citing.
+- Format: `([[TranscriptName#^t15|@22:15]])` -- the visible label is the `@mm:ss` timestamp from the turn's section header.
+- Whole-section synthesis keeps the section-anchor form from Step 7.
+
+Mechanic: block-stamper skill. Full format canon: [[Conventions Registry]].
 
 ## Common Mistakes
 
