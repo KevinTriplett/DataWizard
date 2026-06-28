@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-25'
+updated: '2026-06-28'
 operator: Andrew
 priority: high
 maturity: working
@@ -13,8 +13,7 @@ edit_log:
   - DW-S183 2026-06-14
   - "DW-S191 2026-06-21: move_note wikilink claim corrected"
   - "DW-S197 2026-06-22: added action-items priority tiers (Urgent)"
-  - "DW-S201 2026-06-25: block-ID citations promoted to standard (header-first,
-    harvest-driven lazy stamping, glyph display)"
+  - "DW-S206 2026-06-28: codified the bang-prefix filename retirement"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.

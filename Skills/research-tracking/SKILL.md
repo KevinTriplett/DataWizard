@@ -8,7 +8,7 @@ description: >-
   accumulating without a tracking system, or any time you are about to evaluate
   a tool, repo, framework, or external resource.
 type: skill
-updated: '2026-06-26'
+updated: '2026-06-28'
 version: '1.4'
 ---
 

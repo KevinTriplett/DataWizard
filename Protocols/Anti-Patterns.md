@@ -2,12 +2,13 @@
 title: Anti-Patterns
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-13'
+updated: '2026-06-28'
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
   - DW-S182 2026-06-13
+  - "DW-S206 2026-06-28: codified the bang-prefix filename retirement"
 ---
 
 Explicit anti-patterns. If you catch yourself doing any of these, stop.
