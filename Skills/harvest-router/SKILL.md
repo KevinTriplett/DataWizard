@@ -9,8 +9,8 @@ description: >-
   correct folders, sets routing YAML, and appends action items to target
   projects.
 type: skill
-version: '1.0'
-updated: '2026-04-24'
+version: '1.1'
+updated: '2026-06-26'
 ---
 # Harvest Router Skill
 
@@ -63,7 +63,7 @@ The full sweep. Scan content folders and the root for unrouted files.
 **Folders to scan (in priority order):**
 1. **Vault root (`/`)** — highest priority. Transcripts, meeting notes, and
    misc files land here constantly. Look for `.md` files that aren't
-   infrastructure (skip `!`-prefixed files, canvas files, image files).
+   infrastructure (skip legacy `!`-prefixed files, canvas files, image files).
 2. **`_Transcripts/`** — all transcript types
 3. **`_Meetings/`** — meeting notes
 4. **`_Clippings/`** — web clips and articles
@@ -81,7 +81,7 @@ The full sweep. Scan content folders and the root for unrouted files.
 **What to skip:**
 - Files with `harvest_status: harvested` or `harvest_status: reviewed`
 - Files with `triage_status: reviewed` (already triaged by Reddit pipeline)
-- Infrastructure files (0.x files, `!` prefixed, templates)
+- Infrastructure files (0.x files, legacy `!`-prefixed, templates)
 - Files in `_Companions/` (these are outputs, not sources)
 - Files in `xArchive` or `_xArchive` folders
 - Files in `.obsidian/`, `.git/`, or other dot-folders
@@ -236,15 +236,15 @@ the former; the harvest skills set the latter.
 ### Step 6: Append action items
 
 For each project that received routed content, append a line to that
-project's action items file (`! Action Items - [Project].md`):
+project's action items file (`0.5 Action Items - [Project].md`):
 
 ```markdown
 - [ ] **Harvest pending content ([date])** — [N] new items routed. Sources: [brief list of filenames]. Use transcript-harvest or document-harvest skill.
 ```
 
 **Finding action items files:** Action items files follow the pattern
-`! Action Items - [Project Name].md` or `! Action Items.md` in the
-project's home folder. If you can't find one, tell the user rather than
+`0.5 Action Items - [Project Name].md` in the project's
+`_Infrastructure - [Project]/` folder. If you can't find one, tell the user rather than
 creating one.
 
 **Deduplication:** Before appending, check if there's already a pending

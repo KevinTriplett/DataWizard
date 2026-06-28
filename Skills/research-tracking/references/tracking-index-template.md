@@ -13,9 +13,12 @@ Create this when you have 5+ research notes and start wondering
 
 ## Setup
 
-Create a note in your project's research or workshop area. Name it
-something like `! Research Tracking Index.md` (the `!` prefix keeps
-it sorted to the top).
+Create a note in your project's research or workshop area, named
+`Research Tracking Index.md` (a plain descriptive title -- no
+sort-prefix). Once it grows past a few hundred items, section it into a
+shell + section-folder; the markdown stays canonical. See the
+research-tracking skill and the [[Conventions Registry]] (file naming;
+shell + section pattern).
 
 ## Template
 

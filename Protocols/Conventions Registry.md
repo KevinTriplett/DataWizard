@@ -91,6 +91,7 @@ The `_` prefix sorts active meta-folders to the top and is shell-safe (no escapi
 - **Domain folders** take the project name as a prefix when the project has a dominant name (`Weave Events/`, `Weave Resources/`), clustering them in search and Finder. (D74)
 - **Project guidelines** is always `0.0 Project Guidelines - ProjectName.md`.
 - **START HERE files are retired** (D62). Human onboarding lives in 0.0; Claude setup lives in a Seed guide. Do not create new ones.
+- **The `!` filename prefix is retired** (S116 / PI v4.0). Do not prefix note filenames with `!` to force sort order; use the `0.x` infrastructure slots or a plain descriptive title. This does not affect the `_!nbox/` intake folder or the optional inline `!!` / `!` urgency markers in 0.5 - those are a folder name and in-doc markers, not note-name sort prefixes.
 - Use descriptive titles, not codes. Hyphens for multi-word YAML values (`video-transcript`). ISO dates in filenames (`YYYY-MM-DD`).
 
 For the full cross-platform character map (forbidden characters, replacements, sanitization), see the **Filename Safety guide** - that is the one home for filename character rules. This entry covers structure and numbering only.

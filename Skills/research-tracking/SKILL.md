@@ -8,8 +8,8 @@ description: >-
   accumulating without a tracking system, or any time you are about to evaluate
   a tool, repo, framework, or external resource.
 type: skill
-updated: '2026-06-01'
-version: '1.3'
+updated: '2026-06-26'
+version: '1.4'
 ---
 
 # Research Tracking
@@ -36,9 +36,15 @@ methodology itself.
 
 ## The Tracking Index
 
-The tracking index is a single note that serves as the master lookup
-for all evaluated items. See `references/tracking-index-template.md`
-for the full template and column guide.
+The tracking index is a markdown index -- the master lookup for all
+evaluated items. It starts as a single note and, once it grows to
+hundreds of items, sections into a shell + section-folder (one section
+per batch or session); see the shell + section pattern in the
+[[Conventions Registry]]. The markdown is always canonical: a project
+may add a database or other derived index for fast queries, but that
+index is rebuilt from the markdown, never hand-edited as a parallel
+source of truth. See `references/tracking-index-template.md` for the
+full template and column guide.
 
 **Core columns:** Name, URL, Date, Depth (light/moderate/deep),
 Relevance (high/medium/low/none), and Output.
