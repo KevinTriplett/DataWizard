@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-23'
-version: '4.1'
+updated: '2026-06-29'
+version: '4.2'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -22,6 +22,8 @@ edit_log:
     fixes, S179 stub guard, renumber"
   - "DW-S198 2026-06-23 - v4.1: defer shell embed to close + strip claim_id
     (verify-after-claim)"
+  - "DW-S211 2026-06-29 - v4.2: Active Threads ledger maintenance (D105);
+    in-place + entry pointer, legacy in-entry roster kept as fallback"
 ---
 
 # Session Closer Skill
@@ -112,7 +114,18 @@ Before presenting the draft, verify all required frontmatter fields are present.
 
 `seed_version` is read from VERSION.md during orientation -- never hardcode it from template examples. The former `datawizard_protocol_version` pin is retired per D93; do not add it. If any field is missing from the draft, add it before proceeding. Do not present a draft with missing required fields. This is especially important for `operator`, which powers team dashboards and authorship queries but is easy to omit when pattern-matching from older session logs that predate this requirement. `seed_version` makes team Seed currency visible -- when scanning session logs, a stale Seed version is immediately apparent.
 
-### Step 2.6: Active quest threads
+### Step 2.6: Active Threads ledger
+
+If the project maintains an **Active Threads ledger** -- a vantage-independent roster of open parallel arcs kept as its own file (DataWizard: `{home}/_Sections - {Project}/Active Threads - {Project}.md`, embedded in the `0.5` action-items shell) -- maintain it **in place**. Do not regenerate it from scratch, and do not write the roster into the session-log entry. Re-read the ledger, then for each arc:
+
+- **Touched this session:** patch its block -- update `status:`, set `last:` to this session, refresh `next:`, append this session to `history:`.
+- **Untouched:** leave the block unchanged.
+- **Resolved this session:** cut the block and write a one-liner under the current `#### YYYY-MM` heading in the Resolved archive (`Active Threads Resolved - {Project}.md`), creating the month heading if new. Format: `- T# <name> - resolved S### -> <where it landed>`.
+- **New arc this session:** add a `### T{N}` block (next free number) with all fields; set `home:` to its durable backstop (an empty `home:` flags an arc with no task-level home -- a coverage gap).
+
+Patch in place and verify each change landed (Working Rule 5). The ledger lists **all** open arcs regardless of this session's focus -- do **not** deduplicate it against "What's next" (that vantage-dependence is the carry-forward flicker the ledger fixes; D105). In the session-log entry, the roster is replaced by a one-line pointer (see Output Format).
+
+**Legacy in-entry roster (projects without a ledger).** If the project has no Active Threads ledger, fall back to the in-entry roster maintained inside the session-log entry, described below.
 
 Read the previous session's "Active quest threads" section (if it exists). For each thread:
 - If work was done on it this session, update its status and remaining work
@@ -417,19 +430,12 @@ Adapt detail to the work type:
 - Design: what prior decisions constrain the space, what the deliverable is
 - Debugging: what's broken, what was tried, where the evidence is
 
-### Active quest threads
+### Active threads
 
-Threads of ongoing work across recent sessions. Included so future
-instances don't lose sight of parallel workstreams. See Step 2.6 for
-how to maintain this section.
-
-**1. Thread name** (session range, e.g. S152-S157 or WV_2026-06-01_AA_01 through WV_2026-06-10_JC_02)
-Remaining work summary. Key doc: `path/to/spec.md`.
-
-**2. Thread name** (session range)
-Remaining work summary. Key doc: `path/to/spec.md`.
-
-[Repeat for each active thread. Remove when completed.]
+Open parallel arcs live in the Active Threads ledger: [[Active Threads - {Project}]]
+(maintained in place at close -- not duplicated in the entry). For projects without
+a ledger, keep the roster inline here instead -- see Step 2.6 for the legacy format
+(bold numbered name, session range, 2-3 sentences of remaining work, key doc paths).
 ```
 
 ## Structured Format for Complex Sessions
