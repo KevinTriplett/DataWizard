@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-06-29'
+updated: '2026-06-30'
 ---
 
 # DataWizard Skills
@@ -32,7 +32,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **block-stamper** (v1.0) | Technique | Stamp sequential block IDs (^bN for articles, ^tN for transcripts) on source file paragraphs, making them addressable for citations, harvest provenance, and RAG indexing. Run before enrichment or harvesting; called as a prerequisite by the enrichment and harvest skills. |
 | **install-wizard** | Technique | Interactive post-install setup for new DataWizard users. Picks up where the README left off: verifies MCP connection (all tools), guides Project Instructions setup, explains git as the sync/collaboration layer, offers git onboarding. Triggers on: 'set up DataWizard', 'finish DataWizard setup', 'I just installed DataWizard'. |
 | **project-health-audit** (v2.0) | Technique | Judgment-half audit of a DW project: consumes the dw_lint report for machine findings (filenames, YAML, sync, links, types), then checks infrastructure completeness (D84), MOC regeneration freshness (D92), shell narrative order, and routes findings. Tiered scopes (Quick/Standard/Full/Incremental); manual fallback for vaults without lint tooling. Triggered via 'DW review' or session-closer's threshold nudge. |
-| **project-reconsolidation** (v1.0) | Technique | Periodic reconciliation audit that diffs every record of open work (action items, thread roster or ledger, quest log, dashboard) against recent session-log ground truth, classifies divergences (slipped / stalled / orphaned / done-but-open / contradiction / duplication / model-gap), and writes a reconsolidation report. The detection-and-repair complement to the structural Active Threads ledger (D105, D106); audits the tracking model, not just the data. Distinct from semantic divergence-convergence (framing drift). Triggers on 'run a reconsolidation pass', 'reconcile the open work', or a due tracking-health review. |
+| **project-reconsolidation** (v1.1) | Technique | Periodic reconciliation audit that diffs every record of open work (action items, thread roster or ledger, quest log, dashboard) against recent session-log ground truth, classifies divergences (slipped / stalled / orphaned / done-but-open / contradiction / duplication / model-gap), and writes a reconsolidation report. The detection-and-repair complement to the structural Active Threads ledger (D105, D106); audits the tracking model, not just the data. Distinct from semantic divergence-convergence (framing drift). Triggers on 'run a reconsolidation pass', 'reconcile the open work', or a due tracking-health review. |
 | **git-onboarding** | Technique | Walking a new collaborator through git setup for a vault or DW project. Gathers variables, guides through setup interactively, sets up DW Save (Cmd+Shift+S) with backup scheduling, and generates a project-specific onboarding guide. Uses the Git Guide (`Seed/Guides/Git Guide.md`) as reference. |
 
 ## Knowledge Lifecycle
