@@ -12,8 +12,8 @@ description: "Use when reconciling a project's tracking surfaces against reality
   tracking-health review is due. Distinct from semantic divergence/framing-drift
   reconciliation during harvest."
 type: skill
-version: "1.0"
-updated: 2026-06-29
+version: "1.1"
+updated: 2026-06-30
 created: 2026-06-29
 ---
 
@@ -41,7 +41,7 @@ The name is borrowed from memory reconsolidation: a record is most editable righ
 ## Before You Start
 
 1. Read this skill fully.
-2. Enumerate the project's tracking surfaces: every place that claims to record open or parallel work. In a DataWizard project these are typically the session-log thread roster (or the Active Threads ledger, once it exists), 0.5 Action Items, 0.7 Quest Log, and 0.9 Dashboard plus quest frontmatter. Other systems will have their own set. The point is to list all of them, because the audit is the diff between them.
+2. Enumerate the project's tracking surfaces: every place that claims to record open or parallel work. In a DataWizard project these are typically the session-log thread roster (or the Active Threads ledger, once it exists), 0.5 Action Items, 0.7 Quest Log, and 0.9 Dashboard plus quest frontmatter. **Also include any multi-phase driver/plan document acting as a de-facto arc** - a finite plan doc (an action plan, a build-plan roadmap) that is the main arc for a stretch of sessions is easy to miss because no orientation ever re-reads it, yet its checkboxes rot and its residuals orphan when it winds down (the S180-S189 pass found exactly this). Other systems will have their own set. The point is to list all of them, because the audit is the diff between them.
 3. Pick the window. Reconsolidation works one bounded slice of session history at a time, most recent first. A week (~15-20 entries) is a good unit. Trying to reconcile the whole project at once exhausts context before the synthesis lands.
 4. Confirm where the report goes (in DW: `Workshop - [Project]/Reconsolidation Reports/`).
 
