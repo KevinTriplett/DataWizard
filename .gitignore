@@ -9,6 +9,10 @@
 Vault Config.md
 task-manager-config.md
 
+# Ignore seed artifacts
+Seed/
+Seed\ Sync\ Log.md
+
 # Telegram harvester artifacts (credentials and session files - never commit)
 Scripts/.env
 Scripts/*.session
