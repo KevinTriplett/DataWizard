@@ -22,5 +22,5 @@ alias dwlog='tail -20 ~/.datawizard-sync.log'
 # [remote "upstream"]
 #     url = https://github.com/andrewalan11/DataWizard.git
 #     fetch = +refs/heads/*:refs/remotes/upstream/*
-# DW_REPO="$HOME/[PATH_TO_YOUR_VAULT]/_DataWizard"
-# alias dwpull='git -C "$DW_REPO" fetch upstream && git -C "$DW_REPO" merge upstream/main && git -C "$DW_REPO" push origin main'
+DW_REPO="$HOME/ObsidianNoSync/_DataWizard"
+alias dwpull='git -C "$DW_REPO" fetch upstream && git -C "$DW_REPO" merge upstream/main'
