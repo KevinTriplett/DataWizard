@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-06-28'
+updated: '2026-07-03'
 operator: Andrew
 priority: high
 maturity: working
@@ -14,6 +14,8 @@ edit_log:
   - "DW-S191 2026-06-21: move_note wikilink claim corrected"
   - "DW-S197 2026-06-22: added action-items priority tiers (Urgent)"
   - "DW-S206 2026-06-28: codified the bang-prefix filename retirement"
+  - "DW-S218 2026-07-03: added the Tracking Model section (D108 - one canonical
+    surface per fact class)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -261,6 +263,34 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 **Rule:** the 0.5 Action Items file orders work by urgency tier, top to bottom: **Urgent** (drop everything - address next session at the latest; use sparingly) -> **This Session / Next Session** (the hot list) -> **Soon** (~2-5 sessions out; sub-tiered P1 / P2 / P3, P1 highest) -> **Blocked / Waiting** (note the blocker) -> **Done** (dated, with brief resolution; archive when long). An item's tier is its section; the inline `!!` / `!` markers are an optional secondary signal, not a replacement. **Urgent** is distinct from the Seed Assessment Action Plan's P0-P6 phase labels - those are project-overhaul phases, a different axis from backlog urgency.
 
 **Example:** the S197 session-claiming-collision fix sits under Urgent; a 5-sessions-out idea sits under Soon / P3.
+
+---
+
+## Tracking Model
+
+**Rule:** work tracking follows the same discipline as knowledge tracking: **one canonical surface per fact class; everything else points, nothing restates.** A fact written on two surfaces will drift (D105, D108). The registry of fact classes:
+
+| Fact class | Canonical surface | Everything else |
+|---|---|---|
+| An arc exists / where its truth lives | Active Threads ledger row | session logs point |
+| Step state within a driver-doc arc | the driver doc's **State Board** | ledger `next:` points; backlog item slims to a pointer |
+| Tactical next 1-3 sessions | 0.5 Backlog | - |
+| Recommended entry point for the next session | the session log's "What's next" (one-session TTL) | everything else in "What's next" points, never restates |
+| Carried side/native task lists | a durable queue doc (e.g. a Native Run Queue) | "What's next" points |
+| Stream position (perpetual threads) | the stream-state note (D107) | db mirror optional, derived |
+
+Sub-rules:
+
+- **State Boards:** one table per driver doc - step / status / remaining / runtime / last touched. Status is an enum (`not started | in progress | blocked | done`); commentary lives outside the Status cell. Maintained **on advance** (patch the row the moment a step's state changes), **verified** at session close - the same argument that made stamp-on-cite beat bulk-stamping.
+- **Commit-moment rule:** every thread class anchors tracking updates to its own commit moment - normal sessions at close; perpetual threads at the batch/cursor write (they never close).
+- **Orientation follows the pointer:** when the active arc's ledger row points at a State Board, orientation reads the board. Pointer-following is reliable only when a protocol step forces it.
+- **Hand-maintained canonical surfaces get machine drift-checks** - they lack the generated-view protection knowledge surfaces have (lint checks; reconsolidation passes carry the diff until a check exists).
+- **Retirement is detected, not scheduled:** a driver doc whose board is all-terminal but whose `status:` is still active triggers a retirement ceremony in the next reconsolidation pass - reconcile the board, rehome residuals, flip status, archive satellite queue docs.
+- **Model-gap findings land here:** when a reconsolidation or design review surfaces a fact class with no canonical surface (or two surfaces claiming one fact), amend this table - do not scatter the finding into tactical backlogs.
+
+(D105, D107, D108; design: [[RTI Federation and Tracking Model - Stress Test S218]], [[RTI Federation - T1 Design Review S217]])
+
+**Example:** the T1 arc - ledger row says the arc is active and points at [[RTI Federation - Substrate Coherence Build Plan]]'s State Board; the board holds step state; the Backlog carries a pointer item; the Native Run Queue holds the carried native tasks; "What's next" says which of these to start on and points.
 
 ---
 
