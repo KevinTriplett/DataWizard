@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-07-03'
+updated: '2026-07-09'
 operator: Andrew
 priority: high
 maturity: working
@@ -14,7 +14,7 @@ edit_log:
   - "DW-S191 2026-06-21: move_note wikilink claim corrected"
   - "DW-S197 2026-06-22: added action-items priority tiers (Urgent)"
   - "DW-S206 2026-06-28: codified the bang-prefix filename retirement"
-  - "DW-S218 2026-07-03: added the Tracking Model section (D108 - one canonical
+  - "DW-S218 2026-07-09: added the Tracking Model section (D108 - one canonical
     surface per fact class)"
 ---
 
