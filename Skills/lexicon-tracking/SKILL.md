@@ -9,14 +9,14 @@ description: "Use when building or maintaining a project's living
   lexicon_candidates inline); this skill is their downstream home plus the
   evolution-tracking layer."
 type: skill
-created: 2026-07-14
-updated: 2026-07-14
+created: 2026-07-15
+updated: 2026-07-15
 operator: Andrew
 generating_agent: Claude (Andrew)
 version: "0.1"
 status: draft
 edit_log:
-  - RW-S38 2026-07-14 first draft from the ReWoven transcript-wide lexicon pass;
+  - RW-S38 2026-07-15 first draft from the ReWoven transcript-wide lexicon pass;
     to be pressure-tested next session
 ---
 
