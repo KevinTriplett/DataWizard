@@ -18,11 +18,14 @@ status: draft
 edit_log:
   - RW-S38 2026-07-15 first draft from the ReWoven transcript-wide lexicon pass;
     to be pressure-tested next session
+  - RW-S39 2026-07-15 added Curation (the Prune) section - six-destination
+    taxonomy, holding docs, anti-patterns, clusters, prune signals - from the
+    S39 ReWoven prune; still v0.1 draft pending fresh-transcript validation
 ---
 
 # Lexicon Tracking Skill
 
-**Status:** v0.1 DRAFT (RW-S38). First-drafted from the ReWoven transcript-wide lexicon pass; not yet pressure-tested. Review before relying on it.
+**Status:** v0.1 DRAFT (RW-S38 extraction; RW-S39 curation). First-drafted from the ReWoven transcript-wide lexicon pass, then extended with the Curation (the Prune) taxonomy from the S39 prune. Not yet pressure-tested end to end against a fresh transcript. Review before relying on it.
 
 ## Overview
 
@@ -57,7 +60,7 @@ This skill is the downstream home for the `lexicon_candidates` that transcript-h
 4. **Extract per batch** (parallel subagents for large spans - see Batch Mode). Each extractor gets: its file subset, the current glossary term list (for dedup), the extraction schema, and the evolution-signal heuristic. Each writes a **staging note** (one per batch) - do not write to the glossary yet.
 5. **Synthesize.** Read the staging notes together. Assemble the evolution arcs across batches (this is cross-batch work the extractors cannot do alone). Draft: (a) net-new additions grouped by the glossary's existing categories, and (b) the evolution timeline entries.
 6. **Review before writing.** Present the additions and arcs to the operator. The glossary is curated - confirm whether to add a curated subset or everything-for-later-pruning.
-7. **Write.** Add net-new gems to the glossary (as a clearly-marked, dated additions block if adding wholesale, so pruning is easy). Write/update the evolution timeline. Keep the staging notes as the raw record - do not delete them.
+7. **Write.** Add net-new gems to the glossary (as a clearly-marked, dated additions block if adding wholesale, so pruning is easy - the prune itself is a separate pass, see Curation (the Prune)). Write/update the evolution timeline. Keep the staging notes as the raw record - do not delete them.
 8. **Metadata + provenance.** Set `updated` and append `edit_log` on every doc touched. Cite source transcript + date on gems; use block-stamper for turn-level citations when a phrase points at a specific transcript turn.
 
 ## Extraction Schema
@@ -95,11 +98,41 @@ For a transcript-wide pass whose total span is large (roughly >25k words or >6 s
 - **Each extractor writes a staging note; the coordinator (you) does the cross-batch evolution synthesis** - individual extractors only see their slice and cannot assemble arcs.
 - **Sonnet subagents are appropriate** for the extraction pass; the synthesis and glossary-merge judgment stays with the primary agent.
 
+## Curation (the Prune)
+
+Extraction is only half the job. A raw pass over-produces: in the ReWoven case, ~62 extracted items yielded only ~25 (~40%) glossary-ready gems. The rest are not junk - they are workshop material, content better-homed elsewhere, or holds. Pruning is a distinct pass, ideally **interactive with the operator and item by item, by section** - keep/cut on a team's own voice is their judgment, not the agent's. If the extraction was added as a dated wholesale block, the prune can (and often should) be a later, separate pass; distance sharpens the operator's keep/cut judgment. Do not silently prune during extraction - the additions block exists precisely to defer it.
+
+**Six destinations, not two.** Every extracted item resolves to one of:
+
+- **Fold** - ready language; merge into the matching curated glossary section.
+- **Merge** - overlaps an existing entry; collapse into it, keeping the sharper phrasing and any new source/quote.
+- **Workshop** - the idea is right but the language isn't forged yet. Goes to a Workshop holding doc, not the glossary. In practice the *largest* bucket.
+- **Bin** - cut but worth holding for re-examination. Goes to a Cutting Room Floor holding doc with a one-line reason.
+- **Route** - real content in the wrong doc (show format, fund/legal mechanics, logistics). Cut from the lexicon; note the destination doc. Extraction reliably over-pulls these.
+- **Delete** - not worth holding; tombstone it in one line, since the raw record survives in the staging notes anyway.
+
+**The keep/cut heuristic.** Would this phrase plausibly appear, in the team's own words, in a derived document (deck, one-sheet, script, funder note) or as a voice/usage guardrail? Yes -> Fold/Merge. If it only describes a mechanism or a one-off moment -> Route/Bin/Delete. If the instinct is right but the words aren't -> Workshop.
+
+**Prune signals.**
+- "too woo" / spiritual-bypass, or off-register for the audience -> Bin or Anti-Patterns.
+- "right idea, language isn't there" -> Workshop (name what needs smithing in a one-line "needs:").
+- mechanics, numbers, logistics, org/legal structure -> Route.
+- a phrase the team flags as inward-only (e.g. "nerds") -> Anti-Patterns, not the public glossary.
+
+**Two organizing devices that emerge in a prune:**
+- **Clusters / memes** - a coined internal name that groups related gems (e.g. a "cluster of wounds," a "Church of Do It Now"). When several items rhyme, name the cluster rather than listing them loose.
+- **Anti-Patterns registry** - a glossary section for language to keep *off* public copy: inward-facing house terms not yet cleared, and negative-space markers of what the project deliberately is not (e.g. reject "ascension" language). Distinct from the Bin - the Bin holds cut items; Anti-Patterns is an active do-not-use guide.
+
+**Holding docs.** A curated prune needs two companion docs alongside the glossary and timeline:
+- **`<Project> Lexicon - Workshop`** - the refinement queue; each entry carries its context and a one-line "needs:" naming what to smith. When forged, fold into the glossary and remove it here.
+- **`<Project> Lexicon - Cutting Room Floor`** - held items (with reasons), a "Routed elsewhere" list (item + destination doc), and a tombstone list of hard deletes.
+
 ## Outputs
 
 - **The living glossary** - stays curated. When adding wholesale for later pruning, isolate the new material in a dated, labeled additions block rather than interleaving unproven entries into the curated sections.
 - **The evolution timeline** - a companion doc; one section per arc, each with dated verbatim stages (rough form -> pressure/coining moment -> crystallized form). Link it from the glossary; do not duplicate full arcs into the glossary (link, don't restate).
 - **Staging notes** - the raw per-batch record. Kept, not deleted - they hold the long tail the curated glossary omits and the provenance for future prunes.
+- **The holding docs** (once a prune has run) - a Workshop doc (the refinement queue) and a Cutting Room Floor doc (held / routed / deleted). See Curation (the Prune).
 
 ## Principles
 
@@ -116,6 +149,9 @@ For a transcript-wide pass whose total span is large (roughly >25k words or >6 s
 - Extractors asserting evolution arcs from a single batch - arcs are cross-batch; only the coordinator has the span.
 - Dumping every candidate into the curated glossary - bloats it; use a marked additions block for wholesale adds.
 - Deleting staging notes after the merge - they are the raw record and the provenance for pruning.
+- Treating raw extraction as glossary-ready - expect only ~40% to fold straight in; the rest is Workshop / Route / Bin (see Curation).
+- Pruning silently during extraction instead of deferring to a separate, operator-in-the-loop pass.
+- Binning a term that's actually inward-facing - route it to the Anti-Patterns registry, not the Cutting Room Floor.
 - Forgetting to feed extractors the current glossary term list - produces duplicate entries and inconsistent dedup tags.
 - Not updating `updated`/`edit_log` on the glossary and timeline after writing.
 
