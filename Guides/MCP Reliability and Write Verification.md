@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-06-23'
+updated: '2026-07-25'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -11,6 +11,9 @@ edit_log:
   - DW-S198 2026-06-23 - verify-after-claim session-claiming rule
   - DW-S199 2026-06-23 - sandbox SQLite-write limitation (disk I/O error on FUSE
     mount)
+  - RG-S4 2026-07-25 - planted the update_frontmatter merge:true array-wipe
+    failure mode; sandbox mount-path correction to RW S53; cross-mount mv
+    duplicate hazard
 ---
 # MCP Reliability and Write Verification
 
@@ -29,6 +32,18 @@ As of May 2026, the Obsidian MCP has intermittent reliability issues when multip
 **Stale reads.** After a successful `patch_note`, a subsequent `read_note` on the same file may return the pre-patch version. This may overlap with the phantom read issue (the MCP serving cached pre-patch content).
 
 **Frontmatter wipe via merge: false.** `update_frontmatter` with `merge: false` replaces the entire frontmatter -- any field you omit is deleted. Always use `merge: true` (the default) unless intentionally replacing the full schema. If you must use `merge: false`, re-read frontmatter first and include every field.
+
+**Array wipe via merge: true (the sneaky one).** `merge: true` merges at the **top level of keys only**. Any array value you pass **replaces** the existing array wholesale -- it does not append. This silently destroys history on exactly the two fields agents update most often, `edit_log` and `tags`, and unlike the `merge: false` case there is no obvious "I am replacing everything" signal to make you cautious. Passing `{"edit_log": ["DW-S200 2026-07-25"]}` on a file with twenty prior entries leaves it with one.
+
+Rule: **before stamping any array field, re-read the file's frontmatter** (`get_frontmatter` is cheapest) and pass the complete list with your new item appended. Never pass a bare one-item array to a file that may already have entries. Scalars (`updated`, `status`, `operator`) are safe to pass alone.
+
+Verify after any array write by counting entries:
+
+```bash
+awk '/^edit_log:/{f=1;next}/^[a-z_]+:/{f=0}f&&/^  - /{c++}END{print c+0}' "file.md"
+```
+
+A count of 1 where there should be many means the array was clobbered -- restore from your pre-write read. Note that shell files legitimately carry no `edit_log` (they are exempt per [[YAML Schema]]), so 0 on a `0.2 Session Log` shell is correct, not damage. Grounding: RG S4 (2026-07-25) wiped 21 entries from `0.2 Session Log - ReWoven` and 9 from `0.3 Decision Log - ReWoven` this way. Both were recoverable **only because the full arrays happened to still be in the session's context** from reads minutes earlier -- with a fresh context, or a compaction in between, the history would have been unrecoverable short of a backup. Treat a bare array stamp as a destructive operation.
 
 ## What Triggers These Issues
 
@@ -123,6 +138,10 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **`search_notes` can false-negative on exact titles.** A search for an exact note title can return content matches in other files while missing the note itself, even when the file exists and `list_directory` shows it. During an MMM link audit, searching "Foraging in High-Dimensional Data @ DISI" returned files that *mention* the phrase but not `_Clippings/Foraging in High-Dimensional Data @ DISI 2025.md` itself -- leading to a false "broken link" finding that was only caught by a later `list_directory` on `_Clippings/`. Rule: before reporting a wikilink as broken or a file as missing, verify with `list_directory` on the expected folder (or a filesystem `Glob`), not search alone. Search confirms presence; it cannot confirm absence. (Source: MMM S12)
 
 **Sandbox bash cannot delete files on the vault FUSE mount.** From the Cowork sandbox, `rm`/unlink fails with "Operation not permitted" on the Regen Vault (a FUSE mount -- `.fuse_hidden*` files are the tell), though `touch`, create, `mv`/rename, and truncate-write all work. To archive or relocate vault files, use `obsidian:move_note` (it runs with Obsidian's full filesystem access), not bash `cp`+`rm` (which aborts at the first delete). When stamping an archive banner on a file with YAML frontmatter, insert it AFTER the closing `---` (e.g. `patch_note` in front of the first body line) -- prepending breaks the frontmatter. (Source: DW S182)
+
+**Sandbox bash CAN reach the vault -- but only at the mount path, not the Mac path.** A correction to a belief recorded in RW S53 ("device_bash cannot see the vault"). The Cowork sandbox does mount the session's connected folders, at `/sessions/<session-id>/mnt/<folder-name>/` -- discover them with `ls mnt/` from the default working directory. Mac absolute paths (`/Users/.../Vaults/Regen Vault/...`) fail with "No such file"; mount-relative paths work. This makes bash genuinely useful for **read-only** verification, which is fast and cheap at scale: `ls | wc -l` for counts, `stat -c %s` for byte-size comparison against a pre-change directory listing, `find -size -1c` for truncation. Writes and deletes remain restricted per the two entries above. (Source: RG S4, correcting RW S53)
+
+**Cross-mount `mv` leaves duplicates, not a failed no-op.** Extends the delete limitation above. Each connected folder is a *separate* mount, so `mv` between two of them (e.g. `_ProjectA/...` to `_ProjectB/...`) is internally copy-then-unlink. The copy succeeds and the unlink fails -- so a chained `mv` of N files aborts partway with the sources still present **and** copies already written at the destination. The failure is not clean: you are left mid-migration with duplicates. Recovery is `obsidian:move_note` with `overwrite: true`, which replaces the stray copy and removes the source in one operation. For any multi-file relocation, skip bash entirely and use `move_note` from the start -- issued in parallel, 20 calls per message block is comfortable. (Source: RG S4)
 
 **Sandbox bash cannot write SQLite databases on the vault FUSE mount.** Plain file create/overwrite/truncate works (above), but opening a SQLite db on the mount for writing fails with `sqlite3.OperationalError: disk I/O error` -- FUSE does not support the byte-range locking and journaling (`-wal`/`-shm`/`-journal`) SQLite needs. Reads are fine: copy the db to a sandbox-writable dir (e.g. the outputs folder) and read the copy. Consequence: any SQLite-backed tool (e.g. `dw_ops.db`) must run its **writes natively on the user's machine**, never from the Cowork sandbox; a sandbox session participates by queueing changes (markdown / intake) for a native process to ingest. Verified S199 by probe -- bash `CREATE`/`OVERWRITE` ok, `rm` and SQLite write both fail. (Source: DW S199)
 
