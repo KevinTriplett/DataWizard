@@ -42,7 +42,7 @@ Work through these sections in order. Don't rush -- check in after the big pictu
 
 DataWizard is not a product or an app you download. It's a set of prompts and a few scripts that teach your AI assistant how to work in your notes -- and how to leave breadcrumbs so that you and future conversations can find your way back through the vault to the source.
 
-Here's the problem it solves: every time you start a new AI conversation, the AI has amnesia. It doesn't remember yesterday's conversation, your decisions, or your project context. Most people deal with this by re-explaining everything each time, or by copy-pasting notes into chat. That works for quick questions, but it breaks down when you're doing real work across days, weeks, or months.
+Here's the problem it solves: every time you start a new AI conversation, it's as if the AI has amnesia. It can have trouble remembering yesterday's conversation, your decisions, or your project context. Most people deal with this by re-explaining everything each time, or by copy-pasting notes into chat. That works for quick questions, but it breaks down when you're doing real work across days, weeks, or months.
 
 DataWizard gives the AI a structured place to read and write -- your Obsidian vault -- and teaches it to leave a trail. Session logs, metadata, structured notes, project files. Every conversation adds to the trail, and every new conversation reads it to pick up where the last one left off. It's not magic; it's just well-organized markdown files that the AI knows how to use.
 
@@ -50,25 +50,25 @@ DataWizard gives the AI a structured place to read and write -- your Obsidian va
 
 There are four pieces, and they're all simple:
 
-**Your vault** is an Obsidian vault -- a folder of markdown files on your computer. This is where everything lives: your notes, your projects, your research, your session history. It's local, it's yours, and it's just files. Nothing is locked in a proprietary format or stored in someone else's cloud.
+**Your vault** is an Obsidian vault -- a folder of markdown files (specially formatted text files, readable by humans and machines) that live locally on your computer. The Obsidian vault is where everything lives: your notes, your projects, your research, your session history. It's local, it's yours, and it's just files. Nothing is locked in a proprietary format or stored in someone else's cloud.
 
-**The Seed** is a folder of instructions that lives inside your vault (at `_DataWizard/Seed/`). It's the playbook. It contains protocols, skills, and guides that teach the AI how to operate in your vault -- what conventions to follow, how to structure information, how to leave breadcrumbs. Without the Seed, the AI is a generic chatbot. With it, the AI knows your system.
+**The DataWizard Seed** is a folder of instructions that lives inside your vault (at `_DataWizard/Seed/`). It's the playbook. It contains protocols, skills, and guides that tell the AI how to operate in your vault -- what conventions to follow, how to structure information, how to leave breadcrumbs. Without the Seed, the AI is a generic chatbot. With it, the AI knows your system.
 
-**Your AI assistant** -- Claude, or any LLM that can connect to your vault -- is the engine that does the work. It reads the Seed to know what to do, then reads and writes your vault to actually do it. DataWizard is designed primarily for Claude but the concepts work with any AI that supports tool use and can connect to Obsidian.
+**Your AI assistant** -- Claude, or any LLM that can connect to your vault -- is the engine that does the work. It reads the Seed to know what to do, then reads and writes your vault to actually do it. The connection between the AI and your vault is called MCP (Model Context Protocol) -- you'll see this term come up, but all you need to know is that it's the bridge that lets the AI read and write your notes directly instead of you having to copy-paste things into chat. DataWizard is designed primarily for Claude but the concepts work with any AI that supports MCP and can connect to Obsidian.
 
-**Git** is the backup and collaboration layer. Think of it as a save system that remembers every version of every file and can sync between your computer and the cloud -- or between your computer and a teammate's. You interact with it through one keystroke (DW Save, Cmd+Shift+S on Mac), and you don't need to understand how it works under the hood. If you're working solo, it's your backup. If you're working with others, it's how your changes stay in sync without overwriting each other. Git setup is optional but recommended.
+**Git** (hosted on github.com) is the backup and collaboration layer. Think of it as a save system that remembers every version of every file and can sync between your computer and the cloud -- or between your computer and a teammate's. Once it's set up, you interact with it through one keystroke (DW Save, Cmd+Shift+S on Mac), and you don't need to understand how it works under the hood. If you're working solo, it's your backup. If you're working with others, it's how your changes stay in sync without overwriting each other. Git setup is optional but recommended.
 
 ### 3. How It Works Day to Day
 
 This is the core loop -- the rhythm of working with DataWizard:
 
-**Project Instructions** are a block of text you paste into your Claude Project settings (or feed to whatever LLM you use). They're the foundation. They tell the AI what conventions to follow, what skills it has, and how to navigate your vault. Think of it as the AI's job description for your vault. Without Project Instructions, nothing else works. With them, every conversation in that project starts with a capable, vault-aware assistant.
+**Project Instructions** are a block of text you paste into your Claude Project (or other LLM) settings. You just need to paste them once, the first time you're setting it up. They're the foundation. Whenever you start up a new thread or chat (an "instance") the Project Instructions tell the AI what conventions to follow, what skills it has, and how to navigate your vault. Think of it as the AI's job description for your vault. Without Project Instructions, nothing else works. With them, every conversation in that project starts with a capable, vault-aware assistant.
 
 **Orientation** is what happens at the start of every conversation. The AI reads your project files -- what the project is about, what happened in recent sessions, what's on the to-do list -- and gets up to speed. This is the AI reading the breadcrumb trail. It takes about a minute, and it's not the AI being slow -- it's the AI doing its homework so it doesn't ask you to re-explain everything. When orientation finishes, the AI knows where you left off and what's next.
 
 **Working together** follows a simple rule: the AI proposes, you approve. It shares its plan before acting. It shows you what it wants to change before writing to your vault. You're always the decision-maker; the AI is a capable collaborator that doesn't go off on its own without checking with you first.
 
-**Session Closer** is how you end a conversation. You say "let's close the session" (or "wrap up", or "we're done") and the AI writes a log entry: what happened, what was learned, and what to do next. This is the most important habit in DataWizard. It's the breadcrumb that the next conversation will follow. Skip it, and the next conversation starts blind. Do it consistently, and you build a trail of structured memory that accumulates over weeks and months -- every session building on the last.
+**Session Closer** is how you end a conversation. This is the most important habit in DataWizard. It's the breadcrumb that the next conversation will follow. Skip it, and the next conversation starts blind. Do it consistently, and you build a trail of structured memory that accumulates over weeks and months -- every session building on the last. To invoke the session-closer skill, just say "let's close the session" (or "wrap up", or "we're done") and the AI writes a log entry: what happened, what was learned, and what to do next. Note that because of the way that LLM memory (or "context") works, it's best to keep sessions focussed. DataWizard invites the LLM to voice when it's getting tight on context, so that you start to get a sense of when it's a good time to close a session.
 
 **DW Save** is one keystroke (Cmd+Shift+S on Mac, Ctrl+Shift+S on Windows) that backs everything up to GitHub. Hit it when you finish a session, before a call, or anytime you want your work safe. There's also an automatic backup that runs in the background as a safety net, in case you forget. If you're working with a team, DW Save also pushes your changes so others can see them.
 
@@ -102,7 +102,7 @@ Everything else you'll pick up as you go. The AI knows the protocols and will gu
 
 ### If Called During Install (by install-wizard Step 1)
 
-Present sections 1 through 4 above, then hand control back to the install wizard for the procedural setup steps. Do not present section 5 -- the install wizard handles "getting started" through its own flow. The install wizard's nerd calibration (Step 2) has already set the language level; follow that calibration.
+Present sections 1 through 4 above, then hand control back to the install wizard for the procedural setup steps. Do not present section 5 -- the install wizard handles "getting started" through its own flow.
 
 ### If Called Standalone
 

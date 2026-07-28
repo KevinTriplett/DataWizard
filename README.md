@@ -1,16 +1,18 @@
 # DataWizard
 
-> A local-first AI knowledge management system for Obsidian.
+> Prompts and scripts that teach your AI assistant to work in your Obsidian vault.
 
 ---
 
 ## What Is DataWizard?
 
-DataWizard teaches Claude how to work in your Obsidian vault -- reading, writing, organizing, and enriching your notes using consistent protocols. The goal is not to read everything yourself. It's to build a system that reads for you, remembers for you, and retrieves what matters when you need it.
+DataWizard is a set of prompts and a few scripts that teach your AI assistant how to work in your Obsidian vault -- and how to leave breadcrumbs so that you and future conversations can find your way back through the vault to the source.
 
-What it does: classifies notes by content type, enriches them with tags and metadata, processes transcripts into searchable companion notes, routes content into the right place, manages multi-project infrastructure, coordinates multiple AI agents in the same vault, and saves everything with one keystroke.
+The problem: every new AI conversation starts with a blank slate. DataWizard solves this by giving the AI a structured place to read and write -- your vault -- and teaching it to leave a trail. Session logs, metadata, structured notes, project files. Every conversation adds to the trail, and every new conversation reads it to pick up where the last one left off.
 
-Core principles: local-first, markdown-native, modular pipelines, progressive enrichment, draft-then-approve collaboration.
+What it does: classifies notes by content type, enriches them with tags and metadata, processes transcripts into searchable notes, routes content to the right projects, manages multi-project infrastructure, and saves everything with one keystroke.
+
+It's not a product or an app. It's just well-organized markdown files and a playbook that teaches the AI how to use them. Local-first, open source, and designed primarily for Claude but compatible with any AI that supports MCP.
 
 ---
 
