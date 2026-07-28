@@ -7,10 +7,12 @@ description: >-
   'I just installed DataWizard', 'verify my MCP connection', or any context
   where a new user has just connected MCP and needs to complete setup.
 type: skill
-version: '1.2'
-updated: '2026-06-18'
+version: '1.3'
+updated: '2026-07-28'
 edit_log:
   - DW-S189 2026-06-18 - repointed to renamed/de-fenced PI (v4.4)
+  - DW 2026-07-28 - Step 1 now references dw-intro skill instead of inline
+    explanation
 ---
 # Install Wizard Skill
 
@@ -37,17 +39,11 @@ Read this skill fully. Do not skip or reorder steps -- they build on each other 
 
 ## Step 1: What Is DataWizard
 
-Before diving into setup, give the user a brief picture of what they're installing and how the pieces fit together:
+Before diving into setup, give the user a clear picture of what they've installed and how everything fits together. Read and follow the `dw-intro` skill (`Seed/Skills/dw-intro/SKILL.md`), presenting sections 1 through 4 (What DataWizard Actually Is, The Pieces, How It Works Day to Day, What Skills Are Available). The dw-intro skill handles tone, depth, and content -- do not substitute your own explanation or abbreviate it.
 
-> "Before we dive into setup, here's what we're going to install:
->
-> **The Vault** -- your Obsidian vault is where everything lives. Notes, transcripts, research, project docs -- all markdown files on your computer, not in the cloud.
->
-> **The DataWizard Seed** -- the folder you just installed (_DataWizard/Seed/). It contains protocols, skills, and guides that teach Claude how to operate in your vault. Think of it as the instruction manual that makes Claude a vault-aware assistant instead of a generic chatbot.
->
-> **The MCP Connection** -- the bridge between Claude and your vault. It lets Claude read, write, search, and organize your notes directly from a conversation.
->
-> Together: you talk to Claude, Claude reads the Seed to know what to do, and uses MCP to do it in your vault. That's the whole system."
+The dw-intro skill has its own tone guidance (plain language, no jargon). Present it before the Nerd Calibration -- it gives the user context they need to understand why the calibration questions matter. The calibration (Step 2) then sets the language level for the rest of the install wizard (Steps 3-8).
+
+After the dw-intro presentation, check in with the user before proceeding to Step 2.
 
 ## Step 2: Nerd Calibration
 
