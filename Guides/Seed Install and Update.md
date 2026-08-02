@@ -2,7 +2,7 @@
 title: Seed Install and Update
 type: guide
 created: '2026-06-11'
-updated: '2026-06-18'
+updated: '2026-08-01'
 operator: Andrew
 audience: Claude instances helping DataWizard users
 purpose: >-
@@ -11,10 +11,21 @@ purpose: >-
 edit_log:
   - DW-S168 2026-06-11
   - DW-S189 2026-06-18
+  - "DW-S227 2026-08-01 - Jay FR batch item b: zip-as-canon distribution note;
+    Windows update_seed.ps1 manual-update instructions + Task Scheduler
+    auto-sync section"
+  - "DW-S227 2026-08-01 - Jay FR batch item d: announcement norm added to
+    Upstream Operator Note; note de-personalized (maintainer name removed)"
 ---
 # Seed Install and Update
 
 *For Claude instances helping DataWizard users install or update their Seed. Covers fresh install, manual updates, and automated sync setup.*
+
+## Distribution model: zip is canonical
+
+The **zip download is the canonical install and update path for every operator, on every platform.** All install/update commands and both update scripts (`update_seed.sh`, `update_seed.ps1`) pull the GitHub zip, not a git clone.
+
+Git clones of the Seed are for **contributors only**. The Seed's history can be rewritten (for example, to purge an accidentally committed secret), which breaks a downstream clone's next `git pull` with an unrelated-histories error -- while the zip is unaffected. So: **operator path = zip** (the scripts below), **contributor path = git clone** (only if you intend to push changes back upstream).
 
 ---
 
@@ -78,7 +89,13 @@ The script auto-detects the vault path if run from within the Seed folder. It co
 
 If `update_seed.sh` doesn't exist (older install), use the curl command from the Fresh Install section above -- it handles both fresh installs and updates.
 
-For Windows, use the PowerShell command from the Fresh Install section.
+On Windows, use the PowerShell twin `update_seed.ps1` (same version-compare, sync-log, and PI-change behavior, same exit codes):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "C:\path\to\vault\_DataWizard\Seed\update_seed.ps1"
+```
+
+Like the bash script, it auto-detects the vault root when run from inside the Seed folder, and only downloads when a newer version is available. If `update_seed.ps1` doesn't exist (older install), use the PowerShell command from the Fresh Install section -- it handles both fresh installs and updates.
 
 ---
 
@@ -163,9 +180,41 @@ For users who don't run `datawizard-sync.sh`, set up a standalone daily sync.
 
 The Seed will now sync daily at 6am and on login.
 
-### Windows
+### Windows (Task Scheduler)
 
-Automated sync is not yet available for Windows. Use the manual PowerShell update above when prompted during orientation.
+Windows uses Task Scheduler in place of launchd. This mirrors the Mac Path B (Seed-only daily sync) using `update_seed.ps1`.
+
+1. Test the script manually first:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File "C:\path\to\vault\_DataWizard\Seed\update_seed.ps1"
+   ```
+   It should print "Already current..." or "Seed updated successfully...". Check for errors.
+
+2. Register a scheduled task that runs it daily at 6am and at logon (edit the vault path first). Ask the user to run this once in PowerShell:
+   ```powershell
+   $vault  = "C:\path\to\vault"
+   $script = Join-Path $vault "_DataWizard\Seed\update_seed.ps1"
+   $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$script`""
+   $triggers = @(
+       (New-ScheduledTaskTrigger -Daily -At 6am),
+       (New-ScheduledTaskTrigger -AtLogOn)
+   )
+   Register-ScheduledTask -TaskName "DataWizard Seed Update" -Action $action -Trigger $triggers -Description "Daily DataWizard Seed sync from GitHub"
+   ```
+
+3. Verify the task is registered:
+   ```powershell
+   Get-ScheduledTask -TaskName "DataWizard Seed Update"
+   ```
+
+4. (Optional) Run it once on demand to confirm it works end to end:
+   ```powershell
+   Start-ScheduledTask -TaskName "DataWizard Seed Update"
+   ```
+
+The Seed will now sync daily and at logon. Results are logged to `_DataWizard\Seed Sync Log.md`, the same log the Mac path writes.
+
+> Note: this Windows recipe has not yet been validated on a live Windows machine -- confirm the first run against the Seed Sync Log before relying on the schedule.
 
 ---
 
@@ -187,4 +236,6 @@ While verifying, check whether the human's Project Instructions version matches.
 
 ## Upstream Operator Note
 
-The Seed maintainer (Andrew) does NOT run auto-sync. His Seed is the upstream source -- running `update_seed.sh` would overwrite local edits with the last push to GitHub. This guide is for downstream operators only.
+The Seed maintainer (whoever publishes the Seed to GitHub) does NOT run auto-sync. Their local Seed is the upstream source -- running `update_seed.sh` / `update_seed.ps1` would overwrite local edits with the last push to GitHub. This guide's install/update automation is for downstream operators only.
+
+**Announcement norm.** After each Seed push, the maintainer posts a one-line announcement to the operator/team channel: the new `seed:` / `project_instructions:` versions and whether operators must re-paste Project Instructions. This is the push-side counterpart to the local-only version check instances run at orientation -- without it, operators have no signal that a new Seed shipped (both the zip and npx caches update silently).

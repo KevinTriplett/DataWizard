@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-07-25'
+updated: '2026-08-01'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -14,10 +14,14 @@ edit_log:
   - RG-S4 2026-07-25 - planted the update_frontmatter merge:true array-wipe
     failure mode; sandbox mount-path correction to RW S53; cross-mount mv
     duplicate hazard
+  - "DW-S227 2026-08-01 - Jay FR batch item a: which-server header,
+    version-pinning section, search_notes positive note, move_note EISDIR entry"
 ---
 # MCP Reliability and Write Verification
 
-> Guide for Claude instances using the Obsidian MCP (Local REST API) to write vault content. Covers known failure modes, verification protocol, and concurrency practices.
+> Guide for Claude instances using the Obsidian MCP to write vault content. Covers known failure modes, verification protocol, and concurrency practices.
+>
+> **Which server this describes.** The failure modes below were observed with `@bitbonsai/mcpvault` as the Obsidian MCP server. They are not specific to the Local REST API built-in MCP, which behaves differently. If you run a different Obsidian MCP server, expect a different failure profile -- treat these gotchas as calibrated to mcpvault unless noted otherwise, and pin a known-good version (see Version Pinning and npx Caching below).
 >
 > Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
 
@@ -44,6 +48,17 @@ awk '/^edit_log:/{f=1;next}/^[a-z_]+:/{f=0}f&&/^  - /{c++}END{print c+0}' "file.
 ```
 
 A count of 1 where there should be many means the array was clobbered -- restore from your pre-write read. Note that shell files legitimately carry no `edit_log` (they are exempt per [[YAML Schema]]), so 0 on a `0.2 Session Log` shell is correct, not damage. Grounding: RG S4 (2026-07-25) wiped 21 entries from `0.2 Session Log - ReWoven` and 9 from `0.3 Decision Log - ReWoven` this way. Both were recoverable **only because the full arrays happened to still be in the session's context** from reads minutes earlier -- with a fresh context, or a compaction in between, the history would have been unrecoverable short of a backup. Treat a bare array stamp as a destructive operation.
+
+## Version Pinning and npx Caching
+
+If you run mcpvault (or any MCP server) via `npx`, note that **npx caches server versions indefinitely** -- a config that names `@bitbonsai/mcpvault` with no version can silently keep running a months-old build long after fixes ship. Several 0.12.x releases carry reliability-relevant fixes (patch_note `$`-pattern corruption fixed in 0.12.2; YAML parser swapped to the `yaml` package in 0.12.1; `.trash/` exclusion in 0.12.3), so an unpinned old build can reintroduce bugs this guide assumes are gone.
+
+Rules:
+
+- **Pin the version** in the MCP config (`@bitbonsai/mcpvault@0.12.5` or newer), never a bare package name.
+- **Verify what is actually running** rather than trusting the config -- npx may be serving a cached build. If reliability regressions appear, clear the npx cache and reinstall the pinned version before diagnosing anything else.
+- **Record the MCP server and version** in session-log frontmatter alongside `seed_version` when it matters -- it makes a stale MCP visible the way `seed_version` makes a stale Seed visible.
+- Note: mcpvault's `--read-only` flag is documented but **not implemented** (upstream issue #112) -- do not rely on it to protect a vault.
 
 ## What Triggers These Issues
 
@@ -133,9 +148,13 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 
 **`move_note` does NOT auto-update wikilinks.** When you rename or relocate a note via `move_note`, Obsidian's MCP does not update wikilinks in other files that reference the moved note. After any rename or move, you must manually search the vault for references to the old path/name and patch them. Search vault-wide, not just within the current project -- wikilinks without paths can resolve across projects. (Source: MMM S08)
 
+**`move_note` can throw `EISDIR` and wedge the session (mcpvault).** A `move_note` call can fail with an `EISDIR` ("illegal operation on a directory") error; once it does, the session sometimes degrades -- subsequent MCP calls hang or fail until the server/session is restarted. This has been reproduced independently multiple times and is a likely cause of mid-session wedges that get misattributed to other causes (e.g. malformed frontmatter). No mcpvault release has a per-call timeout to bound it (an upstream feature request). Fallbacks, in order: (1) pin >= 0.12.5 first, to rule out already-fixed bugs; (2) do not retry more than once -- a wedged MCP will not clear by hammering it; (3) do the move another way -- `move_note` from a fresh session, a Terminal `mv` (then fix wikilinks by hand, since move does not update them), or directly in Obsidian; (4) if wedged, restart the MCP server/session.
+
 **Short-name embeds are more resilient than full-path embeds.** `![[4.0 The Ecosystem]]` is safer than `![[_Metamorphic Media/Metamorphic Media Shared/Metamorphic Media - Vision Document/4.0 The Ecosystem]]`. When content is reorganized, full-path embeds break silently. Worse, Obsidian may resolve a broken full-path embed to a same-named file in a different project -- the MMM Vision shell was embedding Flow Funding's `4.0 The Ecosystem` instead of its own because the full path had gone stale. Short-name embeds resolve by filename proximity, which is more resilient to reorganization. Use short-name embeds unless disambiguation is genuinely needed (multiple files with the same name across the vault). (Source: MMM S08)
 
 **`search_notes` can false-negative on exact titles.** A search for an exact note title can return content matches in other files while missing the note itself, even when the file exists and `list_directory` shows it. During an MMM link audit, searching "Foraging in High-Dimensional Data @ DISI" returned files that *mention* the phrase but not `_Clippings/Foraging in High-Dimensional Data @ DISI 2025.md` itself -- leading to a false "broken link" finding that was only caught by a later `list_directory` on `_Clippings/`. Rule: before reporting a wikilink as broken or a file as missing, verify with `list_directory` on the expected folder (or a filesystem `Glob`), not search alone. Search confirms presence; it cannot confirm absence. (Source: MMM S12)
+
+**Vault-wide `search_notes` is fine to use.** Scoping every search to a single folder out of caution is unnecessary -- there is no reliability reason to avoid vault-wide search, and it works reliably across the whole vault. Use it freely for discovery. The one real caveat is the exact-title false-negative directly above: search confirms presence, never absence -- a "no results" is not proof a note or link is missing; confirm absence with `list_directory` / `Glob`.
 
 **Sandbox bash cannot delete files on the vault FUSE mount.** From the Cowork sandbox, `rm`/unlink fails with "Operation not permitted" on the Regen Vault (a FUSE mount -- `.fuse_hidden*` files are the tell), though `touch`, create, `mv`/rename, and truncate-write all work. To archive or relocate vault files, use `obsidian:move_note` (it runs with Obsidian's full filesystem access), not bash `cp`+`rm` (which aborts at the first delete). When stamping an archive banner on a file with YAML frontmatter, insert it AFTER the closing `---` (e.g. `patch_note` in front of the first body line) -- prepending breaks the frontmatter. (Source: DW S182)
 

@@ -1,8 +1,12 @@
 ---
 created: 2026-04-24
-updated: 2026-04-24
+updated: 2026-08-01
 type: guide
 scope: seed
+edit_log:
+  - "DW-S227 2026-08-01 - Jay FR batch item b: scoped Windows platform note
+    (Seed updates via update_seed.ps1; full DW Save PowerShell port flagged as
+    future work)"
 ---
 
 # DataWizard Sync Setup Guide
@@ -10,6 +14,17 @@ scope: seed
 > **This is the Multi-Project setup for DW Save.** For an overview of DW Save (what it is, Single vs Multi-Project, backup scheduling guidance), see Git Guide Section 5.5. This guide covers the Multi-Project path only -- use it when your vault contains multiple separate git repos that all need to sync with one keystroke.
 
 This guide walks you through setting up `datawizard-sync.sh` -- the script that syncs your shared git repos via git. It replaces Obsidian Relay with direct git sync through GitHub. "Shared repos" means any repo inside your vault that pushes to GitHub -- collaborative projects (for example, a shared book or a team knowledge base) and the DW Seed itself.
+
+## Platform note: this guide is macOS
+
+`datawizard-sync.sh` is a bash script wired to macOS-specific pieces (launchd for scheduling, `osascript` for notifications, the Obsidian Shell commands hotkey). It is the multi-repo **DW Save** git flow, and it is currently Mac-only.
+
+**On Windows:**
+
+- **Seed updates** have a dedicated cross-platform path -- use `update_seed.ps1` (see the `Seed Install and Update` guide, Manual Update and Task Scheduler sections). Because the **zip is the canonical Seed distribution** for every platform, keeping the Seed current on Windows needs nothing from this guide.
+- **Full DW Save (multi-repo git stage/commit/pull/push)** does not yet have a Windows equivalent. A PowerShell port of `datawizard-sync.sh` (Task Scheduler in place of launchd, toast notifications in place of `osascript`) is future work. Until then, Windows operators on shared git repos can use the **Obsidian Git** community plugin for per-repo auto-sync (same plugin path described in "Non-DW Collaborators" below).
+
+The rest of this guide assumes macOS.
 
 ## What It Does
 
