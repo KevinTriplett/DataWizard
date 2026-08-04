@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-07-09'
+updated: '2026-08-04'
 operator: Andrew
 priority: high
 maturity: working
@@ -16,6 +16,8 @@ edit_log:
   - "DW-S206 2026-06-28: codified the bang-prefix filename retirement"
   - "DW-S218 2026-07-09: added the Tracking Model section (D108 - one canonical
     surface per fact class)"
+  - "DW-S232 2026-08-04: citation section restructured block-first (D112);
+    path-qualification + fetch-before-cite + convention-flip sweep rule added"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -146,38 +148,35 @@ For the full cross-platform character map (forbidden characters, replacements, s
 
 ## Citation format
 
-**Rule:** cite with a trailing parenthetical wikilink whose anchor deep-links to a `##` heading (or a `^block-id`) in the source:
-
-```
-([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]])
-```
-
-With speaker attribution:
-
-```
-([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]] — Speaker)
-```
-
-No-header fallback (cite the note title only):
-
-```
-([[NoteTitle|YYYY-MM-DD — Note Name]])
-```
-
-Rules: citations go at the **end** of a statement; one per claim is usually enough; ISO dates; the `#anchor` must exactly match a heading in the source (this is why transcripts are segmented before harvesting).
-
-**Source tags (optional):** for documents that cite many sources repeatedly, register short uppercase tags (`[MAR3]`, `[SP]`) in the project's source-reference doc and use them inline. Tags supplement wikilink citations, they don't replace them. Adopt only when full wikilinks become unwieldy.
-
-**Block-ID anchors (standard).** Section (`##`) anchors are the default granularity. When a citation must point at a *specific paragraph or transcript turn* - the breadcrumb from a synthesis or harvest claim back to its exact source - that block gets an Obsidian block ID and the citation targets it:
+**Rule:** cite with a trailing parenthetical wikilink whose anchor deep-links into the source. For all new material the **default granularity is the block** - `^bN` for a document paragraph, `^tN` for a transcript turn - so a citation points at the specific paragraph or turn that backs the claim, not the whole section:
 
 ```
 ([[SourceFileName#^b7|§]])        document block (glyph display)
 ([[SourceFileName#^t15|@22:15]])  transcript turn (timestamp display)
 ```
 
-Conventions: `^bN` for document blocks, `^tN` for transcript turns. The visible label is a `§` glyph for blocks and the `@mm:ss` timestamp for transcript turns; multiple blocks in one bullet repeat the glyph, each its own link (`(§, §)`). Blocks are stamped **on cite, not in bulk** - during enrichment or harvest, only where something actually references them - so sources accumulate IDs only where they have been cited, and header-less prose (bold dividers, no `##`) goes straight to block-level. Assign the next unused integer per file; never renumber, and never re-stamp a block that already has an ID (re-stamping breaks live citations - S173). IDs are sparse, so `^b9` is a stable handle, not "the 9th block." Block IDs are hidden in Obsidian reading mode and are the human breadcrumb layer; where a RAG index exists a block ID aligns with its chunk coordinate, but the index computes full coordinates independently. Whole-section synthesis uses the section-anchor form. Full spec: [[Citation Mechanism - Block-Level Provenance]].
+Block-default changes *which anchor you reach for*, not *when you stamp*: stamping stays **on cite, sparse, never in bulk** - a block gets its ID only when something actually cites it, never a pre-stamp pass (S173). Assign the next unused integer per file; never renumber, and never re-stamp a block that already has an ID. IDs are sparse, so `^b9` is a stable handle, not "the 9th block." The visible label is a `§` glyph for document blocks and an `@mm:ss` timestamp for transcript turns (interim-adopted; where a turn has no timestamped header, fall back to `§`); multiple blocks in one bullet repeat the glyph, each its own link (`(§, §)`). Block IDs are hidden in Obsidian reading mode and are the human breadcrumb layer; where a RAG index exists a block ID aligns with its chunk coordinate, but the index computes full coordinates independently.
 
-**Example:** `regenerative finance shifts the unit of account ([[2026-03-04 Strategy Call#Unit of Account|2026-03-04 — Unit of Account]] — Jordan).`
+**Scope.** The block-default governs new material citing an *in-vault source at claim granularity* - companion bullets and synthesis claims. It does not govern whole-document backlinks (`source:` YAML), `harvested_into:` routing, Message Log citations, external URLs, or citations to a source the instance cannot stamp (read-only mounts, PDFs, other vaults) - those keep their own forms.
+
+**Section-anchor fallback.** A `#Section` anchor is the named fallback, for exactly two cases: (1) the claim genuinely synthesizes a whole section (a legitimate whole-section citation, not false precision), or (2) the source is not block-addressable at cite time (an unsegmented transcript, or a source out of stamping reach). Whole-section companion synthesis uses the `§` label; harvest destinations keep their date-and-section label:
+
+```
+([[NoteTitle#Section Header|§]])                                    whole-section companion synthesis
+([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]])             harvest destination
+([[NoteTitle#Section Header|YYYY-MM-DD — Section Name]] — Speaker)   harvest destination with speaker
+([[NoteTitle|YYYY-MM-DD — Note Name]])                              no-header fallback (note title only)
+```
+
+Companions are block-default; **harvest destinations keep section-default with block/turn-when-specific** (their label-format precision is a separate open question). This section is the canonical statement of why the two regimes differ - skills point here rather than restating it.
+
+Rules: citations go at the **end** of a statement; one per claim is usually enough; ISO dates; a `#anchor` must exactly match a heading in the source (this is why transcripts are segmented before harvesting). **Cite only what you have read** - a citation asserts the cited block was actually read, not recalled. **Colliding basenames:** when two files share a basename, path-qualify the link so Obsidian resolves deterministically - `([[Folder/Name#^b7|§]])`.
+
+**Source tags (optional):** for documents that cite many sources repeatedly, register short uppercase tags (`[MAR3]`, `[SP]`) in the project's source-reference doc and use them inline. Tags supplement wikilink citations, they don't replace them. Adopt only when full wikilinks become unwieldy.
+
+Full spec: [[Citation Mechanism - Block-Level Provenance]].
+
+**Example:** `the unit of account shifts from currency to contribution ([[2026-03-04 Strategy Call#Unit of Account|§]]).`
 
 ---
 
@@ -307,6 +306,7 @@ Sub-rules:
 - **Bulk vault edits:** for batch YAML or filename changes, use MCP tools (`obsidian:update_frontmatter`, `obsidian:move_note`) directly rather than Obsidian plugins. Full rationale: Decision Log **D44**.
 - **Check `harvest_status` before reading a source:** before harvesting or processing a source file, read its `harvest_status` (and related provenance YAML) first, so already-processed material isn't re-harvested. A cheap guard against duplicate work in the pipeline.
 - **Git push before batch ops:** before running any script that bulk-moves or modifies vault files, commit and push first. `git checkout .` is then the undo if a batch run goes wrong.
+- **Sweep on a convention flip:** when a convention or default here changes, grep the Seed and project docs for the *old* rule's signature phrases and reconcile each hit - convert it to a pointer, fix the stale value, or consciously retain it (retention is the last resort, and record the retained ones). Patching only the sections you remember misses drift. (S225 Build 3.)
 
 ---
 

@@ -7,7 +7,7 @@ description: >-
   pending, or hand-highlighted documents. NOT for transcripts - use
   transcript-harvest instead.
 type: skill
-updated: '2026-06-25'
+updated: '2026-08-04'
 version: '0.5'
 edit_log:
   - "MMM meta-learning plant 2026-06-09: added Step 3 (triage before fetching),
@@ -15,6 +15,8 @@ edit_log:
   - "DW-S182 2026-06-13: repointed See Also to post-demolition homes (D94)"
   - "DW-S202 2026-06-25: added Block-Level Citations section (stamp-on-cite,
     ^bN/§) pointing at block-stamper + Conventions Registry"
+  - "DW-S232 2026-08-04: added companion-vs-harvest default-granularity pointer
+    (D112)"
 ---
 
 # Document Harvest Skill
@@ -58,6 +60,8 @@ Section anchors (the `## Section` citations in Step 5) are the default. When a h
 - Whole-section synthesis keeps the section-anchor form from Step 5.
 
 Mechanic: block-stamper skill. Full format canon: [[Conventions Registry]].
+
+Harvest destinations keep section anchors as their default *by design* - this differs from companions, which are block-default (D112, S232). See the Conventions Registry citation section for why the two regimes differ; it is the canonical statement, not a contradiction to resolve.
 
 ## Common Mistakes
 

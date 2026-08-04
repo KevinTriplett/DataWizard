@@ -6,7 +6,7 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-06-25'
+updated: '2026-08-04'
 version: '0.9'
 edit_log:
   - DW-S158 2026-06-08
@@ -16,6 +16,8 @@ edit_log:
     lexicon criteria); repointed See Also to post-demolition homes"
   - "DW-S202 2026-06-25: added Block-Level Citations section (stamp-on-cite,
     ^tN/@mm:ss) pointing at block-stamper + Conventions Registry"
+  - "DW-S232 2026-08-04: added companion-vs-harvest default-granularity pointer
+    (D112)"
 ---
 
 # Transcript Harvest Skill
@@ -99,6 +101,8 @@ Section anchors (the `## Section Header` citations in Step 7) are the default. W
 - Whole-section synthesis keeps the section-anchor form from Step 7.
 
 Mechanic: block-stamper skill. Full format canon: [[Conventions Registry]].
+
+Harvest destinations keep section anchors as their default *by design* - this differs from companions, which are block-default (D112, S232). See the Conventions Registry citation section for why the two regimes differ; it is the canonical statement, not a contradiction to resolve.
 
 ## Common Mistakes
 
