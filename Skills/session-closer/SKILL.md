@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-06-29'
-version: '4.2'
+updated: '2026-08-04'
+version: '4.2.1'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -24,6 +24,11 @@ edit_log:
     (verify-after-claim)"
   - "DW-S211 2026-06-29 - v4.2: Active Threads ledger maintenance (D105);
     in-place + entry pointer, legacy in-entry roster kept as fallback"
+  - "DW-S235 2026-08-04 - v4.2.1: Step 2.6 no-ledger fallback made explicit and
+    mandatory (mode-selector line + REQUIRED lead-in; field failure in a
+    multi-operator project)"
+  - "DW-S235 2026-08-04 - v4.2.1 (cont.): Step 3.12 re-flag merge rule (flag_for
+    is a shared unread-queue; never overwrite pending state)"
 ---
 
 # Session Closer Skill
@@ -116,6 +121,8 @@ Before presenting the draft, verify all required frontmatter fields are present.
 
 ### Step 2.6: Active Threads ledger
 
+Every close maintains the roster of open parallel arcs somewhere. There are exactly two modes, and dropping the roster is never an option: **(a) the project has a ledger** -- maintain it in place, below; **(b) no ledger exists** -- you MUST write the legacy in-entry roster (further below). Detecting that no ledger exists selects mode (b); it does not discharge the roster obligation.
+
 If the project maintains an **Active Threads ledger** -- a vantage-independent roster of open parallel arcs kept as its own file (DataWizard: `{home}/_Sections - {Project}/Active Threads - {Project}.md`, embedded in the `0.5` action-items shell) -- maintain it **in place**. Do not regenerate it from scratch, and do not write the roster into the session-log entry. Re-read the ledger, then for each arc:
 
 - **Touched this session:** patch its block -- update `status:`, set `last:` to this session, refresh `next:`, append this session to `history:`.
@@ -125,7 +132,7 @@ If the project maintains an **Active Threads ledger** -- a vantage-independent r
 
 Patch in place and verify each change landed (Working Rule 5). The ledger lists **all** open arcs regardless of this session's focus -- do **not** deduplicate it against "What's next" (that vantage-dependence is the carry-forward flicker the ledger fixes; D105). In the session-log entry, the roster is replaced by a one-line pointer (see Output Format).
 
-**Legacy in-entry roster (projects without a ledger).** If the project has no Active Threads ledger, fall back to the in-entry roster maintained inside the session-log entry, described below.
+**Legacy in-entry roster (projects without a ledger) -- REQUIRED, not optional.** If the project has no Active Threads ledger, you MUST maintain the in-entry roster inside the session-log entry, described below. (Field failure, 2026-07, multi-operator project: three consecutive closes correctly detected the missing ledger, then dropped the roster entirely -- leaving that operator's open arcs invisible to the rest of the team.)
 
 Read the previous session's "Active quest threads" section (if it exists). For each thread:
 - If work was done on it this session, update its status and remaining work
@@ -304,6 +311,8 @@ For each file the user selects:
 2. Add `flag_by: FirstName` (the operator's first name)
 3. Ask for a one-line `flag_note`, or suggest a default based on the file title/context
 4. Add `flag_for:` as a YAML list of all other team operators (e.g. if Andrew flags it: `flag_for: [Kaliya, Jay, Kevin]`). The user can adjust the list if it's only relevant to specific people.
+
+**Re-flagging a file that already carries an unresolved flag: merge, never overwrite.** Union the existing `flag_for` list with the new recipients (preserving names who haven't dismissed yet), keep or combine the `flag_note` so both notices survive, and update `flag`/`flag_by` to the newer flagging. `flag_for` is a shared unread-queue -- overwriting it silently erases other operators' pending notifications. (Field catch, 2026-08: a re-flag would have erased two operators' unread state on a Decision Log flag; the closing session merged instead.)
 
 **On ungraceful session close** (context exhausted before the user can confirm): auto-flag any `priority: high` files created this session using `flag_by: "FirstName (auto)"` and `flag_for:` listing all other team operators. The human can review and remove auto-flags in a subsequent session.
 

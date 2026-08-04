@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-01'
+updated: '2026-08-04'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -16,6 +16,8 @@ edit_log:
     duplicate hazard
   - "DW-S227 2026-08-01 - Jay FR batch item a: which-server header,
     version-pinning section, search_notes positive note, move_note EISDIR entry"
+  - DW-S235 2026-08-04 - transport-502 verify-before-retry section
+    (must-have-changed-field verification rule)
 ---
 # MCP Reliability and Write Verification
 
@@ -48,6 +50,16 @@ awk '/^edit_log:/{f=1;next}/^[a-z_]+:/{f=0}f&&/^  - /{c++}END{print c+0}' "file.
 ```
 
 A count of 1 where there should be many means the array was clobbered -- restore from your pre-write read. Note that shell files legitimately carry no `edit_log` (they are exempt per [[YAML Schema]]), so 0 on a `0.2 Session Log` shell is correct, not damage. Grounding: RG S4 (2026-07-25) wiped 21 entries from `0.2 Session Log - ReWoven` and 9 from `0.3 Decision Log - ReWoven` this way. Both were recoverable **only because the full arrays happened to still be in the session's context** from reads minutes earlier -- with a fresh context, or a compaction in between, the history would have been unrecoverable short of a backup. Treat a bare array stamp as a destructive operation.
+
+## Transport 502s: Verify Before Retry, Against a Must-Have-Changed Field
+
+When the MCP runs across a remote bridge (e.g. a cloud Cowork session proxying to a desktop MCP server), write calls can fail with an HTTP 502 from the bridge transport rather than from the MCP server itself. The 502 masks either outcome: the write may or may not have landed. Observed 4 times in one day across two projects (2026-08), affecting `write_note`, `patch_note`, and `update_frontmatter`; in all four cases verification showed the write had NOT landed and a single retry succeeded -- but a blind retry of a `patch_note` that HAD landed would duplicate content.
+
+Rules:
+
+- **Never retry a 502'd write blind.** Verify first (filesystem tools preferred, per the Verification Protocol above), then retry once at most.
+- **Verify against a field that MUST have changed** -- the new `edit_log` entry, the patched string, the new file. Never verify against a field that may already equal the target: `updated:` on a same-day edit is a false-positive check (it already held today's date before the write). This is the observed trap: the obvious field can be the wrong field.
+- A 502 whose error body names the bridge/CDN zone (not the MCP server) indicates the transport layer -- swapping the Obsidian MCP server will not remove these; the verify-before-retry discipline is the durable mitigation.
 
 ## Version Pinning and npx Caching
 

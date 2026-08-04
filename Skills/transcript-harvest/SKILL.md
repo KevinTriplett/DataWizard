@@ -97,7 +97,7 @@ When harvesting from transcripts, watch for a phrase or framing that:
 Section anchors (the `## Section Header` citations in Step 7) are the default. When a harvest claim points at a **specific transcript turn** rather than a whole section, cite the turn directly with a block ID:
 
 - Stamp as you cite: use the block-stamper skill to give that turn an ID (reuse the existing one if present; otherwise the next unused `^tN`), then link to it. Don't pre-stamp the whole transcript -- stamping is the act of citing.
-- Format: `([[TranscriptName#^t15|@22:15]])` -- the visible label is the `@mm:ss` timestamp from the turn's section header.
+- Format: `([[TranscriptName#^t15|@22:15]])` -- the visible label is the **cited turn's own `@mm:ss`** timestamp. Use the `§` glyph as the label only when the turn has no derivable timestamp (an unsegmented or headerless transcript with no per-turn times). (Confirmed S236; supersedes the earlier section-header-derived rule.)
 - Whole-section synthesis keeps the section-anchor form from Step 7.
 
 Mechanic: block-stamper skill. Full format canon: [[Conventions Registry]].
