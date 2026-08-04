@@ -18,6 +18,8 @@ edit_log:
     surface per fact class)"
   - "DW-S232 2026-08-04: citation section restructured block-first (D112);
     path-qualification + fetch-before-cite + convention-flip sweep rule added"
+  - "DW-S232 2026-08-04: Tracking Model sub-rule 'act at commit moment for
+    state, defer decisions for evidence' (insight-capture plant)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -281,6 +283,7 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 Sub-rules:
 
 - **State Boards:** one table per driver doc - step / status / remaining / runtime / last touched. Status is an enum (`not started | in progress | blocked | done`); commentary lives outside the Status cell. Maintained **on advance** (patch the row the moment a step's state changes), **verified** at session close - the same argument that made stamp-on-cite beat bulk-stamping.
+- **Act at the commit moment for state; defer decisions for evidence.** The rule the State Board and stamp-on-cite both instantiate, generalized: state that must stay consistent with reality - display labels, version pins, board state, breadcrumbs, indexes - is updated at the moment it changes; deferring it to a later bulk pass costs in proportion to what accumulates in between. This is *not* "never defer" - *decisions* correctly wait until evidence exists (open questions, dry-run-then-apply, deferred indexing). The tell: if leaving it stale makes a live surface **lie**, it is state - act now; if acting early would commit you to an unvalidated choice, it is a decision - wait. (Named S232.)
 - **Commit-moment rule:** every thread class anchors tracking updates to its own commit moment - normal sessions at close; perpetual threads at the batch/cursor write (they never close).
 - **Orientation follows the pointer:** when the active arc's ledger row points at a State Board, orientation reads the board. Pointer-following is reliable only when a protocol step forces it.
 - **Hand-maintained canonical surfaces get machine drift-checks** - they lack the generated-view protection knowledge surfaces have (lint checks; reconsolidation passes carry the diff until a check exists).

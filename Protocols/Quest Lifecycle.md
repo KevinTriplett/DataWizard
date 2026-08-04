@@ -2,9 +2,12 @@
 title: Quest Lifecycle
 type: protocol
 created: '2026-05-29'
-updated: '2026-05-29'
+updated: '2026-08-04'
 datawizard_protocol_version: '1.7'
 maturity: draft
+edit_log:
+  - 2026-08-04 - added overtaken and needs-review statuses (8-status lifecycle,
+    D113)
 ---
 
 # Quest Lifecycle
@@ -21,6 +24,8 @@ Canonical status values and transitions for quest files across all DW-managed pr
 | `ready-for-debrief` | Work is complete, needs review or close-out before marking done. |
 | `complete` | Reviewed and closed. Kept for record. |
 | `cancelled` | Abandoned. Kept for record, not for action. |
+| `needs-review` | Completion believed but unverified. Confirm done (then debrief or complete) or capture the residual and resume. |
+| `overtaken` | Superseded by events or other work before completion. Terminal. Kept for record; no debrief owed. |
 
 ## Valid Transitions
 
@@ -32,18 +37,27 @@ open --> active --> ready-for-debrief --> complete
             |
             v
           active  (resume)
-            |
-            v
-        cancelled  (from any non-terminal state)
+
+active | paused --> needs-review --> complete  (verified, no debrief owed)
+                        |      \--> ready-for-debrief  (verified, debrief owed)
+                        v
+                      active  (residual found; resume)
+
+cancelled  (from any non-terminal state)
+overtaken  (from any non-terminal state)
 ```
 
 Normal flow: `open` to `active` to `ready-for-debrief` to `complete`.
 
 `paused` is an optional detour from `active`. A paused quest returns to `active` when work resumes.
 
-`cancelled` is reachable from any non-terminal state (`open`, `active`, `paused`, `ready-for-debrief`).
+`needs-review` is entered from `active` or `paused` when completion is believed but unverified (typically surfaced by an audit). It exits to `complete` (or `ready-for-debrief` if a debrief is owed) once verified, or back to `active` if a residual surfaces.
 
-`complete` and `cancelled` are terminal -- no transitions out.
+`cancelled` is reachable from any non-terminal state (`open`, `active`, `paused`, `ready-for-debrief`, `needs-review`).
+
+`overtaken` is likewise reachable from any non-terminal state -- for quests superseded rather than abandoned.
+
+`complete`, `cancelled`, and `overtaken` are terminal -- no transitions out.
 
 ## When to Use Each Status
 
@@ -53,11 +67,15 @@ Normal flow: `open` to `active` to `ready-for-debrief` to `complete`.
 
 **ready-for-debrief:** Use this when the deliverables are done but you want a review gate before closing. This is especially useful for quests with multiple phases or cross-project implications. For simple quests, going directly from `active` to `complete` is acceptable.
 
+**needs-review vs ready-for-debrief:** `ready-for-debrief` means the work is verified done and awaiting its close-out review. `needs-review` means completion is believed but unverified -- typically discovered during a reconsolidation or health audit. The next touch verifies: confirm done (then debrief or `complete`), or capture the residual and resume.
+
+**overtaken vs cancelled:** `cancelled` is abandonment by choice -- the quest stopped being worth doing. `overtaken` is supersession -- events or other work made the quest moot (its goal was achieved another way, or the ground shifted under it). The distinction matters for retrospectives: cancelled quests were misjudged bets; overtaken quests were casualties of a changing plan. Neither owes a debrief.
+
 ## Dashboard Conventions
 
 Standard dashboard views and their filters:
 
-- **Active:** `status == "active"` or `status == "ready-for-debrief"` -- things needing attention now
+- **Active:** `status == "active"`, `status == "ready-for-debrief"`, or `status == "needs-review"` -- things needing attention now
 - **Paused:** `status == "paused"` -- parked work, periodic review
 - **Open:** `status == "open"` -- backlog
 - **All:** no status filter -- full inventory including complete and cancelled
@@ -80,7 +98,7 @@ Quest files must include these fields for dashboard compatibility:
 type: quest
 quest_id: XX-Q-NNN    # project prefix + sequential number
 project: ProjectName
-status: open           # one of the 6 lifecycle values
+status: open           # one of the 8 lifecycle values
 priority: 1            # 1 (highest) to 3 (lowest)
 owner: name
 assigned: YYYY-MM-DD   # date quest was created or assigned
