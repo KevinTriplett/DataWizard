@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+#
+# DataWizard commit guard (pre-commit hook)
+# ------------------------------------------
+# Blocks a commit when the staged changes contain either:
+#   1. unresolved merge-conflict markers (outside fenced code blocks), or
+#   2. Windows-unsafe filenames.
+#
+# It runs on EVERY commit through git's plumbing -- including unattended
+# commits from the Obsidian Git plugin timer and the launchd sync script --
+# so silent auto-sync corruption never lands.
+#
+# Because a blocked auto-commit is otherwise invisible, on a block this hook
+# writes SYNC-BLOCKED.md at the repo root (visible in Obsidian) explaining
+# what happened and how to fix it. The note clears itself on the next good save.
+#
+# Installed per-clone by install-git-hooks.sh (.git/hooks/ is not synced).
+# Bypass a genuine false positive once with:  git commit --no-verify
+#
+# NOTE: the conflict-marker awk grammar below is kept byte-identical to
+# ci/check-conflict-markers.yml -- one grammar, two surfaces. Edit both together.
+
+set -uo pipefail
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+breadcrumb="$repo_root/SYNC-BLOCKED.md"
+
+conflict_hits=""
+filename_hits=""
+
+# ---- Check 1: unresolved conflict markers (skips fenced code blocks) ----
+scan_conflicts() {
+  git show ":$1" 2>/dev/null | awk -v fname="$1" '
+    { sub(/\r$/, ""); s = $0; sub(/^ ? ? ?/, "", s) }
+    s ~ /^```/ || s ~ /^~~~/ { infence = !infence; next }
+    infence { next }
+    s ~ /^<<<<<<</ || s ~ /^=======$/ || s ~ /^>>>>>>>/ || s ~ /^\|\|\|\|\|\|\|/ {
+      print fname ":" FNR ": " $0; hit = 1
+    }
+    END { exit (hit ? 1 : 0) }'
+}
+
+while IFS= read -r -d '' path; do
+  # skip binary blobs (numstat reports "-" for added/removed on binary)
+  if [ "$(git diff --cached --numstat -- "$path" | cut -f1)" = "-" ]; then
+    continue
+  fi
+  if out="$(scan_conflicts "$path")"; then
+    :
+  else
+    conflict_hits="${conflict_hits}${out}"$'\n'
+  fi
+done < <(git diff --cached -z --name-only --diff-filter=ACM)
+
+# ---- Check 2: Windows-unsafe filenames (same rules as check-filenames.yml) ----
+while IFS= read -r -d '' path; do
+  IFS='/' read -ra parts <<< "$path"
+  for comp in "${parts[@]}"; do
+    [ -z "$comp" ] && continue
+    reasons=""
+    case "$comp" in *" ") reasons="trailing space" ;; esac
+    case "$comp" in *.) reasons="${reasons:+$reasons, }trailing dot" ;; esac
+    case "$comp" in
+      *'?'*|*':'*|*'*'*|*'"'*|*'<'*|*'>'*|*'|'*)
+        reasons="${reasons:+$reasons, }reserved character" ;;
+    esac
+    if printf '%s' "$comp" | LC_ALL=C grep -q '[[:cntrl:]]'; then
+      reasons="${reasons:+$reasons, }control character"
+    fi
+    base="${comp%%.*}"
+    shopt -s nocasematch
+    case "$base" in
+      CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])
+        reasons="${reasons:+$reasons, }reserved device name" ;;
+    esac
+    shopt -u nocasematch
+    if [ -n "$reasons" ]; then
+      filename_hits="${filename_hits}${path} (${reasons})"$'\n'
+    fi
+  done
+done < <(git diff --cached -z --name-only --diff-filter=ACM)
+
+# ---- Verdict ----
+if [ -z "$conflict_hits" ] && [ -z "$filename_hits" ]; then
+  rm -f "$breadcrumb" 2>/dev/null || true
+  exit 0
+fi
+
+{
+  echo "# SYNC BLOCKED"
+  echo
+  echo "Your last save was stopped on purpose because a safety check found a"
+  echo "problem. Nothing was lost -- your files are all still here. The save"
+  echo "(commit) just did not go through yet."
+  echo
+  echo "Detected: $(date '+%Y-%m-%d %H:%M')"
+  echo
+  if [ -n "$conflict_hits" ]; then
+    echo "## Unresolved conflict markers"
+    echo
+    echo "These lines look like an unfinished merge. Git leaves markers like"
+    echo '<<<<<<<, =======, and >>>>>>> when two versions disagree:'
+    echo
+    echo '```'
+    printf '%s' "$conflict_hits"
+    echo '```'
+    echo
+    echo "Fix: open each file listed above, delete those marker lines, and keep"
+    echo "the text you actually want."
+    echo
+  fi
+  if [ -n "$filename_hits" ]; then
+    echo "## Windows-unsafe filenames"
+    echo
+    echo "These names would break a teammate's sync on Windows:"
+    echo
+    echo '```'
+    printf '%s' "$filename_hits"
+    echo '```'
+    echo
+    echo 'Fix: rename them. No trailing space or dot, and avoid  ? : * " < > |'
+    echo
+  fi
+  echo "---"
+  echo
+  echo "After fixing, just save again (DW Save / commit-and-sync)."
+  echo "If you are certain this is a false alarm, bypass the check once with:"
+  echo
+  echo '    git commit --no-verify'
+  echo
+  echo "This note disappears automatically once the next save succeeds."
+} > "$breadcrumb"
+
+echo "COMMIT BLOCKED by the DataWizard commit guard." >&2
+[ -n "$conflict_hits" ] && echo "  - unresolved conflict markers found in staged files" >&2
+[ -n "$filename_hits" ] && echo "  - Windows-unsafe filenames found in staged files" >&2
+echo "  Details written to SYNC-BLOCKED.md (open it in Obsidian)." >&2
+echo "  Bypass once (only if you are sure): git commit --no-verify" >&2
+
+exit 1

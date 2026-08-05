@@ -2,12 +2,12 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: '2026-06-22'
+updated: '2026-08-05'
 operator: Andrew
 edit_log:
-  - >-
-    DW-S195 2026-06-22 - created the guides catalog and named the Platform and
+  - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
     Environment Behaviors cluster
+  - DW-S242 2026-08-05 - Git Guide row now notes the commit guard
 ---
 # DataWizard Guides
 
@@ -30,7 +30,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 ### Git and sync
 | Guide | Covers |
 |---|---|
-| **Git Guide** | Git for the vault and DW projects: repo setup, nested vs standalone repos, push workflows, DW Save. Sectioned - see `Git Guide/`. |
+| **Git Guide** | Git for the vault and DW projects: repo setup, nested vs standalone repos, push workflows, DW Save, and the commit guard (conflict-marker + Windows-unsafe-filename pre-commit hook and CI). Sectioned - see `Git Guide/`. |
 | **Seed Install and Update** | Installing the Seed into a vault and updating it via `update_seed.sh`. |
 
 ### Vault structure and content

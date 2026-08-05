@@ -2,7 +2,9 @@
 title: Git Guide
 type: guide
 created: '2026-05-02'
-updated: '2026-05-02'
+updated: '2026-08-05'
+edit_log:
+  - DW-S242 2026-08-05 - added the 10.0 Commit Guards section embed
 ---
 
 # Git Guide
@@ -36,3 +38,5 @@ A complete reference for using git with Obsidian vaults and DataWizard projects.
 ![[8.0 Local Backups]]
 
 ![[9.0 Troubleshooting]]
+
+![[10.0 Commit Guards]]

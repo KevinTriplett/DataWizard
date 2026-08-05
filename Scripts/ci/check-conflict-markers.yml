@@ -1,0 +1,44 @@
+name: Check for conflict markers
+
+# Server-side backstop to the local pre-commit guard: fails the push if any
+# tracked file contains unresolved merge-conflict markers outside a fenced
+# code block. Pairs with check-filenames.yml (Windows-unsafe filename check).
+#
+# NOTE: the awk grammar below is kept byte-identical to the pre-commit hook
+# (Seed/Scripts/hooks/pre-commit) -- one grammar, two surfaces. Edit both together.
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  check-conflict-markers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Scan tracked files for conflict markers
+        shell: bash
+        run: |
+          set -uo pipefail
+          fail=0
+          while IFS= read -r -d '' path; do
+            # skip binary and empty files
+            grep -Iq . "$path" || continue
+            if ! awk -v fname="$path" '
+              { sub(/\r$/, ""); s = $0; sub(/^ ? ? ?/, "", s) }
+              s ~ /^```/ || s ~ /^~~~/ { infence = !infence; next }
+              infence { next }
+              s ~ /^<<<<<<</ || s ~ /^=======$/ || s ~ /^>>>>>>>/ || s ~ /^\|\|\|\|\|\|\|/ {
+                print "::error file=" fname ",line=" FNR "::Unresolved conflict marker: " $0
+                hit = 1
+              }
+              END { exit (hit ? 1 : 0) }' "$path"; then
+              fail=1
+            fi
+          done < <(git -c core.quotePath=false ls-files -z)
+          if [ "$fail" -ne 0 ]; then
+            echo "Found unresolved conflict markers. Remove the <<<<<<< / ======= / >>>>>>> lines and keep the intended text."
+            exit 1
+          fi
+          echo "No conflict markers in tracked files."

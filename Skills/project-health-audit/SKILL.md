@@ -8,15 +8,14 @@ description: >-
 type: skill
 version: '2.0'
 created: '2026-05-23'
-updated: '2026-06-15'
+updated: '2026-08-05'
 operator: Andrew
 edit_log:
-  - >-
-    DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
-    J1-J6, D84/D87/D88/D92/D93 updates, manual fallback appendix
-  - >-
-    DW-S185 2026-06-15 - subagent delegation context note (Handling Large
+  - "DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
+    J1-J6, D84/D87/D88/D92/D93 updates, manual fallback appendix"
+  - DW-S185 2026-06-15 - subagent delegation context note (Handling Large
     Projects)
+  - "DW-S242 2026-08-05 - Manual Fallback: added conflict-marker backstop check"
 ---
 
 # Project Health Audit Skill
@@ -166,6 +165,7 @@ For vaults without Python tooling, hand-run the old mechanical categories, conde
 3. **YAML compliance** — `type:` lowercase and valid; `created:`/`updated:` in YYYY-MM-DD; section files have `parent:` + `edit_log:`; harvest fields use valid values and wikilinks.
 4. **Filename safety** — no `? | * < > " \ :`, tab, NBSP, CR, em-dashes, curly quotes, consecutive spaces, trailing space before extension (see `Seed/Guides/Filename Safety.md`).
 5. **Stale conventions** — `~`-prefix meta-folders, Roman-numeral section headers, `_Archive - ` folder naming (D87: xArchive), missing `- ProjectName` suffixes, shells with inline content.
+6. **Conflict markers** — vault-wide grep for unresolved conflict-marker lines (the `<<<` / `===` / `>>>` triples) at the start of a line, outside fenced code blocks. The commit guard (Git Guide §10) prevents these at source; this is the catch-after-the-fact backstop. Whitelist fenced/example contexts so conflict-resolution tutorials do not re-flag every run.
 
 ## Related
 
