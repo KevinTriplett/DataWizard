@@ -8,8 +8,11 @@ description: >-
   accumulating without a tracking system, or any time you are about to evaluate
   a tool, repo, framework, or external resource.
 type: skill
-updated: '2026-06-28'
-version: '1.4'
+updated: '2026-08-05'
+version: '1.5'
+edit_log:
+  - "DW-S243 2026-08-05 - v1.5: After Fan-Out routing subsection (routing loop
+    for fan-out outputs)"
 ---
 
 # Research Tracking
@@ -105,6 +108,16 @@ link the research note in the Output column.
 Hold all tracking updates until the batch is complete. This prevents
 context-switching and lets you capture batch-level observations.
 Commit all entries to the Evaluated table at once after the batch.
+
+### After Fan-Out -- Route Each Output
+
+When a parallel fan-out (see tools-research, Parallel Fan-Out) produces many
+outputs at once, each usually needs to land on more than the tracking index.
+A repeatable routing loop for outside-project research, validated across
+several passes: write the research note, add the tracker pointer (the RTI
+row), index it in the relevant MOC, add a harvest-log row if it fed a
+harvest, and refresh any stale stub the item updates. Run the same loop per
+output so nothing lands in only one place.
 
 ### Where Patterns Go
 

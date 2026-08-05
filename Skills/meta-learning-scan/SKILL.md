@@ -10,11 +10,13 @@ description: >-
   planting. Also use when the user wants to set up automated learning extraction
   for any DW project.
 type: skill
-version: '1.2'
+version: '1.3'
 created: '2026-06-01'
-updated: '2026-06-15'
+updated: '2026-08-05'
 edit_log:
   - DW-S185 2026-06-15 - platform/environment routing hint (Step 4 Deferred)
+  - "DW-S243 2026-08-05 - v1.3: Step 3 header-variant note (### Findings treated
+    as learnings-equivalent)"
 ---
 
 # Meta-Learning Scan
@@ -90,6 +92,8 @@ Parse the session number from `last_meta_learning_review`. If the field is missi
    - The session number for provenance
 
 **Inline session logs:** Read the full session log file once. For each session entry in the scan range, locate its `**Learnings:**` or `### Learnings` block (formatting varies across projects -- some use bold headers, some use `###`). Learnings in inline logs are often formatted as bullet lists with bold category tags rather than the `- **tag**: text` pattern used in section files. Handle both formats.
+
+**Header variant.** Some operators write the section as `### Findings` (with inline `finding:` / `pattern-discovered:` tags) instead of `### Learnings`. Treat `### Findings` as learnings-equivalent -- scan it the same way, and check for both headers before concluding a session has none. A session that used the variant must not be reported as "no learnings." (Source: Weave, 2026-08)
 
 **Context efficiency:** Read only what's needed. For sectioned logs, read just the Learnings section rather than the full entry. For inline logs, you'll read the whole file once, which is fine -- inline logs are typically under 5,000 words. If the file is too large for MCP, fall back to filesystem tools with the absolute vault path.
 

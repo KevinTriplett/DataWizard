@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-04'
+updated: '2026-08-05'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -18,6 +18,12 @@ edit_log:
     version-pinning section, search_notes positive note, move_note EISDIR entry"
   - DW-S235 2026-08-04 - transport-502 verify-before-retry section
     (must-have-changed-field verification rule)
+  - DW-S243 2026-08-05 - planted 11 env-review items (bridge drops/hangs,
+    read-overflow ceiling, in-app-rename drift + file-not-found-is-real,
+    Glob-vs-mount caveat, device_stage_files verify path, mcpvault params, mount
+    rotation + diff bulk-verify, shell-divider + edit_file gotchas, bulk-python
+    frontmatter); absorbed the Rename Wikilink Drift / read_multiple_notes
+    Overflow FR
 ---
 # MCP Reliability and Write Verification
 
@@ -61,6 +67,10 @@ Rules:
 - **Verify against a field that MUST have changed** -- the new `edit_log` entry, the patched string, the new file. Never verify against a field that may already equal the target: `updated:` on a same-day edit is a false-positive check (it already held today's date before the write). This is the observed trap: the obvious field can be the wrong field.
 - A 502 whose error body names the bridge/CDN zone (not the MCP server) indicates the transport layer -- swapping the Obsidian MCP server will not remove these; the verify-before-retry discipline is the durable mitigation.
 
+## Bridge Drops and Hangs (Remote Transport)
+
+Distinct from a 502 on a single write, the remote bridge itself can fail in two ways, both of which take out *all* MCP calls rather than corrupting one: a **tool-registry drop** (calls return "not found" immediately, no hang) and a **multi-minute hang** on a call. Both recover by quitting Claude Desktop from the tray and relaunching. A mid-session registry drop can also recover via `RefreshMcpTools` once the desktop app reconnects, without a full relaunch. Observed ~3x in one session with no partial writes -- verify-after-write held throughout, so a dropped or hung call is an availability problem, not silent corruption. (Source: Weave, 2026-08)
+
 ## Version Pinning and npx Caching
 
 If you run mcpvault (or any MCP server) via `npx`, note that **npx caches server versions indefinitely** -- a config that names `@bitbonsai/mcpvault` with no version can silently keep running a months-old build long after fixes ship. Several 0.12.x releases carry reliability-relevant fixes (patch_note `$`-pattern corruption fixed in 0.12.2; YAML parser swapped to the `yaml` package in 0.12.1; `.trash/` exclusion in 0.12.3), so an unpinned old build can reintroduce bugs this guide assumes are gone.
@@ -72,11 +82,19 @@ Rules:
 - **Record the MCP server and version** in session-log frontmatter alongside `seed_version` when it matters -- it makes a stale MCP visible the way `seed_version` makes a stale Seed visible.
 - Note: mcpvault's `--read-only` flag is documented but **not implemented** (upstream issue #112) -- do not rely on it to protect a vault.
 
+**mcpvault parameter specifics.** `delete_note` requires `confirmPath` identical to `path`. `update_frontmatter` takes its payload under `frontmatter:` (not `updates:`), and `merge: true` preserves fields written by other operators -- useful under concurrency. (Source: Weave, 2026-08)
+
 ## What Triggers These Issues
 
 **Concurrent MCP access** is the confirmed trigger. All observed failures occurred on a day when 6+ Cowork instances were running simultaneously on the same vault, writing to the same project folder. Single-instance sessions have not exhibited these issues.
 
 **Git state interference** can compound the problem. If the vault contains a git repo in an unusual state (stuck rebase, detached HEAD), the MCP reads the filesystem working directory, which may not reflect the expected branch state. Files that are committed but not checked out will be invisible to the MCP.
+
+## Read-Tool Overflow and Batch Ceilings
+
+`read_multiple_notes` on a large batch overflows the tool-result ceiling and dumps the payload to a host-path file the Cowork sandbox cannot read -- so the read effectively returns nothing usable (observed at ~73KB of docs, and again with 5+ medium notes). Keep batches to **2-4 notes per `read_multiple_notes` call**, or fall back to individual `read_note` calls, which stay under the limit.
+
+For a single large note that overflows on its own: parse the saved tool-result JSON by section header / character range, or read it with `filesystem:read_text_file` (a 55KB file read cleanly in one call) and script-parse. A note that reliably overflows on read is also a sectioning candidate (Working Rule 7). (Source: ReWoven S34; Weave, 2026-07/08)
 
 ## Verification Protocol
 
@@ -90,7 +108,9 @@ Use the `Read`, `Glob`, or `Grep` tools to check the file directly on the filesy
 - **For `patch_note`:** Use `Read` on the patched file and confirm the patched text is present.
 - **For `update_frontmatter`:** Use `Read` on the file and confirm the frontmatter field was updated.
 
-If filesystem tools cannot reach the vault (common in Cowork -- the vault path may not be connected), request access via `request_cowork_directory` at the start of the session. This is especially important when running concurrent instances.
+If filesystem tools cannot reach the vault (common in Cowork -- the vault path may not be connected), request access via `request_cowork_directory` at the start of the session. This is especially important when running concurrent instances. Note that `device_stage_files` cannot verify Obsidian-MCP writes when the vault path is not a Cowork-connected folder -- in that layout `obsidian:read_note` (Tier 2) is the verification path for MCP-written content. (Source: Weave, 2026-07)
+
+**Caveat -- Glob is unreliable against the Cowork vault mount.** Directory-prefixed patterns (`folder/*`) return nothing; recursive patterns (`**/name*`) work. Glob has also returned "No files found" for freshly created folders that `list_directory` and bash `ls` both saw. Prefer `list_directory` or a bash `ls` for existence checks against the mount, and treat a Glob miss as inconclusive, not proof of absence. (Source: Weave, 2026-06/07, observed twice)
 
 ### Tier 2: Obsidian MCP Read-Back (Weaker)
 
@@ -160,6 +180,10 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 
 **`move_note` does NOT auto-update wikilinks.** When you rename or relocate a note via `move_note`, Obsidian's MCP does not update wikilinks in other files that reference the moved note. After any rename or move, you must manually search the vault for references to the old path/name and patch them. Search vault-wide, not just within the current project -- wikilinks without paths can resolve across projects. (Source: MMM S08)
 
+**In-app renames and MCP moves drift in opposite directions.** Obsidian's *in-app* rename auto-updates inbound wikilinks across the vault; MCP `move_note` does not. Mixing the two -- an in-app rename plus an MCP move -- and then running a `replaceAll` link cleanup double-suffixes the links (the in-app half already fixed them, the `replaceAll` fixes them again). Rule: after any rename, grep the *current on-disk* link text before a `replaceAll` cleanup, so you only rewrite links that are actually stale. (Source: ReWoven S30; VibeCut S23, independent)
+
+**"File not found" is not always the known glitch -- it can be a real rename.** The reflex to retry through the intermittent read glitch (where `read_note` fails on a path `list_directory` shows) masks the case where a human renamed or moved the note mid-session. Re-list the folder before retrying: a genuine rename shows up under the new name, the glitch shows the file still there. (Source: Weave, 2026-08)
+
 **`move_note` can throw `EISDIR` and wedge the session (mcpvault).** A `move_note` call can fail with an `EISDIR` ("illegal operation on a directory") error; once it does, the session sometimes degrades -- subsequent MCP calls hang or fail until the server/session is restarted. This has been reproduced independently multiple times and is a likely cause of mid-session wedges that get misattributed to other causes (e.g. malformed frontmatter). No mcpvault release has a per-call timeout to bound it (an upstream feature request). Fallbacks, in order: (1) pin >= 0.12.5 first, to rule out already-fixed bugs; (2) do not retry more than once -- a wedged MCP will not clear by hammering it; (3) do the move another way -- `move_note` from a fresh session, a Terminal `mv` (then fix wikilinks by hand, since move does not update them), or directly in Obsidian; (4) if wedged, restart the MCP server/session.
 
 **Short-name embeds are more resilient than full-path embeds.** `![[4.0 The Ecosystem]]` is safer than `![[_Metamorphic Media/Metamorphic Media Shared/Metamorphic Media - Vision Document/4.0 The Ecosystem]]`. When content is reorganized, full-path embeds break silently. Worse, Obsidian may resolve a broken full-path embed to a same-named file in a different project -- the MMM Vision shell was embedding Flow Funding's `4.0 The Ecosystem` instead of its own because the full path had gone stale. Short-name embeds resolve by filename proximity, which is more resilient to reorganization. Use short-name embeds unless disambiguation is genuinely needed (multiple files with the same name across the vault). (Source: MMM S08)
@@ -168,9 +192,9 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 
 **Vault-wide `search_notes` is fine to use.** Scoping every search to a single folder out of caution is unnecessary -- there is no reliability reason to avoid vault-wide search, and it works reliably across the whole vault. Use it freely for discovery. The one real caveat is the exact-title false-negative directly above: search confirms presence, never absence -- a "no results" is not proof a note or link is missing; confirm absence with `list_directory` / `Glob`.
 
-**Sandbox bash cannot delete files on the vault FUSE mount.** From the Cowork sandbox, `rm`/unlink fails with "Operation not permitted" on the Regen Vault (a FUSE mount -- `.fuse_hidden*` files are the tell), though `touch`, create, `mv`/rename, and truncate-write all work. To archive or relocate vault files, use `obsidian:move_note` (it runs with Obsidian's full filesystem access), not bash `cp`+`rm` (which aborts at the first delete). When stamping an archive banner on a file with YAML frontmatter, insert it AFTER the closing `---` (e.g. `patch_note` in front of the first body line) -- prepending breaks the frontmatter. (Source: DW S182)
+**Sandbox bash cannot delete files on the vault FUSE mount.** From the Cowork sandbox, `rm`/unlink fails with "Operation not permitted" on the Regen Vault (a FUSE mount -- `.fuse_hidden*` files are the tell), though `touch`, create, `mv`/rename, and truncate-write all work. To archive or relocate vault files, use `obsidian:move_note` (it runs with Obsidian's full filesystem access), not bash `cp`+`rm` (which aborts at the first delete). When stamping an archive banner on a file with YAML frontmatter, insert it AFTER the closing `---` (e.g. `patch_note` in front of the first body line) -- prepending breaks the frontmatter. (Source: DW S182) Bulk frontmatter edits via a Python script over the mount do work, and beat per-file MCP patches at scale -- the delete restriction still applies, so a script may rewrite in place but not unlink. (Source: Weave S98)
 
-**Sandbox bash CAN reach the vault -- but only at the mount path, not the Mac path.** A correction to a belief recorded in RW S53 ("device_bash cannot see the vault"). The Cowork sandbox does mount the session's connected folders, at `/sessions/<session-id>/mnt/<folder-name>/` -- discover them with `ls mnt/` from the default working directory. Mac absolute paths (`/Users/.../Vaults/Regen Vault/...`) fail with "No such file"; mount-relative paths work. This makes bash genuinely useful for **read-only** verification, which is fast and cheap at scale: `ls | wc -l` for counts, `stat -c %s` for byte-size comparison against a pre-change directory listing, `find -size -1c` for truncation. Writes and deletes remain restricted per the two entries above. (Source: RG S4, correcting RW S53)
+**Sandbox bash CAN reach the vault -- but only at the mount path, not the Mac path.** A correction to a belief recorded in RW S53 ("device_bash cannot see the vault"). The Cowork sandbox does mount the session's connected folders, at `/sessions/<session-id>/mnt/<folder-name>/` -- discover them with `ls mnt/` from the default working directory. Mac absolute paths (`/Users/.../Vaults/Regen Vault/...`) fail with "No such file"; mount-relative paths work. This makes bash genuinely useful for **read-only** verification, which is fast and cheap at scale: `ls | wc -l` for counts, `stat -c %s` for byte-size comparison against a pre-change directory listing, `find -size -1c` for truncation. Writes and deletes remain restricted per the two entries above. (Source: RG S4, correcting RW S53) Mount stability is not guaranteed for a whole session -- the path can rotate or lose permissions mid-session (a path that served `find` earlier later returned Permission denied for `grep`); if a bash check suddenly fails where it worked, re-discover the mount (`ls mnt/`) rather than concluding the file is gone. At scale, `diff -rq` between the mount and a reference copy plus a targeted `grep` verifies a multi-file operation (e.g. a 16-file dedup) without pulling any file into context -- the context-cheapest verification for bulk work. (Source: Weave, 2026-07/08)
 
 **Cross-mount `mv` leaves duplicates, not a failed no-op.** Extends the delete limitation above. Each connected folder is a *separate* mount, so `mv` between two of them (e.g. `_ProjectA/...` to `_ProjectB/...`) is internally copy-then-unlink. The copy succeeds and the unlink fails -- so a chained `mv` of N files aborts partway with the sources still present **and** copies already written at the destination. The failure is not clean: you are left mid-migration with duplicates. Recovery is `obsidian:move_note` with `overwrite: true`, which replaces the stray copy and removes the source in one operation. For any multi-file relocation, skip bash entirely and use `move_note` from the start -- issued in parallel, 20 calls per message block is comfortable. (Source: RG S4)
 
@@ -179,6 +203,10 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **Git working-tree ops fail from the sandbox; run them in Terminal.** Because the sandbox can create but not delete or overwrite files on the vault FUSE mount (above), any git operation that touches the working tree or index - `pull`, `checkout`, `branch`, `commit`, even `git status` when there are uncommitted changes - fails partway and leaves stale lock files it cannot unlink (`.git/index.lock`, `.git/ORIG_HEAD.lock`, `.git/objects/maintenance.lock`), sometimes plus a stray untracked file and harmless `tmp_obj_*` cruft from a fetch. Read-only inspection on a clean tree (`git log`, `git status` with no changes, `git fetch` for inspection) is fine. Run all working-tree git ops via a Terminal command on the user's Mac (Working Rule 15) or via DW Save; if a sandbox attempt already left locks, the recovery command removes the lock files first, then runs the real op. (Source: DW S188, S189)
 
 **`patch_note` does not match inside YAML frontmatter.** `patch_note` operates only on the markdown body, not the frontmatter block. A patch whose `oldString` targets a frontmatter field (e.g. a skill's `description:`, or any `key: value` line above the closing `---`) returns `matchCount: 0` / "String not found" even when the text is visibly present. Use `update_frontmatter` (merge: true) for frontmatter edits; reserve `patch_note` for body content. (Source: DW S198)
+
+**`patch_note` also fails on a shell's `---` divider.** A patch whose `oldString` targets the `---` horizontal rule separating embed sections in a shell file returns "target not found." Use a filesystem Edit with a unique text anchor (include neighboring text), or anchor the patch on adjacent body text rather than the bare divider. (Source: Weave, 2026-07)
+
+**`filesystem:edit_file` can insert text inline when the anchor starts mid-line.** If the match anchor begins partway through a line, the inserted header text lands inline rather than on its own line. Dry-run first and include the preceding text in the anchor so the insertion point is unambiguous. (Source: Weave, 2026-07)
 
 ## Incident Reference
 

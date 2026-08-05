@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-04'
-version: '4.2.1'
+updated: '2026-08-05'
+version: '4.2.2'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -29,6 +29,8 @@ edit_log:
     multi-operator project)"
   - "DW-S235 2026-08-04 - v4.2.1 (cont.): Step 3.12 re-flag merge rule (flag_for
     is a shared unread-queue; never overwrite pending state)"
+  - "DW-S243 2026-08-05 - v4.2.2: Step 3.5 header-variant tolerance note (###
+    Findings learnings-equivalent)"
 ---
 
 # Session Closer Skill
@@ -173,6 +175,8 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 ### Step 3.5: Knowledge transfer check
 
 **Before moving to infrastructure updates, triage each learning from this session.**
+
+> **Header variant.** Some sessions record learnings under a `### Findings` header (with inline `finding:` / `pattern-discovered:` tags) instead of `### Learnings`. Treat it as learnings-equivalent -- triage those items the same way, and downstream meta-learning scans do too. Prefer `### Learnings` for new entries, but don't rewrite an inherited `### Findings` entry just to rename the header.
 
 For each finding, decision, or detailed context that emerged during the session, classify it:
 

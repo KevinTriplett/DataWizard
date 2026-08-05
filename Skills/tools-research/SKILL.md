@@ -8,8 +8,11 @@ description: >-
   of flagged items, or any link or resource that needs investigation. Covers
   both single-target deep dives and batch triage passes.
 type: skill
-updated: '2026-06-15'
-version: '1.2'
+updated: '2026-08-05'
+version: '1.3'
+edit_log:
+  - "DW-S243 2026-08-05 - v1.3: Parallel Fan-Out section (mandatory spot-verify,
+    roster batching, research-before-tiering) + Common Mistakes bullet"
 ---
 
 # Tools Research
@@ -112,6 +115,36 @@ calls and tree-page web fetches return empty in the sandbox; a shallow
 `git clone --depth 1` into the working environment is the reliable way
 to pull a small repo's files for a deep read. (DW S166)
 
+## Parallel Fan-Out (Subagents at Scale)
+
+For research or audit work too large for one context -- a roster of dozens
+of people/orgs, a repo-wide audit across thousands of files -- dispatch
+parallel subagents rather than working serially. Fan-out is powerful but
+has one serious failure mode: **subagents fabricate**. In a repo-wide audit
+at ~4,500-file scale, parallel agents were effective but invented a
+nonexistent assumption ID and wrong pathway names. Treat fan-out output as
+unverified until checked.
+
+**Mandatory spot-verification pass.** After any fan-out, verify a sample of
+each agent's claims against the actual source files before using the
+results. This is not optional -- it is the step that makes fan-out output
+trustworthy. Fabricated specifics (IDs, names, paths) are what to look for;
+they read as confident and correct.
+
+**Roster batching (N > ~10 targets).** For roster research over many people
+or orgs, dispatch agents in batches, each given: (a) the project context,
+(b) an exact profile template to fill, and (c) an instruction to write its
+file(s) directly and return only a short summary -- keeping the
+coordinator's context lean so it can run many agents without overflowing.
+
+**Research before tiering.** Do the per-item research before tiering or
+prioritizing candidates. Priors mis-tier: in one roster pass, two Tier-1
+outreach targets surfaced only through per-person research and would have
+ranked low on priors. Tier from findings, not from the name on the list.
+
+The routing loop that consumes fan-out outputs is documented in the
+research-tracking skill (After Fan-Out -- Route Each Output). (Source: Weave, 2026-08)
+
 ## The Research Loop
 
 ### Phase 1 -- Gather (no opinions yet)
@@ -197,6 +230,9 @@ Even at light depth, record the evaluation. A brief verdict saying
   finding is relevant to a specific system, it belongs in that system's
   design doc. The principle: research findings should live where the
   future work happens, not where the research happened.
+- **Trusting fan-out output unverified.** Subagent claims are provisional
+  until spot-checked against the source files; fabricated IDs, names, and
+  paths read as confident and slip through if you skip the verification pass.
 
 ## See Also
 
