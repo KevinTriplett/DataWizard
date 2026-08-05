@@ -8,6 +8,8 @@ edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
     Environment Behaviors cluster
   - DW-S242 2026-08-05 - Git Guide row now notes the commit guard
+  - DW-S244 2026-08-05 - added the Browser and File System Access Behaviors
+    guide to the Platform cluster
 ---
 # DataWizard Guides
 
@@ -24,6 +26,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Cowork Scheduled Tasks** | Running DW automation as Cowork scheduled tasks: timezone/`fireAt`, one model per run, cron jitter, idempotency and the requirements for reliable unattended runs, runtime-URL limits. |
 | **MCP Reliability and Write Verification** | Obsidian MCP failure modes (ghost writes, phantom/stale reads, frontmatter wipe), the write-verification protocol, concurrency practice, and sandbox/git gotchas. |
 | **Editing the Claude Desktop Config** | Finding and safely editing `claude_desktop_config.json` to add MCP servers or grant folder access; JSON pitfalls and recovery. |
+| **Browser and File System Access Behaviors** | Runtime gotchas for a single-file browser tool that reads/writes local files: File System Access API (Chromium-only, `file://`, IndexedDB handle persistence, read→readwrite upgrade, user-gesture rule, folder-scoped grants), artifact contexts blocking local storage, DOM/CSS gotchas (`hidden` vs class `display`, `color-scheme`), and headless mock-adapter verification. |
 
 ## Other Guides
 
