@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-04'
+updated: '2026-08-05'
 operator: Andrew
 priority: high
 maturity: working
@@ -20,6 +20,8 @@ edit_log:
     path-qualification + fetch-before-cite + convention-flip sweep rule added"
   - "DW-S232 2026-08-04: Tracking Model sub-rule 'act at commit moment for
     state, defer decisions for evidence' (insight-capture plant)"
+  - "DW-S246 2026-08-05: distribution-layer 'copied state rots' paragraph (D111)
+    + Seed-depersonalization one-liner (meta-learning review S221-S230)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -29,6 +31,8 @@ The single home for DataWizard's structural and formatting conventions. When a c
 **Rule:** Every convention has exactly one canonical home. Everywhere else links to it rather than repeating it. A rule stated in two places will drift; a rule stated once and linked to cannot.
 
 This registry is that home for the conventions below. Skills, guides, and project docs that touch these topics should link here (e.g., "companion naming: see the Conventions Registry") rather than carrying their own copy. The same principle governs the rest of the Seed: the YAML Schema owns field definitions, the Filename Safety guide owns the character map, the session-closer owns cadence numbers, the Content Type Taxonomy owns `type:` values. When you find a convention restated somewhere, replace the copy with a pointer.
+
+The same law governs the **distribution layer**: copied state rots; only pointers stay true. A value copied out of its canonical home -- a version number restated in a collaborator doc, a "pinned" claim in a README, a recommended method repeated in setup instructions -- will eventually lie, because nothing forces the copy to update when the source changes. Point at the canonical source (VERSION.md, the config itself, this registry); where a copy is unavoidable, treat it as a release artifact the convention-flip sweep (below) must reconcile. Named from three instances in one arc, then re-demonstrated inside that same arc when a "pinned >=0.12.5" claim was found false across three docs while the running config said `@latest`. (D111; S226, S227, S230)
 
 **Example:** Before this registry, the 0.x slot table appeared in three docs with three different slot lists. Now it appears once (below); the Protocol shell, the health-audit skill, and the project-guidelines skill link to it.
 
@@ -310,6 +314,7 @@ Sub-rules:
 - **Check `harvest_status` before reading a source:** before harvesting or processing a source file, read its `harvest_status` (and related provenance YAML) first, so already-processed material isn't re-harvested. A cheap guard against duplicate work in the pipeline.
 - **Git push before batch ops:** before running any script that bulk-moves or modifies vault files, commit and push first. `git checkout .` is then the undo if a batch run goes wrong.
 - **Sweep on a convention flip:** when a convention or default here changes, grep the Seed and project docs for the *old* rule's signature phrases and reconcile each hit - convert it to a pointer, fix the stale value, or consciously retain it (retention is the last resort, and record the retained ones). Patching only the sections you remember misses drift. (S225 Build 3.)
+- **Seed content ships depersonalized:** the Seed goes to other users, so Seed-bound content stays generic -- no vault names, collaborator names, or operator initials. Render provenance as `(project, date)` -- e.g. `(Weave, 2026-08)` -- matching the environment guides' existing style. Frontmatter-provenance policy and the legacy sweep are tracked in the DW Backlog's Seed de-personalization sweep item. (S227, S243)
 
 ---
 

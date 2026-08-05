@@ -2,7 +2,7 @@
 title: Filename Safety - Cross-Platform Character Map
 type: guide
 created: '2026-04-30'
-updated: '2026-06-18'
+updated: '2026-08-05'
 status: active
 tags:
   - protocol
@@ -10,6 +10,8 @@ tags:
   - DataWizard
 edit_log:
   - DW-S189 2026-06-18
+  - DW-S246 2026-08-05 - consecutive-spaces link-integrity rationale (wikilink
+    space-collapse dangle, S229; meta-learning review S221-S230)
 ---
 
 # Filename Safety - Cross-Platform Character Map
@@ -43,7 +45,7 @@ These characters must never appear in filenames:
 
 ## Additional Rules
 
-- **Consecutive spaces**: Collapse to a single space. Common PDF extraction artifact.
+- **Consecutive spaces**: Collapse to a single space. Common PDF extraction artifact. This is a link-integrity rule, not just a Windows one: Obsidian collapses consecutive spaces when resolving wikilinks, so citations to a double-space filename resolve to a single-space target and silently dangle (two live cases found in `_Clippings`, S229).
 - **Trailing whitespace before extension**: Strip. Example: `My File .md` becomes `My File.md`.
 - **Em-dashes** (--): Use plain hyphens (-) instead. Em-dashes cause patch_note matching failures.
 - **Curly quotes** (" " ' '): Use straight quotes (' ") instead. Same patch_note issue.

@@ -10,6 +10,8 @@ edit_log:
   - DW-S242 2026-08-05 - Git Guide row now notes the commit guard
   - DW-S244 2026-08-05 - added the Browser and File System Access Behaviors
     guide to the Platform cluster
+  - DW-S245 2026-08-05 - added the Git Hook and CI Behaviors guide to the
+    Platform cluster
 ---
 # DataWizard Guides
 
@@ -27,6 +29,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **MCP Reliability and Write Verification** | Obsidian MCP failure modes (ghost writes, phantom/stale reads, frontmatter wipe), the write-verification protocol, concurrency practice, and sandbox/git gotchas. |
 | **Editing the Claude Desktop Config** | Finding and safely editing `claude_desktop_config.json` to add MCP servers or grant folder access; JSON pitfalls and recovery. |
 | **Browser and File System Access Behaviors** | Runtime gotchas for a single-file browser tool that reads/writes local files: File System Access API (Chromium-only, `file://`, IndexedDB handle persistence, read→readwrite upgrade, user-gesture rule, folder-scoped grants), artifact contexts blocking local storage, DOM/CSS gotchas (`hidden` vs class `display`, `color-scheme`), and headless mock-adapter verification. |
+| **Git Hook and CI Behaviors** | Where guard/automation scripts run across a git-synced repo's environments: local hooks (install-per-clone, `core.hooksPath` supersedes `.git/hooks/`), mobile Obsidian Git (isomorphic-git runs no hooks - CI is the only mobile net), and awk-in-CI being mawk (interval + grouped-alternation panic; write mawk-safe). Git how-to stays in the Git Guide; this covers execution-environment facts. |
 
 ## Other Guides
 

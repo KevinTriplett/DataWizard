@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-07-28'
+updated: '2026-08-05'
 ---
 
 # DataWizard Skills
@@ -33,7 +33,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **dw-intro** (v1.0) | Technique | Plain-language introduction to DataWizard: what it is, how the pieces fit together, the five essential practices (Project Instructions, orientation, session closer, DW Save, the approval model), and a skills overview. Called by install-wizard during setup. Also triggers standalone on: 'what is DataWizard?', 'what can DW do?', 'explain DataWizard', 'how does DataWizard work?', 'tell me about DataWizard'. |
 | **install-wizard** (v1.3) | Technique | Interactive post-install setup for new DataWizard users. Picks up where the README left off: presents the dw-intro, verifies MCP connection (all tools), guides Project Instructions setup, explains git as the sync/collaboration layer, offers git onboarding. Triggers on: 'set up DataWizard', 'finish DataWizard setup', 'I just installed DataWizard'. |
 | **project-health-audit** (v2.0) | Technique | Judgment-half audit of a DW project: consumes the dw_lint report for machine findings (filenames, YAML, sync, links, types), then checks infrastructure completeness (D84), MOC regeneration freshness (D92), shell narrative order, and routes findings. Tiered scopes (Quick/Standard/Full/Incremental); manual fallback for vaults without lint tooling. Triggered via 'DW review' or session-closer's threshold nudge. |
-| **project-reconsolidation** (v1.1) | Technique | Periodic reconciliation audit that diffs every record of open work (action items, thread roster or ledger, quest log, dashboard) against recent session-log ground truth, classifies divergences (slipped / stalled / orphaned / done-but-open / contradiction / duplication / model-gap), and writes a reconsolidation report. The detection-and-repair complement to the structural Active Threads ledger (D105, D106); audits the tracking model, not just the data. Distinct from semantic divergence-convergence (framing drift). Triggers on 'run a reconsolidation pass', 'reconcile the open work', or a due tracking-health review. |
+| **project-reconsolidation** (v1.2) | Technique | Periodic reconciliation audit that diffs every record of open work (action items, thread roster or ledger, quest log, dashboard) against recent session-log ground truth, classifies divergences (slipped / stalled / orphaned / done-but-open / contradiction / duplication / model-gap), and writes a reconsolidation report. The detection-and-repair complement to the structural Active Threads ledger (D105, D106); audits the tracking model, not just the data. Distinct from semantic divergence-convergence (framing drift). Triggers on 'run a reconsolidation pass', 'reconcile the open work', or a due tracking-health review. |
 | **git-onboarding** | Technique | Walking a new collaborator through git setup for a vault or DW project. Gathers variables, guides through setup interactively, sets up DW Save (Cmd+Shift+S) with backup scheduling, and generates a project-specific onboarding guide. Uses the Git Guide (`Seed/Guides/Git Guide.md`) as reference. |
 
 ## Knowledge Lifecycle
@@ -62,5 +62,7 @@ Skills that depend on DW infrastructure (tracking index, triage docs, two-vault 
 ## Skill Format
 
 Skills follow the SKILL.md standard: YAML frontmatter with `name` and `description`, markdown body with instructions. Description says WHAT and WHEN (trigger conditions), never HOW (workflow). Body stays under 500 lines. Reference files go in the skill folder one level deep.
+
+Two authoring notes from field use: (1) a skill that must work in two contexts -- called during a larger workflow vs invoked standalone -- can carry a "context-specific behavior" section with if-called-during / if-called-standalone rules, rather than duplicating content or splitting into two skills; (2) sequencing trap -- when skill A calls skill B at an early step, B executes before A's later calibration steps have run, so sequence sub-skill calls after the state they depend on. (S223)
 
 See `Seed/Skills/project-guidelines/SKILL.md` for a well-structured example.
