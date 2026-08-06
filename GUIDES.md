@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: '2026-08-05'
+updated: '2026-08-06'
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -12,6 +12,7 @@ edit_log:
     guide to the Platform cluster
   - DW-S245 2026-08-05 - added the Git Hook and CI Behaviors guide to the
     Platform cluster
+  - DW-S250 2026-08-06 - added the Review Automation guide
 ---
 # DataWizard Guides
 
@@ -48,6 +49,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Harvest Workflow Guide** | The harvest pipeline end to end: routing, provenance, and execution. |
 | **Obsidian Bases Reference** | Using Obsidian Bases for DW dashboards and filtered views. |
 | **Working Principles** | The reasoning behind the Working Rules - the "why" under the behavioral contract. |
+| **Review Automation** | The three periodic reviews (health audit, meta-learning, Content Interests): the pending-report model, the cadence table (single home), and how scheduled automation detects staleness so the session-closer only surfaces waiting reports. |
 
 ### Onboarding and integrations
 | Guide | Covers |

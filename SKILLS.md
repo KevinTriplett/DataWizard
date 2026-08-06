@@ -3,6 +3,9 @@ title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
 updated: '2026-08-06'
+edit_log:
+  - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
+    for pending-report model (D114)
 ---
 
 # DataWizard Skills
@@ -16,7 +19,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | Skill | Type | Description |
 |---|---|---|
 | **project-guidelines** (v1.4) | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. Handles existing filename conventions gracefully. Includes `last_content_interests_review:` in new 0.0 templates. |
-| **session-closer** (v4.2.1) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Periodic threshold nudges for health audit, meta-learning review, and Content Interests staleness -- cadence numbers live in the skill's thresholds step (single source). Insight-capture-aware knowledge transfer check. |
+| **session-closer** (v4.3.0) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. |
 | **side-quest** (v1.0) | Technique | Tracking a tangent from the project's current arc as a parallel stream in the session log. Routes a side quest's continuation into "Active quest threads" and protects the main arc's "What's next" from being overwritten, so parallel streams don't collide under concurrency. Triggers on: "let's go on a side quest," "continue the [X] side quest." |
 | **research-tracking** | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |
 | **tools-research** | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Batch mode includes harvest pre-filtering and two-speed processing. References research-tracking. |
@@ -45,7 +48,7 @@ tools-research (evaluate external things) → research-tracking (prevent duplica
 
 content-interest-scan and harvest-router feed the upstream end by surfacing unrouted content. content-interests-review keeps the routing signals current so the whole chain stays calibrated. S149.
 
-**Protocol nudges** are lightweight behavioral triggers embedded at specific moments in the lifecycle -- session-closer's threshold nudges for health audit, meta-learning review, and Content Interests staleness (cadence numbers live in session-closer's thresholds step, the single source). insight-capture has its own nudge for instances to offer mid-session when rich context is loaded. These nudges are not a separate skill but a pattern: a brief conditional check at a decision point that surfaces the right skill at the right time. S149, S157.
+**Protocol nudges** are lightweight behavioral triggers embedded at specific moments in the lifecycle. The three periodic reviews (health audit, meta-learning review, Content Interests) are no longer nudged by session-closer thresholds: scheduled automation detects staleness and produces a pending-review report, and session-closer Step 3.10 only surfaces a report already waiting -- see the Review Automation guide, where the cadence numbers now live (D114). insight-capture has its own nudge for instances to offer mid-session when rich context is loaded. These nudges are a pattern, not a separate skill: a brief conditional check at a decision point that surfaces the right thing at the right time. S149, S157, S250.
 
 ## Archived Skills
 

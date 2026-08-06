@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-05'
-version: '4.2.2'
+updated: '2026-08-06'
+version: '4.3.0'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -31,6 +31,9 @@ edit_log:
     is a shared unread-queue; never overwrite pending state)"
   - "DW-S243 2026-08-05 - v4.2.2: Step 3.5 header-variant tolerance note (###
     Findings learnings-equivalent)"
+  - "DW-S250 2026-08-06 - v4.3.0: Step 3.10 threshold nudges retired ->
+    pending-review-report surfacing only; cadence numbers moved to Review
+    Automation guide (D114 supersedes D88 home)"
 ---
 
 # Session Closer Skill
@@ -86,7 +89,7 @@ Throughout this skill, examples use solo-operator format. For multi-operator pro
 
 Pick **lite** or **full**, and state which you chose (D98).
 
-- **Lite close** -- for sessions with no new conventions, no harvest, and few file touches. Do only: the log entry (What happened / Learnings-if-any / What's next), frontmatter validation (Step 2.5), write + embed (Step 3, including the section-shell sync), metadata verification (Step 3.8), and the thread name (Step 5). Skip the knowledge-transfer / convention / residual triage (Steps 3.5-3.7), the periodic threshold checks (Step 3.10), the file-size check (Step 3.11), and the team-flag prompt (Step 3.12) -- the lite preconditions make these no-ops. You may still check off an action item you completed.
+- **Lite close** -- for sessions with no new conventions, no harvest, and few file touches. Do only: the log entry (What happened / Learnings-if-any / What's next), frontmatter validation (Step 2.5), write + embed (Step 3, including the section-shell sync), metadata verification (Step 3.8), and the thread name (Step 5). Skip the knowledge-transfer / convention / residual triage (Steps 3.5-3.7), the pending-review report check (Step 3.10), the file-size check (Step 3.11), and the team-flag prompt (Step 3.12) -- the lite preconditions make these no-ops. You may still check off an action item you completed.
 - **Full close** -- everything below. Use it whenever the session established or changed a convention, did harvest, made decisions, or touched many files.
 
 When in doubt, go full. State the chosen tier in one line before proceeding (e.g. "Closing S196 as a full close -- touched the closer skill plus several infra files").
@@ -260,23 +263,19 @@ For each section file created or renamed this session, verify its parent shell c
 
 This catches the most common drift pattern -- adding sections without updating the shell -- at the point of creation. Skip this step if no section files were created or renamed this session.
 
-### Step 3.10: Periodic threshold checks (full closes only)
+### Step 3.10: Pending review reports (full closes only)
 
 > **Lite closes skip this step** (see Step 0). Run it only in a full close.
 
-Check the project's `0.0 Project Guidelines` frontmatter against the cadence table below. This step is the **single home** for these cadence numbers (D88) -- SKILLS.md, the PI, and other docs describe the nudges without quoting numbers. None of these block session close.
+The session-closer does **not** compute review staleness or nudge on session/day thresholds. Detecting that a health audit, meta-learning review, or Content Interests refresh is due -- and running the scan that produces a report -- is the job of the scheduled review automation (see the **Review Automation** guide). This step's only job is to surface reports those scans have already left waiting. None of this blocks session close.
 
-| Check | Frontmatter field | Threshold | On trigger |
-|---|---|---|---|
-| Project health audit | `last_health_audit` | 30+ sessions since, or never recorded | Prompt: "It's been [N] sessions since the last health audit (or: none on record). Want me to run a DW review?" If yes, load `project-health-audit`; after it runs, stamp `last_health_audit` to the current session ID. |
-| Meta-learning review | `last_meta_learning_review` | 30+ sessions since, or never recorded | Nudge in "What's next": "A meta-learning review is due ([N] sessions since last). Load the meta-learning-review skill." |
-| Content Interests | `last_content_interests_review` | 30+ days since, OR 10+ sessions since, OR field absent | Nudge in "What's next": "Content Interests may need refreshing ([N] days). Load content-interests-review." |
+List the project's Learning Reports folder (`{home}/Workshop - {ProjectName}/Learning Reports/` for full-convention projects; `{home}/Learning Reports/` for flat). For any report file with `status: pending-review` (`Meta-Learning Report - *`, `Health Audit Report - *`, `Content Interests Report - *`), add one line to "What's next":
 
-**Gap arithmetic:** solo-operator projects subtract session numbers; multi-operator projects list the session-log folder and count files dated after the reference session.
+"A [review type] report is waiting for your review: [filename]."
 
-**Meta-learning pending-report trigger (independent of the table).** Regardless of session count, list the Learning Reports folder (`{home}/Workshop - {ProjectName}/Learning Reports/` for full-convention projects; `{home}/Learning Reports/` for flat). If any `Meta-Learning Report - *.md` has `status: pending-review`, nudge: "A meta-learning scan report is waiting for review: [filename]." This catches reports the nightly scan produces between sessions.
+Name the file; do not summarize it. If no reports are pending, say nothing.
 
-**Silence rule (health audit).** Do not mention the health audit in "What's next," during orientation, or anywhere outside this step -- no "approaching threshold" or "getting close" language. The audit nudge exists only here, only when the threshold is met. (The meta-learning and content-interests nudges, by contrast, are designed to land in "What's next" when their thresholds fire.)
+**Silence rule.** Outside this step -- in orientation, elsewhere in "What's next," anywhere -- never say a review is "due," "approaching," or "getting close," and never quote a cadence number. The session-closer holds no cadence numbers; they live only in the Review Automation guide (D114). Silence is the default; a named pending report is the only surfacing.
 
 ### Step 3.11: File size check
 

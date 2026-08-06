@@ -4,17 +4,19 @@ description: >-
   Use when a cluster of related seeds and seedpods is ready to be synthesized
   into a coherent project concept -- a "garden" (taxonomy type: garden).
   Triggers on: 'build a garden', 'synthesize a garden', 'let's garden these
-  seeds', 'plant a garden', or resuming with 're-synthesize the [X] garden'
-  when new seeds have been added. Not for capturing a single note or freshly
-  loaded context (use insight-capture), and not for standing up a full project
-  (use project-guidelines).
+  seeds', 'plant a garden', or resuming with 're-synthesize the [X] garden' when
+  new seeds have been added. Not for capturing a single note or freshly loaded
+  context (use insight-capture), and not for standing up a full project (use
+  project-guidelines).
 type: skill
 created: '2026-08-06'
 updated: '2026-08-06'
 operator: Andrew
-version: '1.0'
+version: '1.1'
 edit_log:
   - DW-S248 2026-08-06
+  - DW-S249 2026-08-06 - companion-base generator shipped;
+    planter/companion-base defaults point at Seed scripts; Step 8 updated
 ---
 # Garden Synthesis Skill
 
@@ -83,8 +85,8 @@ Roles the skill resolves:
 | `seed-sources` | Folder(s) where seeds and seedpods live | Ask once |
 | `garden-home` | Where garden notes are written | `_Gardens/` |
 | `research-layers` | Ordered allies-research layers to sweep | local vault -> archive/transcript store -> web |
-| `planter` | Optional script that stamps `gardens:` onto constituent seeds | none (tag manually) |
-| `companion-base` | Optional live view generated per garden | none |
+| `planter` | Script that stamps `gardens:` onto constituent seeds | the Seed's `Scripts/plant_garden_seeds.py` |
+| `companion-base` | Generator for the per-garden live view (`.base`) | the Seed's `Scripts/generate_garden_base.py` |
 
 If the `## Garden Sources` block is missing, ask the operator once for the roles
 this run needs, proceed, and offer to record them in `Vault Config.md` so the
@@ -138,9 +140,12 @@ reorders or removes). If no planter is configured, tag manually -- but tag *all*
 members; partial tagging leaves the vault-wide query unreliable.
 
 ### Step 8: Companion live view (optional)
-If a `companion-base` is configured, generate or refresh the per-garden live
-view filtered on membership, giving a "planted seeds" table that updates as seeds
-are added and tagged. Skip cleanly if not configured.
+Run the `companion-base` generator (the Seed's `generate_garden_base.py` by
+default) to create or refresh the per-garden live view -- a `.base` filtered on
+`gardens.contains("<Garden Name>")`, giving a "Planted Seeds" table (name /
+type / stage) that updates as seeds are tagged. It refuses to overwrite an
+existing `.base` unless forced, so hand-customized views are safe. Skip cleanly
+if no generator is configured.
 
 ### Step 9: Track stage and hand off
 Record the garden's `stage:` and, at session close, note remaining work (seeds
