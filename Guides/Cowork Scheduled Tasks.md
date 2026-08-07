@@ -3,13 +3,14 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: '2026-06-22'
+updated: 2026-08-06
 operator: Andrew
 edit_log:
   - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
     scheduled-task learnings)
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
     (pointer)
+  - "DW-S250 2026-08-06 - added Cloud git proxy and sandbox limits section (D115)"
 ---
 
 # Cowork Scheduled Tasks
@@ -42,6 +43,12 @@ A task that runs without a human in the loop needs all of:
 ## Other known failure modes
 
 - **Runtime-constructed URLs.** `web_fetch` inside a scheduled task rejects URLs constructed at runtime (discovered mid-run rather than passed in the prompt). For URLs the run discovers, route through the Chrome MCP instead.
+
+## Cloud git proxy and sandbox limits
+
+The Cowork cloud sandbox (where a scheduled task's fresh session runs) routes all git through a proxy that only permits repos in the session's authorized "sources." A push to a repo outside that set is refused at the environment level -- even with a valid credential in the URL -- with `access denied by the git proxy: <owner>/<repo> is not in this session's authorized repository set`. Reads may still pass through a URL-embedded token, but writes are gated. This is the most likely cause of a scheduled task that "gate-denies" or silently fails to push: a personal access token does not buy past the proxy; the repo has to be an authorized source.
+
+Related: the sandbox is a Linux VM with the operator's folders mounted, not macOS itself, and a cloud-fired task cannot wake a sleeping machine. So a macOS-local scheduler (launchd + a `pmset` scheduled wake) cannot be set up from a Cowork session, and a cloud task cannot run "overnight while the laptop is closed." For unattended, machine-independent git automation -- especially overnight -- prefer **GitHub Actions cron** (native `GITHUB_TOKEN` write, no proxy, no machine). See the **Review Automation** guide for the worked example. (DW-S250)
 
 ## See also
 

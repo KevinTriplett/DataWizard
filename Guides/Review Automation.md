@@ -43,6 +43,17 @@ These numbers live here and nowhere else (D114, relocating D88). Every other doc
 
 ## Scheduled automation
 
-The scheduled review-status check is wired per operator -- it is not shipped in the Seed, because scheduling is machine-specific. For how to run DW automation as a scheduled task (timing, one-model-per-run, cron jitter, idempotency, and the reliability requirements for unattended runs), see the **Cowork Scheduled Tasks** guide. The task's job is: read stamps -> compute staleness -> on a trip, run the scan -> write a `pending-review` report -> notify. It never plants unattended.
+The scheduled review-status check is wired per operator -- it is not shipped in the Seed, because scheduling is machine-specific. Its job is always: read stamps -> compute staleness -> on a trip, run the scan -> write a `pending-review` report -> notify. It never plants unattended.
 
-Producer maturity (as of 2026-08): `meta-learning-scan` produces its report today. `content-interest-scan` is a draft (v0.1). `project-health-audit` is a judgment-half skill -- only its machine half (`dw_lint`) runs unattended, producing a lint-based Health Audit Report for the operator to pick up; the judgment pass and planting stay human. Finalizing these three producers into a single scheduled check is the review-automation build; until it lands, the session-closer simply finds no pending reports and stays silent.
+### Substrate: prefer GitHub Actions for git-synced vaults
+
+Which harness works depends on where git can actually push:
+
+- **GitHub Actions cron (preferred when the vault is a git repo).** A scheduled workflow on the vault's own repo runs on GitHub's infrastructure at the cron time -- no operator machine awake, no desktop app open. It has native write access via the built-in `GITHUB_TOKEN` (no personal token to store), pulls the repo, runs the scan by calling the Claude API, writes the `pending-review` report, commits, pushes, and notifies by opening a repo issue (the report also syncs down to the vault, where the session-closer surfaces it). This sidesteps both the "wake the machine" problem and the Cowork cloud git proxy.
+- **Cowork scheduled task.** A fresh Cowork session fired on a schedule. Viable only when the operator's machine is awake and the desktop app is open at fire time (so the vault bridge is live) AND the target repo is in the session's authorized sources -- the Cowork cloud routes git through a proxy that refuses pushes to repos outside that set (see the **Cowork Scheduled Tasks** guide). Both conditions are fragile for an overnight run, so prefer GitHub Actions whenever the vault is a git repo.
+
+The scan producers are the same regardless of substrate; only the harness differs. For Cowork-scheduled-task specifics (timing, one-model-per-run, cron jitter, idempotency), see the **Cowork Scheduled Tasks** guide.
+
+### Producer maturity
+
+As of 2026-08: `meta-learning-scan` produces its report today. `content-interest-scan` is a draft (v0.1). `project-health-audit` is a judgment-half skill -- only its machine half (`dw_lint`) runs unattended, producing a lint-based Health Audit Report for the operator to pick up; the judgment pass and planting stay human. Until a producer is finalized into the scheduled check, the session-closer simply finds no pending report for that review and stays silent.
