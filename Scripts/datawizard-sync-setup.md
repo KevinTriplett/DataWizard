@@ -1,12 +1,13 @@
 ---
 created: 2026-04-24
-updated: 2026-08-01
+updated: 2026-08-07
 type: guide
 scope: seed
 edit_log:
   - "DW-S227 2026-08-01 - Jay FR batch item b: scoped Windows platform note
     (Seed updates via update_seed.ps1; full DW Save PowerShell port flagged as
     future work)"
+  - "DW-S253 2026-08-07 - Chunk 5: added commit-guard install step (Step 3) + LLM-list item + ~/Scripts re-copy note; points at Git Guide 10.0"
 ---
 
 # DataWizard Sync Setup Guide
@@ -73,7 +74,19 @@ cp "/path/to/your/vault/_DataWizard/Seed/Scripts/datawizard-sync.sh" ~/Scripts/
 chmod +x ~/Scripts/datawizard-sync.sh
 ```
 
-## Step 3: Test It
+> **Keep this copy current.** `datawizard-sync.sh` gets Seed updates, but this `~/Scripts/` copy does not update itself -- after any Seed update that changes `Scripts/datawizard-sync.sh`, re-run the `cp` above. To avoid the copy drifting at all, you can instead point your hotkey and launchd plist directly at the Seed copy (`.../_DataWizard/Seed/Scripts/datawizard-sync.sh`) and skip `~/Scripts/` entirely.
+
+## Step 3: Install the Commit Guard (Per Repo)
+
+The commit guard is a pre-commit hook that blocks a commit containing unresolved conflict markers or Windows-unsafe filenames, so corrupt content never syncs silently. Git hooks are not synced, so install it once **per repo** -- including the Seed itself -- and **re-run it after any Seed update that touches `Scripts/hooks/`** (the installer is idempotent):
+
+```bash
+bash "/path/to/your/vault/_DataWizard/Seed/Scripts/install-git-hooks.sh" "/path/to/your/repo"
+```
+
+Full behavior, the shared-team `core.hooksPath` alternative, and what a block looks like: see Git Guide Section 10.0 Commit Guards.
+
+## Step 4: Test It
 
 ```bash
 bash ~/Scripts/datawizard-sync.sh
@@ -81,7 +94,7 @@ bash ~/Scripts/datawizard-sync.sh
 
 You should see a macOS notification: either "DW Saved" with project names, "Everything up to date," or an error message.
 
-## Step 4: Set Up the Hotkey (Cmd+Shift+S)
+## Step 5: Set Up the Hotkey (Cmd+Shift+S)
 
 This lets you "save" your work to git from inside Obsidian.
 
@@ -102,7 +115,7 @@ Now Cmd+Shift+S in Obsidian will: save + push + notification.
 
 *Note for developers: [a fork of this plugin](https://github.com/kalliopeargentina/obsidian-shellcommands) enables keyring access for secrets like API keys and credentials.*
 
-## Step 5: Set Up the Safety Net (Optional)
+## Step 6: Set Up the Safety Net (Optional)
 
 This runs the sync automatically every 2 hours as a background safety net, catching anything you forgot to manually save. Change the `<integer>7200</integer>` to change the amount of time (in seconds) between automatic syncs.
 
@@ -173,7 +186,7 @@ launchctl load ~/Library/LaunchAgents/com.datawizard.sync.plist
 
 If the error log shows "not found" or "No such file," check that the script path in the plist matches the actual location of `datawizard-sync.sh`.
 
-## Step 6: Terminal Alias (Optional)
+## Step 7: Terminal Alias (Optional)
 
 For quick manual syncs from terminal:
 
@@ -274,5 +287,6 @@ If a user asks you to help set up sync for a new project, the steps are:
 3. Add the repo path to `~/.datawizard-sync.conf`
 4. Exclude the folder from the vault-level `.gitignore`
 5. Test with `dwsync` or `bash ~/Scripts/datawizard-sync.sh`
+6. Install the commit guard in the new repo: `bash "<vault>/_DataWizard/Seed/Scripts/install-git-hooks.sh" "<repo>"` (re-run after any Seed `Scripts/hooks/` update). Details: Git Guide 10.0 Commit Guards.
 
 Also verify the DW Seed path (`_DataWizard/Seed`) is in the config -- it's easy to add collaborative repos and forget the Seed itself.

@@ -23,6 +23,8 @@ jobs:
           set -uo pipefail
           fail=0
           while IFS= read -r -d '' path; do
+            # skip Obsidian workspace/plugin state (mirrors the pre-commit hook)
+            case "$path" in .obsidian/*|*/.obsidian/*) continue ;; esac
             # skip binary and empty files
             grep -Iq . "$path" || continue
             if ! awk -v fname="$path" '

@@ -6,6 +6,9 @@
 #   1. unresolved merge-conflict markers (outside fenced code blocks), or
 #   2. Windows-unsafe filenames.
 #
+# The conflict-marker check skips .obsidian/ trees (Obsidian workspace/plugin
+# state, not authored content; plugin JS legitimately contains marker strings).
+#
 # It runs on EVERY commit through git's plumbing -- including unattended
 # commits from the Obsidian Git plugin timer and the launchd sync script --
 # so silent auto-sync corruption never lands.
@@ -41,6 +44,10 @@ scan_conflicts() {
 }
 
 while IFS= read -r -d '' path; do
+  # skip Obsidian workspace/plugin state (machine state, not authored content):
+  # plugins' bundled JS legitimately contains conflict-marker strings, which
+  # would false-positive on every plugin update. Filename check below still runs.
+  case "$path" in .obsidian/*|*/.obsidian/*) continue ;; esac
   # skip binary blobs (numstat reports "-" for added/removed on binary)
   if [ "$(git diff --cached --numstat -- "$path" | cut -f1)" = "-" ]; then
     continue
