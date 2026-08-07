@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# DataWizard commit guard breadcrumb (per-clone, regenerated; never commit)
+SYNC-BLOCKED.md
+
 # Obsidian workspace (per-user, not for sync)
 .obsidian/
 .trash/
