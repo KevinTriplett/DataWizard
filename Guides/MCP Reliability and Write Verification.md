@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-05'
+updated: '2026-08-07'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -28,6 +28,7 @@ edit_log:
     path-namespace split (write-verification implication)
   - "DW-S246 2026-08-05 - meta-learning review S221-S230: obsidian tools are
     .md-only, scripts via device shell / filesystem tools"
+  - "DW-S253 2026-08-07 - sandbox git working-tree lock nuance: git status orphans index.lock; nested-repo self-heal via S252 sweep vs root no-healer; rename-aside recovery"
 ---
 # MCP Reliability and Write Verification
 
@@ -208,7 +209,7 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 
 **Sandbox bash cannot write SQLite databases on the vault FUSE mount.** Plain file create/overwrite/truncate works (above), but opening a SQLite db on the mount for writing fails with `sqlite3.OperationalError: disk I/O error` -- FUSE does not support the byte-range locking and journaling (`-wal`/`-shm`/`-journal`) SQLite needs. Reads are fine: copy the db to a sandbox-writable dir (e.g. the outputs folder) and read the copy. Consequence: any SQLite-backed tool (e.g. `dw_ops.db`) must run its **writes natively on the user's machine**, never from the Cowork sandbox; a sandbox session participates by queueing changes (markdown / intake) for a native process to ingest. Verified S199 by probe -- bash `CREATE`/`OVERWRITE` ok, `rm` and SQLite write both fail. (Source: DW S199)
 
-**Git working-tree ops fail from the sandbox; run them in Terminal.** Because the sandbox can create but not delete or overwrite files on the vault FUSE mount (above), any git operation that touches the working tree or index - `pull`, `checkout`, `branch`, `commit`, even `git status` when there are uncommitted changes - fails partway and leaves stale lock files it cannot unlink (`.git/index.lock`, `.git/ORIG_HEAD.lock`, `.git/objects/maintenance.lock`), sometimes plus a stray untracked file and harmless `tmp_obj_*` cruft from a fetch. Read-only inspection on a clean tree (`git log`, `git status` with no changes, `git fetch` for inspection) is fine. Run all working-tree git ops via a Terminal command on the user's Mac (Working Rule 15) or via DW Save; if a sandbox attempt already left locks, the recovery command removes the lock files first, then runs the real op. (Source: DW S188, S189)
+**Git working-tree ops fail from the sandbox; run them in Terminal.** Because the sandbox can create but not delete or overwrite files on the vault FUSE mount (above), any git operation that touches the working tree or index - `pull`, `checkout`, `branch`, `commit`, even `git status` when there are uncommitted changes - fails partway and leaves stale lock files it cannot unlink (`.git/index.lock`, `.git/ORIG_HEAD.lock`, `.git/objects/maintenance.lock`), sometimes plus a stray untracked file and harmless `tmp_obj_*` cruft from a fetch. Read-only inspection on a clean tree (`git log`, `git status` with no changes, `git fetch` for inspection) is fine. Run all working-tree git ops via a Terminal command on the user's Mac (Working Rule 15) or via DW Save; if a sandbox attempt already left locks, the recovery command removes the lock files first, then runs the real op. (Source: DW S188, S189) **S253 nuance:** even `git status` (index refresh) can orphan an `index.lock`; a lock orphaned in a **nested repo listed in the sync config self-heals** on the next run via the S252 `datawizard-sync.sh` stale-lock sweep, but the **root repo has no healer**, so a root orphan silently blocks all auto-commits until cleared - a live footgun. Recovery without a Terminal: **rename the lock aside** (`mv .git/index.lock .git/index.lock.stray.delete-me`), since rename works on the FUSE mount where unlink fails, then have the user `rm` it later. (DW S253)
 
 **`patch_note` does not match inside YAML frontmatter.** `patch_note` operates only on the markdown body, not the frontmatter block. A patch whose `oldString` targets a frontmatter field (e.g. a skill's `description:`, or any `key: value` line above the closing `---`) returns `matchCount: 0` / "String not found" even when the text is visibly present. Use `update_frontmatter` (merge: true) for frontmatter edits; reserve `patch_note` for body content. (Source: DW S198)
 
