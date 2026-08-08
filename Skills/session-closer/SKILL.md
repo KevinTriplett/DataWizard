@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-06'
-version: '4.3.0'
+updated: '2026-08-08'
+version: '4.4.0'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -34,6 +34,8 @@ edit_log:
   - "DW-S250 2026-08-06 - v4.3.0: Step 3.10 threshold nudges retired ->
     pending-review-report surfacing only; cadence numbers moved to Review
     Automation guide (D114 supersedes D88 home)"
+  - "DW-S258 2026-08-08 - v4.4.0: Step 4.5 next-session recap + suggested-model
+    send-off, delivered just before the thread name (Step 5 unchanged)"
 ---
 
 # Session Closer Skill
@@ -343,6 +345,15 @@ Session-close action item updates are incremental -- check off what's done, add 
 3. **Expect ~1/3 staleness.** Roughly a third of accumulated action items will be stale -- not explicitly resolved, just no longer relevant. This is normal. Flag them for removal rather than carrying them forward indefinitely.
 
 Full triage is a periodic activity, not a session-close requirement. The session-closer's job is incremental maintenance; the triage patterns above apply when the backlog has grown unwieldy. (RW S9, S142)
+
+### Step 4.5: Next-session recap and suggested model
+
+Just before suggesting the thread name, give a brief, action-oriented recap -- never a generic "nice work, see you next time." Two or three sentences at most, spoken in chat only (not written to the vault):
+
+- **Next up:** one line naming the single most valuable thing to pick up next session. Pull it from "What's next" Priority 1 -- the specific task with its key file path, not a vague topic.
+- **Suggested model:** name the Claude model tier that best fits that task, with a 3-5 word reason. Match model to task shape -- a high-capability reasoning model (Opus-tier) for deep design, synthesis, architecture, or hard debugging; a faster model (Sonnet-tier) for mechanical, harvest, or well-specified execution work. Keep it tier-generic (Opus-tier / Sonnet-tier) rather than pinning a version number, which goes stale.
+
+Keep it tight -- the recap and model line are the last thing the user reads before the thread name, so they should land as a clear "here's where to restart and what to run it on."
 
 ### Step 5: Suggest final thread name
 

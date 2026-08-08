@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-07'
+updated: '2026-08-08'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -28,7 +28,11 @@ edit_log:
     path-namespace split (write-verification implication)
   - "DW-S246 2026-08-05 - meta-learning review S221-S230: obsidian tools are
     .md-only, scripts via device shell / filesystem tools"
-  - "DW-S253 2026-08-07 - sandbox git working-tree lock nuance: git status orphans index.lock; nested-repo self-heal via S252 sweep vs root no-healer; rename-aside recovery"
+  - "DW-S253 2026-08-07 - sandbox git working-tree lock nuance: git status
+    orphans index.lock; nested-repo self-heal via S252 sweep vs root no-healer;
+    rename-aside recovery"
+  - "DW-S257 2026-08-08 - array-wipe entry extended: transcription-drift variant
+    (copy array values verbatim from the fresh read, never retype)"
 ---
 # MCP Reliability and Write Verification
 
@@ -60,7 +64,7 @@ Verify after any array write by counting entries:
 awk '/^edit_log:/{f=1;next}/^[a-z_]+:/{f=0}f&&/^  - /{c++}END{print c+0}' "file.md"
 ```
 
-A count of 1 where there should be many means the array was clobbered -- restore from your pre-write read. Note that shell files legitimately carry no `edit_log` (they are exempt per [[YAML Schema]]), so 0 on a `0.2 Session Log` shell is correct, not damage. Grounding: RG S4 (2026-07-25) wiped 21 entries from `0.2 Session Log - ReWoven` and 9 from `0.3 Decision Log - ReWoven` this way. Both were recoverable **only because the full arrays happened to still be in the session's context** from reads minutes earlier -- with a fresh context, or a compaction in between, the history would have been unrecoverable short of a backup. Treat a bare array stamp as a destructive operation.
+A count of 1 where there should be many means the array was clobbered -- restore from your pre-write read. Note that shell files legitimately carry no `edit_log` (they are exempt per [[YAML Schema]]), so 0 on a `0.2 Session Log` shell is correct, not damage. Grounding: RG S4 (2026-07-25) wiped 21 entries from `0.2 Session Log - ReWoven` and 9 from `0.3 Decision Log - ReWoven` this way. Both were recoverable **only because the full arrays happened to still be in the session's context** from reads minutes earlier -- with a fresh context, or a compaction in between, the history would have been unrecoverable short of a backup. Treat a bare array stamp as a destructive operation. And when re-supplying the full array (e.g. to append one `edit_log` entry), copy the existing values **verbatim from the fresh read** - retyping them invites transcription drift that silently rewrites history (field-caught: a paraphrased historical entry was restored only because the pre-write read was still in context; diff the written array against the read one before moving on).
 
 ## Transport 502s: Verify Before Retry, Against a Must-Have-Changed Field
 
