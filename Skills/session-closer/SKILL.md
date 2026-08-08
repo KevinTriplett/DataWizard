@@ -8,7 +8,7 @@ description: >-
   previous session.
 type: skill
 updated: '2026-08-08'
-version: '4.4.0'
+version: '4.4.1'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -36,6 +36,8 @@ edit_log:
     Automation guide (D114 supersedes D88 home)"
   - "DW-S258 2026-08-08 - v4.4.0: Step 4.5 next-session recap + suggested-model
     send-off, delivered just before the thread name (Step 5 unchanged)"
+  - "DW-S258 2026-08-08 - v4.4.1: Step 5 presents the thread name in a fenced
+    code block (renders as a one-click-to-copy box in chat)"
 ---
 
 # Session Closer Skill
@@ -358,6 +360,8 @@ Keep it tight -- the recap and model line are the last thing the user reads befo
 ### Step 5: Suggest final thread name
 
 Suggest a final thread name for the session. Solo-operator format: `checkmark ProjectAbbrev SNN - brief description` (e.g., `√ DW S43 - Weave git migration final stage`). Multi-operator format: `checkmark PROJ_YYYY-MM-DD_INITIALS_NN - description` (e.g., `√ WV_2026-06-10_AA_01 - session ID convention update`). The checkmark prefix signals the session is complete. Base the description on what actually happened, not the provisional name from orientation.
+
+Present the final thread name on its own line inside a fenced code block (triple backticks) with nothing else in the block, so it renders as a one-click-to-copy box in chat.
 
 This step is intentionally last. The thread name is the signal that all session-close work is complete -- the user copies it, and the session is done.
 

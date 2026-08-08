@@ -2,11 +2,14 @@
 title: Harvest Workflow Guide
 type: guide
 created: '2026-04-25'
-updated: '2026-06-13'
+updated: '2026-08-08'
 operator: Andrew
 status: active
 edit_log:
-  - 'DW-S182 2026-06-13: folded Protocol 6.0 completion note; repointed cross-refs to post-demolition homes'
+  - "DW-S182 2026-06-13: folded Protocol 6.0 completion note; repointed
+    cross-refs to post-demolition homes"
+  - "DW-S262 2026-08-08: added Multi-destination/not-ready destinations edge
+    case (embeddable synth-note pointer; D116)"
 tags:
   - protocol
   - harvesting
@@ -167,6 +170,10 @@ When returning to a previously harvested source (e.g., a supplemental pass or ne
 ### Multi-project sources
 
 Sources with `harvest_for: [ProjectA, ProjectB]` need harvest into each project's documents. A source is only fully harvested when `harvested_into` covers all projects listed in `harvest_for`. Update the ledger in each project.
+
+### Multi-destination or not-ready destinations
+
+When a harvest fans out to several destination docs, or a destination is contested or not yet ready (mid-edit under concurrent operation, awaiting a team decision), don't synthesize straight into those docs. Harvest once into a `c_` synth note of self-contained, embeddable `##` sections and let each destination transclude the section it needs. Full convention: [[Conventions Registry]] (Harvest via embeddable synth note).
 
 ### Companion-only enrichment
 

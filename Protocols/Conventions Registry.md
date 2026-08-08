@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-05'
+updated: '2026-08-08'
 operator: Andrew
 priority: high
 maturity: working
@@ -22,6 +22,9 @@ edit_log:
     state, defer decisions for evidence' (insight-capture plant)"
   - "DW-S246 2026-08-05: distribution-layer 'copied state rots' paragraph (D111)
     + Seed-depersonalization one-liner (meta-learning review S221-S230)"
+  - "DW-S262 2026-08-08: added Harvest via embeddable synth note section (D116;
+    Weave FR adoption) + Change-governance merge-gate (D111) + Catalogs
+    conventions; fixed OPSEC/D25 miscitation"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -91,6 +94,14 @@ The `_` prefix sorts active meta-folders to the top and is shell-safe (no escapi
 
 ---
 
+## Catalogs
+
+**Rule:** The Seed keeps two parallel catalogs, each the single index for its kind: **`SKILLS.md`** lists every skill (triggered workflows) and **`GUIDES.md`** lists every guide (operational and platform/environment references). A new skill or guide is registered in its catalog on creation; the catalog is the discovery surface, not a place to restate the item's content. Guides that retire keep an `xArchive -` filename prefix and drop out of the catalog. Protocols (this registry, the YAML Schema, the taxonomy) live in `Protocols/` and are not catalogued the same way -- they are few and cross-referenced directly.
+
+**Example:** the Platform and Environment Behaviors guide cluster is enumerated in `GUIDES.md`; a new platform-gotcha guide is added there so instances can find it. (S195)
+
+---
+
 ## File naming
 
 **Rule:**
@@ -130,6 +141,32 @@ For the full cross-platform character map (forbidden characters, replacements, s
 **Rule:** Enrichment output goes in separate companion notes, never in-place edits to the source. Companions use the `c_` prefix with **no space**: `c_source-title.md`. They live under `_Companions/`, with subfolders mirroring the source folder names (`_Companions/_Clippings/` for sources in `_Clippings/`). Every companion is `type: companion`; corpus-mode enrichment is marked by a `corpus_context:` field, not by a different type. (D83, S179)
 
 **Example:** source `_Clippings/biophysical-orgonomy.md` produces `_Companions/_Clippings/c_biophysical-orgonomy.md` with `type: companion`.
+
+---
+
+## Harvest via embeddable synth note
+
+**Rule:** When a harvest routes to **multiple destinations, or to a destination that is contested or not yet ready** (mid-edit under concurrent operation, or awaiting a team decision), harvest once into a single `c_` companion built from self-contained, **embeddable** `##` sections, and let each destination transclude the section it needs (`![[synth-note#Section Name]]`) rather than copying the content in. This is "link, don't restate" applied to harvest output -- the content lives in one place, propagation is by embed, and editing a section updates every doc that embeds it. When a harvest routes cleanly to a single ready destination the instance owns, direct synthesis (the standard harvest skills) is simpler -- reach for this pattern only when fan-out or a not-ready destination earns it.
+
+**Structure of the synth note:**
+
+- **Weave-in sections.** Each `##` section reads cleanly when transcluded on its own and carries a one-line source/provenance tag, so provenance travels with the embed.
+- **Embed Map.** A table near the top: one row per weave-in section giving its destination doc, the exact `![[synth-note#Section Name]]` string to paste, and a **route** marker -- `embed` (transclude into a working doc) or `native` (write the content in directly, then keep the synth-note section as provenance). Logs, decision records, and trackers are `native` by default -- they want to be self-contained and append-only.
+- **Team-download header.** A synopsis section at the very top -- 2-3 plain-language sentences on the source plus a "where it landed" list linking each destination. Flag *this synth note* for the team (a file-level flag whose `flag_note` points at the synopsis), not the raw source.
+- **`embed_targets` YAML** on the synth note lists the onward destinations so the flow is machine-scannable -- the second provenance hop after the source's `harvested_into`. Field definition: [[YAML Schema]]. Provenance model: [[Harvest Provenance Architecture]].
+
+**Workflow:**
+
+1. **Overlap check first.** Before adding a section, check whether the destination already covers it (the target-section overlap check design-harvest uses). If it does, a cross-reference beats an embed.
+2. **Harvest into the synth note** as weave-in sections, build the Embed Map, write the team-download header, and flag the synth note.
+3. **Per-section sensitivity.** Mark any confidential section inline -- a confidential section is never embedded or graduated into a funder-facing or public doc, per the project's confidentiality rules.
+4. **Destinations transclude when their owning thread is ready** -- placement is separated from the act of harvesting and can wait.
+5. **Resolves-open-questions cross-link.** When a section closes open questions living in a destination, the embed lead-in names which items it resolves, and the resolved items are struck in place.
+6. **Graduate when a destination must be self-contained** (e.g. a funder-facing export): replace the embed with native content, then retire the embed -- the synth note remains as provenance.
+
+**Heading stability.** A section-embed breaks silently if the synth-note heading changes -- an empty transclusion still looks fine in the destination. Weave-in headings must be stable and filename-safe (no em-dashes, curly quotes, or colons -- same discipline as patch anchors, Working Rule 8). **Close step:** verify on disk (a filesystem read, not the MCP reader -- Working Rule 10) that every `##` heading in the synth note exactly matches its `![[synth-note#Section Name]]` string in every destination.
+
+**Example:** a call harvested into `c_2026-08 Team Sync` routes a "Fundraising status" section (`embed`) into a working plan via `![[c_2026-08 Team Sync#Fundraising status]]`, and a "Decision - entity choice" section (`native`) into the Decision Log; the synth note carries `embed_targets` listing both and is flagged for the team while the raw transcript is not. (D116; validated twice -- Weave, 2026-08.)
 
 ---
 
@@ -249,6 +286,14 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 (5.0 salvage + D77)
 
 **Example:** D77 itself uses Decision / Rationale / Date plus `**Protocol updated:** Not applicable`, because it is a meta-convention about the log rather than a protocol-doc change.
+
+---
+
+## Change-governance merge-gate
+
+**Rule:** A pull request or collaborator change that alters a **recommended tool, connection method, architecture, or operator-facing setup instruction** requires a **logged decision before merge** -- it must not ride in as a documentation edit. Merging such a change silently adopts a de facto architecture or tooling decision; the decision log is where that choice is made deliberately and greppably, not the diff. Kin to "change the value, check the rationale" (a value change is visible everywhere it is used, but its justification lives in one doc and dies silently) and to the Tracking Model's act-at-the-commit-moment discipline. (D111)
+
+**Example:** a docs PR that switches the recommended MCP connection method is gated -- log the decision (rationale plus the alternatives rejected) first, then merge. The failure mode this guards against: an unlogged method switch that stood as a doc/reality divergence for roughly 40 sessions before anyone caught it.
 
 ---
 
