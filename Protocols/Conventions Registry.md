@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-08'
+updated: '2026-08-10'
 operator: Andrew
 priority: high
 maturity: working
@@ -25,6 +25,9 @@ edit_log:
   - "DW-S262 2026-08-08: added Harvest via embeddable synth note section (D116;
     Weave FR adoption) + Change-governance merge-gate (D111) + Catalogs
     conventions; fixed OPSEC/D25 miscitation"
+  - "WV_2026-08-10_AA_01 2026-08-10: added Operator personal / scratch folders
+    section (Weave-origin, generalized + depersonalized; DW decision-log entry
+    pending)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -91,6 +94,14 @@ Files are named `0.N Title - ProjectName.md`; the ProjectName suffix disambiguat
 The `_` prefix sorts active meta-folders to the top and is shell-safe (no escaping needed in zsh/bash). The `x` prefix sorts the archive to the *bottom*, where dead files belong. The `- ProjectName` suffix prevents ambiguity when several projects share one vault. (D71, D74, D87)
 
 **Example:** `_Infrastructure - DataWizard/`, `_Sections - DataWizard/Session Log/`, `xArchive - DataWizard/`.
+
+---
+
+## Operator personal / scratch folders
+
+**Rule:** An operator may keep a personal, eponymous folder at the project root as a scratchpad / notebook. It holds anything not meant for the shared vault: **ephemeral** docs (meeting- or event-scoped, stale afterward), **private** notes (not intended for anyone else to read), and **not-yet-ready** drafts (unshared work in progress). The point is less clutter in the shared vault - the personal folder absorbs low-stakes and in-progress material so the shared strategy and workflow folders stay reserved for durable, shareable content. Ephemeral items carry `maturity: ephemeral`; unfinished ones use `maturity: draft`. A note can **graduate** out of the personal folder into the wider vault when it is ready to share (move with `move_note` and fix references). Durable synthesis, companions, and decisions route to their normal shared homes directly, never via the personal folder. (Weave, 2026-08)
+
+**Example:** an operator's `<Name>/` folder holds a meeting running-order (ephemeral), a rough idea not yet shared, and a team draft not ready for review; when the draft is ready it graduates into the appropriate shared folder.
 
 ---
 
