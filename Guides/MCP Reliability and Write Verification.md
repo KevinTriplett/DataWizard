@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-08'
+updated: '2026-08-10'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -33,6 +33,8 @@ edit_log:
     rename-aside recovery"
   - "DW-S257 2026-08-08 - array-wipe entry extended: transcription-drift variant
     (copy array values verbatim from the fresh read, never retype)"
+  - "DW-S263 2026-08-10 - patch_note session-wide bogus 'oldString cannot be
+    empty' failure mode + filesystem edit_file fallback"
 ---
 # MCP Reliability and Write Verification
 
@@ -218,6 +220,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **`patch_note` does not match inside YAML frontmatter.** `patch_note` operates only on the markdown body, not the frontmatter block. A patch whose `oldString` targets a frontmatter field (e.g. a skill's `description:`, or any `key: value` line above the closing `---`) returns `matchCount: 0` / "String not found" even when the text is visibly present. Use `update_frontmatter` (merge: true) for frontmatter edits; reserve `patch_note` for body content. (Source: DW S198)
 
 **`patch_note` also fails on a shell's `---` divider.** A patch whose `oldString` targets the `---` horizontal rule separating embed sections in a shell file returns "target not found." Use a filesystem Edit with a unique text anchor (include neighboring text), or anchor the patch on adjacent body text rather than the bare divider. (Source: Weave, 2026-07)
+
+**`patch_note` can fail session-wide with a bogus "oldString cannot be empty".** Observed: every `patch_note` call in a session returned `"oldString cannot be empty"` even though non-empty, exact-match `oldString` values were supplied (verified against fresh reads), across multiple files and repeated attempts. Reads, `write_note`, and `update_frontmatter` worked normally in the same session; a bridge reconnect did not clear it. When this signature appears, stop retrying `patch_note` (the error is spurious, not a matching problem) and fall back to the local filesystem MCP's `edit_file` on the real vault path -- it makes surgical, diff-verified edits reliably (same fallback as the vault-script editing pattern above). Small files can alternatively go through a re-read + full `write_note` overwrite. (Source: DW S263)
 
 **`filesystem:edit_file` can insert text inline when the anchor starts mid-line.** If the match anchor begins partway through a line, the inserted header text lands inline rather than on its own line. Dry-run first and include the preceding text in the anchor so the insertion point is unambiguous. (Source: Weave, 2026-07)
 
