@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-10'
+updated: '2026-08-14'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -33,8 +33,11 @@ edit_log:
     rename-aside recovery"
   - "DW-S257 2026-08-08 - array-wipe entry extended: transcription-drift variant
     (copy array values verbatim from the fresh read, never retype)"
-  - "DW-S263 2026-08-10 - patch_note session-wide bogus 'oldString cannot be
-    empty' failure mode + filesystem edit_file fallback"
+  - DW-S263 2026-08-10 - patch_note session-wide bogus 'oldString cannot be
+    empty' failure mode + filesystem edit_file fallback
+  - RW-S68 2026-08-14 - rename-on-mount inconsistency caveat (RW S46/S67 vs DW
+    S182/S253); cloud-container overflow-recovery nuance (saved tool-result
+    readable by cloud Bash)
 ---
 # MCP Reliability and Write Verification
 
@@ -105,7 +108,7 @@ Rules:
 
 `read_multiple_notes` on a large batch overflows the tool-result ceiling and dumps the payload to a host-path file the Cowork sandbox cannot read -- so the read effectively returns nothing usable (observed at ~73KB of docs, and again with 5+ medium notes). Keep batches to **2-4 notes per `read_multiple_notes` call**, or fall back to individual `read_note` calls, which stay under the limit.
 
-For a single large note that overflows on its own: parse the saved tool-result JSON by section header / character range, or read it with `filesystem:read_text_file` (a 55KB file read cleanly in one call) and script-parse. A note that reliably overflows on read is also a sectioning candidate (Working Rule 7). (Source: ReWoven S34; Weave, 2026-07/08)
+For a single large note that overflows on its own: parse the saved tool-result JSON by section header / character range, or read it with `filesystem:read_text_file` (a 55KB file read cleanly in one call) and script-parse. A note that reliably overflows on read is also a sectioning candidate (Working Rule 7). (Source: ReWoven S34; Weave, 2026-07/08) Nuance for **remote (cloud) Cowork sessions**: there the saved tool-result file lands in the *cloud container*, where the cloud `Bash` tool CAN read it -- parse the saved JSON and slice its `content` field (python `json.loads`, then string-slice). The "sandbox cannot read it" limitation applies to the on-device sandbox layout, not the cloud-container layout. (Source: RW S68)
 
 ## Verification Protocol
 
@@ -206,6 +209,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **Vault-wide `search_notes` is fine to use.** Scoping every search to a single folder out of caution is unnecessary -- there is no reliability reason to avoid vault-wide search, and it works reliably across the whole vault. Use it freely for discovery. The one real caveat is the exact-title false-negative directly above: search confirms presence, never absence -- a "no results" is not proof a note or link is missing; confirm absence with `list_directory` / `Glob`.
 
 **Sandbox bash cannot delete files on the vault FUSE mount.** From the Cowork sandbox, `rm`/unlink fails with "Operation not permitted" on the Regen Vault (a FUSE mount -- `.fuse_hidden*` files are the tell), though `touch`, create, `mv`/rename, and truncate-write all work. To archive or relocate vault files, use `obsidian:move_note` (it runs with Obsidian's full filesystem access), not bash `cp`+`rm` (which aborts at the first delete). When stamping an archive banner on a file with YAML frontmatter, insert it AFTER the closing `---` (e.g. `patch_note` in front of the first body line) -- prepending breaks the frontmatter. (Source: DW S182) Bulk frontmatter edits via a Python script over the mount do work, and beat per-file MCP patches at scale -- the delete restriction still applies, so a script may rewrite in place but not unlink. (Source: Weave S98)
+
+**Rename on the mount is inconsistent -- verify, don't assume.** The entry above records `mv`/rename working on the FUSE mount (DW S182), and the rename-aside lock recovery (DW S253) depends on it. But ReWoven sessions have seen the opposite: sandbox `os.rename`/`mv` failing with PermissionError while create/overwrite worked (RW S46), and a device-side session finding in-place rename failing where copy-out-then-truncate-write (`perl ... > /tmp/x && cat /tmp/x > file`) succeeded (RW S67, `device_bash` VM mount -- a different mount than the sandbox FUSE). Treat rename as environment-dependent: verify the result after any mount rename, and on failure fall back to `obsidian:move_note` (for vault notes) or copy-then-truncate-write (for any file). (RW S46, S67; surfaced RW S68 meta-learning review)
 
 **Sandbox bash CAN reach the vault -- but only at the mount path, not the Mac path.** A correction to a belief recorded in RW S53 ("device_bash cannot see the vault"). The Cowork sandbox does mount the session's connected folders, at `/sessions/<session-id>/mnt/<folder-name>/` -- discover them with `ls mnt/` from the default working directory. Mac absolute paths (`/Users/.../Vaults/Regen Vault/...`) fail with "No such file"; mount-relative paths work. This makes bash genuinely useful for **read-only** verification, which is fast and cheap at scale: `ls | wc -l` for counts, `stat -c %s` for byte-size comparison against a pre-change directory listing, `find -size -1c` for truncation. Writes and deletes remain restricted per the two entries above. (Source: RG S4, correcting RW S53) Mount stability is not guaranteed for a whole session -- the path can rotate or lose permissions mid-session (a path that served `find` earlier later returned Permission denied for `grep`); if a bash check suddenly fails where it worked, re-discover the mount (`ls mnt/`) rather than concluding the file is gone. At scale, `diff -rq` between the mount and a reference copy plus a targeted `grep` verifies a multi-file operation (e.g. a 16-file dedup) without pulling any file into context -- the context-cheapest verification for bulk work. (Source: Weave, 2026-07/08)
 
