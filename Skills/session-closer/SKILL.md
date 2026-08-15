@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-08'
-version: '4.4.1'
+updated: '2026-08-15'
+version: '4.5.0'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -38,6 +38,9 @@ edit_log:
     send-off, delivered just before the thread name (Step 5 unchanged)"
   - "DW-S258 2026-08-08 - v4.4.1: Step 5 presents the thread name in a fenced
     code block (renders as a one-click-to-copy box in chat)"
+  - "DW-S270 2026-08-15 - v4.5.0: Step 3 stub overwrite + move_note rename
+    replaces delete_note (no destructive-op permission prompt); rename
+    verification step added"
 ---
 
 # Session Closer Skill
@@ -163,9 +166,9 @@ The quest threads section prevents long-running workstreams from falling off the
 
 Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
 1. Re-read the session log shell to get the current section number and embed list
-2. Write the new section file with the final title to the session log folder. Solo-operator: `99.0 Session 113 - Brief Title.md` (use section number as prefix). Multi-operator: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix). See Session Identifier Format for full details.
-3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): **first confirm the stub is yours** -- match its `claim_id` to the one you stamped at orientation (or, if absent, its focus line and `operator`). Never delete or overwrite a parallel instance's in-progress stub (the S178/S179 collision); if it isn't yours, leave it and claim the next available identifier. Once confirmed yours, delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it. The final entry does not carry `claim_id` -- it is a claim-time field only (see [[YAML Schema]] Session Log Fields).
-4. Add the session embed to the shell. Under verify-after-claim (PI Orientation Step 3) the stub is NOT embedded at claim, so you are normally adding the embed fresh at close -- patch it into the shell in reverse-chronological position. (Legacy fallback: if an older workflow already left a stub embed in the shell, replace it with the final filename rather than adding a duplicate.)
+2. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): **first confirm the stub is yours** -- match its `claim_id` to the one you stamped at orientation (or, if absent, its focus line and `operator`). Never overwrite a parallel instance's in-progress stub (the S178/S179 collision); if it isn't yours, leave it and claim the next available identifier. Once confirmed yours, **the stub becomes the entry -- no delete needed**: overwrite it in place with the full final entry (`write_note`, overwrite mode, complete frontmatter -- overwrite replaces the whole file, which drops `claim_id` and `status: in-progress`; the final entry never carries either, see [[YAML Schema]] Session Log Fields), then rename it to the final title with `move_note`. Solo-operator final name: `99.0 Session 113 - Brief Title.md` (section number as prefix). Multi-operator: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix). See Session Identifier Format for full details. Nothing links to the stub filename (the shell embed is added fresh in step 4), so the rename needs no link repair. If no stub exists (older claim workflow, or the stub was lost), write the new section file with the final title directly.
+3. **Verify the rename landed**: re-list the session log folder and confirm the final filename exists and the "in progress" filename is gone. If the rename failed, the full entry is intact under the stub filename -- retry the rename once; if it still fails, keep the stub filename, tell the user, and use the actual on-disk filename in step 4. (A complete entry stranded under an "in progress" name cannot be double-claimed -- its `status: in-progress` and `claim_id` are gone, and claims always go above the highest identifier -- but rename it next session.)
+4. Add the session embed to the shell, using the filename verified in step 3. Under verify-after-claim (PI Orientation Step 3) the stub is NOT embedded at claim, so you are normally adding the embed fresh at close -- patch it into the shell in reverse-chronological position. (Legacy fallback: if an older workflow already left a stub embed in the shell, replace it with the final filename rather than adding a duplicate.)
 
 > **Parallel instance check:** Before writing, re-list the session log
 > section folder and verify the target identifier doesn't already exist

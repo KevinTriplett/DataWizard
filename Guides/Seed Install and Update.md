@@ -1,13 +1,6 @@
 ---
-title: Seed Install and Update
-type: guide
-created: '2026-06-11'
-updated: '2026-08-01'
-operator: Andrew
 audience: Claude instances helping DataWizard users
-purpose: >-
-  Canonical guide for installing, manually updating, and auto-syncing the
-  DataWizard Seed
+created: 2026-06-11
 edit_log:
   - DW-S168 2026-06-11
   - DW-S189 2026-06-18
@@ -16,6 +9,16 @@ edit_log:
     auto-sync section"
   - "DW-S227 2026-08-01 - Jay FR batch item d: announcement norm added to
     Upstream Operator Note; note de-personalized (maintainer name removed)"
+  - DW-S270 2026-08-15 - one-command auto-sync installers (--install-autosync /
+    -InstallAutosync) replace the manual plist and Task Scheduler recipes;
+    sleep/wake catch-up semantics documented; upstream seed_role guard;
+    git-clone-aware sync
+operator: Andrew
+purpose: Canonical guide for installing, manually updating, and auto-syncing the
+  DataWizard Seed
+title: Seed Install and Update
+type: guide
+updated: 2026-08-15
 ---
 # Seed Install and Update
 
@@ -25,7 +28,7 @@ edit_log:
 
 The **zip download is the canonical install and update path for every operator, on every platform.** All install/update commands and both update scripts (`update_seed.sh`, `update_seed.ps1`) pull the GitHub zip, not a git clone.
 
-Git clones of the Seed are for **contributors only**. The Seed's history can be rewritten (for example, to purge an accidentally committed secret), which breaks a downstream clone's next `git pull` with an unrelated-histories error -- while the zip is unaffected. So: **operator path = zip** (the scripts below), **contributor path = git clone** (only if you intend to push changes back upstream).
+Git clones of the Seed are for **contributors only**. The Seed's history can be rewritten (for example, to purge an accidentally committed secret), which breaks a downstream clone's next `git pull` with an unrelated-histories error -- while the zip is unaffected. So: **operator path = zip** (the scripts below), **contributor path = git clone** (only if you intend to push changes back upstream). `update_seed.sh` recognizes a cloned Seed and syncs it with `git fetch` + fast-forward merge instead of the zip, refusing to touch local edits or local commits; `update_seed.ps1` skips clones and tells you to sync with git.
 
 ---
 
@@ -99,11 +102,13 @@ Like the bash script, it auto-detects the vault root when run from inside the Se
 
 ---
 
-## Automated Sync (Mac only)
+## Automated Sync
 
-Once manual updates work, you can set up daily automatic syncing so the Seed stays current without human intervention.
+Once manual updates work, turn on daily automatic syncing so the Seed stays current without human intervention. Both installers are built into the update scripts -- one command, no hand-edited config.
 
-### Path A: Already running datawizard-sync.sh
+**The machine does not need to be awake at the scheduled hour.** On Mac, launchd runs a missed calendar job once when the machine wakes from sleep, and the login trigger covers a machine that was powered off. On Windows, Task Scheduler's `StartWhenAvailable` fires a missed run as soon as the machine is next available. The only way to never sync is to never turn the computer on.
+
+### Path A: Already running datawizard-sync.sh (Mac)
 
 If the user already has a launchd agent running `datawizard-sync.sh` for git repo syncing, the Seed just needs to be included in their sync config.
 
@@ -123,98 +128,55 @@ If the user already has a launchd agent running `datawizard-sync.sh` for git rep
    ```
    Should show `com.datawizard.sync`. If not, they need to reload it.
 
-Done. Their existing sync schedule now covers the Seed.
+Done. Their existing sync schedule now covers the Seed. They do NOT also need Path B -- that would be two agents syncing the same folder.
 
-### Path B: Seed-only sync
+### Path B: Seed-only sync (Mac)
 
-For users who don't run `datawizard-sync.sh`, set up a standalone daily sync.
+One command:
 
-1. Test the script manually first:
-   ```bash
-   bash "/path/to/vault/_DataWizard/Seed/update_seed.sh"
-   ```
-   Should print "Already current" or "Seed updated successfully." Check for errors.
+```bash
+bash "/path/to/vault/_DataWizard/Seed/update_seed.sh" --install-autosync
+```
 
-2. Create the launchd plist. Ask the user to run (replacing VAULT_PATH with their actual vault path):
-   ```bash
-   cat > ~/Library/LaunchAgents/com.datawizard.seed-update.plist << 'EOF'
-   <?xml version="1.0" encoding="UTF-8"?>
-   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-     "http://purl.apple.com/dtds/PropertyList-1.0.dtd">
-   <plist version="1.0">
-   <dict>
-       <key>Label</key>
-       <string>com.datawizard.seed-update</string>
-       <key>ProgramArguments</key>
-       <array>
-           <string>/bin/bash</string>
-           <string>VAULT_PATH/_DataWizard/Seed/update_seed.sh</string>
-       </array>
-       <key>StartCalendarInterval</key>
-       <dict>
-           <key>Hour</key>
-           <integer>6</integer>
-           <key>Minute</key>
-           <integer>0</integer>
-       </dict>
-       <key>RunAtLoad</key>
-       <true/>
-       <key>StandardErrorPath</key>
-       <string>/tmp/datawizard-seed-update.err</string>
-   </dict>
-   </plist>
-   EOF
-   ```
-   **Important:** The user must manually edit the file to replace `VAULT_PATH` with their actual vault path before loading.
+This writes the launchd agent (`com.datawizard.seed-update`) with the vault path filled in automatically, loads it, verifies it registered, and writes an "Auto-sync installed" entry to the Seed Sync Log. Schedule: daily at 6:00 plus at every login, with catch-up on wake. Options:
 
-3. Load it:
-   ```bash
-   launchctl load ~/Library/LaunchAgents/com.datawizard.seed-update.plist
-   ```
+- `--hour N` -- sync at a different hour (0-23), e.g. `--hour 9`
+- `--uninstall-autosync` -- remove the agent
 
-4. Verify:
-   ```bash
-   launchctl list | grep datawizard.seed
-   ```
-   Should show `com.datawizard.seed-update`.
+`RunAtLoad` means the first sync fires immediately on install -- that's expected.
 
-The Seed will now sync daily at 6am and on login.
+Verify:
+```bash
+launchctl list | grep datawizard.seed
+```
+Should show `com.datawizard.seed-update`, and the Seed Sync Log should have the install entry.
 
 ### Windows (Task Scheduler)
 
-Windows uses Task Scheduler in place of launchd. This mirrors the Mac Path B (Seed-only daily sync) using `update_seed.ps1`.
+One command (PowerShell):
 
-1. Test the script manually first:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File "C:\path\to\vault\_DataWizard\Seed\update_seed.ps1"
-   ```
-   It should print "Already current..." or "Seed updated successfully...". Check for errors.
+```powershell
+powershell -ExecutionPolicy Bypass -File "C:\path\to\vault\_DataWizard\Seed\update_seed.ps1" -InstallAutosync
+```
 
-2. Register a scheduled task that runs it daily at 6am and at logon (edit the vault path first). Ask the user to run this once in PowerShell:
-   ```powershell
-   $vault  = "C:\path\to\vault"
-   $script = Join-Path $vault "_DataWizard\Seed\update_seed.ps1"
-   $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$script`""
-   $triggers = @(
-       (New-ScheduledTaskTrigger -Daily -At 6am),
-       (New-ScheduledTaskTrigger -AtLogOn)
-   )
-   Register-ScheduledTask -TaskName "DataWizard Seed Update" -Action $action -Trigger $triggers -Description "Daily DataWizard Seed sync from GitHub"
-   ```
+This registers a Scheduled Task named "DataWizard Seed Update": daily at 6:00 plus at every logon, with `StartWhenAvailable` catch-up for runs missed while the machine was asleep or off. No admin rights required. Options:
 
-3. Verify the task is registered:
-   ```powershell
-   Get-ScheduledTask -TaskName "DataWizard Seed Update"
-   ```
+- `-Hour N` -- sync at a different hour (0-23)
+- `-UninstallAutosync` -- remove the task
 
-4. (Optional) Run it once on demand to confirm it works end to end:
-   ```powershell
-   Start-ScheduledTask -TaskName "DataWizard Seed Update"
-   ```
+Verify:
+```powershell
+Get-ScheduledTask -TaskName "DataWizard Seed Update"
+```
 
-The Seed will now sync daily and at logon. Results are logged to `_DataWizard\Seed Sync Log.md`, the same log the Mac path writes.
+Optionally run it once on demand to confirm end to end:
+```powershell
+Start-ScheduledTask -TaskName "DataWizard Seed Update"
+```
 
-> Note: this Windows recipe has not yet been validated on a live Windows machine -- confirm the first run against the Seed Sync Log before relying on the schedule.
+Results log to `_DataWizard\Seed Sync Log.md`, the same log the Mac path writes.
+
+> Note: the Windows installer has not yet been validated on a live Windows machine -- confirm the first run against the Seed Sync Log before relying on the schedule.
 
 ---
 
@@ -238,4 +200,6 @@ While verifying, check whether the human's Project Instructions version matches.
 
 The Seed maintainer (whoever publishes the Seed to GitHub) does NOT run auto-sync. Their local Seed is the upstream source -- running `update_seed.sh` / `update_seed.ps1` would overwrite local edits with the last push to GitHub. This guide's install/update automation is for downstream operators only.
 
-**Announcement norm.** After each Seed push, the maintainer posts a one-line announcement to the operator/team channel: the new `seed:` / `project_instructions:` versions and whether operators must re-paste Project Instructions. This is the push-side counterpart to the local-only version check instances run at orientation -- without it, operators have no signal that a new Seed shipped (both the zip and npx caches update silently).
+**The scripts enforce this.** A `seed_role` row containing `upstream` in the vault's `Vault Config.md` (untracked, user-specific) makes both scripts refuse to sync or install auto-sync on that machine (exit 3, logged). The maintainer should carry that row; downstream operators should not.
+
+**Announcement norm.** After each Seed push, the maintainer posts a one-line announcement to the operator/team channel: the new `seed:` / `project_instructions:` versions and whether operators must re-paste Project Instructions. This is the push-side counterpart to the local-only version check instances run at orientation -- without it, operators have no signal that a new Seed shipped (both the zip and npx caches update silently). With auto-sync installed, downstream Seeds pick up a push within a day on their own -- the announcement still matters for PI re-pastes, which no script can do for the user.

@@ -267,6 +267,8 @@ powershell -ExecutionPolicy Bypass -File "_DataWizard\Seed\update_seed.ps1"
 
 This downloads the latest Seed and overwrites only the Seed files. Your project content (session logs, action items, workshop docs) is never touched.
 
+**Set-and-forget option:** add `--install-autosync` (Mac) or `-InstallAutosync` (Windows) to the command above to install a daily automatic check (6:00 by default, with catch-up when the machine wakes or logs in -- it does not need to be awake at the scheduled hour). Full details, options, and how to remove it: `Guides/Seed Install and Update.md`.
+
 ---
 
 ## What's in the Seed
@@ -300,7 +302,7 @@ If a user shares this README or the GitHub link with you, help them get DataWiza
 Key points:
 - The Seed should be installed locally in the vault, not read from GitHub
 - All protocols, skills, and guides are in `_DataWizard/Seed/` -- read them via MCP
-- Orientation reads the local Seed's VERSION.md only -- no GitHub fetch. Updates run via update_seed.sh (Mac) or update_seed.ps1 (Windows) when the user asks
+- Orientation reads the local Seed's VERSION.md only -- no GitHub fetch. Updates run via update_seed.sh (Mac) or update_seed.ps1 (Windows) when the user asks, or automatically if the user has installed auto-sync (`--install-autosync` / `-InstallAutosync`)
 - Always get user approval before writing to the vault
 - If the user already has a Seed installed, check if it needs updating before starting
 - After MCP is connected, load the `install-wizard` skill to complete setup interactively

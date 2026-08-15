@@ -1,5 +1,5 @@
 
-seed: 1.1.1
+seed: 1.2.0
 protocol: 1.8
 project_instructions: 4.5
 
@@ -37,6 +37,24 @@ deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
 Design, edit its plist to point at the new root path.
 
 This notice can be removed from VERSION.md after 2026-09.
+
+## What's New in 1.2.0
+- One-command Seed auto-sync: `update_seed.sh --install-autosync` (Mac,
+  launchd) / `update_seed.ps1 -InstallAutosync` (Windows, Task Scheduler).
+  Daily check at 6:00 (configurable via --hour / -Hour) plus at login,
+  with catch-up when the machine wakes - it does not need to be awake at
+  the scheduled hour. Remove with --uninstall-autosync / -UninstallAutosync.
+- update_seed.sh is now git-clone aware: a cloned Seed syncs via
+  git fetch + fast-forward merge and is never clobbered when local
+  edits or local commits exist (skip is logged instead).
+- Upstream guard: a `seed_role` row containing `upstream` in Vault
+  Config.md makes both scripts refuse to sync or install auto-sync
+  (protects the maintainer's Seed, which pushes rather than pulls).
+- session-closer v4.5.0: at close, the orientation stub is overwritten
+  in place with the final entry and renamed (write + move) instead of
+  deleted - no more destructive-op permission prompt for the stub.
+- Seed Install and Update guide rewritten around the one-command
+  auto-sync flow; README Updating section points to it.
 
 ## What's New in 1.1.1
 - SECURITY: .gitignore now excludes Telegram harvester artifacts

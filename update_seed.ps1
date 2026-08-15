@@ -5,16 +5,30 @@
 
   Usage:
     powershell -ExecutionPolicy Bypass -File update_seed.ps1 [-Vault C:\path\to\vault]
+    powershell -ExecutionPolicy Bypass -File update_seed.ps1 -InstallAutosync [-Hour 6] [-Vault C:\path\to\vault]
+    powershell -ExecutionPolicy Bypass -File update_seed.ps1 -UninstallAutosync
 
   If run from within the Seed, auto-detects the vault root (two levels up).
   If run standalone (e.g. first install), pass -Vault explicitly.
 
-  Exit codes: 0 = updated, 1 = error, 2 = already current
+  -InstallAutosync registers a Windows Scheduled Task that runs this script
+  daily at -Hour (default 6:00) AND at every logon. StartWhenAvailable means
+  a run missed while the machine was asleep or off fires as soon as the
+  machine is next available - the computer does NOT need to be awake at the
+  scheduled time to stay in sync. No admin rights required.
+
+  Note: if your Seed is a git clone (Seed\.git exists), sync it with git
+  instead of this script - the zip copy would leave the working tree dirty.
+
+  Exit codes: 0 = updated/ok, 1 = error, 2 = already current, 3 = skipped (guard)
 #>
 
 [CmdletBinding()]
 param(
-    [string]$Vault = ""
+    [string]$Vault = "",
+    [switch]$InstallAutosync,
+    [switch]$UninstallAutosync,
+    [ValidateRange(0,23)][int]$Hour = 6
 )
 
 $ErrorActionPreference = 'Stop'
@@ -22,6 +36,7 @@ $ErrorActionPreference = 'Stop'
 $RepoUrl = "https://github.com/andrewalan11/DataWizard/archive/refs/heads/main.zip"
 $TmpDir  = Join-Path $env:TEMP "dw-seed-update"
 $TmpZip  = Join-Path $env:TEMP "dw-seed.zip"
+$TaskName = "DataWizard Seed Update"
 
 # --- Determine vault root ---
 $VaultRoot = $Vault
@@ -33,6 +48,8 @@ if ([string]::IsNullOrWhiteSpace($VaultRoot)) {
 
 $SeedDir = Join-Path $VaultRoot "_DataWizard\Seed"
 $SyncLog = Join-Path $VaultRoot "_DataWizard\Seed Sync Log.md"
+$VaultConfig = Join-Path $SeedDir "Vault Config.md"
+$ScriptPath = Join-Path $SeedDir "update_seed.ps1"
 
 function Get-VersionField {
     param([string]$File, [string]$Field)
@@ -68,6 +85,75 @@ function Write-LogEntry {
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     Add-Content -Path $SyncLog -Value ("**{0}** — {1}" -f $timestamp, $Message) -Encoding utf8
     Write-Host $Message
+}
+
+function Test-Upstream {
+    # The maintainer's Seed is the upstream source; auto-syncing it would
+    # overwrite local edits. Guard: seed_role row containing 'upstream' in
+    # the (untracked, user-specific) Vault Config.md.
+    if (-not (Test-Path $VaultConfig)) { return $false }
+    $match = Select-String -Path $VaultConfig -Pattern 'seed_role.*upstream' -Quiet
+    return [bool]$match
+}
+
+# --- Uninstall autosync ---
+if ($UninstallAutosync) {
+    $existing = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+    if ($null -ne $existing) {
+        Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
+        Write-LogEntry "Auto-sync uninstalled (Scheduled Task '$TaskName' removed)."
+    } else {
+        Write-Host "No Scheduled Task named '$TaskName' found - nothing to remove."
+    }
+    exit 0
+}
+
+# --- Install autosync ---
+if ($InstallAutosync) {
+    if (Test-Upstream) {
+        Write-LogEntry "REFUSED: -InstallAutosync blocked. Vault Config marks this machine as the Seed upstream (seed_role: upstream)."
+        exit 3
+    }
+    if (Test-Path (Join-Path $SeedDir ".git")) {
+        Write-LogEntry "REFUSED: -InstallAutosync blocked. This Seed is a git clone - the zip sync would dirty the working tree. Sync it with git instead."
+        exit 3
+    }
+
+    $timeString = "{0:00}:00" -f $Hour
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" `
+        -Argument ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`" -Vault `"{1}`"" -f $ScriptPath, $VaultRoot)
+    $trigDaily = New-ScheduledTaskTrigger -Daily -At $timeString
+    $trigLogon = New-ScheduledTaskTrigger -AtLogOn
+    $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable `
+        -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
+        -ExecutionTimeLimit (New-TimeSpan -Minutes 15)
+
+    Register-ScheduledTask -TaskName $TaskName -Action $action `
+        -Trigger $trigDaily, $trigLogon -Settings $settings -Force | Out-Null
+
+    # Verify it registered
+    $check = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+    if ($null -ne $check) {
+        Write-LogEntry ("Auto-sync installed: daily at {0} + at logon, with catch-up when the machine wakes (Scheduled Task '{1}')." -f $timeString, $TaskName)
+        Write-Host ""
+        Write-Host "To remove later: powershell -ExecutionPolicy Bypass -File update_seed.ps1 -UninstallAutosync"
+        exit 0
+    } else {
+        Write-LogEntry "ERROR: Scheduled Task registration did not verify. Open Task Scheduler and check for '$TaskName'."
+        exit 1
+    }
+}
+
+# --- Sync run below this point ---
+
+if (Test-Upstream) {
+    Write-LogEntry "SKIPPED: sync refused on the upstream (maintainer) machine per Vault Config seed_role."
+    exit 3
+}
+
+if (Test-Path (Join-Path $SeedDir ".git")) {
+    Write-LogEntry "SKIPPED: this Seed is a git clone. Sync it with git (fetch + fast-forward) instead of the zip copy."
+    exit 3
 }
 
 # --- Capture current version (if Seed exists) ---
@@ -140,7 +226,8 @@ if ($FreshInstall) {
     Write-Host "Next steps:"
     Write-Host "  1. Paste Project Instructions into your Claude project settings."
     Write-Host "     Source: $SeedDir\DataWizard Project Instructions.md"
-    Write-Host "  2. (Optional) Set up auto-sync - see the Seed Install and Update guide."
+    Write-Host "  2. (Recommended) Turn on daily auto-sync:"
+    Write-Host "     powershell -ExecutionPolicy Bypass -File `"$ScriptPath`" -InstallAutosync"
 } else {
     Write-LogEntry "Updated: Seed $OldVersion -> $NewVersion, PI $OldPI -> $NewPI."
     if ($OldPI -ne $NewPI) {
