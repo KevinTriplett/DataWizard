@@ -2,10 +2,12 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-08-06'
+updated: '2026-08-15'
 edit_log:
   - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
     for pending-report model (D114)
+  - DW-S270 2026-08-15 - session-closer row bumped to v4.5.0 (stub
+    overwrite+rename ceremony)
 ---
 
 # DataWizard Skills
