@@ -15,6 +15,8 @@ edit_log:
   - DW-S250 2026-08-06 - added the Review Automation guide
   - DW-S273 2026-08-18 - added Chrome MCP and Web Tool Behaviors + Cowork Build
     Environment guides to the Platform cluster
+  - DW-S272 2026-08-18 - added the Orientation Flag Sweep - Query Spec guide
+    (Flag Surfacing Chain, referenced by PI v4.6)
 ---
 # DataWizard Guides
 
@@ -54,6 +56,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Obsidian Bases Reference** | Using Obsidian Bases for DW dashboards and filtered views. |
 | **Working Principles** | The reasoning behind the Working Rules - the "why" under the behavioral contract. |
 | **Review Automation** | The three periodic reviews (health audit, meta-learning, Content Interests): the pending-report model, the cadence table (single home), and how scheduled automation detects staleness so the session-closer only surfaces waiting reports. |
+| **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub and intake sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
 
 ### Onboarding and integrations
 | Guide | Covers |

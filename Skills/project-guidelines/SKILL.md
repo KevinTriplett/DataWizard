@@ -7,7 +7,7 @@ description: >-
   of 0.0 files needing creation or updates.
 type: skill
 version: '1.5'
-updated: '2026-06-12'
+updated: '2026-08-18'
 ---
 
 # Project Guidelines Skill
@@ -55,7 +55,7 @@ Adapt depth to project complexity. Lightweight projects need only 1, 2, 6, 7, 8.
 
 **6. Folder structure** — table: folder → purpose.
 
-**7. Key pointers** — canonical docs, config files, repos, URLs.
+**7. Key pointers** — canonical docs, config files, repos, URLs. Name the project's **intake folders** here (where inbound feature requests, bug reports, skill requests, and handoffs from other projects land) so outbound items from other projects have a named target. The three-class file-placement rule (infrastructure / inbound / outbound-at-target-intake) lives in the Conventions Registry — point to it rather than restating it.
 
 **8. Working conventions** — project-SPECIFIC rules only. Don't repeat universal protocol.
 

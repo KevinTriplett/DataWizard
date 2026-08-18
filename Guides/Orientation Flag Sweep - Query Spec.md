@@ -3,6 +3,8 @@ created: 2026-08-18
 edit_log:
   - DW-S272 2026-08-18 - created (F2 query spec + constants + read-only-sweep
     decision; referenced by PI Orientation Step 6, v4.6)
+  - "DW-S279 2026-08-18 - fourth correction: null-literal normalization in
+    field() (live-corpus catch during the whole-build verification sweep)"
 maturity: working
 operator: Andrew
 seed_version: 1.2.0
@@ -76,7 +78,12 @@ def sweep(root_dir, operator=None):
                     names = [x.strip(' \'"') for x in re.findall(r'-[ \t]*(.+)', mb.group(1))]
             def field(name):
                 fmm = re.search(r'^' + name + r':[ \t]*(.*)$', fm, re.M)
-                return fmm.group(1).strip().strip('\'"') if fmm else ''
+                if not fmm:
+                    return ''
+                v = fmm.group(1).strip().strip('\'"')
+                # YAML null literals (e.g. flag_due: null, written by
+                # properties editors) mean "absent", not the string 'null'.
+                return '' if v.lower() in ('null', '~', 'none') else v
             rows.append({'path': p, 'flag': field('flag'), 'flag_by': field('flag_by'),
                          'flag_due': field('flag_due'), 'flag_default': field('flag_default'),
                          'flag_for': names})
@@ -92,7 +99,7 @@ top = rows[:5]
 remainder = len(rows) - len(top)
 ```
 
-Three corrections applied over the original reference implementation: **CRLF/BOM normalization** (`utf-8-sig` + newline normalize, so files saved on Windows or with a BOM are not silently skipped by the `^---\n` anchor); **zero-indent block lists** (`[ \t]*` not `[ \t]+`, so a `flag_for:` list whose items sit at column 0 is parsed); **empty-due-last sort** (a sentinel high date so flags without a `flag_due` fall to the end rather than sorting ahead of dated ones).
+Four corrections applied over the original reference implementation: **CRLF/BOM normalization** (`utf-8-sig` + newline normalize, so files saved on Windows or with a BOM are not silently skipped by the `^---\n` anchor); **zero-indent block lists** (`[ \t]*` not `[ \t]+`, so a `flag_for:` list whose items sit at column 0 is parsed); **empty-due-last sort** (a sentinel high date so flags without a `flag_due` fall to the end rather than sorting ahead of dated ones); **null-literal normalization** (a YAML null literal -- `null`, `~`, `None`, as properties editors write for an empty date field -- is treated as field-absent, never as a date string; without this, a `flag_due: null` file counts as dated and sorts by the literal string, which lands last only by lexicographic luck -- an uppercase `NULL` variant would sort a phantom item to the top of every queue. Live-corpus catch, 2026-08).
 
 Surface each of `top` with title (filename), `flag_note`, `flag_by`, `flag`, and `flag_due`; on any item past `flag_due`, show its `flag_default` (what happens on silence). Then state the `remainder` count.
 

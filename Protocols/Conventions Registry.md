@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-10'
+updated: '2026-08-18'
 operator: Andrew
 priority: high
 maturity: working
@@ -28,6 +28,11 @@ edit_log:
   - "WV_2026-08-10_AA_01 2026-08-10: added Operator personal / scratch folders
     section (Weave-origin, generalized + depersonalized; DW decision-log entry
     pending)"
+  - "DW-S272 2026-08-18: added File placement -- three classes + Attention
+    requests live in the flag cluster (Flag Surfacing Chain, D117)"
+  - "DW-S278 2026-08-18: added ID families table (task-ID pointer row),
+    optimistic-claim pattern, carry-the-probe, and ceremony-placement entries
+    (D119)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -356,6 +361,51 @@ Sub-rules:
 
 ---
 
+## ID families
+
+**Rule:** Every identifier family answers three questions in one place: where a value is *defined*, what scope it must be *unique* in, and how the next one is *minted*. One row per family; a new family adds its row here at creation instead of improvising - the triad is cheap to fill while the thinking is hot and expensive to reconstruct after drift. (DataWizard, 2026-08)
+
+| Family | Format | Definition site | Minting rule | Uniqueness scope |
+|---|---|---|---|---|
+| Session IDs | `SNNN` (solo) / composite (multi-operator) | session log section folder (claim stub) | optimistic claim: next free above highest entry and any in-progress stub | project |
+| Decision IDs | `DNN` | decision log entry | next sequential; never reused - supersede instead | project |
+| Open questions | `QNN` | decision log open questions | next sequential | project |
+| Thread IDs | `TNN` | Active Threads ledger row | next free on arc open | project |
+| Gate IDs | `G-NNN` | Operator Gate Queue row | next free at queue feed | project |
+| Quest IDs | `XX-Q-NNN` | quest file frontmatter (`quest_id`) | next free across active quests + archive | project |
+| Task IDs | `PREFIX-NNNNN` | checkbox line in the quest layer | scan-max + verify-after-mint - see the **Quest Lifecycle** protocol (canonical home) | project (scan scope = active quests + archive + quest index) |
+| Intake titles (FRs, bug reports) | descriptive filename | the intake folder | filename uniqueness; descriptive, not coded | intake folder |
+
+The Task IDs row is the worked example: its definition-site / scope / minting triad took a three-session design arc to settle after live collisions in two projects; filling the row at family creation is the cheap alternative.
+
+**Example:** a new "experiment IDs" family gets its row (format, definition site, minting rule, scope) before the first ID is minted.
+
+---
+
+## Optimistic-claim pattern
+
+**Rule:** When two sessions can contend for one resource (an ID slot, a filename, a shared row), claim it by **writing, then reading back, then retrying on loss**: write your claim, re-read to confirm your value survived, and on loss take the next free slot and re-verify. No locks, no coordinator - convergence comes from each claimant renumbering only its own claim. Named instances, each canonical in its own home: session claims (the orientation claim ceremony), MCP write verification, task-ID minting (Quest Lifecycle). Any future two-sessions-one-resource problem is answered by "apply the optimistic-claim pattern, scope = X" - not a new design session. (DataWizard, 2026-08)
+
+**Example:** two parallel sessions both mint task ID N+1; each re-searches after writing, at least one sees the double definition, renumbers its own line, and re-verifies.
+
+---
+
+## Carry the probe, not the snapshot
+
+**Rule:** A handoff, brief, or design doc that cites live state another session will act on ships the **query** (the grep/search) alongside or instead of the result, with the instruction to regenerate at execution time. A bare count is stale on arrival - in one design arc, live-state numbers went stale within hours of being written, twice. Corollary: never ship a truncated result (a `| head`-capped listing) as evidence - list the whole window or ship the probe. (DataWizard, 2026-08)
+
+**Example:** a repair handoff says "residual counter fields: run `grep -rl '^next_task_id' <quest folder>` at execution time" rather than "4 files have residual counters."
+
+---
+
+## Ceremony joins existing ceremony moments
+
+**Rule:** A new verification or bookkeeping step must attach to an existing ceremony moment - orientation, the write/mint moment, or session close - never create a new one. Individually-justified checks accrete; the ceremony diet survives only if the number of *moments* stays fixed even as checks move in and out of them. (DataWizard, 2026-08)
+
+**Example:** task-ID uniqueness is checked at the mint moment (verify-after-mint) and at existing lint/audit cadence - not via a new session-closer step.
+
+---
+
 ## Cadence
 
 **Rule:** periodic-review cadence numbers (health audit, meta-learning review, content-interest refresh) live in **exactly one place: the session-closer's thresholds table**. Every other doc describes the nudge without quoting a number. To change a cadence, edit that table; don't restate the value here. (D88)
@@ -371,6 +421,28 @@ Sub-rules:
 - **Git push before batch ops:** before running any script that bulk-moves or modifies vault files, commit and push first. `git checkout .` is then the undo if a batch run goes wrong.
 - **Sweep on a convention flip:** when a convention or default here changes, grep the Seed and project docs for the *old* rule's signature phrases and reconcile each hit - convert it to a pointer, fix the stale value, or consciously retain it (retention is the last resort, and record the retained ones). Patching only the sections you remember misses drift. (S225 Build 3.)
 - **Seed content ships depersonalized:** the Seed goes to other users, so Seed-bound content stays generic -- no vault names, collaborator names, or operator initials. Render provenance as `(project, date)` -- e.g. `(Weave, 2026-08)` -- matching the environment guides' existing style. Frontmatter-provenance policy and the legacy sweep are tracked in the DW Backlog's Seed de-personalization sweep item. (S227, S243)
+
+---
+
+## File placement -- three classes
+
+**Rule:** Files sort into three placement classes by *audience*, not by the writer's location:
+
+- **Project infrastructure** -- the 0.x series, `Conventions/`, `Quests/`: lives in `_Infrastructure - ProjectName/`.
+- **Inbound notes** -- notes FROM another project (or DW) addressed TO this project (handoffs, "Note from X - ..."): live in `_Infrastructure/` (or wherever the project's 0.0 says), because this project's instances are the audience.
+- **Outbound items** -- feature requests, bug reports, skill requests, or handoffs addressed to ANOTHER project: file directly at the **target project's intake folder**, never in the origin's `_Infrastructure/`. The origin keeps only a session-log line recording what was filed where; a pointer stub is optional and discouraged (it becomes clutter).
+
+Each project names its intake folders in its 0.0 so "the target's intake" is unambiguous; without a named intake, writers fall back to origin-side filing. **Rationale:** an item routed by the writer's convenience (file it where I am) rather than the reader's path (file it where they look) fails silently while looking like infrastructure -- the same failure class as an undelivered flag. One project accumulated eleven outbound feature requests in its own `_Infrastructure/`, unread, before the pattern was caught. (Weave pilot, 2026-08; Flag Surfacing Chain.)
+
+**Example:** a DataWizard feature request written during a Weave session is filed in `_DataWizard/Workshop - DataWizard/Feature Requests/`, with a one-line record in the Weave session log -- not in Weave's `_Infrastructure/`.
+
+---
+
+## Attention requests live in the flag cluster, not banners
+
+**Rule:** A request for another operator's action is carried by the `flag*` cluster (YAML Schema, Team Coordination Fields), where the orientation sweep and dashboard queries find it -- never by a prose banner or callout alone. A banner may *repeat* a flagged request for a reader already in the file, but a banner is not a delivery mechanism: nothing queries prose, so an action-request that lives only in a banner reaches no one who is not already reading that file. (Flag Surfacing Chain, 2026-08; D117.)
+
+**Example:** a callout reading "needs sign-off from another operator" at the top of a doc does not deliver -- set `flag_for` with a `flag_note` stating the decision, and let the sweep surface it; the callout may echo it for in-file readers.
 
 ---
 
