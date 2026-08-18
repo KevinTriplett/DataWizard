@@ -1,0 +1,121 @@
+---
+created: 2026-08-18
+edit_log:
+  - DW-S272 2026-08-18 - created (F2 query spec + constants + read-only-sweep
+    decision; referenced by PI Orientation Step 6, v4.6)
+maturity: working
+operator: Andrew
+seed_version: 1.2.0
+title: Orientation Flag Sweep - Query Spec
+type: guide
+updated: 2026-08-18
+---
+# Orientation Flag Sweep - Query Spec
+
+*The mechanism behind the PI Orientation sweep step. The PI states WHAT the sweep does in three sub-checks; this doc is HOW -- the query, the constants, the per-surface method -- so the PI stays short (PI real estate is scarce). Referenced by PI Orientation Step 6.*
+
+## What the sweep is
+
+At orientation, one step runs three conditionally-gated checks and writes a single compliance-trace line into the session claim stub. It surfaces to the current operator what is already waiting on them -- flags addressed to them, their own stale stubs, newly filed intake -- at the one lifecycle point guaranteed to run in their own session. Full behavioral rationale: the Flag Surfacing Chain design (four-link delivery chain; orientation is the reader-path choke point).
+
+## Read-only by design (conscious deviation, pinned)
+
+**The sweep writes nothing to any file's frontmatter. Its only write is its own trace line in the claim stub.** It surfaces flags and their defaults; it does not stamp `flag_status`. Two writers change flag state, both outside the sweep: an explicit operator response during the session (act -> remove the operator's name from `flag_for`; conscious defer -> keep the name, set `flag_status: deferred`), and the session-closer's expiry pass, which is the ONLY automatic writer of `flag_status: expired-unread` (and the only automatic name-clearer).
+
+This is a deliberate departure from the Flag Surfacing Chain charter's F4-layer-1 note, which suggested the sweep "records `flag_status`" on overdue items. Reasons: (a) flags are multi-addressee -- one operator's sweep must not stamp status or clear names for co-addressees who have not seen the item; (b) automatic frontmatter writes at orientation, from possibly-concurrent sibling sessions, are a new race surface on shared files (the MCP-concurrency rule exists for exactly this); (c) a cheap read-only sweep is what the "PI real estate is scarce" constraint promised. Recorded in the Decision Log with the sweep-adoption entry.
+
+## Constants
+
+- **`STALE_STUB_DAYS = 3`** -- a session-claim stub still `status: in-progress` and older than this many days is offered for reconciliation. Rationale: long enough that same-day and next-day work-in-progress is never nagged, short enough that a genuinely dropped stub surfaces within a working week.
+- **Live-sibling guard** -- never offer to reconcile a stub whose claim date is today, regardless of age arithmetic. Concurrent sessions in the same project each hold a fresh in-progress stub; the sweep must be structurally incapable of offering to reconcile a live sibling.
+- **Flag budget** -- surface at most **5** flags, ordered due-first (see sort), and report the count of the remainder. A wall of flags at orientation trains operators to skip the step.
+
+## Sub-check (a) -- flag sweep [multi-operator projects only]
+
+Solo-operator projects skip the query and report `n/a (solo)` in the trace.
+
+### Query (filesystem-primary; the canonical reference)
+
+Raw-text frontmatter extraction, deliberately NOT a strict YAML parse -- so it still returns fields from files whose frontmatter fails strict parsing (an over-long or unescaped quoted `flag_note` has broken parsing in practice, after which a YAML parser returns empty silently and the flag reads as absent). Exact-match against the extracted `flag_for` list, so `operator:` and `flag_by:` never produce false positives. No result cap.
+
+```python
+import os, re
+
+STALE_STUB_DAYS = 3
+
+def sweep(root_dir, operator=None):
+    """Return flag rows for a project tree; filter to one operator's queue if given."""
+    rows = []
+    for root, dirs, files in os.walk(root_dir):
+        if 'xArchive' in root:
+            continue
+        for f in files:
+            if not f.endswith('.md'):
+                continue
+            p = os.path.join(root, f)
+            try:
+                # utf-8-sig strips a BOM; normalize CRLF/CR so ^---\n matches.
+                t = open(p, encoding='utf-8-sig').read(8000).replace('\r\n', '\n').replace('\r', '\n')
+            except Exception:
+                continue
+            m = re.match(r'^---\n(.*?)\n---', t, re.S)
+            if not m:
+                continue
+            fm = m.group(1)
+            if 'flag_for' not in fm:
+                continue
+            names = []
+            mm = re.search(r'^flag_for:[ \t]*(\S.*)$', fm, re.M)   # inline form
+            if mm:
+                val = mm.group(1).strip()
+                names = [n.strip(' []\'"') for n in val.split(',') if n.strip(' []\'"')]
+            else:                                                   # block-list form
+                # [ \t]* (not +) so zero-indent block list items are caught too.
+                mb = re.search(r'^flag_for:[ \t]*\n((?:[ \t]*-[ \t]*.+\n?)+)', fm, re.M)
+                if mb:
+                    names = [x.strip(' \'"') for x in re.findall(r'-[ \t]*(.+)', mb.group(1))]
+            def field(name):
+                fmm = re.search(r'^' + name + r':[ \t]*(.*)$', fm, re.M)
+                return fmm.group(1).strip().strip('\'"') if fmm else ''
+            rows.append({'path': p, 'flag': field('flag'), 'flag_by': field('flag_by'),
+                         'flag_due': field('flag_due'), 'flag_default': field('flag_default'),
+                         'flag_for': names})
+    if operator:
+        rows = [r for r in rows if operator in r['flag_for']]
+    return rows
+
+# Sweep-step usage:
+rows = sweep(project_root, operator='<current operator first name>')
+# Empty flag_due sorts LAST (sentinel), then due-first, then flag date.
+rows.sort(key=lambda r: (r['flag_due'] or '9999-12-31', r['flag'] or '9999-12-31'))
+top = rows[:5]
+remainder = len(rows) - len(top)
+```
+
+Three corrections applied over the original reference implementation: **CRLF/BOM normalization** (`utf-8-sig` + newline normalize, so files saved on Windows or with a BOM are not silently skipped by the `^---\n` anchor); **zero-indent block lists** (`[ \t]*` not `[ \t]+`, so a `flag_for:` list whose items sit at column 0 is parsed); **empty-due-last sort** (a sentinel high date so flags without a `flag_due` fall to the end rather than sorting ahead of dated ones).
+
+Surface each of `top` with title (filename), `flag_note`, `flag_by`, `flag`, and `flag_due`; on any item past `flag_due`, show its `flag_default` (what happens on silence). Then state the `remainder` count.
+
+### Fallback (surfaces without filesystem access)
+
+Where an instance cannot run the script (no shell / no filesystem tool), use the MCP frontmatter search for `flag_for` as a candidate finder, then confirm each hit with `get_frontmatter`. **Treat a grep-matched file whose `get_frontmatter` returns empty as a parse failure, never as fields-absent** -- that is the silent-`{}` case above, and it is a real flag the fallback would otherwise drop. The MCP search also caps results, so on a large backlog the filesystem path is the only complete one; the fallback is a degraded mode, not an equivalent.
+
+## Sub-check (b) -- stale-stub reconciliation [all projects, incl. solo]
+
+Among the session-log stubs already listed at claim time (PI Step 3a), select those that are `status: in-progress`, owned by the CURRENT operator, older than `STALE_STUB_DAYS`, and NOT claimed today (live-sibling guard). For each, offer to **mark it abandoned with a one-line reason** -- offer only, never auto-author, and never touch another operator's stub.
+
+v1 is detect + offer + mark-abandoned. Backfill-and-close (reconstructing the entry from the stub's git-commit window) is a later build gated on the git-reconstruction helper; a v1 that "closed" a stale stub without it would be a pattern-matched session close, which the lifecycle-skill rule forbids.
+
+## Sub-check (c) -- intake what's-new [optional, cheap]
+
+List the project's intake folders and surface items added since the last session. **Comparison anchor:** an item is "new" if its frontmatter `created` date is on or after the date of the most recent session-log entry (fall back to file mtime where `created` is absent). Anchoring on the last log entry's date -- not "since I last looked" -- makes two instances compute the same answer. Intake folders for DataWizard: `Feature Requests/`, `Bug Reports/`, `Skill Requests/`, `Intake Queue/` (the canonical intake registry; see the Conventions Registry).
+
+## The compliance trace (always written)
+
+Write ONE line into the claim stub every orientation, unconditionally, including the running PI version. Gated-off checks report their gate rather than being omitted -- a missing line is a broken sweep, and must stay distinguishable from "nothing was waiting."
+
+```
+flag sweep [PI v4.6]: 3 surfaced, 1 handled, 0 deferred | stubs: 1 stale, 0 reconciled | intake: 2 new
+```
+
+Solo-project example: `flag sweep [PI v4.6]: n/a (solo) | stubs: 1 stale, 0 reconciled | intake: 0 new`. The session-closer carries this line forward when it overwrites the stub at close, so even a session that never closes leaves the sweep record on disk.

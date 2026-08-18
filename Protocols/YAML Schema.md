@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-08'
+updated: '2026-08-18'
 operator: Andrew
 priority: high
 maturity: working
@@ -13,6 +13,9 @@ edit_log:
   - "DW-S198 2026-06-23: added claim_id stub field"
   - "DW-S262 2026-08-08: added embed_targets field (embeddable synth-note
     harvest; D116)"
+  - "DW-S272 2026-08-18: Section 4 reconciled to flag* canonical (F1); added
+    flag_due/flag_default/flag_status + flag_note content requirement +
+    team_attention* deprecation mapping + flagged_for non-canonical note"
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -135,7 +138,7 @@ Session close (session-closer Step 3.8) verifies these fields rather than applyi
 
 ### Team Coordination Fields
 
-*Phase 0 of the Team Attention System. These fields power the shared team dashboard and the session-close team flag workflow. Full design: [[Team Attention System - Cross-Pollination and Unread Content Surfacing]].*
+*These fields power multi-operator coordination: the shared team dashboard, the session-close flag workflow, and the orientation-time flag sweep. The canonical cluster is `flag*` (below). The older `team_attention*` names are deprecated -- see the mapping at the end of this section.*
 
 **`operator`**: The human team member whose session created or substantially updated this file. Set at creation time as part of the birth metadata contract (see above). Use first name only (e.g. `Andrew`, `Kaliya`, `Jay`). Apply to:
 - Session log section files (always)
@@ -143,22 +146,46 @@ Session close (session-closer Step 3.8) verifies these fields rather than applyi
 
 This field was not applied to files before the birth metadata contract. Existing files gain it when next touched; no bulk backfill needed.
 
-**`team_attention`**: ISO date (YYYY-MM-DD) the file was flagged for team review. Set during session close via the team flag prompt. When present, the file appears in the dashboard's "Flagged for Team Attention" section. Always set `team_attention_by` and `team_attention_note` at the same time.
+**The `flag*` cluster.** A flag is a request for a specific operator's attention on a specific file, surfaced to them at orientation (the flag sweep) and on the team dashboard. The cluster is the delivery interface: queries read it, session close writes it.
 
-**`team_attention_by`**: Who flagged the file. Use the operator's first name for human-confirmed flags (e.g. `Kaliya`). Use `Name (auto)` for auto-flags generated on ungraceful session close (e.g. `Kaliya (auto)`). This distinction lets the dashboard display auto-flags differently and helps reviewers calibrate how much urgency to assign.
+**`flag`**: ISO date (YYYY-MM-DD) the file was flagged. When present, the file is a live flag. Set `flag_by`, `flag_note`, and `flag_for` at the same time.
 
-**`team_attention_note`**: Required when `team_attention` is set. One-line context string explaining why the file needs team attention. Brief enough to read at a glance in the dashboard. E.g. `Key funder intelligence for Katapult pitch`.
+**`flag_by`**: Who flagged the file. First name for human-confirmed flags (e.g. `Kaliya`). Use `Name (auto)` for auto-flags generated on ungraceful session close (e.g. `Kaliya (auto)`) -- this lets the dashboard render auto-flags differently and helps reviewers calibrate urgency.
+
+**`flag_for`**: The operators the flag is addressed to, as a YAML list of first names (e.g. `[Kaliya, Jay]`). This is the routing field the orientation sweep matches against. When an operator acts on their item, remove their name (union-merge discipline). A conscious defer KEEPS the name -- the item re-surfaces due-first next session (marked `flag_status: deferred`) rather than vanishing, so a deferral is never mistaken for a handled item. Clear the whole cluster when the list empties. A single name may be written inline (`flag_for: Kaliya`) or as a one-item list.
+
+**`flag_note`**: Required when `flag` is set. The context string, and it must **state the decision needed and what is blocked until it is made**. "Please review the tiers" fails; "Approve or amend the priority tiers -- outreach proceeds in the current order by default on silence" passes. Keep it to one line at a glance on the dashboard. If the note runs long or contains characters that stress YAML (colons, quotes, brackets), fold it -- use a block scalar (`flag_note: >-`) or a single-quoted string -- because an over-long or unescaped quoted note has broken frontmatter parsing in practice, after which a parser returns empty frontmatter silently and the flag reads as absent. A flag whose note breaks parsing is an undelivered flag.
+
+**`flag_due`** (optional): ISO date by which a response is needed. The sweep orders due-first and surfaces overdue items with their default in effect.
+
+**`flag_default`** (optional): What happens on silence after `flag_due` -- the text that turns an unanswered flag into a decision rather than an indefinite block (e.g. `outreach proceeds in the listed order`). Pairs with `flag_due`.
+
+**`flag_status`** (optional): Lifecycle marker. `deferred` = the operator saw it and consciously deferred; the name stays on `flag_for` and the item re-surfaces due-first next session. `expired-unread` = past `flag_due` with no response; the expiry pass sets this and clears the names, recording that the default is now in effect.
 
 ```yaml
 operator: Kaliya
-team_attention: 2026-05-27
-team_attention_by: Kaliya
-team_attention_note: Key funder intelligence for Katapult pitch
+flag: 2026-05-27
+flag_by: Kaliya
+flag_for: [Andrew, Jay]
+flag_note: "Approve or amend the funder shortlist -- Katapult outreach proceeds in listed order on silence"
+flag_due: 2026-06-03
+flag_default: outreach proceeds in the listed order
 ```
 
-**`team_attention` vs `priority: high`.** These are orthogonal signals. `priority` measures a document's long-term importance to the project. `team_attention` means "other operators need to see this now." A high-priority doc may already be well-known (no flag needed). A medium-priority doc may contain a surprise finding that changes someone else's working assumptions (flag warranted). Use both when appropriate -- they answer different questions.
+**`flag` vs `priority: high`.** Orthogonal signals. `priority` measures a document's long-term importance to the project. `flag` means "these operators need to see this now." A high-priority doc may already be well-known (no flag needed); a medium-priority doc may carry a surprise finding that changes someone else's working assumptions (flag warranted). Use both when appropriate -- they answer different questions.
 
-**Auto-flagging on ungraceful close.** If a session ends without the team flag prompt, the instance should auto-flag any files created that session with `priority: high`, using `Name (auto)` in `team_attention_by`. The human can review and remove auto-flags in a subsequent session.
+**Auto-flagging on ungraceful close.** If a session ends without the flag prompt, the instance auto-flags any files it created that session with `priority: high`, using `Name (auto)` in `flag_by`. The human reviews and removes auto-flags in a later session.
+
+**`flagged_for` is not canonical.** Some vaults use a `flagged_for` field as a wikilink pointer to a separate flags document -- that is unrelated to operator attention and must not be read as an attention flag. Use `flag_for` for attention routing.
+
+**Deprecated: `team_attention*`.** Phase 0 shipped `team_attention` / `team_attention_by` / `team_attention_note`. These are superseded by the `flag*` cluster; no live consumer reads them. Migrate on next touch:
+
+| Deprecated | Canonical |
+|---|---|
+| `team_attention` | `flag` |
+| `team_attention_by` | `flag_by` |
+| `team_attention_note` | `flag_note` |
+| *(none)* | `flag_for` (new -- the routing field the sweep requires) |
 
 ### Harvest Tracking
 

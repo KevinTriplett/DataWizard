@@ -3,7 +3,7 @@ title: DataWizard Project Instructions
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-06-23'
+updated: '2026-08-18'
 tags:
   - protocol
   - AI-collaboration
@@ -15,19 +15,23 @@ edit_log:
   - DW-S177 2026-06-12
   - DW-S189 2026-06-18
   - DW-S198 2026-06-23
+  - "DW-S272 2026-08-18: v4.6 -- orientation sweep step (flag sweep + stale-stub
+    reconciliation + intake what's-new) inserted as Step 6; Steps 6-8 renumbered
+    to 7-9; Step 3 internal ref updated; see [[Orientation Flag Sweep - Query
+    Spec]]"
 ---
 
 
 
 
 `Project home folder: 
-# DataWizard Project Instructions v 4.5
+# DataWizard Project Instructions v 4.6
 
 (Project home folder is the obsidian vault folder where this project's 0.0 / 0.2 / 0.5 files live, e.g. `_DataWizard/`. Cowork: fill this in after pasting the file into Settings - Project Instructions. Claude Code / Sidecar: instead declare it in your vault-root `CLAUDE.md` above the `@import`.)
 
 ---
 
-**Version:** v4.5 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
+**Version:** v4.6 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
 
 This is the DataWizard behavioral contract, consumed two ways: pasted into Cowork's Settings - Project Instructions, or `@import`ed from a vault-root `CLAUDE.md` (Claude Code / Sidecar). Heed the tool appendix for your surface (`## Cowork tools` or `## Claude Code tools`) and ignore the other. The Seed itself always lives at `_DataWizard/Seed/`.
 
@@ -70,12 +74,17 @@ Skills live in `_DataWizard/Seed/Skills/` (portable Seed skills) and in the proj
    b. Write the stub with full birth metadata (type, created, updated, operator, edit_log, status: in-progress), a Part of breadcrumb, and a `claim_id` (a short random token unique to this claim).
    c. Re-read the stub and check `claim_id`: yours means the claim holds; not yours means a sibling won the slot, so increment to the next free identifier and repeat from (b).
    d. Do not add the embed to the session log shell yet - the session-closer adds it at close (and strips `claim_id`).
-   Once the user confirms the session's direction (Step 6), patch the stub with 1-2 lines describing the focus. The session-closer overwrites this stub with the full entry at session end.
+   Once the user confirms the session's direction (Step 7), patch the stub with 1-2 lines describing the focus. The session-closer overwrites this stub with the full entry at session end.
 4. Read 0.2 Session Log (last 2-3 entries only). The most recent "What's next" section tells you where to pick up.
 5. Read action items file if one exists.
-6. State the project abbreviation and session identifier, then present orientation and confirm the session's direction with the user. Solo-operator identifier: "DW S116". Multi-operator: use the composite format from the session-closer skill's Session Identifier Format section (e.g. "WV_2026-06-10_AA_01").
-7. Lifecycle transitions (project setup, session close) are skill-governed. Read the skill before executing.
-8. Ready to work. Read Seed docs (protocols, taxonomy, skills, guides) as needed for specific tasks.
+6. Orientation sweep -- surface what is already waiting on this operator. One step, three conditionally-gated checks; write the compliance trace into the claim stub (Step 3) unconditionally. Future orientation-time checks extend this sub-check list -- never add a new orientation step. Query, constants, and per-surface method: [[Orientation Flag Sweep - Query Spec]].
+   a. Flag sweep [multi-operator projects only; solo projects report `n/a (solo)`]. Find files in THIS project whose `flag_for` contains the current operator; surface the top ~5 due-first (count the rest) with title, `flag_note`, `flag_by`, `flag`, and `flag_due`, noting `flag_default` on overdue items. The sweep is read-only -- it does not write `flag_status`; act (name removed) and defer (name kept, `flag_status: deferred`) are explicit operator responses, and the closer's expiry pass is the only automatic writer of `expired-unread`.
+   b. Stale-stub reconciliation [all projects]. Among the stubs listed at claim time, detect `in-progress` stubs owned by the CURRENT operator older than the stale threshold and not claimed today; offer to mark each abandoned with a one-line reason. Offer only, never auto-author, never touch another operator's stub. (Backfill-and-close arrives with the git-reconstruction helper in a later build.)
+   c. Intake what's-new [optional]. List the project's intake folders (Feature Requests, Bug Reports, Skill Requests, Intake Queue) for items newer than the last session-log entry; surface new ones.
+   Trace format (always, with the running PI version): `flag sweep [PI v4.6]: N surfaced, M handled, K deferred | stubs: P stale, Q reconciled | intake: R new`; gated-off checks report their gate. A missing trace line is a broken sweep, distinguishable from 'nothing was waiting.'
+7. State the project abbreviation and session identifier, then present orientation -- including anything the sweep surfaced -- and confirm the session's direction with the user. Solo-operator identifier: "DW S116". Multi-operator: use the composite format from the session-closer skill's Session Identifier Format section (e.g. "WV_2026-06-10_AA_01").
+8. Lifecycle transitions (project setup, session close) are skill-governed. Read the skill before executing.
+9. Ready to work. Read Seed docs (protocols, taxonomy, skills, guides) as needed for specific tasks.
 
 ## Cowork tools
 
