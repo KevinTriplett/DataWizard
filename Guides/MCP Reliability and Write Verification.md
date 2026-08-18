@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-14'
+updated: '2026-08-18'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -38,6 +38,10 @@ edit_log:
   - RW-S68 2026-08-14 - rename-on-mount inconsistency caveat (RW S46/S67 vs DW
     S182/S253); cloud-container overflow-recovery nuance (saved tool-result
     readable by cloud Bash)
+  - "DW-S273 2026-08-18 - array-wipe entry: contended-file
+    clobber-by-concurrency variant (immediate re-read, concurrent-entry verify,
+    filesystem edit_file for atomic append; corrects FR's patch_note
+    suggestion)"
 ---
 # MCP Reliability and Write Verification
 
@@ -70,6 +74,8 @@ awk '/^edit_log:/{f=1;next}/^[a-z_]+:/{f=0}f&&/^  - /{c++}END{print c+0}' "file.
 ```
 
 A count of 1 where there should be many means the array was clobbered -- restore from your pre-write read. Note that shell files legitimately carry no `edit_log` (they are exempt per [[YAML Schema]]), so 0 on a `0.2 Session Log` shell is correct, not damage. Grounding: RG S4 (2026-07-25) wiped 21 entries from `0.2 Session Log - ReWoven` and 9 from `0.3 Decision Log - ReWoven` this way. Both were recoverable **only because the full arrays happened to still be in the session's context** from reads minutes earlier -- with a fresh context, or a compaction in between, the history would have been unrecoverable short of a backup. Treat a bare array stamp as a destructive operation. And when re-supplying the full array (e.g. to append one `edit_log` entry), copy the existing values **verbatim from the fresh read** - retyping them invites transcription drift that silently rewrites history (field-caught: a paraphrased historical entry was restored only because the pre-write read was still in context; diff the written array against the read one before moving on).
+
+**Contended files add a clobber-by-concurrency variant.** Because any array you pass replaces the whole array, a second instance's entry appended between your read and your write is silently erased -- the array you write is the array that wins. Mitigations, in order: (1) re-read the frontmatter *immediately* before the write, not minutes earlier, to shrink the race window; (2) after writing, verify the array contains your entry AND any concurrent entries -- an entry you didn't write is the tell that you raced someone; if your write replaced theirs, restore both; (3) for a truly append-only write, use a filesystem-level edit anchored on the last existing entry (`filesystem:edit_file`) -- `patch_note` cannot do this, since it does not match inside frontmatter (see below). (Source: ReWoven S24, RW S44; VibeCut S50/S60, independent)
 
 ## Transport 502s: Verify Before Retry, Against a Must-Have-Changed Field
 

@@ -1,0 +1,57 @@
+---
+created: 2026-08-18
+edit_log:
+  - DW-S273 2026-08-18 - created from the Chrome MCP Tool-Behavior Reference FR
+    (behaviors from RW S11-S31 reviews); WeasyPrint item routed to the Cowork
+    Build Environment guide
+operator: Andrew
+scope: seed
+title: Chrome MCP and Web Tool Behaviors
+type: guide
+updated: 2026-08-18
+---
+# Chrome MCP and Web Tool Behaviors
+
+> Guide for Claude instances driving external websites and web apps through the Chrome MCP (browser automation) and web-fetch tools. Covers interaction limits, per-platform gotchas (Google Docs, Apps Script), and read recipes for client-rendered pages.
+>
+> **Scope.** This guide is about driving *external* sites and web tools. For the File System Access API and the runtime behavior of single-file browser tools (local GUIs), see **Browser and File System Access Behaviors**. For sandbox build-toolchain behaviors (including HTML-to-PDF rendering), see **Cowork Build Environment**.
+>
+> Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
+
+These gotchas are the most rot-prone kind of learning: they have no design-doc home, so they get rediscovered cold session after session. New Chrome MCP / web-tool behaviors append here rather than being re-derived.
+
+## Chrome MCP Interaction Limits
+
+**OAuth consent popups cannot be driven -- plan a human-in-the-loop pause.** Authorizing an app (observed with Google Apps Script) triggers an OAuth consent popup window that the Chrome MCP cannot interact with; the user must click through it manually. Plan for a handoff pause at first authorization rather than discovering it mid-flow. (Source: RW S17)
+
+**Click coordinates must be scaled by `devicePixelRatio`.** On high-DPI displays, raw coordinates land in the wrong place. (Source: RW S31)
+
+## Reading Client-Rendered Pages
+
+Pages that render client-side (JS apps) may expose little or nothing to a plain fetch or a naive page read. Three working recipes, in escalating order of effort:
+
+1. **Hash-anchor + scroll-screenshots.** Navigate to a hash anchor and take scroll-screenshots section by section rather than expecting full text from a single fetch. Worked on client-rendered fundraiser/leaderboard pages. (Source: RW S28)
+2. **Render-wait + `innerText` slices.** For heavily client-rendered app pages (e.g. Bubble apps) that defeat `web_fetch` entirely: Chrome `navigate`, wait ~8s for render, then pull text in slices via `javascript_tool` reading `document.body.innerText`. The tool's output truncates around ~1KB, so slice the string across multiple calls. (Source: RW S31)
+3. **Know which sites fetch fine.** Not everything needs the browser: e.g. Substack subdomains fetch cleanly with `web_fetch`. Try the cheap fetch first.
+
+## web_fetch Behaviors
+
+**Token-cap overflow saves to a temp file.** When a page exceeds the token cap, `web_fetch` errors and saves the content to a temp file. In practice, search-result summaries plus one canonical readable page were decision-grade -- budget for this rather than retrying the same oversized fetch. (Source: RW S23)
+
+## Google Docs via Chrome
+
+**Heading keyboard shortcuts type literal characters on Mac.** Ctrl+Alt+N and similar heading shortcuts do not apply styles through the Chrome tools -- they insert literal characters into the document. Use the style dropdown, or write plain text with caps. (Source: RW S17)
+
+**Typed numbers auto-convert into nested lists.** When the cursor is inside existing list-formatted content, typing numbered text auto-nests it, and Ctrl+Z does not reliably revert large typed blocks. Workaround: paste the block via clipboard rather than typing it. (Source: RW S16)
+
+## Google Apps Script
+
+**First authorization needs the manual OAuth click** (see Interaction Limits above).
+
+**Batch reads/writes; never loop `setValue()`.** Individual `setValue()` calls are extremely slow (~3 minutes for 200 cells); batch `getValues()` / `setValues()` is ~100x faster (~3 seconds). Standard Apps Script knowledge, recorded here because agent-driven spreadsheet automation hit it cold. (Source: RW S17)
+
+## See Also
+
+- **Browser and File System Access Behaviors** -- local single-file browser tools, File System Access API
+- **Cowork Build Environment** -- sandbox toolchain, network/fetch workarounds (GitHub REST, rate limits), HTML-to-PDF rendering
+- **MCP Reliability and Write Verification** -- Obsidian MCP failure modes and write verification

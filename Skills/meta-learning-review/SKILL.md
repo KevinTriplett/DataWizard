@@ -7,8 +7,8 @@ description: >-
   report is ready for review. Also triggered by the session-closer's periodic
   threshold nudge when a review is due.
 type: skill
-updated: '2026-06-23'
-version: '1.3.3'
+updated: '2026-08-18'
+version: '1.4.0'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -19,6 +19,9 @@ edit_log:
     checks step (session-closer v4.0 renumber)
   - "DW-S198 2026-06-23 - D88 sweep: dropped 5-10 session cadence quotes, defer
     to session-closer threshold step"
+  - "DW-S273 2026-08-18 - v1.4.0: Step 5 stamps reviewed-through session not
+    current; Step 2 superseded-claim vault sweep; Cadence + Wiring realigned to
+    D114 (Review Automation guide)"
 ---
 
 # Meta-Learning Review Skill
@@ -46,9 +49,9 @@ This is the interpretive complement to design-harvest. Design-harvest plants res
 
 ## Cadence
 
-The review-and-plant cycle runs on a periodic per-project cadence -- long enough for meaningful patterns to accumulate while keeping each review batch manageable. The cadence number lives in one place, the session-closer's periodic threshold checks step (D88), so this skill does not restate it.
+The review-and-plant cycle runs on a periodic per-project cadence -- long enough for meaningful patterns to accumulate while keeping each review batch manageable. The cadence number lives in one place, the **Review Automation** guide's cadence table (D114), so this skill does not restate it.
 
-That step provides the trigger: it checks `last_meta_learning_review:` in 0.0 frontmatter against the current session number and nudges when a review is due.
+The scheduled review-status check provides the trigger: it reads `last_meta_learning_review:` in 0.0 frontmatter, computes staleness against that table, and when a review is due produces a `pending-review` report that the session-closer surfaces at close.
 
 ### Backlog Mode
 
@@ -69,6 +72,8 @@ This is the critical step that separates useful planting from noise. For each su
 1. **Read the target document** (skill, design doc, protocol section) that the learning would be planted into
 2. **Check whether it's already there.** S97 found 2 of 10 suggestions were already implemented and 4 of 6 external validations already planted. Expect a significant already-done rate, especially in active projects.
 3. **Check whether the learning is still accurate.** A learning from 8 sessions ago about tool behavior may have been superseded by a tool update or a subsequent session's finding.
+
+4. **When a learning supersedes a prior claim, check the rest of the vault.** For any learning with a "use X over Y", "Y was wrong", or "Y is deprecated" shape, verifying that the plant landed in its target doc is not enough -- search the vault for other docs still asserting the old claim, and either fix them in the same pass or file an action item per doc. A plant can succeed while other docs keep teaching the superseded thing for many sessions afterward.
 
 Do not skip verification. The meta-learning report (or on-demand extraction) works from session logs, which are snapshots of understanding at the time. The vault may have evolved since.
 
@@ -148,7 +153,7 @@ After planting is complete:
 
 1. **Mark reviewed items** in the report (if one exists) with their disposition: done, planted (with target doc), deferred (with action item reference), or discussed (with outcome).
 2. **Update the report's frontmatter** with `last_review_session:` set to the current session identifier.
-3. **Update the session-closer tracking field.** The session-closer checks `last_meta_learning_review:` in the project's 0.0 frontmatter to determine when to nudge. Update this field to the current session identifier.
+3. **Update the reviewed-through stamp.** The scheduled review-status check reads `last_meta_learning_review:` in the project's 0.0 frontmatter to determine when the next review is due. Set it to the reviewed report's **end-of-scan-range session** (the reviewed-through point), not the current session -- the next scan picks up immediately after the reviewed range, so stamping the current session silently skips everything between the range end and the review session. The pending-report trigger is what nudges the next review, so the accurate stamp does not silence it. Review one report per session; with a backlog, each review advances the stamp one report at a time.
 
 ### Step 6: Summarize
 
@@ -162,9 +167,9 @@ Present the review results to the user:
 
 ### Session-closer integration
 
-The session-closer's periodic threshold checks step applies here. It reads `last_meta_learning_review:` from the project's 0.0 frontmatter, compares against the current session number, and adds a nudge to the "What's next" section when a review is due (the cadence threshold lives in that step -- D88).
+Detecting that a review is due is the job of scheduled automation, not the session-closer: the scheduled review-status check reads `last_meta_learning_review:` from the project's 0.0 frontmatter, computes staleness against the cadence table in the **Review Automation** guide (the single home for cadence numbers), and when a review is due runs the scan, leaving a `status: pending-review` report in the Learning Reports folder.
 
-The nudge should read: "A meta-learning review is due ([N] sessions since last review). Check for a report in [Learning Reports folder], or run on demand."
+The session-closer's only related job is surfacing: at a full close it lists the Learning Reports folder for any `status: pending-review` report and, if found, adds one line to "What's next" naming the file. It holds no cadence numbers and does no gap arithmetic.
 
 ### Scheduled report generation
 

@@ -8,11 +8,13 @@ description: >-
   of flagged items, or any link or resource that needs investigation. Covers
   both single-target deep dives and batch triage passes.
 type: skill
-updated: '2026-08-05'
-version: '1.3'
+updated: '2026-08-18'
+version: '1.4'
 edit_log:
   - "DW-S243 2026-08-05 - v1.3: Parallel Fan-Out section (mandatory spot-verify,
     roster batching, research-before-tiering) + Common Mistakes bullet"
+  - "DW-S273 2026-08-18 - v1.4: fetch-before-cite hard rule in Phase 1 + Common
+    Mistakes bullet"
 ---
 
 # Tools Research
@@ -164,6 +166,17 @@ research-tracking skill (After Fan-Out -- Route Each Output). (Source: Weave, 20
    the summary. The goal is to keep the gems that would otherwise get
    flattened into a generic assessment.
 
+**Hard rule -- fetch before cite.** If a claim carries a citation, the
+cited source must have been fetched and read in this session, or
+verifiably read and captured earlier (a research note or tracking entry
+from an actual read). Never attach a citation to a claim sourced from
+memory or inference -- a citation lends authority precisely because it
+promises the page was read. When a citation cannot be backed by a real
+read, either fetch the page before citing, or drop the citation and mark
+the claim unverified. This matters most for outputs that feed external
+documents (pitches, one-pagers), where a wrong-but-cited fact is a
+credibility risk.
+
 ### Phase 2 -- Assess (now form your opinion)
 
 5. **Calibrate depth** (see below) and decide whether to write a full
@@ -233,6 +246,8 @@ Even at light depth, record the evaluation. A brief verdict saying
 - **Trusting fan-out output unverified.** Subagent claims are provisional
   until spot-checked against the source files; fabricated IDs, names, and
   paths read as confident and slip through if you skip the verification pass.
+- **Citing from memory.** A citation on an unfetched source is fabricated
+  authority -- the fetch-before-cite rule in Phase 1 is not optional.
 
 ## See Also
 

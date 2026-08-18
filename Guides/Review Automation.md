@@ -2,10 +2,13 @@
 title: "Review Automation"
 type: guide
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-18
 operator: Andrew
 edit_log:
-  - "DW-S250 2026-08-06 - created: pending-report model + review-cadence single-home (D114 relocates D88)"
+  - "DW-S250 2026-08-06 - created: pending-report model + review-cadence
+    single-home (D114 relocates D88)"
+  - "DW-S273 2026-08-18 - Stamping paragraph split by review type: meta-learning
+    stamps reviewed-through session, not current"
 ---
 
 # Review Automation
@@ -35,7 +38,12 @@ These numbers live here and nowhere else (D114, relocating D88). Every other doc
 
 **Gap arithmetic** (used by the scheduled check, not the session-closer): solo-operator projects subtract session numbers; multi-operator projects count session-log files dated after the reference session; day-based checks compare calendar dates.
 
-**Stamping.** A review is complete only when its report has been reviewed and planted. On completion, stamp the corresponding field on the 0.0 to the current session ID (or date, for Content Interests) -- that is what stops the review from re-firing. A report that has been produced but not yet reviewed stays `pending-review`; the stamp advances only on completion, never at report-production time.
+**Stamping.** A review is complete only when its report has been reviewed and planted. On completion, stamp the corresponding field on the 0.0 -- that is what stops the review from re-firing. Which value to stamp depends on whether the review has a scan range:
+
+- `last_meta_learning_review` takes the reviewed report's **end-of-scan-range session** (the reviewed-through point), not the current session. The next scan starts after the stamp, so stamping the current session silently skips every session between the range end and the review session. The pending-report trigger surfaces any unreviewed report regardless of the stamp, so accurate stamping does not silence the next chunk. Review one report per session.
+- `last_health_audit` and `last_content_interests_review` have no scan range; they take the current session ID (or date, for Content Interests).
+
+A report that has been produced but not yet reviewed stays `pending-review`; the stamp advances only on completion, never at report-production time.
 
 ## Report locations
 
