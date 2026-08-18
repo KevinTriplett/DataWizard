@@ -17,6 +17,8 @@ edit_log:
     Environment guides to the Platform cluster
   - DW-S272 2026-08-18 - added the Orientation Flag Sweep - Query Spec guide
     (Flag Surfacing Chain, referenced by PI v4.6)
+  - DW-S279 2026-08-18 - added the Team Attention Rollout and Flag Queue Page
+    Template rows (Flag Surfacing Chain B2)
 ---
 # DataWizard Guides
 
@@ -57,6 +59,8 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Working Principles** | The reasoning behind the Working Rules - the "why" under the behavioral contract. |
 | **Review Automation** | The three periodic reviews (health audit, meta-learning, Content Interests): the pending-report model, the cadence table (single home), and how scheduled automation detects staleness so the session-closer only surfaces waiting reports. |
 | **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub and intake sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
+| **Team Attention Rollout** | Activating the flag system on a multi-operator project: preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
+| **Flag Queue Page Template** | Copy-in template for a per-person flag queue page (Dataview): one section per operator over `flag_for` frontmatter, with the empty-due-last sort fix and the exact-name list-matching caveat. Render surface only -- the frontmatter is the mechanism. |
 
 ### Onboarding and integrations
 | Guide | Covers |

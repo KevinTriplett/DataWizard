@@ -33,6 +33,10 @@ edit_log:
   - "DW-S278 2026-08-18: added ID families table (task-ID pointer row),
     optimistic-claim pattern, carry-the-probe, and ceremony-placement entries
     (D119)"
+  - "DW-S279 2026-08-18: added The reader-path principle (named; Flag Surfacing
+    Chain B2)"
+  - "DW-S278 2026-08-18: inbound notes rehomed to per-project Session Exchange
+    folders; _Infrastructure is infra-only, never notes (operator ruling)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -429,12 +433,20 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 **Rule:** Files sort into three placement classes by *audience*, not by the writer's location:
 
 - **Project infrastructure** -- the 0.x series, `Conventions/`, `Quests/`: lives in `_Infrastructure - ProjectName/`.
-- **Inbound notes** -- notes FROM another project (or DW) addressed TO this project (handoffs, "Note from X - ..."): live in `_Infrastructure/` (or wherever the project's 0.0 says), because this project's instances are the audience.
+- **Inbound notes** -- notes FROM another project (or DW) addressed TO this project (handoffs, "Note from X - ..."): live in the target project's **`Session Exchange/`** folder (created on first use; under the project's Workshop folder when one exists, else at the project's shared root), because this project's instances are the audience. Infrastructure folders (`_Infrastructure - ProjectName/`) hold infrastructure files ONLY - never notes; a note filed there mixes audience-facing mail into the 0.x surface. (Operator ruling, DataWizard, 2026-08.)
 - **Outbound items** -- feature requests, bug reports, skill requests, or handoffs addressed to ANOTHER project: file directly at the **target project's intake folder**, never in the origin's `_Infrastructure/`. The origin keeps only a session-log line recording what was filed where; a pointer stub is optional and discouraged (it becomes clutter).
 
 Each project names its intake folders in its 0.0 so "the target's intake" is unambiguous; without a named intake, writers fall back to origin-side filing. **Rationale:** an item routed by the writer's convenience (file it where I am) rather than the reader's path (file it where they look) fails silently while looking like infrastructure -- the same failure class as an undelivered flag. One project accumulated eleven outbound feature requests in its own `_Infrastructure/`, unread, before the pattern was caught. (Weave pilot, 2026-08; Flag Surfacing Chain.)
 
 **Example:** a DataWizard feature request written during a Weave session is filed in `_DataWizard/Workshop - DataWizard/Feature Requests/`, with a one-line record in the Weave session log -- not in Weave's `_Infrastructure/`.
+
+---
+
+## The reader-path principle
+
+**Rule:** Route every coordination artifact by the reader's path, not the writer's convenience: *artifacts routed by the writer's convenience rather than the reader's path fail silently, while looking like infrastructure.* The design test for any coordination feature -- a flag, a handoff, a request, a notice -- is: who reads this, and does their path cross it? If nothing in the reader's routine (orientation, a swept folder, a queried field) crosses the artifact, it is undelivered no matter how well it is written. Orientation is the one guaranteed choke point where a reader's path can be enforced.
+
+This is the general principle under the two entries adjacent to it (file placement by audience; attention via the flag cluster) and under the orientation sweep itself (D117). Evidence class: one project measured its flag system at 0% delivery twice, accumulated eleven outbound feature requests unread in its own infrastructure folder, and left a five-month fork diagnosis buried in an unrelated note -- all artifacts that looked done at write time. (Flag Surfacing Chain, 2026-08; rollout guidance in `Seed/Guides/Team Attention Rollout.md`.)
 
 ---
 

@@ -1,7 +1,7 @@
 
-seed: 1.2.0
+seed: 1.3.0
 protocol: 1.8
-project_instructions: 4.5
+project_instructions: 4.6
 
 ## NOTICE - Seed git history rewritten 2026-06-10 (instances: read this)
 
@@ -37,6 +37,43 @@ deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
 Design, edit its plist to point at the new root path.
 
 This notice can be removed from VERSION.md after 2026-09.
+
+## What's New in 1.3.0
+
+**Team flags are deliverable as of this release.** The Flag Surfacing
+Chain Phase 1 (read side) ships the machinery that surfaces `flag_for`
+items to their addressees -- a system previously measured at 0% delivery
+because only the write side existed.
+
+- **Flag ship date: 2026-08-18.** The session-closer's flag expiry pass
+  (Step 3.13) applies ONLY to flags set on or after this date. Flags
+  that predate it are a pre-existing backlog: triage them in a dedicated
+  session, never mass-expire them (they were set when delivery was
+  broken -- expiring them as "unread" would falsify the record).
+- **Project Instructions v4.6** -- new Orientation Step 6: the unified
+  orientation sweep (flag sweep on multi-operator projects, stale-stub
+  reconciliation, intake what's-new) with an unconditional compliance
+  trace written into the claim stub. **Re-paste required:** copy the
+  updated PI from `Seed/DataWizard Project Instructions.md` into each
+  project's Cowork Settings (or refresh your CLAUDE.md import) --
+  instruction shipped is not instruction loaded, and an operator whose
+  surface still runs v4.5 has no working flag delivery. Instances: the
+  version-mismatch protocol below handles the prompt.
+- **YAML Schema Section 4** reconciled to the `flag*` cluster as
+  canonical (`team_attention*` deprecated, mapping included); new
+  `flag_due` / `flag_default` / `flag_status` fields and a `flag_note`
+  content requirement.
+- **session-closer v4.6.0** -- flag anatomy at set-time, 2-3 flag
+  budget per close, the expiry pass (sole automatic writer of
+  `expired-unread`), sweep-trace carry-forward, and the lean approval
+  gate (write directly for routine closes; three judgment-class
+  stop-and-asks kept).
+- **Three new/updated guides:** `Orientation Flag Sweep - Query Spec`
+  (the sweep query, four corrections, named constants),
+  `Team Attention Rollout` (per-person canary live test, four-branch
+  diagnosis tree, executor chain -- read this before turning flags on
+  in a team project), and `Flag Queue Page Template` (per-person
+  Dataview queue page, empty-due-last sort).
 
 ## What's New in 1.2.0
 - One-command Seed auto-sync: `update_seed.sh --install-autosync` (Mac,

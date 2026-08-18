@@ -48,6 +48,8 @@ edit_log:
     only, three judgment-class stop-and-asks kept); KY_06 hardening (3.9
     add-not-offer + orphan sweep excl. in-progress stubs; parallel-instance
     whole-window listing + collision recovery; 4 Common Mistakes)"
+  - DW-S279 2026-08-18 - generic-names sweep of the two 3.12 examples (C2, Seed
+    depersonalization; Flag Surfacing Chain B2)
 ---
 
 # Session Closer Skill
@@ -331,7 +333,7 @@ were encountered this session.
 - The session log section file (always)
 - Any content documents created or substantially updated this session
 
-Use the human operator's first name (e.g. `Andrew`, `Kaliya`, `Jay`). This field powers the "Recent Team Activity" section of the team dashboard and makes authorship queryable via Bases/Dataview.
+Use the human operator's first name (e.g. `Alice`, `Ben`, `Cara`). This field powers the "Recent Team Activity" section of the team dashboard and makes authorship queryable via Bases/Dataview.
 
 **Team flag prompt (multi-operator projects only).** If the project has more than one operator, present the user with a list of files created or substantially updated this session. Pre-select:
 - Any file created this session with `priority: high`
@@ -345,7 +347,7 @@ Use the human operator's first name (e.g. `Andrew`, `Kaliya`, `Jay`). This field
 For each file the user selects:
 1. Add `flag: YYYY-MM-DD` (today's date) to its frontmatter
 2. Add `flag_by: FirstName` (the operator's first name)
-3. Add `flag_for:` as a YAML list of the operators who need to see it (e.g. if Andrew flags it: `flag_for: [Kaliya, Jay, Kevin]`) -- narrow it to the people it is actually relevant to
+3. Add `flag_for:` as a YAML list of the operators who need to see it (e.g. if Alice flags it: `flag_for: [Ben, Cara]`) -- narrow it to the people it is actually relevant to
 4. Set `flag_note:` to a one-line statement of **the decision needed and what is blocked until it is made** (the content requirement -- [[YAML Schema]] Team Coordination Fields; "please review the tiers" fails, "approve or amend the tiers -- outreach proceeds in listed order on silence" passes). Fold a long note per the same guidance so it cannot break frontmatter parsing
 5. Optionally set `flag_due:` (date a response is needed by) and `flag_default:` (what happens on silence after the due date). Ask for these on anything time-sensitive -- they are what let the expiry pass (Step 3.13) turn silence into a decision
 
