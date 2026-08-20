@@ -1,5 +1,5 @@
 
-seed: 1.3.0
+seed: 1.3.1
 protocol: 1.8
 project_instructions: 4.6
 
@@ -37,6 +37,40 @@ deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
 Design, edit its plist to point at the new root path.
 
 This notice can be removed from VERSION.md after 2026-09.
+
+## What's New in 1.3.1
+
+**Auto-sync self-overwrite fix (`update_seed.sh`).** The updater
+replaced itself on disk mid-run: the zip-mode `cp` and the git-mode
+`merge --ff-only` both overwrite `update_seed.sh` while bash is still
+reading it by byte offset, so execution resumed inside the freshly
+written file -- surfacing as a spurious `UNINSTALL_AUTOSYNC: unbound
+variable` at line 122 (the tell: the "Downloading..." message printed
+first, the line-122 error arrived after). Fixed by wrapping the whole
+script body in a `main()` function invoked on the last line, so bash
+parses to EOF before any file-replacing command runs -- removing the
+dependence on file size entirely. Diagnosed by Tree's instance
+(DreamVault), 2026-08-20. The bash-only fix is version-gated behind
+this 1.3.1 bump so zip-mode installs (which skip when versions match)
+actually pick it up. Note: the *last* run of an old unwrapped script --
+the one that copies 1.3.1 into place -- still crashes on its own bug
+mid-copy (a one-time syntax error, and no sync-log line for that run).
+That is expected and self-correcting: the Seed is already at 1.3.1, and
+the next run (the new script) clears `/tmp` and logs "Already current."
+
+**Zip-over-git self-heal.** A clone that a past zip-mode run copied
+over without committing is left dirty-but-byte-identical to
+`origin/main`, and the git-mode dirty guard then skipped forever
+(exit 3, every run, no sync log ever written). The updater now fetches
+first and, when the tree is dirty but provably lossless to reset (no
+local commits ahead AND working tree already equal to `origin/main`),
+self-heals with `git reset --hard origin/main`. Genuine local edits
+are still refused -- now with the recovery command named in the
+SKIPPED message.
+
+`update_seed.ps1` needed no change: PowerShell parses the whole script
+before executing (no self-overwrite), and it already refuses zip-sync
+on a git clone.
 
 ## What's New in 1.3.0
 

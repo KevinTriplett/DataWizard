@@ -29,6 +29,8 @@
 
 set -euo pipefail
 
+main() {
+
 REPO_URL="https://github.com/andrewalan11/DataWizard/archive/refs/heads/main.zip"
 TMP_DIR="/tmp/dw-seed-update"
 TMP_ZIP="/tmp/dw-seed.zip"
@@ -112,6 +114,24 @@ log_entry() {
 # overwrite local edits with the last push. Detect via Vault Config.md.
 is_upstream() {
   [ -f "$VAULT_CONFIG" ] && grep -qi 'seed_role.*upstream' "$VAULT_CONFIG"
+}
+
+# --- Lossless-reset check ---
+# True when every file in origin/main exists in the working tree with identical
+# content. Uses a throwaway index loaded from origin/main so files that origin
+# added (untracked locally after a zip-over-git copy) are compared too -- a plain
+# `git diff origin/main` reports those as "deleted" and would refuse the heal.
+# Extra untracked files the user owns are ignored (reset --hard leaves them).
+worktree_matches_origin() {
+  local tmp_index="$TMP_DIR.index"
+  rm -f "$tmp_index"
+  local rc=1
+  if GIT_INDEX_FILE="$tmp_index" git -C "$SEED_DIR" read-tree origin/main 2>/dev/null \
+     && GIT_INDEX_FILE="$tmp_index" git -C "$SEED_DIR" diff --quiet 2>/dev/null; then
+    rc=0
+  fi
+  rm -f "$tmp_index"
+  return $rc
 }
 
 # --- Uninstall autosync ---
@@ -233,27 +253,45 @@ if [ -d "$SEED_DIR/.git" ]; then
     exit 1
   fi
 
-  # Never clobber local work: skip if tracked files have local edits.
-  # Untracked files (e.g. a user's Vault Config.md) are fine -- if one ever
-  # collides with an incoming file, the ff-only merge below fails safely.
-  if [ -n "$(git -C "$SEED_DIR" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
-    log_entry "SKIPPED: Seed git working tree has local edits to tracked files. Commit, stash, or discard them, then sync again."
-    exit 3
-  fi
-
+  # Fetch first so we can compare the working tree against origin/main.
   if ! git -C "$SEED_DIR" fetch origin main --quiet 2>/dev/null; then
     log_entry "ERROR: git fetch failed. Check network connection."
     exit 1
   fi
 
-  # Skip if local commits are ahead of origin (likely a maintainer or a fork)
   AHEAD=$(git -C "$SEED_DIR" rev-list --count origin/main..HEAD 2>/dev/null || echo 0)
+  BEHIND=$(git -C "$SEED_DIR" rev-list --count HEAD..origin/main 2>/dev/null || echo 0)
+
+  # Never clobber local work: a tracked-file edit normally means the user has
+  # changes to keep. But a "zip-over-git collision" (an earlier zip-mode run
+  # copied files over a git clone without committing) leaves the tree dirty
+  # while its content is byte-identical to origin/main -- a lossless case we
+  # self-heal. Untracked files (e.g. a user's Vault Config.md) are fine.
+  if [ -n "$(git -C "$SEED_DIR" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
+    if [ "$AHEAD" -eq 0 ] && worktree_matches_origin; then
+      # Tracked working tree already equals origin/main and no local commits
+      # exist: resetting HEAD to origin/main discards nothing.
+      if git -C "$SEED_DIR" reset --hard --quiet origin/main 2>/dev/null; then
+        NEW_VERSION=$(grep '^seed:' "$SEED_DIR/VERSION.md" | awk '{print $2}' || echo "unknown")
+        NEW_PI=$(grep '^project_instructions:' "$SEED_DIR/VERSION.md" | awk '{print $2}' || echo "unknown")
+        log_entry "Self-healed a zip-over-git collision: the working tree was dirty but byte-identical to origin/main, so HEAD was reset to match (no content lost). Now at Seed $NEW_VERSION, PI $NEW_PI."
+        echo ""
+        echo "Seed self-healed and up to date at $SEED_DIR"
+        exit 0
+      fi
+      log_entry "ERROR: detected a zip-over-git collision but the reset failed. Recover manually: git -C \"$SEED_DIR\" reset --hard origin/main"
+      exit 1
+    fi
+    log_entry "SKIPPED: Seed git working tree has local edits to tracked files. Commit, stash, or discard them, then sync again. If this is a stuck clone (files show as modified but are identical to the remote), recover with: git -C \"$SEED_DIR\" reset --hard origin/main -- this discards local changes, so use it only if you have no edits to keep. See the Seed VERSION.md recovery notes."
+    exit 3
+  fi
+
+  # Skip if local commits are ahead of origin (likely a maintainer or a fork)
   if [ "$AHEAD" -gt 0 ]; then
     log_entry "SKIPPED: Seed git clone has $AHEAD local commit(s) ahead of origin/main. Push or reconcile them manually."
     exit 3
   fi
 
-  BEHIND=$(git -C "$SEED_DIR" rev-list --count HEAD..origin/main 2>/dev/null || echo 0)
   if [ "$BEHIND" -eq 0 ]; then
     log_entry "Already current (git, Seed $OLD_VERSION, PI $OLD_PI). No update needed."
     exit 2
@@ -343,3 +381,6 @@ fi
 
 echo ""
 echo "Seed updated successfully at $SEED_DIR"
+}
+
+main "$@"
