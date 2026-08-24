@@ -4,13 +4,24 @@ type: guide
 status: active
 maturity: working
 created: '2026-06-18'
-updated: '2026-06-18'
+updated: '2026-08-24'
 operator: Andrew
 tags:
   - protocol
   - DataWizard
 edit_log:
   - DW-S189 2026-06-18
+  - "DW-S284 2026-08-24 - Additional principles: design for the next phase at
+    build time (S135; kin D112, S282)"
+  - "DW-S284 2026-08-24 - Additional principles: a pointer must survive the
+    condition its rule fires under (S189)"
+  - "DW-S284 2026-08-24 - Additional principles: build discipline for
+    native-surface tools (S199/S202/S203/S204/S207), re-check tool landscape at
+    build time (S209), see it in context (S201), capture leg first (S209 +
+    S257/S261) (meta-learning review S198-S209)"
+  - "DW-S284 2026-08-24 - Additional principles: design and spec review
+    heuristics - uniform principle, invariants x write surfaces, review pass
+    between design and build (S218, S220; meta-learning review S210-S220)"
 ---
 # Working Principles
 
@@ -63,6 +74,30 @@ These were standing principles in the older protocol and remain true even though
 **Confidential content stays local.** Never embed, quote, or reference content from designated private folders in shared or federated project documents. When in doubt about whether something is shareable, treat it as private and ask.
 
 **Hallucination vigilance.** Statistics, citations, and attributed quotes produced by an AI agent are background context, not citable data. Flag uncertain claims for human verification before they go into anything shared with collaborators or funders. The cost of a fabricated citation in a funder document is far higher than the cost of a verification step.
+
+**Design for the next phase at build time.** When building a pipeline stage, a schema, or a store, spend the small extra effort to make its output usable by the phase you already know is coming - retrofitting later is expensive, doing it now is nearly free. The canonical case: designing enrichment output for graph-readiness (normalized entity slugs, typed relationships) before the pipeline ever ran, rather than re-processing every companion note once a graph was wanted (DataWizard, 2026-05). Later instances of the same move: block IDs stamped on every companion at write time so citations could be verified afterwards (2026-08), and a db-backed intake queue designed together with its vault write-back contract rather than bolting the vault on later (2026-08). The test is cheap: name the next phase, ask what it will need from this one, and add only the fields or hooks that answer it.
+
+**A pointer must survive the condition its rule fires under.** Link-don't-restate has a safety limit: slimming a rule to a pointer is only safe if the pointer's target is still reachable in the exact situation the rule exists for. The canonical catch: the PI's Seed-absent recovery rule once pointed at VERSION.md - which lives inside the Seed and is therefore gone precisely when the rule fires (DataWizard, 2026-06). The fix keeps the recovery command in the PI body (`## Seed recovery`). Before replacing any inline instruction with a pointer, name the rule's failure case and check that the target is readable from inside it; if not, the content stays inline, however much it duplicates.
+
+**Build discipline for tools that touch native surfaces.** A reusable validation playbook, learned across a database-substrate rebuild and two source-adapter builds (DataWizard, 2026-06):
+
+- *Audit against live state before building.* A read-only audit of what actually exists corrected two load-bearing assumptions in a build plan that would have derailed the next two steps. Plans inherit the state of the docs they were written from, not the state of the vault.
+- *Validate on a `/tmp` copy before native execution.* A full dry run against a copy caught two real data-fidelity bugs that the safety gate and count-only checks had both missed.
+- *Turn a validation finding into a runtime guardrail, not a doc note.* When a run proved lossy, the script was changed to refuse that run unless `--force` is passed. Durable protection beats a comment somebody has to remember.
+- *Isolate the native-only step.* Put the part that genuinely needs the user's machine (a keychain read, a live db write) behind one flag or one function, so everything else is testable from the sandbox with no install.
+- *Build the enforcement check early.* The first report from a new lint check is the live cleanup worklist - no separate audit pass needed, and defects surface the day the check exists.
+
+**Re-check the tool landscape at build time, not just design time.** Tool drift outruns design-then-build: a transcription app assessed as "closed, no hook" during design shipped local speaker recognition three weeks later, before the build started - and the same note had already flagged a comparable flip once before. The design-session assessment sets direction; the build session re-verifies the specific tools it depends on before committing to them. (DataWizard, 2026-06)
+
+**"See it in context" beats describing.** For a decision that is cosmetic but becomes canon once made (a display glyph, a heading style, a citation rendering), defer it until a rendered example exists and decide by looking at it. One demo resolved in minutes what a description had left open for sessions. (DataWizard, 2026-06)
+
+**The capture leg is load-bearing - design it first.** Front-of-pipeline capture and intake are chronically under-designed relative to the sophisticated processing behind them: the back end gets lavish design while "get the file off the phone" is parked, and the parked step is exactly what breaks and blocks the operator. Seen three times in one project: an audio pipeline whose recording handoff was the missing piece, an intake importer that was built but never once production-run because nothing fed it, and a message-capture pipeline that only became real when its trigger went live. Before designing processing, design and verify the step that gets raw material into the system. (DataWizard, 2026-06 to 2026-08)
+
+**Design and spec review heuristics.** Three cheap, high-yield moves for reviewing a design or a spec before it is built (DataWizard, 2026-07):
+
+- *Apply the system's own principle uniformly.* Wherever a stated principle has an exemption, look there first - non-uniform application is exactly where the bugs hide. Applying a "markdown is canonical" rule to the one component that had been exempted from it surfaced both a runtime mismatch and a correctness bug (a non-idempotent append under a deferred cursor).
+- *List the declared invariants, then check every write surface against each one.* A spec review that did this found three correctness bugs, all sitting in write surfaces where the spec's own idempotency invariant had simply not been applied. Invariants stated once and applied selectively are the spec-level form of the point above.
+- *Put a review pass between design and build.* A spec that was buildable as written still yielded eight issues to a dedicated review at zero code cost, and the build that followed ran with no reopened design questions. The pass is cheap because the reviewer has the whole spec and no code yet; the same defects found during the build cost a re-design each.
 
 ## A note on Rule 17
 

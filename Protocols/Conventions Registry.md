@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-18'
+updated: '2026-08-24'
 operator: Andrew
 priority: high
 maturity: working
@@ -37,6 +37,10 @@ edit_log:
     Chain B2)"
   - "DW-S278 2026-08-18: inbound notes rehomed to per-project Session Exchange
     folders; _Infrastructure is infra-only, never notes (operator ruling)"
+  - "DW-S284 2026-08-24: Archiving gains the consolidate-to-one-home survivor
+    diff (S191); one-liners: SQLite is local / markdown is shared (D103, D107;
+    S192) + per-adopter config at the consumption surface (D96; S187)
+    (meta-learning review S186-S197)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -150,6 +154,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
 - Numbering starts at `1.0` (`0.x` is reserved for infrastructure files). Section headers use plain numeric prefixes matching the filenames - no Roman numerals.
 - Section YAML carries `parent: "[[Shell Name]]"` and `section: N` (matching the filename prefix); each section file opens with `*Part of the [[Shell Name]]*`.
 - **5+ sections** in a document - create the section subfolder rather than leaving the files loose.
+- **Splitting an existing file:** write the section files first and verify they landed, *then* rewrite the original as the shell. The extract exists on disk before the destructive step, so no content is ever at risk if the rewrite fails or is interrupted. (DataWizard, 2026-06)
 - Empty folders can't be deleted via MCP (the vault FUSE mount blocks it); when files are moved out, the human deletes the empty folder manually in Obsidian.
 
 **Example:** `0.2 Session Log - DataWizard.md` is a shell of `![[...]]` embeds; each entry is a file in `_Sections - DataWizard/Session Log/`, numbered from `1.0`.
@@ -202,6 +207,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
   4. Note the archive in the session log; remove the file from active MOC listings.
 - **Filename exception:** if the replacement reuses the same filename (e.g., a regenerated file), the archived copy must be renamed to avoid collision; add the reason in parentheses, e.g. `0.1 MOC - ProjectName (hand-curated, superseded SNNN).md`.
 - **Don't archive:** files that are merely old but still active; files you only moved; content outside your project scope (flag those to the human).
+- **Consolidating to one home:** when the archive is the retired half of a duplicate-to-one-home merge, diff the retired file against the survivor *before* archiving and carry over any load-bearing content the survivor lacks. Confirming "the duplicate is archived" is not the closeout; "the survivor carries everything" is. (A protocol demolition archived a federation-guide duplicate whose "full copies only" rule the surviving guide did not have; caught two weeks later. DataWizard, 2026-06.)
 
 (14.0 salvage, D87)
 
@@ -425,6 +431,8 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 - **Git push before batch ops:** before running any script that bulk-moves or modifies vault files, commit and push first. `git checkout .` is then the undo if a batch run goes wrong.
 - **Sweep on a convention flip:** when a convention or default here changes, grep the Seed and project docs for the *old* rule's signature phrases and reconcile each hit - convert it to a pointer, fix the stale value, or consciously retain it (retention is the last resort, and record the retained ones). Patching only the sections you remember misses drift. (S225 Build 3.)
 - **Seed content ships depersonalized:** the Seed goes to other users, so Seed-bound content stays generic -- no vault names, collaborator names, or operator initials. Render provenance as `(project, date)` -- e.g. `(Weave, 2026-08)` -- matching the environment guides' existing style. Frontmatter-provenance policy and the legacy sweep are tracked in the DW Backlog's Seed de-personalization sweep item. (S227, S243)
+- **SQLite is local, markdown is shared:** per-project databases are gitignored, and a SQLite file on a file-sync folder (Dropbox, iCloud) with concurrent writers can corrupt - so cross-machine sharing is always text: committed rendered markdown plus a key export, never the live db. The db is a rebuildable local cache; markdown is the durable shared record; they round-trip via render / migrate scripts. Applies to every db-backed store (operational db, intake queue). (D103, D107; DataWizard, 2026-06)
+- **Per-adopter config lives at the consumption surface,** never in a shipped git-tracked file - a pull clobbers it. Paths go in the gitignored `Vault Config.md`; the project home folder goes in the pasted Project Instructions or the vault-root CLAUDE.md. Same class as the Vault Config gitignore decision. (D96; DataWizard, 2026-06)
 
 ---
 

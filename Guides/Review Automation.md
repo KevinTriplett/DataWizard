@@ -2,13 +2,18 @@
 title: "Review Automation"
 type: guide
 created: 2026-08-06
-updated: 2026-08-18
+updated: 2026-08-24
 operator: Andrew
 edit_log:
   - "DW-S250 2026-08-06 - created: pending-report model + review-cadence
     single-home (D114 relocates D88)"
   - "DW-S273 2026-08-18 - Stamping paragraph split by review type: meta-learning
     stamps reviewed-through session, not current"
+  - "DW-S284 2026-08-24 - cadence table: Backlog + FR triage row (manual,
+    last_backlog_triage); number relocated out of the DW 0.0"
+  - "DW-S284 2026-08-24 - Scheduled automation: key the scan to consumption rate
+    (last covered session, review cadence) not event rate (S250; meta-learning
+    review S247-S255)"
 ---
 
 # Review Automation
@@ -35,6 +40,9 @@ These numbers live here and nowhere else (D114, relocating D88). Every other doc
 | Project health audit | `last_health_audit` | 30+ sessions since, or never recorded | `dw_lint` (machine half of `project-health-audit`) | `Health Audit Report - *.md` |
 | Meta-learning review | `last_meta_learning_review` | 30+ sessions since, or never recorded | `meta-learning-scan` | `Meta-Learning Report - *.md` |
 | Content Interests | `last_content_interests_review` | 30+ days since, OR 10+ sessions since, OR field absent | `content-interest-scan` | `Content Interests Report - *.md` |
+| Backlog + FR triage | `last_backlog_triage` | 30+ sessions since, or never recorded | none yet (manual; a stock-take session) | none -- the stale-item sweep is the review itself |
+
+The backlog row is manual for now: no scan producer, no pending report, so the scheduled check does not fire it -- it lives here so the number has one home (D114). The triage itself: retire items overtaken by platform evolution or absorbed by other work, verify long-standing "blocked" items (they are often silently resolved), and reconcile FR statuses against what was actually implemented. Yield on past runs: 17 of 46 action items retired in one pass; 7 of 19 FRs resolved in another, 4 by status correction alone (DataWizard, 2026-05). Stamp the current session ID, as for the health audit.
 
 **Gap arithmetic** (used by the scheduled check, not the session-closer): solo-operator projects subtract session numbers; multi-operator projects count session-log files dated after the reference session; day-based checks compare calendar dates.
 
@@ -59,6 +67,8 @@ Which harness works depends on where git can actually push:
 
 - **GitHub Actions cron (preferred when the vault is a git repo).** A scheduled workflow on the vault's own repo runs on GitHub's infrastructure at the cron time -- no operator machine awake, no desktop app open. It has native write access via the built-in `GITHUB_TOKEN` (no personal token to store), pulls the repo, runs the scan by calling the Claude API, writes the `pending-review` report, commits, pushes, and notifies by opening a repo issue (the report also syncs down to the vault, where the session-closer surfaces it). This sidesteps both the "wake the machine" problem and the Cowork cloud git proxy.
 - **Cowork scheduled task.** A fresh Cowork session fired on a schedule. Viable only when the operator's machine is awake and the desktop app is open at fire time (so the vault bridge is live) AND the target repo is in the session's authorized sources -- the Cowork cloud routes git through a proxy that refuses pushes to repos outside that set (see the **Cowork Scheduled Tasks** guide). Both conditions are fragile for an overnight run, so prefer GitHub Actions whenever the vault is a git repo.
+
+**Key the automation to the consumption rate, not the event rate.** When pending reports pile up, the bottleneck is the human review step, and running more scans makes it worse - each unreviewed report is more verification archaeology for the reviewer. So the scan range is keyed off the last session the newest *existing* report covers (not the reviewed-through stamp, which lags while a backlog is worked), and the scan fires at the review cadence from the cadence table, not at the minimum session count that would justify a report. A producer that outruns its consumer only manufactures backlog. (DataWizard, 2026-08)
 
 The scan producers are the same regardless of substrate; only the harness differs. For Cowork-scheduled-task specifics (timing, one-model-per-run, cron jitter, idempotency), see the **Cowork Scheduled Tasks** guide.
 

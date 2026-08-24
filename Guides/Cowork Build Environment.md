@@ -5,11 +5,19 @@ edit_log:
     S23-S34 build cluster + Weave sandbox/network items + DW S221-S230
     device-bridge items + RW S51 staged-path item); seeded from the field-tested
     VibeCut Build Environment Notes
+  - "DW-S284 2026-08-24 - Shell quirks: Write-tool overwrite-unread refusal as
+    concurrency guard (S208); zsh inline-comment handoff gotcha (S204)
+    (meta-learning review S198-S209)"
+  - "DW-S284 2026-08-24 - Device Bridge: Cowork folder connections are
+    exact-path, no sibling exposure, break on move (S216; meta-learning review
+    S210-S220)"
+  - DW-S284 2026-08-24 - zsh handoff bullet extended with the bash heredoc
+    delivery recipe (S252; meta-learning review S247-S255)
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-08-18
+updated: 2026-08-24
 ---
 # Cowork Build Environment
 
@@ -45,6 +53,8 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 
 - **bash `timeout_ms` caps at 45000, and a validation failure rejects the ENTIRE call** -- including any file writes packed into the same command string. Write files with the Write tool, not heredocs, when a call might fail validation. (Source: Weave, 2026-06/08)
 - **The Edit tool requires a prior Read-tool read.** A `cat` via bash does not register; the Edit fails. (Source: VC S23)
+- **The Write tool refuses to overwrite an existing file it has not Read** -- but creates genuinely new files without complaint. This is a feature under concurrency: it is what stopped one session from clobbering a sibling session's freshly written claim stub. Treat the refusal as a signal to re-read (the file may have changed under you), not as an error to force past. See the concurrency practices in the MCP Reliability guide. (Source: DataWizard, 2026-06)
+- **No trailing `#` comments in commands handed to the user's Terminal.** zsh interactive shells (the macOS default) do not honor inline `#` comments unless `INTERACTIVE_COMMENTS` is set; bash does. A handed-off command like `git pull  # then verify` reaches zsh with `#`, `then`, `verify` as arguments, and zsh also breaks on `()` inside a pasted comment line. Put explanations on their own line above the command, and hand multi-line blocks over as a heredoc - `bash <<'SH'` ... `SH` - so the whole block runs under bash regardless of the operator's interactive shell. (Source: DataWizard, 2026-06, 2026-08)
 - **`bash wc -w` returns 0 for cloud-synced files** the mount serves as cloud-only placeholders. Use `obsidian:get_notes_info` for sizes instead. (Source: VC S32)
 - **Staged large-file paths do not survive a session interruption/reclaim.** A staged tool-results directory was gone after a session gap; re-fetching was cheap and deterministic. Re-fetch instead of hunting for the old path. (Source: RW S51)
 
@@ -63,6 +73,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 
 - **`device_commit_files` rejects an explicit `expectedMtimeMs: null`** -- omit the field entirely when no mtime guard is wanted. (Source: DW S229)
 - **`Control_Chrome` proxy: `list_tabs` is reliable; `get_page_content` intermittently errors** ("Google Chrome is not running") even with a tab open. Verify page state via `list_tabs` URL params instead of retrying. (Source: DW S230)
+- **Cowork connects folders individually, by exact path.** Connecting a parent folder does not expose its siblings, and moving or renaming a connected folder on disk breaks its connection until it is re-added in the desktop app. If a session suddenly cannot see a folder it could see before, check whether the folder moved before debugging the tools. (Source: DataWizard, 2026-07)
 
 ## Verification Discipline for Builds
 

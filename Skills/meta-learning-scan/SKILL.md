@@ -10,13 +10,16 @@ description: >-
   planting. Also use when the user wants to set up automated learning extraction
   for any DW project.
 type: skill
-version: '1.3'
+version: '1.3.1'
 created: '2026-06-01'
-updated: '2026-08-05'
+updated: '2026-08-24'
 edit_log:
   - DW-S185 2026-06-15 - platform/environment routing hint (Step 4 Deferred)
   - "DW-S243 2026-08-05 - v1.3: Step 3 header-variant note (### Findings treated
     as learnings-equivalent)"
+  - "DW-S284 2026-08-24 - v1.3.1: Step 5 test_run frontmatter flag for
+    skill-test scans (the S118-S137 test report surfaced unflagged in the DW
+    stack)"
 ---
 
 # Meta-Learning Scan
@@ -141,6 +144,8 @@ learnings_extracted: {count}
 last_review_session: "{Abbrev}-S{last_reviewed}"
 status: pending-review
 ```
+
+If the scan was run as a **skill test** - a forced scan range, or the reviewed-through stamp temporarily overridden - add `test_run: true` to the frontmatter and say so in the report's first line. The review skill detects the pending stack from frontmatter, and a test-generated report is indistinguishable from a real one without the flag; one such report sat in a project's stack for three months before anyone read the body note that explained its origin.
 
 **Report structure:**
 

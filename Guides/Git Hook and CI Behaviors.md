@@ -2,7 +2,7 @@
 title: Git Hook and CI Behaviors
 type: guide
 created: 2026-08-05
-updated: 2026-08-20
+updated: 2026-08-24
 operator: Andrew
 status: active
 edit_log:
@@ -11,6 +11,9 @@ edit_log:
   - DW-S280 2026-08-20 - added self-updating-scripts (main() wrap for
     self-overwrite) and synced-working-tree-vs-remote compare (throwaway
     read-tree index) behaviors, from the update_seed.sh fix
+  - "DW-S284 2026-08-24 - shell portability section: GNU/BSD stat chain with
+    numeric guard, bash 3.2, verify with bash -x on the real script (S252;
+    meta-learning review S247-S255)"
 ---
 
 # Git Hook and CI Behaviors
@@ -29,6 +32,12 @@ Runtime gotchas for **guard and automation scripts that run across a git-synced 
 - **mawk panics on intervals + grouped alternation.** A regex combining a POSIX interval expression `{n,m}` with a grouped alternation `(a|b)` triggers `REcompile() - panic: values still on machine stack` and aborts. This is a hard crash, not a wrong result.
 - **Write CI-bound awk mawk-safe:** use `?`-repetition (e.g. `/^ ? ? ?/` for "up to three leading spaces") and separate `~` tests instead of `{n,m}` intervals and `(a|b)` alternation groups.
 - **The sandbox awk is also mawk**, so running a guard/scanner script locally in the sandbox reproduces the CI panic before it ships. Test shell/awk automation in the sandbox, not only in a gawk shell - a local pass is a real CI pre-check here. (S242: the first commit-guard fence detection used `{0,3}` + grouped alternation and panicked the sandbox awk, which is what caught it before it reached a CI that would have panicked identically.)
+
+## Shell portability: stat, bash 3.2, and the verification harness
+
+- **`stat` differs between GNU and BSD.** A script that ships to other machines must not assume either. Use the GNU-first fallback chain `stat -c %Y "$X" 2>/dev/null || stat -f %m "$X" 2>/dev/null || echo 0`, and validate the result is numeric before doing arithmetic on it - a silent non-numeric value turns a lock-age check into a no-op.
+- **macOS `/bin/bash` is 3.2.** Anything written against bash 4+ (associative arrays, `${var,,}`, `mapfile`) fails on a stock Mac. Also expect the operator's interactive shell to be zsh.
+- **Verify guard and lock logic on the real script, not only a wrapper harness.** A test harness can false-negative under bash 3.2 while the script under test is fine (or the reverse). Run `bash -x` on the actual script with the real inputs and read the trace; the harness is a convenience, not the evidence. (DataWizard, 2026-08)
 
 ## Self-updating scripts overwrite themselves mid-run
 

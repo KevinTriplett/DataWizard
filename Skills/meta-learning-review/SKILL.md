@@ -7,8 +7,8 @@ description: >-
   report is ready for review. Also triggered by the session-closer's periodic
   threshold nudge when a review is due.
 type: skill
-updated: '2026-08-18'
-version: '1.4.0'
+updated: '2026-08-24'
+version: '1.5.0'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -22,6 +22,13 @@ edit_log:
   - "DW-S273 2026-08-18 - v1.4.0: Step 5 stamps reviewed-through session not
     current; Step 2 superseded-claim vault sweep; Cadence + Wiring realigned to
     D114 (Review Automation guide)"
+  - "DW-S284 2026-08-24 - v1.5.0: review order + holes + several-per-session
+    (Backlog Mode); stack detection from frontmatter (Step 1); reverse
+    supersession check + aged-report mode (Step 2); Superseded and Not-planted
+    dispositions + cross-cutting observations (Step 3); target-dependent
+    provenance style incl. Seed depersonalization (Step 4); Review Outcome
+    format + out-of-order stamp rule (Step 5). From a four-report review
+    session."
 ---
 
 # Meta-Learning Review Skill
@@ -57,9 +64,15 @@ The scheduled review-status check provides the trigger: it reads `last_meta_lear
 
 When first adopting this skill on a project with many unreviewed sessions, expect the initial reviews to cover larger batches. Work through the backlog in manageable chunks (10-15 sessions per review pass) rather than attempting the full history at once. Steady-state reviews of 5-10 sessions are faster and produce cleaner results.
 
+**Order and the stamp.** With several pending reports, review **oldest-first by default** - that is the only order in which the reviewed-through stamp (Step 5) can advance one report at a time. Newest-first is a legitimate choice when freshness matters more (the newest report plants the current version of recurring environment facts), but the stamp then holds at the last contiguous reviewed-through point until the older reports clear. A report whose range sits *behind* the stamp (a gap that was skipped earlier) is reviewed like any other but does not move the stamp.
+
+**Several reports per session** is fine when the residue per report is small and the approval gates stay lean - "one report per session" means one report per approval cycle, not a hard ceiling. Check context headroom before starting each additional report; an aged report's review is mostly verification and is cheap, a fresh 70-learning report is not. (Four reports in one session worked; DataWizard, 2026-08.)
+
 ## How to Review
 
 ### Step 1: Gather the learnings
+
+**Detect the stack from frontmatter, not narrative.** List the project's learning reports folder and read each report's `status:`; the pending stack is exactly the reports marked `pending-review`. Session-log "N reports pending" counts drift within a few sessions (two consecutive entries said six while one report was already `reviewed`; a later entry said eight when the true count was seven). Also read the report's own header notes: a report generated as a skill test with a forced scan range is still a real report, but its already-planted rate will be unusually high.
 
 **Primary path (report exists):** Read the meta-learning report from the project's learning reports folder (e.g., `Workshop/Learning Reports/`). The report should contain extracted learnings organized by theme, with suggested updates.
 
@@ -75,6 +88,10 @@ This is the critical step that separates useful planting from noise. For each su
 
 4. **When a learning supersedes a prior claim, check the rest of the vault.** For any learning with a "use X over Y", "Y was wrong", or "Y is deprecated" shape, verifying that the plant landed in its target doc is not enough -- search the vault for other docs still asserting the old claim, and either fix them in the same pass or file an action item per doc. A plant can succeed while other docs keep teaching the superseded thing for many sessions afterward.
 
+5. **Check the reverse direction too: is the learning itself stale?** Tool and platform learnings age fastest. A learning that was true when logged may have been overtaken by a tool update - and a Seed skill or guide may still be teaching the stale version because it was planted promptly. When a learning turns out to be superseded, search for docs that assert it and fix them in the same pass (a skill was still stating "this tool has no partial read" two months after the server shipped one).
+
+**Aged-report mode.** For a report older than roughly 30 sessions, the residue (ready / discuss / deferred) still gets full verification, but the items the scan already marked "already planted" only need a spot check - they cite specific docs and dates, and re-verifying every one is archaeology. The already-done rate on the residue climbs steeply with age (observed 40-75% across four aged reports), so budget the review as verification, not planting.
+
 Do not skip verification. The meta-learning report (or on-demand extraction) works from session logs, which are snapshots of understanding at the time. The vault may have evolved since.
 
 ### Step 3: Classify each learning
@@ -86,6 +103,10 @@ For each verified learning, assign a disposition:
 - **Needs discussion.** The learning implies a design decision or convention change that shouldn't be made unilaterally. Surface it to the user. If resolved, plant it. If not, create an action item.
 - **Cross-project (DW Workshop).** The learning targets DW Seed infrastructure -- a Seed skill, protocol doc, PI working rule, or Seed guide -- but the current project is not DW itself. These items belong as feature requests or skill requests in the DW Workshop, not planted directly into the current project's docs. Proceed to Step 4.5.
 - **Deferred.** The learning is valid but the target doc doesn't exist yet, or the change is complex enough to warrant its own session. Create an action item with enough context that a future instance can act on it. For complex items, write an accompanying note with the full analysis.
+- **Superseded.** Distinct from already-done: the learning was never planted, but the need behind it evaporated or a later decision replaced it (a platform workaround made moot by an official-API route; a connector gap closed by an in-script adapter; a tool limitation removed by a tool update). Record what superseded it so the trail is traceable. Expect this class to grow with report age.
+- **Not planted (declined).** The learning is accurate but should not be planted as phrased - too minor for a guide, a one-off, or guidance that would route around a platform restriction. Record the reason in the review outcome; a silent drop looks like an oversight to the next reviewer.
+
+**Cross-cutting observations get dispositions too.** The report's closing observations are not decoration - they are often the highest-value items in the batch (a "learnings of this class have no home" observation is what produces a new guide or a new triage bucket). Walk each one and assign it a disposition exactly like a learning.
 
 Platform and environment behaviors are the most common members of the deferred class -- and the most likely to rot. Content learnings self-plant in-session because they have an obvious home (the relevant design doc); platform gotchas (scheduled-task behavior, MCP quirks, sandbox limits) have no design doc, so they accumulate here review after review. Before deferring a platform or environment learning, give it a home in the **Platform and Environment Behaviors** guide cluster -- the standing home for these gotchas; see `Seed/GUIDES.md` for the current members -- by extending a cluster guide, or adding a new guide to the cluster if none fits, rather than leaving it homeless. (S185, named S195)
 
@@ -110,7 +131,7 @@ Common destination types:
 - **Action item:** For learnings that require future work rather than a doc update. Include enough context that the item is self-explanatory.
 
 3. **Frame for the reader.** A skill reader wants "what do I do differently." A design doc reader wants "what does this mean for the architecture." Same learning, different framing. Match the target doc's voice and density.
-4. **Include provenance.** Reference the session(s) where the learning originated, so the trail is traceable. A lightweight inline reference (e.g., "(S85, S86)") is sufficient.
+4. **Include provenance, in the style the target requires.** The trail must be traceable, but the format depends on where the plant lands. **Project docs** (design docs, 0.x files, project skills) take session identifiers - a lightweight inline reference like "(S85, S86)". **Seed-bound content** (Seed skills, guides, protocols, templates) ships to other users, so it takes the Conventions Registry's depersonalized form - `(project, YYYY-MM)`, e.g. `(DataWizard, 2026-06)` - and never a vault name, collaborator name, operator initials, or a bare session number. Decision-log numbers (`D103`) are acceptable only where the target already cites them as its house style (the Conventions Registry does). Check this before writing, not after: a Seed plant with session numbers in it is a depersonalization defect that a later sweep has to find.
 
 ### Step 4.5: File cross-project items in DW Workshop
 
@@ -151,9 +172,9 @@ Body sections: `## Problem` (what the learning revealed), `## Proposed Changes` 
 
 After planting is complete:
 
-1. **Mark reviewed items** in the report (if one exists) with their disposition: done, planted (with target doc), deferred (with action item reference), or discussed (with outcome).
-2. **Update the report's frontmatter** with `last_review_session:` set to the current session identifier.
-3. **Update the reviewed-through stamp.** The scheduled review-status check reads `last_meta_learning_review:` in the project's 0.0 frontmatter to determine when the next review is due. Set it to the reviewed report's **end-of-scan-range session** (the reviewed-through point), not the current session -- the next scan picks up immediately after the reviewed range, so stamping the current session silently skips everything between the range end and the review session. The pending-report trigger is what nudges the next review, so the accurate stamp does not silence it. Review one report per session; with a backlog, each review advances the stamp one report at a time.
+1. **Append a Review Outcome section** to the report (if one exists), in this shape: a `## Review Outcome (SESSION, YYYY-MM-DD)` heading; one line of counts (how many non-already-planted items, how many planted / already done / superseded / not planted); then a **Planted** list (learning -> target doc and section), **Already done** (with where it already lives), **Superseded** (with what superseded it), **Not planted** (with the reason), **Deferred** (with the action item or home), and a closing **Stamp** line stating what the reviewed-through field moved from and to - or that it did not move, and why. This is the disposition record the next reviewer reads first.
+2. **Update the report's frontmatter**: `status: reviewed`, `last_review_session:` set to the current session identifier, `updated:` and an `edit_log` entry.
+3. **Update the reviewed-through stamp.** The scheduled review-status check reads `last_meta_learning_review:` in the project's 0.0 frontmatter to determine when the next review is due. Set it to the reviewed report's **end-of-scan-range session** (the reviewed-through point), not the current session -- the next scan picks up immediately after the reviewed range, so stamping the current session silently skips everything between the range end and the review session. The pending-report trigger is what nudges the next review, so the accurate stamp does not silence it. With a backlog reviewed oldest-first, each review advances the stamp one report at a time. A report reviewed out of order - newest-first, or a gap behind the current stamp - does **not** move the stamp; note that in the Review Outcome's Stamp line so the next reviewer does not "correct" it. (Order guidance: Cadence > Backlog Mode.)
 
 ### Step 6: Summarize
 

@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-18'
-version: '4.6.0'
+updated: '2026-08-24'
+version: '4.6.2'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -50,6 +50,12 @@ edit_log:
     whole-window listing + collision recovery; 4 Common Mistakes)"
   - DW-S279 2026-08-18 - generic-names sweep of the two 3.12 examples (C2, Seed
     depersonalization; Flag Surfacing Chain B2)
+  - "DW-S284 2026-08-24 - v4.6.1: Step 3.5 gains the Environment / tool-behavior
+    triage class routing to the Platform and Environment Behaviors cluster (S216
+    support-session failure mode; meta-learning review S210-S220)"
+  - "DW-S284 2026-08-24 - v4.6.2: What's next standing-proposals rule - check
+    before carrying, strike on resolution (S248; meta-learning review
+    S247-S255)"
 ---
 
 # Session Closer Skill
@@ -171,6 +177,8 @@ If the previous session has no quest threads section (pre-S158 entries), scan th
 
 The quest threads section prevents long-running workstreams from falling off the radar when they aren't the active focus. "What's next" is the immediate handoff; quest threads are the background map of parallel work that isn't currently prioritized.
 
+**Standing proposals: check before carrying, strike on resolution.** A line that recurs across handoffs ("consider building skill X", "the Y refresh is still pending") is not evidence that anything happened - it is evidence that each closer copied it from the last one. Before carrying such a line forward, check whether it has resolved (a skill built, a report reviewed, a gate cleared); when it has, strike it explicitly in this entry rather than letting it drop silently, so the next reader knows it ended rather than wondering if it was lost. One proposal propagated through roughly ten handoffs after its spec was already complete. (DataWizard, 2026-08)
+
 **Side-quest sessions.** When the session was a side quest (frontmatter `stream: side-quest`), its continuation belongs here as a named thread -- and its "What's next" must carry the *main arc* forward unchanged rather than the tangent. See the `side-quest` skill.
 
 ### Step 3: Write the close artifacts
@@ -220,6 +228,7 @@ For each finding, decision, or detailed context that emerged during the session,
 - **Design-doc**: Technical finding that future task-specific work needs. Identify the specific target doc and plant it there. Example: an edge case discovered during a build belongs in the relevant design doc, not just the session log.
 - **Skill-update**: Process improvement that should change how a skill works. Patch the skill now or add a specific action item naming the skill and what to change.
 - **Protocol-update**: Convention change that affects all projects. Handled by Step 3.6 (convention-change check) -- flag it there if not already caught.
+- **Environment / tool-behavior**: A platform, MCP, sandbox, git, or shell gotcha (a tool that fails in a specific way, a mount or sync limitation, an auth or permission quirk). These have a standing home -- the **Platform and Environment Behaviors** guide cluster (`Seed/GUIDES.md` lists the members: MCP Reliability, Cowork Build Environment, Git Guide troubleshooting, Chrome and web tools, scheduled tasks, and so on). Route each one to the cluster guide it fits and plant it now; a one-line entry with `(project, YYYY-MM)` provenance is enough. Support and debugging sessions produce these in batches and are the sessions most likely to close with "files updated: none" -- six environment facts from one such session sat unrouted for two months until a meta-learning review found them. Do not leave them as session-log-only.
 
 **Insight-capture awareness.** If the insight-capture skill was invoked mid-session, its report lists what was planted and where. Use that as a starting point -- verify nothing additional surfaced since the capture ran, rather than doing a full from-scratch triage. If no insight-capture was run, do the full triage as usual.
 
