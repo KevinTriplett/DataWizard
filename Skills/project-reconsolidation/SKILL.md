@@ -6,13 +6,13 @@ description: "Use when reconciling a project's tracking surfaces against reality
   what the session logs actually show. A periodic four-source reconciliation
   audit that diffs every record of open work against recent session-log ground
   truth, classifies divergences (slipped / stalled / orphaned / done-but-open /
-  contradiction / duplication / model-gap), and writes a reconsolidation report.
-  Trigger on: 'run a reconsolidation pass', 'reconsolidation audit', 'reconcile
-  the open work', 'the trackers have drifted', or when a periodic
-  tracking-health review is due. Distinct from semantic divergence/framing-drift
-  reconciliation during harvest."
+  contradiction / duplication / model-gap / partitioned), and writes a
+  reconsolidation report. Trigger on: 'run a reconsolidation pass',
+  'reconsolidation audit', 'reconcile the open work', 'the trackers have
+  drifted', or when a periodic tracking-health review is due. Distinct from
+  semantic divergence/framing-drift reconciliation during harvest."
 type: skill
-version: "1.3"
+version: "1.4"
 updated: 2026-08-24
 created: 2026-06-29
 edit_log:
@@ -22,6 +22,9 @@ edit_log:
     verify-cross-project-state-before-flagging note (S213); step 1 partial-read
     claim superseded (get_note_outline + read_note_lines) (meta-learning review
     S210-S220)"
+  - "DW-S285 2026-08-24 - v1.4: Divergence Taxonomy gains 'partitioned'
+    (operator-private views, no shared surface; S235) + description list updated
+    (meta-learning review S231-S246)"
 ---
 
 # Project Reconsolidation Skill
@@ -78,6 +81,7 @@ Classify each disagreement so the report is scannable and the fixes sort themsel
 - **contradiction** - two surfaces assert incompatible states for the same item.
 - **duplication / divergence** - the same arc tracked twice, or one surface tracking a different set than another.
 - **model-gap** - records that do not fit the schema or vocabulary at all (from method step 5). Distinct from the others: the fix is to the schema, not the record.
+- **partitioned** - on a multi-operator project, each operator maintains a private view of open work (their own roster, quest list, or "next" note) and no shared surface reconciles them; every view is internally consistent and the project-level picture does not exist. Distinct from *slipped*, which is time-based flicker within one surface: here the flicker is across operators, and repairing any one view does nothing. The fix is a shared ledger that every operator's close writes to (the Active Threads pattern), not a merge of the private views. First seen on a four-operator project's first reconciliation (Weave, 2026-08).
 
 ## Detect Now, Repair Later
 

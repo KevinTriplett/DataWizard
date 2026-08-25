@@ -47,6 +47,13 @@ edit_log:
   - "DW-S284 2026-08-24 - SQLite entry consolidated (S199/S203/S204/S207): any
     FUSE mount fails incl. outputs, /tmp copy supports full write-validate runs
     (meta-learning review S198-S209)"
+  - DW-S285 2026-08-24 - patch_note literal-backslash-n in multi-line newString
+    (S233); device_stage_files re-stage returns stale snapshot, verify via live
+    read (S236) (meta-learning review S231-S246)
+  - "DW-S285 2026-08-24 - Read-overflow: single-file 73KB overflow +
+    get_frontmatter {} + char-range slicing (S266); get_frontmatter {} on
+    unparseable YAML, unquoted colon (S285 live) (meta-learning review
+    S256-S266)"
 ---
 # MCP Reliability and Write Verification
 
@@ -119,6 +126,10 @@ Rules:
 
 `read_multiple_notes` on a large batch overflows the tool-result ceiling and dumps the payload to a host-path file the Cowork sandbox cannot read -- so the read effectively returns nothing usable (observed at ~73KB of docs, and again with 5+ medium notes). Keep batches to **2-4 notes per `read_multiple_notes` call**, or fall back to individual `read_note` calls, which stay under the limit.
 
+**A single file can overflow too, and `get_frontmatter` on it returns `{}`.** A 73KB section file overflowed `read_note` outright and `get_frontmatter` on the same file came back empty - the empty result is the overflow, not a file without frontmatter. Read the file with the filesystem tools or a device shell instead, and if the overflow has already dumped a tool result to a saved file, slice it by character range in Python (`s[a:b]`) rather than by lines - the dump is one long JSON line, so line-chunking returns the whole thing again. A file that hits this is past the sectioning threshold; log it as a shell + section candidate. (Source: DataWizard, 2026-08)
+
+**`get_frontmatter` also returns `{}` silently when the YAML does not parse.** An unquoted edit_log entry containing `: ` (a colon-space inside a plain scalar) made a file's frontmatter unparseable; `get_frontmatter` returned `{}` with no error, and `update_frontmatter` would have written a fresh block over the unparsed one (the array-wipe hazard in its worst form). Treat an empty `get_frontmatter` on a file you know has frontmatter as a signal: read the raw file, run it through a YAML parser, and quote the offending entry before any frontmatter write. Entries containing `: ` must be double-quoted. (Source: DataWizard, 2026-08)
+
 For a single large note that overflows on its own: parse the saved tool-result JSON by section header / character range, or read it with `filesystem:read_text_file` (a 55KB file read cleanly in one call) and script-parse. A note that reliably overflows on read is also a sectioning candidate (Working Rule 7). (Source: ReWoven S34; Weave, 2026-07/08) Nuance for **remote (cloud) Cowork sessions**: there the saved tool-result file lands in the *cloud container*, where the cloud `Bash` tool CAN read it -- parse the saved JSON and slice its `content` field (python `json.loads`, then string-slice). The "sandbox cannot read it" limitation applies to the on-device sandbox layout, not the cloud-container layout. (Source: RW S68)
 
 ## Verification Protocol
@@ -134,6 +145,8 @@ Use the `Read`, `Glob`, or `Grep` tools to check the file directly on the filesy
 - **For `update_frontmatter`:** Use `Read` on the file and confirm the frontmatter field was updated.
 
 If filesystem tools cannot reach the vault (common in Cowork -- the vault path may not be connected), request access via `request_cowork_directory` at the start of the session. This is especially important when running concurrent instances. Note that `device_stage_files` cannot verify Obsidian-MCP writes when the vault path is not a Cowork-connected folder -- in that layout `obsidian:read_note` (Tier 2) is the verification path for MCP-written content. (Source: Weave, 2026-07)
+
+**Caveat -- re-staging does not refresh the snapshot.** `device_stage_files` called again on a path that was already staged this session can return the original snapshot: the staged file's metadata looks fresh but its content is the version from the first stage, so a verification read against it "confirms" a write that is not there (or misses one that is). To verify a write made after the first stage, read the live file instead -- a `device_bash` `cat`/`grep` on the mounted vault path, or an `obsidian:read_note` -- rather than re-staging. (Source: DataWizard, 2026-08)
 
 **Caveat -- Glob is unreliable against the Cowork vault mount.** Directory-prefixed patterns (`folder/*`) return nothing; recursive patterns (`**/name*`) work. Glob has also returned "No files found" for freshly created folders that `list_directory` and bash `ls` both saw. Prefer `list_directory` or a bash `ls` for existence checks against the mount, and treat a Glob miss as inconclusive, not proof of absence. (Source: Weave, 2026-06/07, observed twice)
 
@@ -238,6 +251,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **`patch_note` also fails on a shell's `---` divider.** A patch whose `oldString` targets the `---` horizontal rule separating embed sections in a shell file returns "target not found." Use a filesystem Edit with a unique text anchor (include neighboring text), or anchor the patch on adjacent body text rather than the bare divider. (Source: Weave, 2026-07)
 
 **`patch_note` can fail session-wide with a bogus "oldString cannot be empty".** Observed: every `patch_note` call in a session returned `"oldString cannot be empty"` even though non-empty, exact-match `oldString` values were supplied (verified against fresh reads), across multiple files and repeated attempts. Reads, `write_note`, and `update_frontmatter` worked normally in the same session; a bridge reconnect did not clear it. When this signature appears, stop retrying `patch_note` (the error is spurious, not a matching problem) and fall back to the local filesystem MCP's `edit_file` on the real vault path -- it makes surgical, diff-verified edits reliably (same fallback as the vault-script editing pattern above). Small files can alternatively go through a re-read + full `write_note` overwrite. (Source: DW S263)
+
+**`patch_note` can land literal `\n` escapes inside a multi-line `newString`.** A patch whose replacement spans several lines returned success but wrote the two-character sequence `\n` into the body where line breaks were intended, leaving a heading and its paragraph glued on one line. Always re-read a multi-line patch after success and check for literal backslash-n in the landed text; if present, repair with a second patch (or a filesystem edit) rather than assuming the first one rendered. (Source: DataWizard, 2026-08)
 
 **`filesystem:edit_file` can insert text inline when the anchor starts mid-line.** If the match anchor begins partway through a line, the inserted header text lands inline rather than on its own line. Dry-run first and include the preceding text in the anchor so the insertion point is unambiguous. (Source: Weave, 2026-07)
 

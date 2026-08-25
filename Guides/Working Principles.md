@@ -22,6 +22,16 @@ edit_log:
   - "DW-S284 2026-08-24 - Additional principles: design and spec review
     heuristics - uniform principle, invariants x write surfaces, review pass
     between design and build (S218, S220; meta-learning review S210-S220)"
+  - "DW-S285 2026-08-24 - Additional principles: second-model plan review
+    evidence added to the review-pass bullet (S239/S241/S244); validation gate
+    (S231); verify the drift before scheduling its fix (S233); ship the read
+    affordance with the write (S241); reference implementations beat specs
+    (S235) (meta-learning review S231-S246)"
+  - "DW-S285 2026-08-24 - Build discipline: run it once before activating
+    (S256); Additional principles: fresh-context review + read the field's other
+    writers for shared-field redefinitions, with close-time insight routing
+    (S257/S265/S266); bind a provisional default's validation to a must-run step
+    (S264) (meta-learning review S256-S266)"
 ---
 # Working Principles
 
@@ -86,6 +96,7 @@ These were standing principles in the older protocol and remain true even though
 - *Turn a validation finding into a runtime guardrail, not a doc note.* When a run proved lossy, the script was changed to refuse that run unless `--force` is passed. Durable protection beats a comment somebody has to remember.
 - *Isolate the native-only step.* Put the part that genuinely needs the user's machine (a keychain read, a live db write) behind one flag or one function, so everything else is testable from the sandbox with no install.
 - *Build the enforcement check early.* The first report from a new lint check is the live cleanup worklist - no separate audit pass needed, and defects surface the day the check exists.
+- *Run it once before activating.* Visual review passes what the runtime rejects: a regex capture-group index (`.group(2)` where the alternation was non-capturing and the only group was 1) read fine and threw `IndexError` on the first live fire. Trace every `.group(N)` against the pattern's numbered groups, and run the script end to end - on a fixture if not on live data - before the trigger or schedule that activates it is armed. (DataWizard, 2026-08)
 
 **Re-check the tool landscape at build time, not just design time.** Tool drift outruns design-then-build: a transcription app assessed as "closed, no hook" during design shipped local speaker recognition three weeks later, before the build started - and the same note had already flagged a comparable flip once before. The design-session assessment sets direction; the build session re-verifies the specific tools it depends on before committing to them. (DataWizard, 2026-06)
 
@@ -97,7 +108,19 @@ These were standing principles in the older protocol and remain true even though
 
 - *Apply the system's own principle uniformly.* Wherever a stated principle has an exemption, look there first - non-uniform application is exactly where the bugs hide. Applying a "markdown is canonical" rule to the one component that had been exempted from it surfaced both a runtime mismatch and a correctness bug (a non-idempotent append under a deferred cursor).
 - *List the declared invariants, then check every write surface against each one.* A spec review that did this found three correctness bugs, all sitting in write surfaces where the spec's own idempotency invariant had simply not been applied. Invariants stated once and applied selectively are the spec-level form of the point above.
-- *Put a review pass between design and build.* A spec that was buildable as written still yielded eight issues to a dedicated review at zero code cost, and the build that followed ran with no reopened design questions. The pass is cheap because the reviewer has the whole spec and no code yet; the same defects found during the build cost a re-design each.
+- *Put a review pass between design and build.* A spec that was buildable as written still yielded eight issues to a dedicated review at zero code cost, and the build that followed ran with no reopened design questions. The pass is cheap because the reviewer has the whole spec and no code yet; the same defects found during the build cost a re-design each. The strongest form is a *second-model* review of the *plan* (not the code) before any load-bearing build: three consecutive builds of a write engine, a concurrency guard, and an attention view each had real defects pre-empted this way at near-zero cost (DataWizard, 2026-08).
+
+**Validation gate: the method must reproduce the hand-certified set first.** Before trusting an automated verifier, adjudicator, or extraction method on unseen items, require it to reproduce N of N verdicts on a small hand-certified gold set. A method that cannot pass the items a human has already settled has no claim on the items nobody has checked. The gold set bootstraps itself: the first hand-certified batch becomes the gate for the method that certifies the rest (a citation verifier passed 12/12 before it was let loose on the remaining 62 quotes; DataWizard, 2026-07). Kin to the pre-flight review note - both put a cheap check between "built" and "trusted".
+
+**Verify the drift before scheduling its fix.** A claim that something is fixed and a claim that something is broken deserve the same treatment: one targeted read against the artifact itself before the claim becomes a task. Session logs and handoff notes inherit the state of the docs they were written from; a "pinned" claim was found false across three docs, and a "still broken" claim scheduled a fix for a defect that had already been repaired (DataWizard, 2026-07). The read costs a minute; a fix scheduled from a stale claim costs a session. Companion to the Conventions Registry's "copied state rots".
+
+**Ship the read affordance with the write affordance.** When a build adds a way to write something - a status, a flag, a task field - the same chunk must render it somewhere a reader will see it. A correct write with no render path reads as a broken feature to the next operator and invites duplicate writes or a second "fix" of a working thing (DataWizard, 2026-08). The test at chunk boundary: for each new write, name the view that shows it; if none exists yet, the write is not done.
+
+**Reference implementations beat specs for cross-project migrations.** When porting a convention, tracking model, or file format to another project, hand the receiving instance a working example from a project that already runs it - a real ledger, a real State Board, a real quest file - not only the spec. Specs describe the shape; the reference carries the judgment calls the spec left implicit, and the receiving instance diffs against it instead of interpreting from scratch. A four-operator project took the tracking discipline on first contact from a reference ledger where a spec-only handoff had stalled (DataWizard, 2026-08). Same family as the porting sequence: audit, fix structure, backfill, then build.
+
+**Redefining a shared field or convention needs a fresh-context review - and a read of the field's other writers.** The instance drafting a design is structurally blind to collisions that live outside its doc: a design that redefined the meaning of `updated:` collided with a working rule and a session-closer step, and nothing inside the design doc could have shown it - a reviewer with fresh context caught it on the first read (DataWizard, 2026-08; the fifth independent-review win in ten sessions). Two habits follow. First, any design that changes what a shared field, stamp, or convention *means* gets an independent review before build, not only a self-check. Second, at design time budget one read for the field's *other writers* - every skill step, script, or rule that also sets it - because that is where the collision lives; the drafting doc only shows the new writer. Kin to "change the value, check the rationale": a value change is visible everywhere it is used, a semantics change is visible nowhere but in the writers that assumed the old meaning. The same routing instinct applies to insights captured at session close: an insight only survives if it is written to the surface that fires when it matters (a build-time check into the build plan's phase text, a codification question into the item that triggers codification), not only into the session log.
+
+**Bind a provisional default's validation to a step that must run anyway.** A provisional default - a consent rule, a threshold, a routing choice adopted "until the data says otherwise" - silently hardens if nothing owns the check that would revise it. Give the validation to a step that runs regardless: the go-forward pilot that reads the tail anyway owns the volume check that decides whether the default stands, so the check is structurally unskippable rather than a remembered intention (DataWizard, 2026-08). The test: name the step that will run the validation and the date it next runs; if the answer is "someone should look at it", the default is already permanent.
 
 ## A note on Rule 17
 

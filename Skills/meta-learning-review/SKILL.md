@@ -8,7 +8,7 @@ description: >-
   threshold nudge when a review is due.
 type: skill
 updated: '2026-08-24'
-version: '1.5.0'
+version: '1.5.1'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -29,6 +29,9 @@ edit_log:
     provenance style incl. Seed depersonalization (Step 4); Review Outcome
     format + out-of-order stamp rule (Step 5). From a four-report review
     session."
+  - "DW-S285 2026-08-24 - v1.5.1: Step 4 items 5-6 - link bidirectionally at
+    plant time (S245), merge on landing against open intake items (S243)
+    (meta-learning review S231-S246)"
 ---
 
 # Meta-Learning Review Skill
@@ -132,6 +135,8 @@ Common destination types:
 
 3. **Frame for the reader.** A skill reader wants "what do I do differently." A design doc reader wants "what does this mean for the architecture." Same learning, different framing. Match the target doc's voice and density.
 4. **Include provenance, in the style the target requires.** The trail must be traceable, but the format depends on where the plant lands. **Project docs** (design docs, 0.x files, project skills) take session identifiers - a lightweight inline reference like "(S85, S86)". **Seed-bound content** (Seed skills, guides, protocols, templates) ships to other users, so it takes the Conventions Registry's depersonalized form - `(project, YYYY-MM)`, e.g. `(DataWizard, 2026-06)` - and never a vault name, collaborator name, operator initials, or a bare session number. Decision-log numbers (`D103`) are acceptable only where the target already cites them as its house style (the Conventions Registry does). Check this before writing, not after: a Seed plant with session numbers in it is a depersonalization defect that a later sweep has to find.
+5. **Link bidirectionally at plant time.** When the plant lands in one doc but the reader who will trip on the fact arrives through another (a guide entry whose failure shows up while following a skill step; a platform fact whose symptom appears in a git workflow), add a one-line pointer from that other doc back to the plant. It is cheap while the context is warm and expensive to retrofit; a plant with no inbound path from where the problem surfaces is only half planted. (DataWizard, 2026-08)
+6. **Merge on landing.** Before writing, check the project's intake folders (feature requests, skill requests) for open items the plant would satisfy - a grouped "ready to plant" list often overlaps several filed requests, and one plant can close more than one. Each candidate still gets its own classification against the live target doc (a grouped list is not pre-verified); close the ones the plant covers in the same pass, with a pointer to where the content landed. (DataWizard, 2026-08)
 
 ### Step 4.5: File cross-project items in DW Workshop
 

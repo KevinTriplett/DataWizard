@@ -41,6 +41,11 @@ edit_log:
     diff (S191); one-liners: SQLite is local / markdown is shared (D103, D107;
     S192) + per-adopter config at the consumption surface (D96; S187)
     (meta-learning review S186-S197)"
+  - "DW-S285 2026-08-24: File placement gains the Seed-owned-assets exception
+    (fix upstream while hot, no FR round-trip; S235) (meta-learning review
+    S231-S246)"
+  - "DW-S285 2026-08-24: Decision-log conventions: decision numbers are
+    project-local namespaces (S262; meta-learning review S256-S266)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -295,6 +300,8 @@ Use it when multiple collaborators send frequent short messages. Keep individual
 
 Optional fields when relevant: **Supersedes** `D[n]`, **Resolves** `Q[n]`, **See** `[[doc]]`, a status note for provisional decisions.
 
+**Decision numbers are project-local namespaces.** `D25` in one project's log is unrelated to `D25` in another's. A cross-project note (handoff, feature request, review) that cites a decision number is citing the *source* project's log unless it says otherwise - resolve every inbound D-reference against the target project's Decision Log before acting on it, and when writing outbound, qualify the number with the project (`Weave D25`). An inbound request once cited a source-project decision as if it were the target's; the target's same-numbered decision was about something else entirely. (DataWizard, 2026-08)
+
 - **Numbering:** sequential (`D01`, `D02`, ...); never reuse a number. Supersede by marking the old entry and referencing the new one - preserve the full history of thinking.
 - **Open questions** use `Q[number]`; when resolved, mark `Resolved -> D[number]`.
 - **Protocol-updated flag** (D77) on every convention-changing entry makes uncodified changes greppable (`grep "Protocol updated: No"`).
@@ -442,7 +449,7 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 
 - **Project infrastructure** -- the 0.x series, `Conventions/`, `Quests/`: lives in `_Infrastructure - ProjectName/`.
 - **Inbound notes** -- notes FROM another project (or DW) addressed TO this project (handoffs, "Note from X - ..."): live in the target project's **`Session Exchange/`** folder (created on first use; under the project's Workshop folder when one exists, else at the project's shared root), because this project's instances are the audience. Infrastructure folders (`_Infrastructure - ProjectName/`) hold infrastructure files ONLY - never notes; a note filed there mixes audience-facing mail into the 0.x surface. (Operator ruling, DataWizard, 2026-08.)
-- **Outbound items** -- feature requests, bug reports, skill requests, or handoffs addressed to ANOTHER project: file directly at the **target project's intake folder**, never in the origin's `_Infrastructure/`. The origin keeps only a session-log line recording what was filed where; a pointer stub is optional and discouraged (it becomes clutter).
+- **Outbound items** -- feature requests, bug reports, skill requests, or handoffs addressed to ANOTHER project: file directly at the **target project's intake folder**, never in the origin's `_Infrastructure/`. The origin keeps only a session-log line recording what was filed where; a pointer stub is optional and discouraged (it becomes clutter). **Exception - Seed-owned assets:** a defect in a Seed skill, guide, protocol, or script that surfaces while working in another project is fixed upstream in the Seed directly, while the context is hot, and recorded in that project's session log - not filed as a feature request and round-tripped. The outbound-intake rule exists because another project's repo is theirs to change; the Seed is shared, so the instance that found the defect is already the right one to fix it. (Weave field reports fixed same-day in the Seed, 2026-08.)
 
 Each project names its intake folders in its 0.0 so "the target's intake" is unambiguous; without a named intake, writers fall back to origin-side filing. **Rationale:** an item routed by the writer's convenience (file it where I am) rather than the reader's path (file it where they look) fails silently while looking like infrastructure -- the same failure class as an undelivered flag. One project accumulated eleven outbound feature requests in its own `_Infrastructure/`, unread, before the pattern was caught. (Weave pilot, 2026-08; Flag Surfacing Chain.)
 

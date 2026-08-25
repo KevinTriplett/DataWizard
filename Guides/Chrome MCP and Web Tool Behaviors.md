@@ -4,11 +4,14 @@ edit_log:
   - DW-S273 2026-08-18 - created from the Chrome MCP Tool-Behavior Reference FR
     (behaviors from RW S11-S31 reviews); WeasyPrint item routed to the Cowork
     Build Environment guide
+  - "DW-S285 2026-08-24 - Editing in Browser Code Editors section: CodeMirror
+    triple-click newline + keyboard single-span edit recipe (S256; meta-learning
+    review S256-S266)"
 operator: Andrew
 scope: seed
 title: Chrome MCP and Web Tool Behaviors
 type: guide
-updated: 2026-08-18
+updated: 2026-08-24
 ---
 # Chrome MCP and Web Tool Behaviors
 
@@ -33,6 +36,10 @@ Pages that render client-side (JS apps) may expose little or nothing to a plain 
 1. **Hash-anchor + scroll-screenshots.** Navigate to a hash anchor and take scroll-screenshots section by section rather than expecting full text from a single fetch. Worked on client-rendered fundraiser/leaderboard pages. (Source: RW S28)
 2. **Render-wait + `innerText` slices.** For heavily client-rendered app pages (e.g. Bubble apps) that defeat `web_fetch` entirely: Chrome `navigate`, wait ~8s for render, then pull text in slices via `javascript_tool` reading `document.body.innerText`. The tool's output truncates around ~1KB, so slice the string across multiple calls. (Source: RW S31)
 3. **Know which sites fetch fine.** Not everything needs the browser: e.g. Substack subdomains fetch cleanly with `web_fetch`. Try the cheap fetch first.
+
+## Editing in Browser Code Editors (GitHub web editor, CodeMirror)
+
+**Triple-click selects the trailing newline.** The GitHub web editor is CodeMirror: a triple-click line-select includes the line's newline, so typing a replacement over it joins the next line up. For a small in-place edit, do not select the line. Reliable single-character (or short-span) edit via keyboard: click into the line, `cmd+Right` to end-of-line, `Left` N times to reach the span, `shift+Left` to select it, type the replacement, then read the line back before committing. Prefer this over any select-the-line approach when the edit is one token wide - it was used to fix a one-character workflow bug through the browser without a local clone. (Source: DataWizard, 2026-08)
 
 ## web_fetch Behaviors
 

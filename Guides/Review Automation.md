@@ -14,6 +14,8 @@ edit_log:
   - "DW-S284 2026-08-24 - Scheduled automation: key the scan to consumption rate
     (last covered session, review cadence) not event rate (S250; meta-learning
     review S247-S255)"
+  - "DW-S285 2026-08-24 - Backlog triage: bulk-recommendation mode (S263;
+    meta-learning review S256-S266)"
 ---
 
 # Review Automation
@@ -43,6 +45,8 @@ These numbers live here and nowhere else (D114, relocating D88). Every other doc
 | Backlog + FR triage | `last_backlog_triage` | 30+ sessions since, or never recorded | none yet (manual; a stock-take session) | none -- the stale-item sweep is the review itself |
 
 The backlog row is manual for now: no scan producer, no pending report, so the scheduled check does not fire it -- it lives here so the number has one home (D114). The triage itself: retire items overtaken by platform evolution or absorbed by other work, verify long-standing "blocked" items (they are often silently resolved), and reconcile FR statuses against what was actually implemented. Yield on past runs: 17 of 46 action items retired in one pass; 7 of 19 FRs resolved in another, 4 by status correction alone (DataWizard, 2026-05). Stamp the current session ID, as for the health audit.
+
+**Run the triage as bulk recommendations, not item-by-item questions.** Present the whole batch (twenty park-or-revive items is a normal size) with a one-line recommendation per item and a default verdict, and ask the operator to blanket-approve with named exceptions. Twenty items cleared in one round this way where item-by-item questions had never got through them; the operator's attention goes only to the exceptions. Then annotate each verdict at the item's canonical home (the Backlog line, the gate row, the FR frontmatter) in the same pass, so the decision is not stranded in chat. (DataWizard, 2026-08)
 
 **Gap arithmetic** (used by the scheduled check, not the session-closer): solo-operator projects subtract session numbers; multi-operator projects count session-log files dated after the reference session; day-based checks compare calendar dates.
 

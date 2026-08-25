@@ -13,6 +13,9 @@ edit_log:
     S210-S220)"
   - DW-S284 2026-08-24 - zsh handoff bullet extended with the bash heredoc
     delivery recipe (S252; meta-learning review S247-S255)
+  - "DW-S285 2026-08-24 - Device Bridge: Workflow tool args-undefined fallback +
+    subagents reach the bridge via ToolSearch (S231; meta-learning review
+    S231-S246)"
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
@@ -74,6 +77,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **`device_commit_files` rejects an explicit `expectedMtimeMs: null`** -- omit the field entirely when no mtime guard is wanted. (Source: DW S229)
 - **`Control_Chrome` proxy: `list_tabs` is reliable; `get_page_content` intermittently errors** ("Google Chrome is not running") even with a tab open. Verify page state via `list_tabs` URL params instead of retrying. (Source: DW S230)
 - **Cowork connects folders individually, by exact path.** Connecting a parent folder does not expose its siblings, and moving or renaming a connected folder on disk breaks its connection until it is re-added in the desktop app. If a session suddenly cannot see a folder it could see before, check whether the folder moved before debugging the tools. (Source: DataWizard, 2026-07)
+- **Workflow (multi-agent orchestration) tool: `args` arrived `undefined` once; subagents can reach the device bridge.** In one run the value passed as the Workflow's `args` input never reached the script (`args` was `undefined` inside it); inlining the data as constants in the script body is the reliable fallback, and a quick `log(JSON.stringify(args))` at the top of the script tells you which case you are in before any agent spends tokens. Separately, foreground Workflow subagents CAN reach the `remote-devices` bridge (vault reads, `device_bash`) by loading the tools via ToolSearch inside the subagent - the bridge is not restricted to the main loop. (Source: DataWizard, 2026-07)
 
 ## Verification Discipline for Builds
 

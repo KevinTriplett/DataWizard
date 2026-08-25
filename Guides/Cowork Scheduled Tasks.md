@@ -3,21 +3,24 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: 2026-08-06
+updated: 2026-08-24
 operator: Andrew
 edit_log:
   - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
     scheduled-task learnings)
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
     (pointer)
-  - "DW-S250 2026-08-06 - added Cloud git proxy and sandbox limits section (D115)"
+  - DW-S250 2026-08-06 - added Cloud git proxy and sandbox limits section (D115)
+  - DW-S285 2026-08-24 - scope widened to native schedulers; added launchd/cron
+    no-PATH-no-profile section (S261, closes Backlog P1) + hybrid
+    on-demand/backstop trigger pattern (S261) (meta-learning review S256-S266)
 ---
 
 # Cowork Scheduled Tasks
 
 > Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
 
-Operational guidance for running DataWizard automation as Cowork scheduled tasks (the nightly meta-learning and content-interest scans, hourly enrichment batches, and similar). These are platform behaviors learned from running real scheduled tasks; design task prompts and cadences around them.
+Operational guidance for running DataWizard automation as Cowork scheduled tasks (the nightly meta-learning and content-interest scans, hourly enrichment batches, and similar), plus the native-scheduler facts (launchd, cron) that the same automation runs into when it moves onto the operator's machine. These are platform behaviors learned from running real scheduled tasks; design task prompts and cadences around them.
 
 ## Timezone: use the operator's actual offset
 
@@ -43,6 +46,14 @@ A task that runs without a human in the loop needs all of:
 ## Other known failure modes
 
 - **Runtime-constructed URLs.** `web_fetch` inside a scheduled task rejects URLs constructed at runtime (discovered mid-run rather than passed in the prompt). For URLs the run discovers, route through the Chrome MCP instead.
+
+## Native schedulers (launchd, cron): no PATH, no profile
+
+An unattended macOS job started by launchd or cron inherits neither the shell profile (`.zshrc`, `.bash_profile`) nor the GUI-login PATH, so the `python3`, `node`, or Homebrew binary that works in Terminal is not found when the job fires - the job fails silently or runs a different interpreter. In the job's script, pin the concrete interpreter path (a pyenv or system python by absolute path) and export the toolchain PATH explicitly (`/opt/homebrew/bin`, the pyenv shims, whatever the script needs) before any command runs; never rely on the environment the job "should" have. Verify by running the script through the scheduler once (a `launchctl start` or a near-future fire) rather than from Terminal, since Terminal is exactly the environment the job does not get. (DataWizard, 2026-08)
+
+## Hybrid trigger: on-demand primary plus an idempotent scheduled backstop
+
+For a human-fired, lapse-sensitive ingest (message capture, a save-queue pull, a recording handoff), pair an on-demand trigger the operator fires when it matters (a hotkey, a menu action) with a cheap scheduled run that catches the lapses. The scheduled run must be idempotent - it processes only what the on-demand run has not, via a cursor or existing-output check - so the two never double-process and the operator never has to remember which ran. The on-demand path gives immediacy; the backstop bounds how stale the capture can get when the operator forgets. Portable to any feeder that has both a "now" moment and a daily floor. (DataWizard, 2026-08)
 
 ## Cloud git proxy and sandbox limits
 
