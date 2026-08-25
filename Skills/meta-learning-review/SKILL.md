@@ -8,7 +8,7 @@ description: >-
   threshold nudge when a review is due.
 type: skill
 updated: '2026-08-24'
-version: '1.5.1'
+version: '1.5.2'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -32,6 +32,9 @@ edit_log:
   - "DW-S285 2026-08-24 - v1.5.1: Step 4 items 5-6 - link bidirectionally at
     plant time (S245), merge on landing against open intake items (S243)
     (meta-learning review S231-S246)"
+  - "DW-S285 2026-08-24 - v1.5.2: Step 3 pattern-families name-it disposition
+    (3+ instances -> one standing statement; pairs with meta-learning-scan
+    v1.4.0)"
 ---
 
 # Meta-Learning Review Skill
@@ -108,6 +111,8 @@ For each verified learning, assign a disposition:
 - **Deferred.** The learning is valid but the target doc doesn't exist yet, or the change is complex enough to warrant its own session. Create an action item with enough context that a future instance can act on it. For complex items, write an accompanying note with the full analysis.
 - **Superseded.** Distinct from already-done: the learning was never planted, but the need behind it evaporated or a later decision replaced it (a platform workaround made moot by an official-API route; a connector gap closed by an in-script adapter; a tool limitation removed by a tool update). Record what superseded it so the trail is traceable. Expect this class to grow with report age.
 - **Not planted (declined).** The learning is accurate but should not be planted as phrased - too minor for a guide, a one-off, or guidance that would route around a platform restriction. Record the reason in the review outcome; a silent drop looks like an oversight to the next reviewer.
+
+**Pattern families get a name-it disposition.** A report's Pattern Families section (meta-learning-scan v1.4.0+; for older reports, look for the same shape inside the cross-cutting observations) lists practices the project keeps rediscovering under different themes. A family with **three or more instances** is a **name-it** candidate: the plant is one standing statement of the practice - a Working Principles block, a Conventions Registry entry, a new guide, or a skill step - with the instances as its evidence, not N separate one-liners. Fewer than three: leave the family named in the Review Outcome so the next report can count against it. Naming is a design call (it usually implies a decision-log entry), so a name-it candidate is presented in Step 3.5 as its own item, and a family too large for a block (several sources, an open FR) goes to a dedicated session via an action item rather than being squeezed into the review. (Two families - multi-instance coordination, six instances; review-budget economy, four - surfaced this way; DataWizard, 2026-08.)
 
 **Cross-cutting observations get dispositions too.** The report's closing observations are not decoration - they are often the highest-value items in the batch (a "learnings of this class have no home" observation is what produces a new guide or a new triage bucket). Walk each one and assign it a disposition exactly like a learning.
 

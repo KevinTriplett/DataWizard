@@ -46,6 +46,7 @@ edit_log:
     S231-S246)"
   - "DW-S285 2026-08-24: Decision-log conventions: decision numbers are
     project-local namespaces (S262; meta-learning review S256-S266)"
+  - "DW-S285 2026-08-24: Link, don't restate gains \"Pointers carry no status\" (S285 pre-close reflection; 0.0 Key Pointer rot)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -55,6 +56,8 @@ The single home for DataWizard's structural and formatting conventions. When a c
 **Rule:** Every convention has exactly one canonical home. Everywhere else links to it rather than repeating it. A rule stated in two places will drift; a rule stated once and linked to cannot.
 
 This registry is that home for the conventions below. Skills, guides, and project docs that touch these topics should link here (e.g., "companion naming: see the Conventions Registry") rather than carrying their own copy. The same principle governs the rest of the Seed: the YAML Schema owns field definitions, the Filename Safety guide owns the character map, the session-closer owns cadence numbers, the Content Type Taxonomy owns `type:` values. When you find a convention restated somewhere, replace the copy with a pointer.
+
+**Pointers carry no status.** A pointer - a 0.0 Key Pointer, a "see also", a ledger `home:` line - says *where* something lives, never *what state it is in*. "(codification pending, Backlog P3)" inside a pointer is a copy of the item's state, and it will lie the moment the item moves: one 0.0 kept announcing a convention as pending for two weeks after the Registry had adopted it. State lives at the canonical item (the Backlog line, the gate row, the frontmatter `status:`); a pointer that needs to say "pending" should instead link to the thing that is pending. (DataWizard, 2026-08.)
 
 The same law governs the **distribution layer**: copied state rots; only pointers stay true. A value copied out of its canonical home -- a version number restated in a collaborator doc, a "pinned" claim in a README, a recommended method repeated in setup instructions -- will eventually lie, because nothing forces the copy to update when the source changes. Point at the canonical source (VERSION.md, the config itself, this registry); where a copy is unavoidable, treat it as a release artifact the convention-flip sweep (below) must reconcile. Named from three instances in one arc, then re-demonstrated inside that same arc when a "pinned >=0.12.5" claim was found false across three docs while the running config said `@latest`. (D111; S226, S227, S230)
 

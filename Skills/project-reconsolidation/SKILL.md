@@ -12,7 +12,7 @@ description: "Use when reconciling a project's tracking surfaces against reality
   drifted', or when a periodic tracking-health review is due. Distinct from
   semantic divergence/framing-drift reconciliation during harvest."
 type: skill
-version: "1.4"
+version: "1.5"
 updated: 2026-08-24
 created: 2026-06-29
 edit_log:
@@ -25,6 +25,10 @@ edit_log:
   - "DW-S285 2026-08-24 - v1.4: Divergence Taxonomy gains 'partitioned'
     (operator-private views, no shared surface; S235) + description list updated
     (meta-learning review S231-S246)"
+  - "DW-S283 2026-08-24 - v1.5: Before You Start surface checklist expanded to
+    three vantage-dependent classes - adds informal lists inside 'What's next'
+    (S170-S179 held item, S215) and the feature-request/intake folder
+    status-vs-shipped (S158-S169 reconsolidation pass)"
 ---
 
 # Project Reconsolidation Skill
@@ -51,7 +55,7 @@ The name is borrowed from memory reconsolidation: a record is most editable righ
 ## Before You Start
 
 1. Read this skill fully.
-2. Enumerate the project's tracking surfaces: every place that claims to record open or parallel work. In a DataWizard project these are typically the session-log thread roster (or the Active Threads ledger, once it exists), 0.5 Action Items, 0.7 Quest Log, and 0.9 Dashboard plus quest frontmatter. **Also include any multi-phase driver/plan document acting as a de-facto arc** - a finite plan doc (an action plan, a build-plan roadmap) that is the main arc for a stretch of sessions is easy to miss because no orientation ever re-reads it, yet its checkboxes rot and its residuals orphan when it winds down (the S180-S189 pass found exactly this). Other systems will have their own set. The point is to list all of them, because the audit is the diff between them.
+2. Enumerate the project's tracking surfaces: every place that claims to record open or parallel work. In a DataWizard project these are typically the session-log thread roster (or the Active Threads ledger, once it exists), 0.5 Action Items, 0.7 Quest Log, and 0.9 Dashboard plus quest frontmatter. **Also include three surface classes that are easy to miss because no orientation re-reads them, yet each carries real open work that orphans when it slips:** (a) any multi-phase driver/plan document acting as a de-facto arc - a finite plan doc (an action plan, a build-plan roadmap) that is the main arc for a stretch of sessions, whose checkboxes rot and whose residuals orphan when it winds down (the S180-S189 pass found exactly this); (b) informal lists living inside "What's next" - walk-away build queues, carried side-task lists - which persist only while each session echoes them forward, orphaning the work the moment a session stops (the S170-S179 pass, where this dropped an enrichment campaign and a rescrape); (c) the feature-request or intake folder, diffed as status frontmatter versus what actually shipped - FRs filed and then completed or superseded between periodic triage passes keep their file-time status indefinitely, invisible to the action-items backstop and the roster alike (the S158-S169 pass found two: one still "proposed" though superseded, one still "in-progress" though shipped). Other systems will have their own set. The point is to list all of them, because the audit is the diff between them.
 3. Pick the window. Reconsolidation works one bounded slice of session history at a time, most recent first. A week (~15-20 entries) is a good unit. Trying to reconcile the whole project at once exhausts context before the synthesis lands.
 4. Confirm where the report goes (in DW: `Workshop - [Project]/Reconsolidation Reports/`).
 5. **Carry the "wired but never exercised" lens.** When the window contains a canon promotion, a newly wired skill, or a capability flipped to "standard," check whether a first production exercise was scheduled and has actually run. Fully wired + zero production reps is a finding in its own right: the S225 citation-arc review found a canon promoted at S201 with no reps five weeks later, alongside two more capabilities in the same state. Canon promotions should name their first production exercise and when it runs -- flag any that don't. (S225, S232)

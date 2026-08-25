@@ -10,7 +10,7 @@ description: >-
   planting. Also use when the user wants to set up automated learning extraction
   for any DW project.
 type: skill
-version: '1.3.1'
+version: '1.4.0'
 created: '2026-06-01'
 updated: '2026-08-24'
 edit_log:
@@ -20,6 +20,9 @@ edit_log:
   - "DW-S284 2026-08-24 - v1.3.1: Step 5 test_run frontmatter flag for
     skill-test scans (the S118-S137 test report surfaced unflagged in the DW
     stack)"
+  - "DW-S285 2026-08-24 - v1.4.0: Step 4 pattern-families cross-theme pass +
+    report template section (from the S231-S246 / S256-S266 review: two unnamed
+    families found only in prose)"
 ---
 
 # Meta-Learning Scan
@@ -122,6 +125,8 @@ When a deferred learning is a platform or environment behavior (scheduled-task q
 
 **Post-review scan timing.** If the scan runs after a manual review in the same session window, items planted during that review will correctly appear as "already planted." This is expected behavior, not an error -- the scan reflects current vault state, which is exactly what the review skill needs.
 
+**Pattern families.** After grouping by theme, make a second pass across *all* themes for learnings that are instances of the same unnamed practice - a way of working the project keeps rediscovering without having named it (a coordination role, a review habit, a scoping test). Platform facts self-plant into standing guides and design facts self-plant into design docs; the residue that needs a human to act on it is exactly these unnamed practices, and they hide because each instance is filed under a different theme. For each family found, give it a provisional name, list its instances (session + one line each), and count them; where prior reports in the folder are cheap to grep, include instances from them too. Write the families as their own section (template below). Three or more instances is the review skill's threshold for naming the practice in a standing doc rather than planting the instances one by one. (Two families with six and four instances went unnamed across two reports until a reviewer noticed them in prose; DataWizard, 2026-08.)
+
 ### Step 5: Write report
 
 Write the report to the project's workshop or research area:
@@ -186,6 +191,17 @@ If the scan was run as a **skill test** - a forced scan range, or the reviewed-t
 {Any patterns that span multiple themes -- e.g., "the design-harvest workflow
 is self-planting most findings, leaving only process heuristics unplanted"
 or "tool behavior learnings are accumulating without a clear home doc."}
+
+## Pattern Families
+
+{One block per family found in Step 4's cross-theme pass. Omit the section
+only if none were found - say so explicitly rather than leaving it out.}
+
+### {Provisional family name} - {N} instances
+- S{n}: {one-line instance}
+- S{n}: {one-line instance}
+- {prior report S{a}-S{b}}: {instance, if cheap to include}
+Suggested home if named: {Working Principles block | Conventions Registry entry | new guide | skill step}
 ```
 
 ### Step 6: Signal completion

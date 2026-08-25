@@ -6,9 +6,9 @@ description: >-
   narrative order, and routes findings. Triggers on: 'DW review', 'audit this
   project', 'check project health', or via session-closer periodic thresholds.
 type: skill
-version: '2.0'
+version: '2.1'
 created: '2026-05-23'
-updated: '2026-08-05'
+updated: '2026-08-24'
 operator: Andrew
 edit_log:
   - "DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
@@ -16,6 +16,9 @@ edit_log:
   - DW-S185 2026-06-15 - subagent delegation context note (Handling Large
     Projects)
   - "DW-S242 2026-08-05 - Manual Fallback: added conflict-marker backstop check"
+  - "DW-S285 2026-08-24 - v2.1: J7 pointers-carry-no-status + cadence note (the
+    check only protects if the audit runs); Manual Fallback 7 frontmatter-parses
+    (C10 equivalent)"
 ---
 
 # Project Health Audit Skill
@@ -108,6 +111,12 @@ Read 3-5 key files (0.0, newest session entry, one section file, one recently-mo
 
 Flag files where YAML `updated:` is more than ~30 days older than filesystem mtime — suggests edits outside DW sessions. Git operations reset mtimes, so advisory only; frontmatter dates are authoritative.
 
+### J7: Pointers Carry No Status
+
+Scan the 0.0's Key Pointers section (and any ledger `home:` lines) for status words - "pending", "not yet", "TBD", "in progress" - attached to a pointer. A pointer states where something lives, never what state it is in; state belongs at the canonical item, and a pointer carrying it is a copy that rots (Conventions Registry, "Pointers carry no status"). Words that are part of a *description* ("holds review-pending notes") are fine; words that assert the pointed-to item's *state* are the finding. Fix: drop the state clause or replace it with a link to the item that holds the state. Cheap probe: `grep -inE 'pending|not yet|TBD|in progress'` over the section, then read each hit.
+
+**A note on cadence.** The machine half only protects a project if the audit actually runs: a project whose Backlog frontmatter had been unparseable for four sessions (C10 would have caught it on day one) had simply not been audited in seventy sessions. The review-cadence table in the Review Automation guide is the trigger; if the health-audit row there is stale, that is itself the first finding to report. (DataWizard, 2026-08)
+
 ## How to Run
 
 1. **Scope** — ask the user (default Standard for threshold-triggered audits). For Incremental, use `last_health_audit:` in 0.0 frontmatter as the cutoff.
@@ -166,6 +175,7 @@ For vaults without Python tooling, hand-run the old mechanical categories, conde
 4. **Filename safety** — no `? | * < > " \ :`, tab, NBSP, CR, em-dashes, curly quotes, consecutive spaces, trailing space before extension (see `Seed/Guides/Filename Safety.md`).
 5. **Stale conventions** — `~`-prefix meta-folders, Roman-numeral section headers, `_Archive - ` folder naming (D87: xArchive), missing `- ProjectName` suffixes, shells with inline content.
 6. **Conflict markers** — vault-wide grep for unresolved conflict-marker lines (the `<<<` / `===` / `>>>` triples) at the start of a line, outside fenced code blocks. The commit guard (Git Guide §10) prevents these at source; this is the catch-after-the-fact backstop. Whitelist fenced/example contexts so conflict-resolution tutorials do not re-flag every run.
+7. **Frontmatter parses** — run every `.md` frontmatter block through a YAML parser (a ten-line Python loop) and list the failures; an unparseable block makes MCP `get_frontmatter` return `{}` silently and puts the file one `update_frontmatter` away from losing its metadata. The usual cause is an unquoted `edit_log` entry containing `: `. (Lint C10 covers this where the tooling exists.)
 
 ## Related
 
