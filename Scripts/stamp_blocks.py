@@ -21,7 +21,15 @@ Modes:
                        the resolved ID appears exactly once and on the located
                        line; non-zero exit on any failure
 
-Row outcomes: stamped <id> | reused <id> | not-found | ambiguous | refused:<why>
+Row outcomes: stamped <id> @L<n> | reused <id> @L<n> | not-found | ambiguous |
+refused:<why>. The @L<n> is the 1-based line the ID landed on (or would land
+on under --dry-run) -- read it: --verify confirms the ID is where the script
+intended, never that the intended line was the right one.
+
+Block boundaries: blank lines, and any line that starts a new element (list
+item, ATX heading, fence, rule, setext underline, blockquote, table row) --
+so prose directly above a heading, fence, rule, quote or table is stamped on
+its own last line, never on the structural line that follows it.
 Exit is non-zero if any row is not-found / ambiguous / refused, or if --verify
 finds an intended ID missing or duplicated.
 
@@ -46,6 +54,12 @@ LIST_PREFIX_RE = re.compile(r"^(\s*(?:[-*+]\s+|\d+[.)]\s+|>\s?)+)")
 # per item; continuation/wrapped lines attach to the item above them).
 LIST_ITEM_START_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+\S")
 HR_RE = re.compile(r"^\s{0,3}(-{3,}|\*{3,}|_{3,})\s*\Z")
+# Setext underline (`---` / `===` directly under paragraph text makes the
+# paragraph a heading in CommonMark); a bare `---` with no paragraph above is
+# a horizontal rule. Both are refused as stamp targets.
+SETEXT_RE = re.compile(r"^\s{0,3}(-+|=+)\s*\Z")
+BLOCKQUOTE_START_RE = re.compile(r"^\s{0,3}>")
+TABLE_ROW_RE = re.compile(r"^\s{0,3}\|")
 TABLE_SEP_RE = re.compile(r"^\s*\|?\s*:?-{3,}.*\|")
 
 
@@ -141,6 +155,45 @@ def find_blocks(lines, body_start):
             cur = [i, i]
             i += 1
             continue
+        if HEADING_RE.match(content):
+            # an ATX heading is always its own one-line block (refused later),
+            # so prose directly below it starts fresh and prose directly above
+            # it is closed here -- never stamped onto the heading line
+            if cur is not None:
+                blocks.append((cur[0], cur[1]))
+            blocks.append((i, i))
+            cur = None
+            i += 1
+            continue
+        if SETEXT_RE.match(content) and cur is not None:
+            # `---`/`===` directly under paragraph text: setext heading. Keep
+            # the underline in the block so refusal_reason sees it on the
+            # target line and refuses the whole heading.
+            cur = [cur[0], i]
+            blocks.append((cur[0], cur[1]))
+            cur = None
+            i += 1
+            continue
+        if HR_RE.match(content):
+            # a rule with nothing above it: its own block (refused later)
+            blocks.append((i, i))
+            i += 1
+            continue
+        first = split_eol(lines[cur[0]])[0] if cur is not None else ""
+        if BLOCKQUOTE_START_RE.match(content) and cur is not None \
+                and not BLOCKQUOTE_START_RE.match(first):
+            # a `>` line interrupts a paragraph: new element, new block
+            blocks.append((cur[0], cur[1]))
+            cur = [i, i]
+            i += 1
+            continue
+        if TABLE_ROW_RE.match(content) and cur is not None \
+                and not TABLE_ROW_RE.match(first):
+            # a table row after prose: new element, new block
+            blocks.append((cur[0], cur[1]))
+            cur = [i, i]
+            i += 1
+            continue
         cur = [i, i] if cur is None else [cur[0], i]
         i += 1
     if cur is not None:
@@ -168,9 +221,15 @@ def refusal_reason(lines, block):
         return "horizontal-rule"
     if FENCE_RE.match(first):
         return "code-fence"
-    # also guard the target (last) line: never land a stamp on a fence line
-    if FENCE_RE.match(split_eol(lines[block[1]])[0]):
+    # also guard the target (last) line: never land a stamp on a structural
+    # line (fence, heading, rule, setext underline)
+    last = split_eol(lines[block[1]])[0]
+    if FENCE_RE.match(last):
         return "code-fence"
+    if HEADING_RE.match(last):
+        return "heading"
+    if SETEXT_RE.match(last) or HR_RE.match(last):
+        return "heading" if block[1] > block[0] else "horizontal-rule"
     for idx in range(block[0], block[1] + 1):
         if TABLE_SEP_RE.match(split_eol(lines[idx])[0]):
             return "table"
@@ -264,7 +323,8 @@ def process_row(row, root, dry_run):
     row.target_idx = target_idx
     existing = existing_id_on_line(split_eol(lines[target_idx])[0])
     if existing:
-        row.status, row.resolved_id, row.outcome = "reused", existing, "reused ^" + existing
+        row.status, row.resolved_id = "reused", existing
+        row.outcome = "reused ^%s @L%d" % (existing, target_idx + 1)
         return
     spec = (row.id or "next")
     if spec == "next":
@@ -277,7 +337,8 @@ def process_row(row, root, dry_run):
             row.status, row.outcome = "refused", "refused:id-collision (^%s already in file)" % block_id
             return
     if dry_run:
-        row.status, row.resolved_id, row.outcome = "would-stamp", block_id, "would-stamp ^" + block_id
+        row.status, row.resolved_id = "would-stamp", block_id
+        row.outcome = "would-stamp ^%s @L%d" % (block_id, target_idx + 1)
         return
     append_id(lines, target_idx, block_id)
     write_text(path, bom + "".join(lines))
@@ -285,7 +346,8 @@ def process_row(row, root, dry_run):
     _, lines2 = read_lines(path)
     cnt, where = id_present_count(lines2, block_id)
     if cnt == 1 and where == target_idx:
-        row.status, row.resolved_id, row.outcome = "stamped", block_id, "stamped ^" + block_id
+        row.status, row.resolved_id = "stamped", block_id
+        row.outcome = "stamped ^%s @L%d" % (block_id, target_idx + 1)
     else:
         row.status, row.resolved_id = "refused", block_id
         row.outcome = "refused:verify-failed (^%s count=%d line=%d want=%d)" % (
