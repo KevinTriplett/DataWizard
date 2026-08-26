@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-24'
+updated: '2026-08-26'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -54,6 +54,7 @@ edit_log:
     get_frontmatter {} + char-range slicing (S266); get_frontmatter {} on
     unparseable YAML, unquoted colon (S285 live) (meta-learning review
     S256-S266)"
+  - "DW-S286 2026-08-26 - Bulk Frontmatter Backfills section (insert never round-trip; invariant in the write path)"
 ---
 # MCP Reliability and Write Verification
 
@@ -179,6 +180,22 @@ Not every write needs full verification. Prioritize based on replaceability:
 **Skip verification (low cost, easily re-done):**
 - Intermediate saves during iterative editing (the final save gets verified)
 - Tag operations via `manage_tags`
+
+## Bulk Frontmatter Backfills: Insert, Never Round-Trip
+
+A backfill that adds or renames one frontmatter field across many files is the most common bulk write in a vault, and the most common way to silently damage files you did not mean to touch. Two rules, both learned on a 71-file `source_id` backfill that a supervising review caught before the first write (DataWizard, 2026-08):
+
+**1. Never parse-modify-dump the YAML.** A YAML round-trip re-serializes every field, not just the one you changed: titles with em-dashes or colons get requoted, `YYYY-MM-DD` strings become date objects and come back in a different form, negative integers and unicode arrows may be rewritten, key order and trailing whitespace shift. The resulting diff has N files of noise and the one real change is unreviewable - and downstream consumers that matched on the old literal form (Dataview, grep-based lint, a manifest generator) break with no error. Compute the change as a **line insertion** (new field) or a **single-line substitution** (rename / value change) on the raw text, directly after a stable anchor line such as the field it belongs beside.
+
+**2. Put the invariant in the write path, not in an after-the-fact diff.** The check "exactly one line added per file and nothing else changed" is cheap to state and decisive; a script that runs it *before* writing turns a hoped-for property into a gate. The shape that works:
+
+1. Enumerate targets with **explicit exclusions** (frontmatter-less files, data files, folder blurbs) and assert the count equals the expected N *before* any write. A naive glob either injects a frontmatter block into a file that never had one or fails the count silently.
+2. For every file, compute the new content in memory and diff it against the original: exactly one added (or changed) line, zero other bytes. Skip files that already carry the field, so the run is idempotent.
+3. If **any** file fails the check, abort the whole batch with the offending path - never write the passing subset.
+4. Write only after all N pass.
+5. Verify from the filesystem afterwards (Tier 1): `grep -c` of the new field equals N, and a "field present iff its anchor field present" scan returns zero mismatches.
+
+The same discipline applies to any scripted edit of many files at once: state the per-file invariant, make the script refuse to write when it fails, and verify the count from disk. Kin to the "turn a validation finding into a runtime guardrail" principle in [[Working Principles]].
 
 ## Concurrency Practices
 

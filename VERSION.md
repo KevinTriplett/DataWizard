@@ -1,5 +1,5 @@
 
-seed: 1.3.1
+seed: 1.4.0
 protocol: 1.8
 project_instructions: 4.6
 
@@ -37,6 +37,16 @@ deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
 Design, edit its plist to point at the new root path.
 
 This notice can be removed from VERSION.md after 2026-09.
+
+## What's New in 1.4.0
+
+**Synthesis provenance - Phase 1: block citation extends to all generated docs.** Block-level citation (D112) now spans every document generated under DW protocols, not only companion notes - design docs, reports, decision entries, session-log entries, exchange reviews, and Seed plants. Granularity follows the **evidence unit, not the document class**: a paragraph or turn takes a block stamp (`^bN`/`^tN`), a whole section takes a section anchor.
+
+- **Conventions Registry** citation section gains generated-docs + obligation tiers, evidence-vs-edit-provenance-root (two syntaxes, one meaning each), the reach rule and metadata exemption (a stamp does not bump `updated:` or `edit_log`), block-ID tolerance (reuse any trailing block ID, human-minted included), and "Seed text may carry block IDs."
+- **block-stamper skill v2**: the non-source exclusion is retired for the evidence-unit rule; adds reach, stamp-before-cite, verify-after-claim collision guard, ID tolerance, the metadata exemption, and the script handoff.
+- **`Scripts/stamp_blocks.py`** (new): an on-cite block stamper - byte-faithful (append to the target line only), stdlib, Python 3.8+, with `--manifest`/`--file`/`--dry-run`/`--verify`, atomic write, and BOM handling. The batch executor twin of the skill; runs natively in Claude Code / GitHub Actions and through the device shell under Cowork. Regression fixtures ship beside it in the consuming vault's test area.
+
+No protocol or Project Instructions change. The extension is recorded as decision entries in the consuming vault; Phase 2 (an outward-facing one-pager as the first production customer) is the next phase.
 
 ## What's New in 1.3.1
 

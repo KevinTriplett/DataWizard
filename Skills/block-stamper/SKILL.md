@@ -17,6 +17,10 @@ edit_log:
     stamp-before-cite, verify-after-claim collision guard, ID tolerance (any
     trailing block ID), metadata exemption, and the stamp_blocks.py script twin
     + manifest contract"
+  - "DW-S293 2026-08-26 - v2 rules folded from S294 review:
+    only-real-stamps-count (next-unused), tight-list/wrapped-item and
+    fence-adjacent placement, per-row read-modify-write wording (matching the
+    stamp_blocks.py D1 fence fix + the list/link-ref fixes)"
 name: block-stamper
 type: skill
 updated: 2026-08-26
@@ -107,6 +111,7 @@ When in doubt, use `^b`. The prefix signals **content shape, not document class*
 ### Numbering
 
 - **Next unused integer in the file** -- scan for existing `^bN`/`^tN`, assign the highest + 1. IDs are *sparse*, so `^b9` is a stable handle, not "the 9th block."
+- **Only real stamps count toward next-unused.** A `#^bN` that appears inside a wikilink citation is a reference to *another* file's block, never a stamp in this file; do not let it advance the sequence.
 - Block IDs are appended at the **end of the paragraph's (or turn's) last line**, separated by a single space.
 - One block ID per paragraph; never mid-paragraph.
 - **Never renumber** to fill gaps -- IDs are permanent handles.
@@ -114,6 +119,9 @@ When in doubt, use `^b`. The prefix signals **content shape, not document class*
 ### Placement
 
 The block ID goes at the very end of the paragraph's **last** line, after all content, inline formatting, and parenthetical references. For a multi-line paragraph or a wrapped list item, that is the last physical line, never the first.
+
+- **Tight lists:** in a list with no blank line between items, every item is its own block; stamp the item you cited, and a wrapped item on its *last* line.
+- **A paragraph directly followed by a code fence** (no blank line between) keeps its stamp on its last prose line -- the line *before* the fence. Never place a stamp on a fence line: a closing ` ``` ` cannot carry trailing text, so a stamp there reopens the code block and breaks the document below it.
 
 ```
 Reich discovered the orgasm function by studying energy pulsation
@@ -149,7 +157,7 @@ Work out every block the citing document will point at, stamp the sources and ve
 
 ### A batch, or several blocks across files (the script twin)
 
-For a citing document that draws on more than a block or two, hand off to **`stamp_blocks.py`** (Seed/Scripts) instead of round-tripping the MCP. Build a manifest -- a JSON list of rows `{"file", "locate", "id"?, "prefix"?}` where `locate` is the first words of the target paragraph and `id` defaults to `"next"`. The script stamps all rows in one byte-faithful read-modify-write per file, verifies, and reports per row: `stamped <id>`, `reused <id>`, `not-found`, `ambiguous`, or `refused:<why>`.
+For a citing document that draws on more than a block or two, hand off to **`stamp_blocks.py`** (Seed/Scripts) instead of round-tripping the MCP. Build a manifest -- a JSON list of rows `{"file", "locate", "id"?, "prefix"?}` where `locate` is the first words of the target paragraph and `id` defaults to `"next"`. The script stamps each row in a byte-faithful read-modify-write (a second row on the same file re-reads after the first write, so the numbering stays correct), verifies, and reports per row: `stamped <id>`, `reused <id>`, `not-found`, `ambiguous`, or `refused:<why>`.
 
 ```
 # dry-run first, then apply and verify

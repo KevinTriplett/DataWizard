@@ -73,8 +73,22 @@ def read_text(path):
 
 
 def write_text(path, text):
-    with open(path, "w", encoding="utf-8", newline="") as fh:
+    # atomic: write a sibling temp file, then rename onto the target, so an
+    # interruption mid-write never leaves a truncated source
+    tmp = path + ".stamp.tmp"
+    with open(tmp, "w", encoding="utf-8", newline="") as fh:
         fh.write(text)
+    os.replace(tmp, path)
+
+
+def read_lines(path):
+    # returns (bom, lines): a leading UTF-8 BOM is split off so front-matter and
+    # locators parse, and re-prepended on write so the file stays byte-faithful
+    text = read_text(path)
+    bom = "\ufeff" if text.startswith("\ufeff") else ""
+    if bom:
+        text = text[len(bom):]
+    return bom, splitkeep(text)
 
 
 def body_start_index(lines):
@@ -87,9 +101,8 @@ def body_start_index(lines):
 
 
 def find_blocks(lines, body_start):
-    """Maximal runs of non-blank lines; a new list item also opens a block so a
-    tight list splits per item. Fence-internal blank lines stay in their block.
-    Returns (start_idx, last_idx) pairs."""
+    """Maximal runs of non-blank lines (blank-line delimited). Fence-internal
+    blank lines stay inside their block. Returns (start_idx, last_idx) pairs."""
     blocks = []
     cur = None
     in_fence = False
@@ -98,13 +111,21 @@ def find_blocks(lines, body_start):
     while i < n:
         content = split_eol(lines[i])[0]
         is_fence = bool(FENCE_RE.match(content))
-        if is_fence:
-            in_fence = not in_fence
-            cur = [i, i] if cur is None else [cur[0], i]
+        if is_fence and not in_fence:
+            # an opening fence starts its own block (refused later), so prose
+            # directly above it is closed here and never gets a stamp on a fence
+            if cur is not None:
+                blocks.append((cur[0], cur[1]))
+            cur = [i, i]
+            in_fence = True
             i += 1
             continue
         if in_fence:
-            cur = [i, i] if cur is None else [cur[0], i]
+            cur = [cur[0], i] if cur is not None else [i, i]
+            if is_fence:  # a closing fence ends the fence block
+                in_fence = False
+                blocks.append((cur[0], cur[1]))
+                cur = None
             i += 1
             continue
         if content.strip() == "":
@@ -146,6 +167,9 @@ def refusal_reason(lines, block):
     if HR_RE.match(first):
         return "horizontal-rule"
     if FENCE_RE.match(first):
+        return "code-fence"
+    # also guard the target (last) line: never land a stamp on a fence line
+    if FENCE_RE.match(split_eol(lines[block[1]])[0]):
         return "code-fence"
     for idx in range(block[0], block[1] + 1):
         if TABLE_SEP_RE.match(split_eol(lines[idx])[0]):
@@ -221,8 +245,7 @@ def process_row(row, root, dry_run):
     if not os.path.isfile(path):
         row.status, row.outcome = "refused", "refused:no-such-file"
         return
-    text = read_text(path)
-    lines = splitkeep(text)
+    bom, lines = read_lines(path)
     bstart = body_start_index(lines)
     blocks = find_blocks(lines, bstart)
     matches = [b for b in blocks if block_matches(lines, b, row.locate)]
@@ -257,9 +280,9 @@ def process_row(row, root, dry_run):
         row.status, row.resolved_id, row.outcome = "would-stamp", block_id, "would-stamp ^" + block_id
         return
     append_id(lines, target_idx, block_id)
-    write_text(path, "".join(lines))
+    write_text(path, bom + "".join(lines))
     # verify-after-claim (collision guard): re-read, ensure unique + on target
-    lines2 = splitkeep(read_text(path))
+    _, lines2 = read_lines(path)
     cnt, where = id_present_count(lines2, block_id)
     if cnt == 1 and where == target_idx:
         row.status, row.resolved_id, row.outcome = "stamped", block_id, "stamped ^" + block_id
@@ -276,7 +299,7 @@ def verify_rows(rows, root):
         if row.status not in ("stamped", "reused") or not row.resolved_id:
             continue
         path = os.path.join(root, row.file)
-        lines = splitkeep(read_text(path))
+        _, lines = read_lines(path)
         cnt, where = id_present_count(lines, row.resolved_id)
         ok = (cnt == 1) and (row.target_idx is None or where == row.target_idx)
         if not ok:
