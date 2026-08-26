@@ -7,11 +7,12 @@ edit_log:
   - "DW-S285 2026-08-24 - Editing in Browser Code Editors section: CodeMirror
     triple-click newline + keyboard single-span edit recipe (S256; meta-learning
     review S256-S266)"
+  - "DW-S290 2026-08-26 - Bridged Chrome control section: remote-devices proxy split-brain (navigate/list/title work; get_page_content + execute_javascript fail session-wide)"
 operator: Andrew
 scope: seed
 title: Chrome MCP and Web Tool Behaviors
 type: guide
-updated: 2026-08-24
+updated: 2026-08-26
 ---
 # Chrome MCP and Web Tool Behaviors
 
@@ -56,6 +57,10 @@ Pages that render client-side (JS apps) may expose little or nothing to a plain 
 **First authorization needs the manual OAuth click** (see Interaction Limits above).
 
 **Batch reads/writes; never loop `setValue()`.** Individual `setValue()` calls are extremely slow (~3 minutes for 200 cells); batch `getValues()` / `setValues()` is ~100x faster (~3 seconds). Standard Apps Script knowledge, recorded here because agent-driven spreadsheet automation hit it cold. (Source: RW S17)
+
+## Bridged Chrome control (remote-devices proxy)
+
+When Chrome is driven through the device bridge (a `Control_Chrome`-style proxy) rather than the in-browser extension, the toolset can go split-brained: `open_url`, `list_tabs`, and `get_current_tab` keep working (they report tabs and titles), while `get_page_content` and `execute_javascript` fail *every* call with "Google Chrome is not running" -- even though the same tabs are listable and Chrome is plainly running. Net capability in that state: navigate and read tab titles, but neither click nor scrape page content. It is session-wide, not transient, so do not burn retries. Fall back to reading tab titles only (navigate to a specific URL and read the resulting `<title>`), hand the click/verify to the operator, or switch to computer use (screenshots) if it can be enabled. (Source: DataWizard, 2026-08)
 
 ## See Also
 
