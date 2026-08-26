@@ -1,19 +1,26 @@
 ---
-name: block-stamper
-description: "Stamp a block ID (^bN documents, ^tN transcripts) on a source
-  paragraph or transcript turn at the moment a citation points to it -- on-cite,
-  not in bulk (S201 canon). Idempotent: reuse an existing ID, else assign the
-  next unused integer; never re-stamp or renumber. Called by corpus-enrichment,
-  transcript-harvest, document-harvest when they cite a passage. Triggers on:
-  'stamp block ids', 'add a citation anchor', 'stamp this block'."
-type: skill
-version: "1.1"
 created: 2026-06-11
-updated: 2026-06-25
+description: "Stamp a block ID (^bN documents, ^tN transcript turns) on the
+  source paragraph or turn a citation points to -- on-cite, sparse,
+  byte-faithful. Any same-vault markdown doc is a citable source; the citation
+  unit is the unit the claim rests on (a paragraph/turn takes a block stamp; a
+  whole section takes a section anchor). Idempotent: reuse any existing trailing
+  block ID, else the next unused integer; never re-stamp or renumber. Batch via
+  stamp_blocks.py. Triggers on: 'stamp block ids', 'add a citation anchor',
+  'stamp this block'."
 edit_log:
   - DW-S166 2026-06-11
-  - "DW-S202 2026-06-25 - reframed bulk -> on-cite stamping (S201 canon):
+  - "DW-S202 2026-06-25 - reframed bulk -> on-cite stamping:
     next-unused-integer, partial-is-normal, bulk demoted to legacy"
+  - "DW-S293 2026-08-26 - v2: non-source exclusion retired for the evidence-unit
+    rule (any same-vault doc citable; unit follows the claim); added reach rule,
+    stamp-before-cite, verify-after-claim collision guard, ID tolerance (any
+    trailing block ID), metadata exemption, and the stamp_blocks.py script twin
+    + manifest contract"
+name: block-stamper
+type: skill
+updated: 2026-08-26
+version: "2.0"
 ---
 # Block Stamper Skill
 
@@ -23,151 +30,173 @@ edit_log:
 
 Stamp a block ID on a source-file paragraph or transcript turn so it becomes addressable via Obsidian's native `^block-id` syntax -- giving a citation a clickable breadcrumb back to the exact passage.
 
-**Stamping is on-cite, not in bulk (S201 canon).** A block gets an ID only when something actually cites it -- during enrichment or harvest -- so sources accumulate IDs sparsely, only where they have been referenced. This is a utility skill: the downstream skills (corpus-enrichment, transcript-harvest, document-harvest) call it at the moment they cite a passage. A whole-document pre-stamp is retained as an optional legacy mode (see Bulk Pre-Stamp below). Citation canon: [[Conventions Registry]]. Full spec: [[Citation Mechanism - Block-Level Provenance]].
+**Stamping is on-cite, not in bulk.** A block gets an ID only when something actually cites it. Sources accumulate IDs sparsely, only where they have been referenced. This is a utility skill: the synthesis and enrichment passes call it at the moment they cite a passage.
+
+**Any markdown document in the same vault is a citable source.** The old "never stamp companion notes, MOCs, infrastructure, or non-source content" exclusion is retired. What replaces it is a granularity rule, not a document-class rule (see The Evidence Unit): a paragraph or turn takes a block stamp whatever file it lives in; a whole section (a MOC listing, an infrastructure section, a guide section read as a whole) takes a section anchor instead. Frontmatter, headings, and boilerplate still never get a block ID -- those are mechanical exclusions (see What Does NOT Get a Block ID).
+
+**Writes are byte-faithful.** A stamp is a one-line append that changes no content. It is exempt from birth-metadata ceremony (no `updated:` bump, no `edit_log` entry on the stamped file), and it must not reflow the file -- append the ID to the target line only, with no end-of-line normalization, whitespace change, or frontmatter re-dump. This keeps a stamp the minimal diff a downstream updated-field reconciliation treats as a non-body change.
+
+Citation canon: the Conventions Registry citation section. Full spec: [[Citation Mechanism - Block-Level Provenance]] and the synthesis-provenance design plan.
 
 ## When to Use
 
-- At cite time -- an enrichment or harvest pass references a specific paragraph or transcript turn that has no ID yet
-- Called by corpus-enrichment, transcript-harvest, or document-harvest as a stamp-on-cite step
+- At cite time -- a synthesis or enrichment pass references a specific paragraph or transcript turn that has no ID yet
+- Called by corpus-enrichment, transcript-harvest, document-harvest, and any synthesis pass (design docs, reports, reviews, plant records) as a stamp-on-cite step
 - User says "stamp this block", "add a citation anchor here", "give this paragraph a block ID"
-- (Legacy) a deliberate whole-file pre-stamp -- rarely needed; see Bulk Pre-Stamp (Legacy) below
 
 ### When NOT to Use
 
-- The target block already carries an ID -- reuse it, never re-stamp (re-stamping breaks live citations, S173)
-- The target is a section header (already addressable via `[[File#Header]]`), a companion note, MOC, infrastructure file, or any non-source content
-- File is in an archive folder
+- The target block already carries a block ID -- reuse it, never add a second (ID Tolerance below)
+- The unit the claim rests on is a whole section, not a paragraph -- use `[[File#Header]]` (The Evidence Unit)
+- The target is a section header (already addressable via `[[File#Header]]`), frontmatter, or other mechanical exclusion
+- The file is out of reach (Reach below): a read-only mount, another vault, a PDF, or a doc a collaborator has visibly claimed mid-edit today
 
-## Before You Start
+## Reach
 
-1. Read this skill fully.
-2. Determine the content type of the source file (article, transcript, or voice memo). This determines the block ID prefix.
-3. Locate the specific block being cited and check whether it already has an ID.
+A stamp is in reach on **any document in the same vault**, regardless of who owns it -- do not fall back to a coarser section anchor out of politeness toward a collaborator's file. Out of reach, where the citation uses a section anchor instead:
+
+- read-only mounts
+- other vaults
+- PDFs and other non-markdown sources
+- a document a sibling instance has visibly claimed mid-edit **today** (an in-progress session stub, or a file another operator is actively editing) -- never stamp into an open stub; it is renamed at close and the link would break
+
+## The Evidence Unit -- block vs section
+
+The citation unit is **the unit the claim rests on**, not the document's class:
+
+- A **paragraph or transcript turn** that a claim rests on takes a block stamp (`^bN` / `^tN`), whatever file it lives in -- a companion, a design doc, a session-log section file, a report, a Seed guide.
+- A **whole section** that a claim genuinely synthesizes takes the section anchor `[[File#Header]]` (the Registry's section-anchor fallback, case 1).
+
+Document classes only indicate where whole-section is *usually* the true unit: MOCs, the 0.x shells and trackers, and guide/infrastructure sections lean section-anchor; but one Key Pointers line or one guide paragraph cited as the specific evidence still takes a block stamp. Two clarifications:
+
+- **Session-log section files are content**, not "shell" infrastructure -- they are primary sources and are block-stamped like any source.
+- **Decision Log entries are section-anchor by nature** -- each is a heading, so `[[Decision Log#D112]]` already hits the exact unit; do not block-stamp inside a D-entry.
 
 ## Content Type Detection
 
 | Content Type | Block Prefix | How to Detect |
 |---|---|---|
-| Article / document / clipping | `^b` | Default. No speaker turns, not a transcript. |
-| Transcript (meeting, interview, podcast) | `^t` | Has speaker turns (`**Name**:` pattern), or `type: transcript` / `type: meeting-transcript` in frontmatter |
-| Voice memo | `^t` | `type: voice-memo` in frontmatter, or single-speaker transcript format |
+| Article / document / prose | `^b` | Default. No speaker turns, not a transcript. |
+| Transcript (meeting, interview, podcast) | `^t` | Has speaker turns (`**Name**:` pattern), or a `transcript` / `voice-memo` value in the `type:` frontmatter |
+| Voice memo | `^t` | `type: voice-memo-transcript` in frontmatter, or single-speaker transcript format |
 
-When in doubt, use `^b` (article default).
+When in doubt, use `^b`. The prefix signals **content shape, not document class**; numbering is a single file-local integer sequence shared across both prefixes.
 
 ## Stamping Rules
 
 ### What Gets a Block ID
 
-- Every substantive prose paragraph (2+ sentences or one sentence making a specific claim)
+- Every substantive prose paragraph (2+ sentences, or one sentence making a specific claim) that a citation points at
 - Each speaker turn in a transcript (the full turn, not each sentence within it)
-- Individual list items when they contain substantive claims (not navigation lists, TOCs, or simple enumerations)
-- Blockquotes that contain substantive content
+- Individual list items when they contain the substantive claim being cited
+- Blockquotes that contain the substantive content being cited
 
-### What Does NOT Get a Block ID
+### What Does NOT Get a Block ID (mechanical exclusions)
 
-- Section headers (`#`, `##`, etc.) -- already addressable via `[[File#Header]]`
+- Section headers (`#`, `##`, ...) -- already addressable via `[[File#Header]]`
 - YAML frontmatter
-- Empty lines
-- Horizontal rules (`---`)
+- Empty lines, horizontal rules (`---`)
+- Tables (the whole table is cited by its section, or a specific cell is out of scope)
 - Image embeds (`![[image]]`, `![alt](url)`)
-- Callout wrappers (`> [!note]` etc. -- stamp the content inside, not the wrapper)
+- Fenced code blocks
+- Callout wrappers (`> [!note]` -- stamp the content inside, not the wrapper)
 - Navigation boilerplate (breadcrumbs, "Part of" lines, TOC links)
-- Very short transitional lines ("See below.", "As follows:", "For example:") that carry no independent claim
-- Lines that are purely formatting (bold-only section dividers like `**Section Name**` with no prose)
+- Very short transitional lines ("See below.", "As follows:") carrying no independent claim
+- Bold-only section dividers (`**Section Name**` with no prose)
 
 ### Numbering
 
-- **Next unused integer in the file** -- scan for existing `^bN`/`^tN`, assign the highest + 1. Under on-cite stamping IDs are *sparse*, so `^b9` is a stable handle, not "the 9th block."
-- Articles: `^b1`, `^b2`, `^b3`, ... Transcripts: `^t1`, `^t2`, `^t3`, ...
-- Block IDs are appended at the **end of the paragraph's (or turn's) last line**, separated by a space
-- One block ID per paragraph -- never mid-paragraph
-- **Never renumber** to fill gaps -- IDs are permanent handles
+- **Next unused integer in the file** -- scan for existing `^bN`/`^tN`, assign the highest + 1. IDs are *sparse*, so `^b9` is a stable handle, not "the 9th block."
+- Block IDs are appended at the **end of the paragraph's (or turn's) last line**, separated by a single space.
+- One block ID per paragraph; never mid-paragraph.
+- **Never renumber** to fill gaps -- IDs are permanent handles.
 
 ### Placement
 
-The block ID goes at the very end of the paragraph, after all content including inline formatting, citations, and parenthetical references:
+The block ID goes at the very end of the paragraph's **last** line, after all content, inline formatting, and parenthetical references. For a multi-line paragraph or a wrapped list item, that is the last physical line, never the first.
 
 ```
 Reich discovered the orgasm function by studying energy pulsation
 blocked in the armoured working class of post-WW1 Vienna. ^b7
 ```
 
-For transcript turns:
+Transcript turn:
 
 ```
 **Kevin**: I had a really good call with some of the community
 organizers and developers for the Holo movement. ^t1
 ```
 
-For list items with substantive claims:
+### ID Tolerance and Idempotency
 
-```
-- Commons-based peer production enables collaborative work at
-  planetary scale without corporate intermediaries ^b12
-```
-
-### Idempotency
-
-- **Never re-stamp a block that already has an ID.** Before stamping the target paragraph/turn, check whether its last line already ends with a `^bN`/`^tN`; if so, reuse that ID and stop.
-- **Partial stamping is the normal state, not an error.** Under on-cite stamping most files are sparsely stamped (only cited blocks carry IDs). Never "complete" a file or flag it as unusual for being partly stamped.
-- Block IDs are assigned once and never renumbered. New stamps always take the next unused integer in the file (never reused, never back-filled).
+- **Reuse any existing trailing block ID.** Before stamping, check the target line's end. If it already carries a block ID -- an instance-minted integer (`^b7`) **or** a human-minted Obsidian ID (`^3f9a2c` from "Copy link to block") -- reuse that ID in the citation and stop. Two IDs on one line break both, so never add a second.
+- Also recognize Obsidian's **standalone** block ID: a whole line that is only `^id` (Obsidian mints these for tables and multi-paragraph blocks). Reuse it; do not add another.
+- **Partial stamping is the normal state.** Most files are sparsely stamped. Never "complete" a file.
 
 ## The Stamping Process (on-cite)
 
-You are stamping **one block** -- the paragraph or transcript turn a citation is about to point at.
+### Stamp before cite
 
-### Step 1: Locate the target block
+Work out every block the citing document will point at, stamp the sources and verify the stamps landed, **then** write the citing document. Partial failure then leaves harmless orphan stamps (an ID nobody points at yet), never dangling citations (a link with no stamp) that break the reader path.
 
-From the citing pass, identify the exact source paragraph or transcript turn being cited. Read enough of the source to find it unambiguously (filesystem Read as fallback if the file is large and the MCP overflows).
+### One block, by hand (MCP fallback)
 
-### Step 2: Check whether it's already stamped
+1. Locate the exact source paragraph or turn being cited.
+2. Check its last line for an existing block ID -- reuse if present (ID Tolerance).
+3. Pick the prefix (content type) and the next unused integer.
+4. Append ` ^bN` at the very end of the block's last line -- `patch_note` with the block's last line as a unique `oldString` -> the same line + ` ^bN`. Never touch frontmatter or headers, and never reflow the line.
+5. **Verify after claim** (collision guard): re-read the file; confirm the ID appears **exactly once** and on the intended line. If it appears twice (a sibling stamped the same integer in the same window), take the next unused integer and re-stamp -- legal because the citing document is not written yet, so a seconds-old uncited stamp is yours to move.
 
-Look at the end of the block's last line. If it already ends with a `^bN`/`^tN`, **reuse that ID** in the citation -- do not add another. Done.
+### A batch, or several blocks across files (the script twin)
 
-### Step 3: Pick the prefix and the next integer
+For a citing document that draws on more than a block or two, hand off to **`stamp_blocks.py`** (Seed/Scripts) instead of round-tripping the MCP. Build a manifest -- a JSON list of rows `{"file", "locate", "id"?, "prefix"?}` where `locate` is the first words of the target paragraph and `id` defaults to `"next"`. The script stamps all rows in one byte-faithful read-modify-write per file, verifies, and reports per row: `stamped <id>`, `reused <id>`, `not-found`, `ambiguous`, or `refused:<why>`.
 
-Prefix by content type (`^b` document, `^t` transcript -- see Content Type Detection above). Scan the file for existing `\^[bt]\d+` IDs and take the next unused integer (highest + 1; never reuse, never back-fill).
+```
+# dry-run first, then apply and verify
+python3 stamp_blocks.py --manifest cite-manifest.json --root <vault> --dry-run
+python3 stamp_blocks.py --manifest cite-manifest.json --root <vault> --verify
+```
 
-### Step 4: Append the ID
+Under Cowork the script runs through the device shell; in Claude Code and GitHub Actions it runs natively. The skill is the behavioral spec and the pure-MCP fallback for a one-off stamp; the script is the batch executor and its behavior matches this skill exactly:
 
-Add ` ^bN` (a space, then the caret ID) at the very end of the block's last line, after all content and punctuation. Use `patch_note` with the block's last line as a unique oldString -> the same line + ` ^bN`. Never touch frontmatter or headers.
+- `locate` identifies the **paragraph**; the stamp goes on the paragraph's **last** line.
+- Zero matches -> `not-found`; more than one -> `ambiguous`; both skip the row and exit non-zero. It never picks the first match.
+- Headings, frontmatter, tables, fences, horizontal rules, and the other mechanical exclusions are refused, not stamped.
+- Reuse recognizes any existing trailing block ID (integer or human-minted) and reports `reused`.
+- A re-run over already-stamped blocks is a no-op (every row `reused`); the file is byte-identical.
 
-### Step 5: Verify
+## Metadata exemption
 
-Re-read the line, confirm the ID is present, and confirm the citation `[[File#^bN]]` resolves. Report the file, the block, the prefix, and the ID assigned (new or reused).
+Stamping a document does **not** bump its `updated:` field and does **not** add an `edit_log` entry -- the content did not change. This holds whether you stamp by hand or via the script (the script writes byte-faithfully so the diff is the single appended ID). Error-tracking that a bump might have given is covered by the verify-after-claim re-read and, at session close, a local citation-resolution lint over every document the session wrote.
 
 ## Edge Cases
 
-**Bold-text section dividers:** Some sources use `**Bold Text**` as section dividers instead of `## Markdown Headers`. These are NOT paragraphs and should NOT get block IDs. However, they also aren't addressable via `[[File#Header]]` (Obsidian only resolves real markdown headers). Block IDs on surrounding paragraphs become the only citation path for these sections. Note this in the report.
-
-**Very short files (<200 words):** Still stampable. Even a few block IDs are useful for citation precision.
-
-**Files with no substantive paragraphs:** Possible for very thin clippings (just a title and a link). Report "no substantive content to stamp" and skip.
-
-**Mixed content:** Some files have prose paragraphs interspersed with code blocks, tables, or embedded content. Stamp the prose; skip the non-prose.
+- **Bold-text section dividers** (`**Bold**` used instead of `## Header`): not paragraphs; do not stamp. Block IDs on the surrounding paragraphs become the citation path for such sections. Note it in the report.
+- **Very short files (<200 words):** still stampable; even a few IDs help.
+- **Files with no substantive paragraphs** (thin clippings): report "no substantive content to stamp" and skip.
+- **Mixed content:** stamp the prose; skip code blocks, tables, and embeds.
+- **Human-minted IDs:** first-class -- reuse them, and cite them like any other (`[[File#^3f9a2c]]`).
 
 ## Common Mistakes
 
-- **Stamping headers.** Headers are already addressable. Don't add block IDs to them.
-- **Stamping inside YAML.** Never touch frontmatter content.
-- **Re-stamping.** Always check the target block for an existing ID first; reuse it.
-- **Renumbering.** Block IDs are permanent. Never renumber to fill gaps.
-- **Putting block ID on the wrong line.** It goes on the LAST line of a multi-line paragraph, not the first.
-- **Forgetting the space.** `text^b1` won't resolve in Obsidian. Must be `text ^b1` with a space before the caret.
-- **Stamping companion notes.** Only stamp source files, never companions or other DW infrastructure.
-- **"Completing" a sparse file.** Under on-cite stamping, a file with only some blocks stamped is correct, not unfinished. Don't fill in the rest.
+- **Falling back to a section anchor out of politeness** toward a collaborator's file. Any same-vault doc is in reach; the section anchor is for whole-section claims, not for foreign files.
+- **Stamping a whole-section claim at the block level** (false precision) -- if the claim rests on the section, use `[[File#Header]]`.
+- **Re-stamping / a second ID on a line.** Always check for an existing trailing ID first and reuse it.
+- **Renumbering** to fill gaps. Block IDs are permanent.
+- **Stamping the first line** of a multi-line paragraph. It goes on the last line.
+- **Forgetting the space.** `text^b1` does not resolve; must be `text ^b1`.
+- **Bumping `updated:` or writing an `edit_log` line** for a stamp. A stamp is not a content edit.
+- **Reflowing the file** (EOL normalization, YAML re-dump). Append to the target line only.
+- **"Completing" a sparse file.** Sparse is correct under on-cite stamping.
 
 ## Bulk Pre-Stamp (Legacy, Optional)
 
-The original model stamped *every* substantive paragraph in a file up front, before enrichment. **This is superseded by on-cite stamping (S201)** and should not be the default -- it created the bulk re-stamp failure mode (S173) and clutters sources with unused IDs. Use it only for a deliberate, one-off full pre-stamp when explicitly requested.
-
-If pre-stamping a whole file: walk it paragraph by paragraph applying the What Gets / What Does Not rules, assign the next unused integer to each unstamped substantive block (never re-stamp, never renumber), then verify. When stamping a batch, process files one at a time (stamp, verify, next) and report a per-batch summary (files processed, blocks stamped, files skipped and why).
+The original model stamped every substantive paragraph up front. This is superseded by on-cite stamping and is not the default -- it clutters sources with unused IDs and created the bulk re-stamp failure mode. Use it only for a deliberate, explicitly requested full pre-stamp, processing files one at a time (stamp, verify, next) with a per-batch summary.
 
 ## See Also
 
-- [[Conventions Registry]] -- the citation-format canon (on-cite stamping, glyph display)
-- [[Citation Mechanism - Block-Level Provenance]] -- full design doc for the citation system
-- corpus-enrichment skill -- primary consumer; stamps + cites blocks in companion notes
-- transcript-harvest skill -- stamps + cites turns in harvest destinations
-- document-harvest skill -- stamps + cites blocks in harvest destinations
-- [[Rabbit Whole RAG - Corpus Architecture]] -- RAG layer computes chunk coordinates independently; a block ID aligns with a chunk where one is stamped (decoupled, S201)
+- [[Citation Mechanism - Block-Level Provenance]] -- full design canon (block IDs, on-cite stamping, lifecycle, precision)
+- the Conventions Registry citation section -- the citation-format canon (block default, section-anchor fallback, glyph display)
+- the synthesis-provenance design plan -- the extension of block citation to all generated documents (obligation tiers, evidence board, export patterns)
+- `stamp_blocks.py` (Seed/Scripts) -- the batch script twin of this skill
+- corpus-enrichment / transcript-harvest / document-harvest skills -- primary callers

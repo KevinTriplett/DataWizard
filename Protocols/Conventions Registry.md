@@ -46,9 +46,19 @@ edit_log:
     S231-S246)"
   - "DW-S285 2026-08-24: Decision-log conventions: decision numbers are
     project-local namespaces (S262; meta-learning review S256-S266)"
-  - "DW-S285 2026-08-24: Link, don't restate gains \"Pointers carry no status\" (S285 pre-close reflection; 0.0 Key Pointer rot)"
-  - "DW-S287 2026-08-26: File placement gains a pointer to the Multi-Instance Coordination Patterns guide (exchange-note anatomy + handshake, canonical there)"
-  - "DW-S289 2026-08-26: File placement gains 'Rows count as outbound items too' (an addressed gate/inventory/backlog row needs a reader-side artifact on the target's orientation path; origin row points) - Flag Workbench review, Quest GUI blind spot"
+  - "DW-S285 2026-08-24: Link, don't restate gains \"Pointers carry no status\"
+    (S285 pre-close reflection; 0.0 Key Pointer rot)"
+  - "DW-S287 2026-08-26: File placement gains a pointer to the Multi-Instance
+    Coordination Patterns guide (exchange-note anatomy + handshake, canonical
+    there)"
+  - "DW-S289 2026-08-26: File placement gains 'Rows count as outbound items too'
+    (an addressed gate/inventory/backlog row needs a reader-side artifact on the
+    target's orientation path; origin row points) - Flag Workbench review, Quest
+    GUI blind spot"
+  - "DW-S293 2026-08-26: Citation format gains synthesis-provenance rules --
+    generated-docs/obligation-tiers, evidence-vs-root, reach + metadata
+    exemption, block-ID tolerance, Seed-may-carry-block-IDs (D121-D123;
+    synthesis provenance Phase 1)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -248,6 +258,16 @@ Block-default changes *which anchor you reach for*, not *when you stamp*: stampi
 ```
 
 Companions are block-default; **harvest destinations keep section-default with block/turn-when-specific** (their label-format precision is a separate open question). This section is the canonical statement of why the two regimes differ - skills point here rather than restating it.
+
+**Generated documents and obligation tiers.** The block-default spans **every document generated under the protocols**, not only companions -- design docs, reports, decision entries, session-log section files, exchange reviews, and plant records. Which classes must cite is set by obligation tier (Tier 1: outward-facing deliverables and decision entries; Tier 2: design docs, reports and reviews, research-index entries, plant records; Tier 3: trackers, backlogs, stubs, and coordination chatter carry no obligation); the synthesis-provenance design plan holds the full tier table. Granularity follows the **evidence unit, not the document class**: a paragraph or turn takes a block stamp whatever file it lives in; a whole section takes the section anchor above.
+
+**Evidence vs edit-provenance root.** A bare session-reference token -- `(S###)` -- is a *root*: "born in, or written in, that session," asserting nothing about reading. It stays legal and is never lint-flagged per token. An *evidence* citation carries the block anchor -- `([[Session Note#^b3|S###]])` -- and asserts the block was read and supports the claim. Same visible label, different anchor; the two render identically in reading mode. Where no vault source exists, use the honest root rather than inventing a hop. Bare tokens are tightened toward evidence on touch, never in bulk; a machine cannot tell the two apart, so there is no per-token lint finding.
+
+**Reach and the metadata exemption.** A block stamp is a one-line append in reach on **any document in the same vault**, regardless of owner -- never fall back to a section anchor out of politeness toward a collaborator's file. Out of reach only: read-only mounts, other vaults, PDFs, and a document a sibling has visibly claimed mid-edit today. Stamping a document does **not** bump `updated:` or add an `edit_log` entry -- a stamp changes no content.
+
+**Block-ID tolerance.** Reuse **any** existing trailing block ID on the target line -- an instance-minted integer (`^b7`) or a human-minted Obsidian ID (`^3f9a2c` from "Copy link to block"); never add a second ID to one line. For a citing document that draws on several blocks, batch the stamping with `stamp_blocks.py` (Seed/Scripts) via a manifest rather than round-tripping by hand.
+
+**Seed text may carry block IDs.** A plant record cites the guide paragraph it planted (`[[Guide Name#^b41]]`) and the origin block the learning came from; block IDs in Seed text are allowed and expected. Session identifiers and vault names remain forbidden in Seed text.
 
 Rules: citations go at the **end** of a statement; one per claim is usually enough; ISO dates; a `#anchor` must exactly match a heading in the source (this is why transcripts are segmented before harvesting). **Cite only what you have read** - a citation asserts the cited block was actually read, not recalled. **Colliding basenames:** when two files share a basename, path-qualify the link so Obsidian resolves deterministically - `([[Folder/Name#^b7|§]])`.
 

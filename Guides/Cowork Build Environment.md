@@ -16,8 +16,13 @@ edit_log:
   - "DW-S285 2026-08-24 - Device Bridge: Workflow tool args-undefined fallback +
     subagents reach the bridge via ToolSearch (S231; meta-learning review
     S231-S246)"
-  - "DW-S287 2026-08-26 - Shell quirks: environment date can lag the operator's local date"
-  - "DW-S288 2026-08-26 - Device Bridge: base64 script transport for device-side batch edits"
+  - "DW-S287 2026-08-26 - Shell quirks: environment date can lag the operator's
+    local date"
+  - "DW-S288 2026-08-26 - Device Bridge: base64 script transport for device-side
+    batch edits"
+  - "LS-S72 2026-08-26 - Shell quirks: pkill -f kills the calling sandbox shell
+    (exit 144); Rendering: Playwright headless runs in some configs +
+    .cjs/localhost-route recipes (Location Scout)"
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
@@ -63,6 +68,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **The environment's stated date can lag the operator's local date by a day.** A session started late in the UTC evening reports the previous day in its environment header while the operator's timezone has rolled over. Check `date` in the operator's timezone (device-side, e.g. `TZ=Europe/Berlin date`) before the first stamp and again at close; one session stamped six files with the wrong date before catching it. (Source: DataWizard, 2026-08)
 - **`bash wc -w` returns 0 for cloud-synced files** the mount serves as cloud-only placeholders. Use `obsidian:get_notes_info` for sizes instead. (Source: VC S32)
 - **Staged large-file paths do not survive a session interruption/reclaim.** A staged tool-results directory was gone after a session gap; re-fetching was cheap and deterministic. Re-fetch instead of hunting for the old path. (Source: RW S51)
+- **`pkill -f <pattern>` kills the calling shell itself.** Cleaning up backgrounded test servers with `pkill -f hub_server` (or any `-f` pattern) matched the sandbox's own wrapper process and terminated the whole `bash` call - it exits 144 with NO output, including any echoes before the pkill, which reads as a mysterious total failure. Never use `pkill`/`killall` in the sandbox. Track each backgrounded PID from `$!` and `kill "$PID"` explicitly; to free a port, start the next server on a different port instead. (Source: Location Scout, 2026-08)
 
 ## Network and GitHub Data
 
@@ -74,6 +80,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 ## Rendering (HTML to PDF)
 
 - **Use WeasyPrint, not headless Chromium.** Headless Chromium / Playwright segfaults in the Cowork sandbox. WeasyPrint (via pip, where installable) renders HTML to PDF faithfully, including `@font-face`. Caveat: WeasyPrint ignores page breaks *inside* flex containers -- keep break-sensitive content out of flex layouts. (Source: RW S31.5)
+- **Headless Chromium via Playwright DOES run in some configurations** -- despite the segfault note above (config-dependent). A sandbox with `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers` preinstalled ran `chromium.launch({headless:true})` reliably for driving a local Leaflet app and asserting rendered DOM (count-honesty checks). Probe with a one-line launch before assuming segfault. Two recipes that matter: (1) require Playwright from a `.cjs` file, not `.mjs` (a `.mjs` forces ESM and `require` is undefined); (2) when serving the app over `http://127.0.0.1`, a blanket `route('**', r=>r.abort())` also aborts the page navigation itself - allow the localhost host through and abort only external hosts. (Source: Location Scout, 2026-08)
 
 ## Device Bridge
 
