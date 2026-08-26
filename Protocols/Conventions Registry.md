@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-24'
+updated: 2026-08-26
 operator: Andrew
 priority: high
 maturity: working
@@ -47,6 +47,7 @@ edit_log:
   - "DW-S285 2026-08-24: Decision-log conventions: decision numbers are
     project-local namespaces (S262; meta-learning review S256-S266)"
   - "DW-S285 2026-08-24: Link, don't restate gains \"Pointers carry no status\" (S285 pre-close reflection; 0.0 Key Pointer rot)"
+  - "DW-S287 2026-08-26: File placement gains a pointer to the Multi-Instance Coordination Patterns guide (exchange-note anatomy + handshake, canonical there)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -457,6 +458,8 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 Each project names its intake folders in its 0.0 so "the target's intake" is unambiguous; without a named intake, writers fall back to origin-side filing. **Rationale:** an item routed by the writer's convenience (file it where I am) rather than the reader's path (file it where they look) fails silently while looking like infrastructure -- the same failure class as an undelivered flag. One project accumulated eleven outbound feature requests in its own `_Infrastructure/`, unread, before the pattern was caught. (Weave pilot, 2026-08; Flag Surfacing Chain.)
 
 **Example:** a DataWizard feature request written during a Weave session is filed in `_DataWizard/Workshop - DataWizard/Feature Requests/`, with a one-line record in the Weave session log -- not in Weave's `_Infrastructure/`.
+
+The anatomy of a Session Exchange note - filename pattern, `audience` / `status` handshake, turn-taking - and the coordination patterns that use it live in `Guides/Multi-Instance Coordination Patterns.md` (canonical home); this entry governs placement only.
 
 ---
 

@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: '2026-08-20'
+updated: 2026-08-26
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -21,6 +21,7 @@ edit_log:
     Template rows (Flag Surfacing Chain B2)
   - DW-S280 2026-08-20 - extended the Git Hook and CI Behaviors row with the
     self-updating-script and working-tree-compare behaviors
+  - "DW-S287 2026-08-26 - added the Process and coordination sub-table with the Multi-Instance Coordination Patterns guide"
 ---
 # DataWizard Guides
 
@@ -63,6 +64,11 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub and intake sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
 | **Team Attention Rollout** | Activating the flag system on a multi-operator project: preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
 | **Flag Queue Page Template** | Copy-in template for a per-person flag queue page (Dataview): one section per operator over `flag_for` frontmatter, with the empty-due-last sort fix and the exact-name list-matching caveat. Render surface only -- the frontmatter is the mechanism. |
+
+### Process and coordination
+| Guide | Covers |
+|---|---|
+| **Multi-Instance Coordination Patterns** | Several instances on one project: the incidental-concurrency baseline (claim, patch-at-close, same-day-block deferral, foreign-write verification), the roles table, and four deliberate patterns - coordination thread, relay review, second-model plan review, supervised build with a build-side check-before-write gate - plus the Session Exchange transport and the exchange-note handshake convention (canonical home), with a worked six-note supervision run. |
 
 ### Onboarding and integrations
 | Guide | Covers |

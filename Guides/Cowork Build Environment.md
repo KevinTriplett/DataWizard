@@ -16,11 +16,12 @@ edit_log:
   - "DW-S285 2026-08-24 - Device Bridge: Workflow tool args-undefined fallback +
     subagents reach the bridge via ToolSearch (S231; meta-learning review
     S231-S246)"
+  - "DW-S287 2026-08-26 - Shell quirks: environment date can lag the operator's local date"
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-08-24
+updated: 2026-08-26
 ---
 # Cowork Build Environment
 
@@ -58,6 +59,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **The Edit tool requires a prior Read-tool read.** A `cat` via bash does not register; the Edit fails. (Source: VC S23)
 - **The Write tool refuses to overwrite an existing file it has not Read** -- but creates genuinely new files without complaint. This is a feature under concurrency: it is what stopped one session from clobbering a sibling session's freshly written claim stub. Treat the refusal as a signal to re-read (the file may have changed under you), not as an error to force past. See the concurrency practices in the MCP Reliability guide. (Source: DataWizard, 2026-06)
 - **No trailing `#` comments in commands handed to the user's Terminal.** zsh interactive shells (the macOS default) do not honor inline `#` comments unless `INTERACTIVE_COMMENTS` is set; bash does. A handed-off command like `git pull  # then verify` reaches zsh with `#`, `then`, `verify` as arguments, and zsh also breaks on `()` inside a pasted comment line. Put explanations on their own line above the command, and hand multi-line blocks over as a heredoc - `bash <<'SH'` ... `SH` - so the whole block runs under bash regardless of the operator's interactive shell. (Source: DataWizard, 2026-06, 2026-08)
+- **The environment's stated date can lag the operator's local date by a day.** A session started late in the UTC evening reports the previous day in its environment header while the operator's timezone has rolled over. Check `date` in the operator's timezone (device-side, e.g. `TZ=Europe/Berlin date`) before the first stamp and again at close; one session stamped six files with the wrong date before catching it. (Source: DataWizard, 2026-08)
 - **`bash wc -w` returns 0 for cloud-synced files** the mount serves as cloud-only placeholders. Use `obsidian:get_notes_info` for sizes instead. (Source: VC S32)
 - **Staged large-file paths do not survive a session interruption/reclaim.** A staged tool-results directory was gone after a session gap; re-fetching was cheap and deterministic. Re-fetch instead of hunting for the old path. (Source: RW S51)
 

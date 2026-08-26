@@ -28,7 +28,7 @@ edit_log:
   - "DW-S283 2026-08-24 - v1.5: Before You Start surface checklist expanded to
     three vantage-dependent classes - adds informal lists inside 'What's next'
     (S170-S179 held item, S215) and the feature-request/intake folder
-    status-vs-shipped (S158-S169 reconsolidation pass)"
+    status-vs-shipped (S158-S169 reconsolidation pass); also adds a repair-lag guard to Detect Now, Repair Later (forcing function - clear the oldest held-fix batch before the next detection pass)"
 ---
 
 # Project Reconsolidation Skill
@@ -90,6 +90,8 @@ Classify each disagreement so the report is scannable and the fixes sort themsel
 ## Detect Now, Repair Later
 
 Separate detection from repair across two sessions. The audit session produces the report and the inventory; a later session executes the fixes. This is deliberate, not just context budgeting. Detection wants the whole window held at once for cross-cutting pattern-spotting; repair wants a clean head and one fix at a time. Folding them together tends to produce rushed fixes made while still mid-analysis.
+
+**Guard against repair-lag.** The split has a failure mode worth naming: detection is satisfying - it produces a report and a clean check-off - while repair is unglamorous bookkeeping, so held-fix batches accumulate faster than they are executed and "repair later" quietly becomes "repair never." One project let a held-fix batch sit roughly 68 sessions across three further detection passes before anyone noticed. Give repair a forcing function: before running the next detection window, first clear the oldest outstanding held-fix batch, so repair never falls more than one window behind detection.
 
 When you do repair, split the fixes:
 
