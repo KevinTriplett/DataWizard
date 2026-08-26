@@ -12,8 +12,8 @@ description: "Use when reconciling a project's tracking surfaces against reality
   drifted', or when a periodic tracking-health review is due. Distinct from
   semantic divergence/framing-drift reconciliation during harvest."
 type: skill
-version: "1.5"
-updated: 2026-08-24
+version: "1.6"
+updated: 2026-08-26
 created: 2026-06-29
 edit_log:
   - "DW-S246 2026-08-05 - v1.2: 'wired but never exercised' lens added to Before
@@ -29,6 +29,7 @@ edit_log:
     three vantage-dependent classes - adds informal lists inside 'What's next'
     (S170-S179 held item, S215) and the feature-request/intake folder
     status-vs-shipped (S158-S169 reconsolidation pass); also adds a repair-lag guard to Detect Now, Repair Later (forcing function - clear the oldest held-fix batch before the next detection pass)"
+  - "DW-S291 2026-08-26 - v1.6: Detect Now, Repair Later gains a cheap-disposition-bias guard - the executing instance drifts toward the least-work close and can rationalize past the gate/decision a crack rides on; re-read the source before disposing (first repair-session field-test)"
 ---
 
 # Project Reconsolidation Skill
@@ -92,6 +93,8 @@ Classify each disagreement so the report is scannable and the fixes sort themsel
 Separate detection from repair across two sessions. The audit session produces the report and the inventory; a later session executes the fixes. This is deliberate, not just context budgeting. Detection wants the whole window held at once for cross-cutting pattern-spotting; repair wants a clean head and one fix at a time. Folding them together tends to produce rushed fixes made while still mid-analysis.
 
 **Guard against repair-lag.** The split has a failure mode worth naming: detection is satisfying - it produces a report and a clean check-off - while repair is unglamorous bookkeeping, so held-fix batches accumulate faster than they are executed and "repair later" quietly becomes "repair never." One project let a held-fix batch sit roughly 68 sessions across three further detection passes before anyone noticed. Give repair a forcing function: before running the next detection window, first clear the oldest outstanding held-fix batch, so repair never falls more than one window behind detection.
+
+**Guard against cheap-disposition bias.** Repair's opposite failure mode: because closing a held item feels like progress, the instance executing the fixes drifts toward whichever disposition closes it with the least work - retire the paused thing, accept the current split, call it superseded - and can rationalize past the gate or decision the crack exists to honor. The tells: reading a gate as weaker than written (a "decide later" gate treated as "do nothing now"), or reversing a logged decision by editing a downstream doc instead of the decision itself, which silently drops the rationale that lives only in the decision. Before disposing of a crack, re-read the gate or decision it rides on at its source and honor it as written; if the honest disposition is more work than the cheap one, that gap is usually the signal the cheap one was wrong. An independent reviewer re-reading the source catches this reliably - a strong use of a second instance on a repair plan.
 
 When you do repair, split the fixes:
 

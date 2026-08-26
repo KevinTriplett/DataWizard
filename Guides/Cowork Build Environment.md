@@ -17,6 +17,7 @@ edit_log:
     subagents reach the bridge via ToolSearch (S231; meta-learning review
     S231-S246)"
   - "DW-S287 2026-08-26 - Shell quirks: environment date can lag the operator's local date"
+  - "DW-S288 2026-08-26 - Device Bridge: base64 script transport for device-side batch edits"
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
@@ -80,6 +81,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **`Control_Chrome` proxy: `list_tabs` is reliable; `get_page_content` intermittently errors** ("Google Chrome is not running") even with a tab open. Verify page state via `list_tabs` URL params instead of retrying. (Source: DW S230)
 - **Cowork connects folders individually, by exact path.** Connecting a parent folder does not expose its siblings, and moving or renaming a connected folder on disk breaks its connection until it is re-added in the desktop app. If a session suddenly cannot see a folder it could see before, check whether the folder moved before debugging the tools. (Source: DataWizard, 2026-07)
 - **Workflow (multi-agent orchestration) tool: `args` arrived `undefined` once; subagents can reach the device bridge.** In one run the value passed as the Workflow's `args` input never reached the script (`args` was `undefined` inside it); inlining the data as constants in the script body is the reliable fallback, and a quick `log(JSON.stringify(args))` at the top of the script tells you which case you are in before any agent spends tokens. Separately, foreground Workflow subagents CAN reach the `remote-devices` bridge (vault reads, `device_bash`) by loading the tools via ToolSearch inside the subagent - the bridge is not restricted to the main loop. (Source: DataWizard, 2026-07)
+- **Transport a multi-file edit script to the device without staging: base64 it.** A parse-guarded Python edit (frontmatter `edit_log` appends, section inserts across several vault files) runs cleanly device-side, but `device_bash` cannot see the sandbox's `/tmp`. Encode the script in the sandbox (`base64 -w0`) and decode it inside the `device_bash` command (`echo '<b64>' | base64 -d > script.py && python3 script.py <vault-path>`); an ~8KB script transports without issue, and the whole batch lands in one call with one verification pass. (Source: DataWizard, 2026-08)
 
 ## Verification Discipline for Builds
 

@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-24'
-version: '4.6.2'
+updated: '2026-08-26'
+version: '4.6.3'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -56,6 +56,7 @@ edit_log:
   - "DW-S284 2026-08-24 - v4.6.2: What's next standing-proposals rule - check
     before carrying, strike on resolution (S248; meta-learning review
     S247-S255)"
+  - "DW-S289 2026-08-26 - v4.6.3: Step 4 gains the Tool inventory bullet (designed / built / live rows in the project's 0.6 Registry; a designed-but-unbuilt tool is inventoried too) - the structural fix for a tool being re-designed in a collaborator project because the existing one was not on any reader's path"
 ---
 
 # Session Closer Skill
@@ -392,6 +393,7 @@ Check whether the session produced work that belongs in other files:
 - **Action items**: Check off completed items, add new ones. Optional but recommended. See the triage guidance below when the backlog needs cleanup.
 - **Decision log**: If decisions were made during the session (agreements, vision refinements, commitments, technical choices, scope changes), they belong as separate entries in the Decision Log. Note them in "What happened" and point to the Decision Log entry.
 - **Harvest ledger**: If harvesting was done during the session, verify the Harvest Ledger was updated as part of the harvest checklist. If not, update `0.4 Harvest Ledger - [Project].md` now.
+- **Tool inventory** (projects that keep one in their 0.6 Registry): if the session *designed* a tool or surface (a design doc now exists), *built* one (code now exists), or brought one *live*, add or update its row with the new state. A designed-but-unbuilt tool belongs in the inventory as much as a live one -- the inventory exists so a later instance in any project can ask "does something like this already exist?" before designing it again. If the built tool needs a native actor to go live, add its gate-queue row in the same pass.
 
 Write the changes directly. Exception: a Decision Log entry is judgment-class -- show its text and get approval before writing it (Step 2). Action items, the harvest ledger, and shell updates are written directly.
 

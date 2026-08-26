@@ -4,6 +4,7 @@ edit_log:
   - DW-S287 2026-08-26 - created (absorbs the coordination-thread, relay-review,
     second-model plan review, supervised-build, and Session Exchange patterns
     from six uses; canonical home for the exchange-note handshake convention)
+  - "DW-S289 2026-08-26 - third reviewer habit: flip the status on the doc the author will open (review delivered = reviewed doc says so; superseded_by for versions)"
 maturity: working
 operator: Andrew
 seed_version: 1.3.1
@@ -127,10 +128,11 @@ A skill for this loop is warranted on the second supervised build that uses this
 - **Body:** a one-paragraph header stating what the note reviews and against what charter; a **verdict** first; then pins (must be decided before write), fixes (must land), minors (fold without discussion), and an offer or question for the other side. Cite the charter's finding numbers so the other side can trace.
 - **Turn-taking from convention, not memory:** the note with the highest `NN` whose `status` names the reader's turn is the one to act on.
 
-**Two reviewer habits** that belong with the transport because they govern what a note may claim:
+**Three reviewer habits** that belong with the transport because they govern what a note may claim and whether it lands:
 
 - **Ground-truth the substrate.** A review that reads only the design doc reviews the author's beliefs. Read what the assumptions touch - and when a design redefines a shared field's meaning, read the field's **other writers**; that is where the collision lives.
 - **Check every path from the reader's root.** A handoff note whose links do not resolve from the reader's project fails the same way an undelivered flag does. Reader-path failures reproduce at every scale, including inside the coordination artifacts built to fix them.
+- **Flip the status on the doc the author will open.** A review note is delivered only when the *reviewed* document says so: set its `status` to name the review (`reviewed - see <note>`), add a one-line banner under the title pointing at the review note and at any revised version, and stamp its edit_log. The author's next session opens the design doc, not the exchange folder; a review that lives only in `Session Exchange/` is addressed but not delivered. Same move for a superseding version: the old doc gets `status: superseded` and a `superseded_by:` pointer. (Adopted after a review of a collaborator design note, 2026-08.)
 
 ## Worked example - a six-note supervision run
 

@@ -48,6 +48,7 @@ edit_log:
     project-local namespaces (S262; meta-learning review S256-S266)"
   - "DW-S285 2026-08-24: Link, don't restate gains \"Pointers carry no status\" (S285 pre-close reflection; 0.0 Key Pointer rot)"
   - "DW-S287 2026-08-26: File placement gains a pointer to the Multi-Instance Coordination Patterns guide (exchange-note anatomy + handshake, canonical there)"
+  - "DW-S289 2026-08-26: File placement gains 'Rows count as outbound items too' (an addressed gate/inventory/backlog row needs a reader-side artifact on the target's orientation path; origin row points) - Flag Workbench review, Quest GUI blind spot"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -458,6 +459,8 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 Each project names its intake folders in its 0.0 so "the target's intake" is unambiguous; without a named intake, writers fall back to origin-side filing. **Rationale:** an item routed by the writer's convenience (file it where I am) rather than the reader's path (file it where they look) fails silently while looking like infrastructure -- the same failure class as an undelivered flag. One project accumulated eleven outbound feature requests in its own `_Infrastructure/`, unread, before the pattern was caught. (Weave pilot, 2026-08; Flag Surfacing Chain.)
 
 **Example:** a DataWizard feature request written during a Weave session is filed in `_DataWizard/Workshop - DataWizard/Feature Requests/`, with a one-line record in the Weave session log -- not in Weave's `_Infrastructure/`.
+
+**Rows count as outbound items too.** The rule is about audience, and a *row* addressed to another project's actor -- a deployment-gate entry ("a session in project X should vendor this"), a tool-inventory row built for project X, a backlog line naming their operator -- has the same audience as a file and fails the same way: it sits in the origin's infrastructure, which the target's instances never open. So an addressed row must have a **reader-side artifact on the target's orientation path** -- a flag on a note in that project, or an exchange note in its `Session Exchange/` with `audience:` set -- and the origin row *points* at it. The origin row alone is a note-to-self. (A tool built for a collaborator project sat in the origin's gate queue for three weeks while the collaborator designed the same tool again; caught in review, 2026-08.)
 
 The anatomy of a Session Exchange note - filename pattern, `audience` / `status` handshake, turn-taking - and the coordination patterns that use it live in `Guides/Multi-Instance Coordination Patterns.md` (canonical home); this entry governs placement only.
 

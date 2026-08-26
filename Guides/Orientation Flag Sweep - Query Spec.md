@@ -5,12 +5,13 @@ edit_log:
     decision; referenced by PI Orientation Step 6, v4.6)
   - "DW-S279 2026-08-18 - fourth correction: null-literal normalization in
     field() (live-corpus catch during the whole-build verification sweep)"
+  - "DW-S289 2026-08-26 - fifth correction: read_through_frontmatter() replaces the 8 KB read cap (live catch - a 10 KB edit_log-heavy frontmatter hid the queue's only dated flag from every surface; found during the Flag Workbench review)"
 maturity: working
 operator: Andrew
 seed_version: 1.2.0
 title: Orientation Flag Sweep - Query Spec
 type: guide
-updated: 2026-08-18
+updated: 2026-08-26
 ---
 # Orientation Flag Sweep - Query Spec
 
@@ -45,6 +46,23 @@ import os, re
 
 STALE_STUB_DAYS = 3
 
+def read_through_frontmatter(p):
+    """Return the file text through its closing frontmatter fence, or the
+    first 8 KB if the file has no frontmatter. NO byte cap on the block:
+    an edit_log-heavy frontmatter can exceed 8 KB (live catch: 10 KB on a
+    project ledger carrying the queue's only dated flag), and a capped
+    read silently drops the flag."""
+    with open(p, encoding='utf-8-sig') as fh:
+        t = fh.read(8000).replace('\r\n', '\n').replace('\r', '\n')
+        if not t.startswith('---\n'):
+            return t
+        while not re.search(r'\n---(\n|$)', t[4:]):
+            more = fh.read(8000)
+            if not more:
+                break
+            t += more.replace('\r\n', '\n').replace('\r', '\n')
+    return t
+
 def sweep(root_dir, operator=None):
     """Return flag rows for a project tree; filter to one operator's queue if given."""
     rows = []
@@ -56,8 +74,9 @@ def sweep(root_dir, operator=None):
                 continue
             p = os.path.join(root, f)
             try:
-                # utf-8-sig strips a BOM; normalize CRLF/CR so ^---\n matches.
-                t = open(p, encoding='utf-8-sig').read(8000).replace('\r\n', '\n').replace('\r', '\n')
+                # utf-8-sig strips a BOM; CRLF/CR normalized so ^---\n matches;
+                # reads to the closing fence, never to a byte cap.
+                t = read_through_frontmatter(p)
             except Exception:
                 continue
             m = re.match(r'^---\n(.*?)\n---', t, re.S)
@@ -99,7 +118,7 @@ top = rows[:5]
 remainder = len(rows) - len(top)
 ```
 
-Four corrections applied over the original reference implementation: **CRLF/BOM normalization** (`utf-8-sig` + newline normalize, so files saved on Windows or with a BOM are not silently skipped by the `^---\n` anchor); **zero-indent block lists** (`[ \t]*` not `[ \t]+`, so a `flag_for:` list whose items sit at column 0 is parsed); **empty-due-last sort** (a sentinel high date so flags without a `flag_due` fall to the end rather than sorting ahead of dated ones); **null-literal normalization** (a YAML null literal -- `null`, `~`, `None`, as properties editors write for an empty date field -- is treated as field-absent, never as a date string; without this, a `flag_due: null` file counts as dated and sorts by the literal string, which lands last only by lexicographic luck -- an uppercase `NULL` variant would sort a phantom item to the top of every queue. Live-corpus catch, 2026-08).
+Five corrections applied over the original reference implementation: **no byte cap on the frontmatter read** (the original read the first 8,000 bytes of each file; a frontmatter block whose `edit_log` has grown past that -- 10 KB on one project's Active Threads ledger -- never reaches its closing fence, so the `^---\n(.*?)\n---` match fails and the flag is silently absent. That file carried the queue's only dated `flag_due`, addressed to four operators, and every surface missed it. `read_through_frontmatter()` reads to the fence. Live-corpus catch, 2026-08-26. Any other reader of `flag_for` -- a notice board, a dashboard script -- must be checked for a sibling cap); **CRLF/BOM normalization** (`utf-8-sig` + newline normalize, so files saved on Windows or with a BOM are not silently skipped by the `^---\n` anchor); **zero-indent block lists** (`[ \t]*` not `[ \t]+`, so a `flag_for:` list whose items sit at column 0 is parsed); **empty-due-last sort** (a sentinel high date so flags without a `flag_due` fall to the end rather than sorting ahead of dated ones); **null-literal normalization** (a YAML null literal -- `null`, `~`, `None`, as properties editors write for an empty date field -- is treated as field-absent, never as a date string; without this, a `flag_due: null` file counts as dated and sorts by the literal string, which lands last only by lexicographic luck -- an uppercase `NULL` variant would sort a phantom item to the top of every queue. Live-corpus catch, 2026-08).
 
 Surface each of `top` with title (filename), `flag_note`, `flag_by`, `flag`, and `flag_due`; on any item past `flag_due`, show its `flag_default` (what happens on silence). Then state the `remainder` count.
 

@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-08-24'
+updated: '2026-08-26'
 edit_log:
   - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
     for pending-report model (D114)
@@ -20,6 +20,8 @@ edit_log:
     row -> v1.4.0 (pattern families)
   - "DW-S285 2026-08-24 - project-health-audit row -> v2.1 (J7 pointer status, Manual Fallback 7 frontmatter parses)"
   - "DW-S283 2026-08-24 - project-reconsolidation row -> v1.5 (Before You Start checklist: informal What's-next lists + FR/intake folder status-vs-shipped)"
+  - "DW-S291 2026-08-26 - project-reconsolidation row -> v1.6 (Detect Now, Repair Later: cheap-disposition-bias guard)"
+  - "DW-S289 2026-08-26 - session-closer row -> v4.6.3 (Step 4 Tool inventory bullet)"
 ---
 
 # DataWizard Skills
@@ -33,7 +35,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | Skill | Type | Description |
 |---|---|---|
 | **project-guidelines** (v1.4) | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. Handles existing filename conventions gracefully. Includes `last_content_interests_review:` in new 0.0 templates. |
-| **session-closer** (v4.6.2) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. |
+| **session-closer** (v4.6.3) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. |
 | **side-quest** (v1.0) | Technique | Tracking a tangent from the project's current arc as a parallel stream in the session log. Routes a side quest's continuation into "Active quest threads" and protects the main arc's "What's next" from being overwritten, so parallel streams don't collide under concurrency. Triggers on: "let's go on a side quest," "continue the [X] side quest." |
 | **research-tracking** | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |
 | **tools-research** | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Batch mode includes harvest pre-filtering and two-speed processing. References research-tracking. |
@@ -51,7 +53,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **dw-intro** (v1.0) | Technique | Plain-language introduction to DataWizard: what it is, how the pieces fit together, the five essential practices (Project Instructions, orientation, session closer, DW Save, the approval model), and a skills overview. Called by install-wizard during setup. Also triggers standalone on: 'what is DataWizard?', 'what can DW do?', 'explain DataWizard', 'how does DataWizard work?', 'tell me about DataWizard'. |
 | **install-wizard** (v1.3) | Technique | Interactive post-install setup for new DataWizard users. Picks up where the README left off: presents the dw-intro, verifies MCP connection (all tools), guides Project Instructions setup, explains git as the sync/collaboration layer, offers git onboarding. Triggers on: 'set up DataWizard', 'finish DataWizard setup', 'I just installed DataWizard'. |
 | **project-health-audit** (v2.1) | Technique | Judgment-half audit of a DW project: consumes the dw_lint report for machine findings (filenames, YAML, sync, links, types), then checks infrastructure completeness (D84), MOC regeneration freshness (D92), shell narrative order, and routes findings. Tiered scopes (Quick/Standard/Full/Incremental); manual fallback for vaults without lint tooling. Triggered via 'DW review' or session-closer's threshold nudge. |
-| **project-reconsolidation** (v1.5) | Technique | Periodic reconciliation audit that diffs every record of open work (action items, thread roster or ledger, quest log, dashboard) against recent session-log ground truth, classifies divergences (slipped / stalled / orphaned / done-but-open / contradiction / duplication / model-gap), and writes a reconsolidation report. The detection-and-repair complement to the structural Active Threads ledger (D105, D106); audits the tracking model, not just the data. Distinct from semantic divergence-convergence (framing drift). Triggers on 'run a reconsolidation pass', 'reconcile the open work', or a due tracking-health review. |
+| **project-reconsolidation** (v1.6) | Technique | Periodic reconciliation audit that diffs every record of open work (action items, thread roster or ledger, quest log, dashboard) against recent session-log ground truth, classifies divergences (slipped / stalled / orphaned / done-but-open / contradiction / duplication / model-gap), and writes a reconsolidation report. The detection-and-repair complement to the structural Active Threads ledger (D105, D106); audits the tracking model, not just the data. Distinct from semantic divergence-convergence (framing drift). Triggers on 'run a reconsolidation pass', 'reconcile the open work', or a due tracking-health review. |
 | **git-onboarding** | Technique | Walking a new collaborator through git setup for a vault or DW project. Gathers variables, guides through setup interactively, sets up DW Save (Cmd+Shift+S) with backup scheduling, and generates a project-specific onboarding guide. Uses the Git Guide (`Seed/Guides/Git Guide.md`) as reference. |
 
 ## Knowledge Lifecycle
