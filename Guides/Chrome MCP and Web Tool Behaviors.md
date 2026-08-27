@@ -8,6 +8,7 @@ edit_log:
     triple-click newline + keyboard single-span edit recipe (S256; meta-learning
     review S256-S266)"
   - "DW-S290 2026-08-26 - Bridged Chrome control section: remote-devices proxy split-brain (navigate/list/title work; get_page_content + execute_javascript fail session-wide)"
+  - "DW-S299 2026-08-26 - Bridged Chrome control section: the in-browser extension is a separate bridge that can work when the proxy is split-brained - check it before deferring verification to the operator"
 operator: Andrew
 scope: seed
 title: Chrome MCP and Web Tool Behaviors
@@ -61,6 +62,8 @@ Pages that render client-side (JS apps) may expose little or nothing to a plain 
 ## Bridged Chrome control (remote-devices proxy)
 
 When Chrome is driven through the device bridge (a `Control_Chrome`-style proxy) rather than the in-browser extension, the toolset can go split-brained: `open_url`, `list_tabs`, and `get_current_tab` keep working (they report tabs and titles), while `get_page_content` and `execute_javascript` fail *every* call with "Google Chrome is not running" -- even though the same tabs are listable and Chrome is plainly running. Net capability in that state: navigate and read tab titles, but neither click nor scrape page content. It is session-wide, not transient, so do not burn retries. Fall back to reading tab titles only (navigate to a specific URL and read the resulting `<title>`), hand the click/verify to the operator, or switch to computer use (screenshots) if it can be enabled. (Source: DataWizard, 2026-08)
+
+**The in-browser extension is a separate bridge -- try it before deferring.** The Claude-in-Chrome browser *extension* (its own MCP toolset, distinct from the device-bridge proxy) can be fully functional in the very session where the proxy is split-brained. Flow: `list_connected_browsers` -> `select_browser` (the user must confirm the browser choice) -> `navigate` -> `get_page_text` / `read_page` / `find` / `computer` clicks all work, giving real scrape-and-click, not just tab titles. So when the proxy goes split-brained, check whether the extension is connected before handing verification to the operator -- one dead bridge does not mean the other is down. (This is exactly the gap that left a shipped CI job unverified for hours the prior session, when only the proxy was tried and it was down.) (Source: DataWizard, 2026-08)
 
 ## See Also
 
