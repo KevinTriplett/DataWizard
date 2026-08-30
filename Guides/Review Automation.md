@@ -2,7 +2,7 @@
 title: "Review Automation"
 type: guide
 created: 2026-08-06
-updated: 2026-08-24
+updated: 2026-08-30
 operator: Andrew
 edit_log:
   - "DW-S250 2026-08-06 - created: pending-report model + review-cadence
@@ -16,6 +16,8 @@ edit_log:
     review S247-S255)"
   - "DW-S285 2026-08-24 - Backlog triage: bulk-recommendation mode (S263;
     meta-learning review S256-S266)"
+  - "DW-S307 2026-08-30 - triage row yield note: status-lag-not-junk +
+    triage-as-decision-ripple-sweep (S307 cadence run)"
 ---
 
 # Review Automation
@@ -44,7 +46,7 @@ These numbers live here and nowhere else (D114, relocating D88). Every other doc
 | Content Interests | `last_content_interests_review` | 30+ days since, OR 10+ sessions since, OR field absent | `content-interest-scan` | `Content Interests Report - *.md` |
 | Backlog + FR triage | `last_backlog_triage` | 30+ sessions since, or never recorded | none yet (manual; a stock-take session) | none -- the stale-item sweep is the review itself |
 
-The backlog row is manual for now: no scan producer, no pending report, so the scheduled check does not fire it -- it lives here so the number has one home (D114). The triage itself: retire items overtaken by platform evolution or absorbed by other work, verify long-standing "blocked" items (they are often silently resolved), and reconcile FR statuses against what was actually implemented. Yield on past runs: 17 of 46 action items retired in one pass; 7 of 19 FRs resolved in another, 4 by status correction alone (DataWizard, 2026-05). Stamp the current session ID, as for the health audit.
+The backlog row is manual for now: no scan producer, no pending report, so the scheduled check does not fire it -- it lives here so the number has one home (D114). The triage itself: retire items overtaken by platform evolution or absorbed by other work, verify long-standing "blocked" items (they are often silently resolved), and reconcile FR statuses against what was actually implemented. Yield on past runs: 17 of 46 action items retired in one pass; 7 of 19 FRs resolved in another, 4 by status correction alone (DataWizard, 2026-05). A later run confirmed the intake's failure mode is **status-lag, not junk**: 24 of 57 FRs closed with only ~6 needing real supersession judgment - the rest were status corrections of already-shipped work, because nothing points a shipping session back at the FR that asked for it; the cadence is what reconciles. The same run showed a logged strategic decision does not sweep its own downstream backlog/FR surfaces - three retires traced to one decision logged four sessions earlier - so the triage doubles as the ripple-sweep for recent decisions (DataWizard, 2026-08). Stamp the current session ID, as for the health audit.
 
 **Run the triage as bulk recommendations, not item-by-item questions.** Present the whole batch (twenty park-or-revive items is a normal size) with a one-line recommendation per item and a default verdict, and ask the operator to blanket-approve with named exceptions. Twenty items cleared in one round this way where item-by-item questions had never got through them; the operator's attention goes only to the exceptions. Then annotate each verdict at the item's canonical home (the Backlog line, the gate row, the FR frontmatter) in the same pass, so the decision is not stranded in chat. (DataWizard, 2026-08)
 

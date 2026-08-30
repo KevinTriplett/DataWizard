@@ -10,9 +10,9 @@ description: >-
   planting. Also use when the user wants to set up automated learning extraction
   for any DW project.
 type: skill
-version: '1.4.0'
+version: '1.4.1'
 created: '2026-06-01'
-updated: '2026-08-24'
+updated: 2026-08-30
 edit_log:
   - DW-S185 2026-06-15 - platform/environment routing hint (Step 4 Deferred)
   - "DW-S243 2026-08-05 - v1.3: Step 3 header-variant note (### Findings treated
@@ -23,6 +23,9 @@ edit_log:
   - "DW-S285 2026-08-24 - v1.4.0: Step 4 pattern-families cross-theme pass +
     report template section (from the S231-S246 / S256-S266 review: two unnamed
     families found only in prose)"
+  - "DW-S309 2026-08-30 - v1.4.1: Step 5 - the report names its own scan window
+    only; never enumerate the pending stack or prescribe the stamp target
+    (S288-S300 report shipped a stale five-report stack narrative)"
 ---
 
 # Meta-Learning Scan
@@ -151,6 +154,8 @@ status: pending-review
 ```
 
 If the scan was run as a **skill test** - a forced scan range, or the reviewed-through stamp temporarily overridden - add `test_run: true` to the frontmatter and say so in the report's first line. The review skill detects the pending stack from frontmatter, and a test-generated report is indistinguishable from a real one without the flag; one such report sat in a project's stack for three months before anyone read the body note that explained its origin.
+
+**The report names its own scan window only.** Do not enumerate the project's pending-report stack in the report body, and do not prescribe the stamp target for the review - both are derived from report frontmatter at review time (the review skill's Step 1 and Step 5), and a narrative version goes stale between generation and review. One report shipped a five-report "pending stack" of which three were already `reviewed`, plus a stamp instruction that would have skipped the ordering rule (DataWizard, 2026-08).
 
 **Report structure:**
 

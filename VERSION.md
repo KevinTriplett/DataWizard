@@ -1,5 +1,5 @@
 
-seed: 1.4.0
+seed: 1.5.0
 protocol: 1.8
 project_instructions: 4.6
 
@@ -37,6 +37,10 @@ deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
 Design, edit its plist to point at the new root path.
 
 This notice can be removed from VERSION.md after 2026-09.
+
+## What's New in 1.5.0
+
+**supervised-build skill (new).** The Coordination Patterns guide's Pattern 4 - the per-chunk review relay between a build session and a reviewer instance - codified as a skill after four field runs (the guide's own codify-on-second-use rule, overdue by two). One `SKILL.md`, two seats: the build session gets the **review gate as a hard step** (before writing chunk N, a `status: reviewed` note covering it must exist in Session Exchange; if absent, pause and ask - skipping review is a conscious operator choice on the record, never a silent omission), and the reviewer gets the verification discipline (verify on disk, never from reports; test shipped scripts by *running* them on scratch fixtures outside the vault; ask for the class rule, not the special-case fix) plus the **mandated State Board write**: a fixed five-field block (status / verified / next_gate / turn / blocking) updated after every delivered review, so a fresh instance can answer "where are we at on this arc" from the driver doc alone. The guide keeps the rationale and the transport conventions and now points at the skill; the field shape lives in the skill.
 
 ## What's New in 1.4.0
 

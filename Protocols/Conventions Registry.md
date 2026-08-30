@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-08-26
+updated: 2026-08-30
 operator: Andrew
 priority: high
 maturity: working
@@ -59,6 +59,9 @@ edit_log:
     generated-docs/obligation-tiers, evidence-vs-root, reach + metadata
     exemption, block-ID tolerance, Seed-may-carry-block-IDs (D121-D123;
     synthesis provenance Phase 1)"
+  - "DW-S309 2026-08-30: Optimistic-claim pattern gains the not-one-shot rider
+    (re-check the token before any later write to the claimed resource;
+    meta-learning review S267-S287)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -426,7 +429,7 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 
 ## Optimistic-claim pattern
 
-**Rule:** When two sessions can contend for one resource (an ID slot, a filename, a shared row), claim it by **writing, then reading back, then retrying on loss**: write your claim, re-read to confirm your value survived, and on loss take the next free slot and re-verify. No locks, no coordinator - convergence comes from each claimant renumbering only its own claim. Named instances, each canonical in its own home: session claims (the orientation claim ceremony), MCP write verification, task-ID minting (Quest Lifecycle). Any future two-sessions-one-resource problem is answered by "apply the optimistic-claim pattern, scope = X" - not a new design session. (DataWizard, 2026-08)
+**Rule:** When two sessions can contend for one resource (an ID slot, a filename, a shared row), claim it by **writing, then reading back, then retrying on loss**: write your claim, re-read to confirm your value survived, and on loss take the next free slot and re-verify. No locks, no coordinator - convergence comes from each claimant renumbering only its own claim. Named instances, each canonical in its own home: session claims (the orientation claim ceremony), MCP write verification, task-ID minting (Quest Lifecycle). Any future two-sessions-one-resource problem is answered by "apply the optimistic-claim pattern, scope = X" - not a new design session. The verify is not one-shot: a claim can be lost after a successful read-back, so any later write to the claimed resource re-checks the token first. (DataWizard, 2026-08)
 
 **Example:** two parallel sessions both mint task ID N+1; each re-searches after writing, at least one sees the double definition, renumbers its own line, and re-verifies.
 

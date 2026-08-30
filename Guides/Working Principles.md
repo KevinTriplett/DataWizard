@@ -4,7 +4,7 @@ type: guide
 status: active
 maturity: working
 created: '2026-06-18'
-updated: '2026-08-26'
+updated: 2026-08-30
 operator: Andrew
 tags:
   - protocol
@@ -37,6 +37,9 @@ edit_log:
     discussion)"
   - "DW-S289 2026-08-26 - Additional principles: check the tool inventory before designing a tool (Flag Workbench / Quest GUI blind spot; inventory + pointer + tooling-review routing)"
   - "DW-S286 2026-08-26 - Build discipline: make the invariant the write gate, not the post-check (bulk backfill)"
+  - "DW-S309 2026-08-30 - Design and spec review heuristics: give the enforcement scope and the operational scope one definition (meta-learning review S267-S287)"
+  - "DW-S309 2026-08-30 - Additional principles: ground-truth the substrate (named; pointer entry over its three canonical homes - 0.0 standing question 4, supervised-build skill, optimistic-claim pattern)"
+  - "DW-S309 2026-08-30 - Additional principles: an artifact is done when on the consumer's path AND verified in its runtime (named; 5-instance family, absorbs the built-vs-deployed watch; meta-learning review S288-S300)"
 ---
 # Working Principles
 
@@ -117,6 +120,11 @@ These were standing principles in the older protocol and remain true even though
 - *Apply the system's own principle uniformly.* Wherever a stated principle has an exemption, look there first - non-uniform application is exactly where the bugs hide. Applying a "markdown is canonical" rule to the one component that had been exempted from it surfaced both a runtime mismatch and a correctness bug (a non-idempotent append under a deferred cursor).
 - *List the declared invariants, then check every write surface against each one.* A spec review that did this found three correctness bugs, all sitting in write surfaces where the spec's own idempotency invariant had simply not been applied. Invariants stated once and applied selectively are the spec-level form of the point above.
 - *Put a review pass between design and build.* A spec that was buildable as written still yielded eight issues to a dedicated review at zero code cost, and the build that followed ran with no reopened design questions. The pass is cheap because the reviewer has the whole spec and no code yet; the same defects found during the build cost a re-design each. The strongest form is a *second-model* review of the *plan* (not the code) before any load-bearing build: three consecutive builds of a write engine, a concurrency guard, and an attention view each had real defects pre-empted this way at near-zero cost (DataWizard, 2026-08).
+- *Give the enforcement scope and the operational scope one definition.* When a convention needs both a lint check and an operational scan (a minting sweep, a router), define the two as the *same scope* - it makes both decidable at once, and a scoped rule once collapsed two open scope questions into one answer (DataWizard, 2026-08). Applies to any future convention-plus-lint pair.
+
+**An artifact is done when it is on the consumer's path AND verified in its runtime.** Default checks test *addressing* - the flag was set, the row was written, the review was filed, the workflow was committed - and addressing is the half that can succeed while delivery silently fails: a flag hidden by a read cap, a built tool sitting in a queue its audience never opens, a review unseen in an exchange folder, a "vault-wide" CI job that only sees the committed tree, a logically-sound workflow file that is invalid to its runner (five instances in one window; DataWizard, 2026-08). The two-part test for any deliverable: name the consumer's actual path to it, and name the runtime check that proved it works there. The named expressions each live in their own home: the reader-path principle (Conventions Registry), the tool inventory rule (above), the gate queue's unverified-deploy-is-unfinished corollary, and pre-flight standing question 5.
+
+**Ground-truth the substrate.** Don't trust the artifact - read what it stands on. One stance, three canonical expressions, each maintained in its own home: for *data*, the pre-flight distribution check (the review-before-live standing questions in a project's 0.0 - does the flag correlate with a metadata attribute rather than content?); for *builds*, the verification half of the supervised-build skill (verify on disk, run shipped scripts on fixtures, never trust the report); for *concurrent writes*, the Conventions Registry's optimistic-claim pattern (verify the token, and not just once). Named once here so recurring instances count against a standing principle instead of re-deriving the family; the rules themselves live and evolve in those three homes. (DataWizard, 2026-08)
 
 **Validation gate: the method must reproduce the hand-certified set first.** Before trusting an automated verifier, adjudicator, or extraction method on unseen items, require it to reproduce N of N verdicts on a small hand-certified gold set. A method that cannot pass the items a human has already settled has no claim on the items nobody has checked. The gold set bootstraps itself: the first hand-certified batch becomes the gate for the method that certifies the rest (a citation verifier passed 12/12 before it was let loose on the remaining 62 quotes; DataWizard, 2026-07). Kin to the pre-flight review note - both put a cheap check between "built" and "trusted".
 

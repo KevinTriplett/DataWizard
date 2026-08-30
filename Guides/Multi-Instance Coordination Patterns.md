@@ -6,6 +6,9 @@ edit_log:
     from six uses; canonical home for the exchange-note handshake convention)
   - "DW-S289 2026-08-26 - third reviewer habit: flip the status on the doc the author will open (review delivered = reviewed doc says so; superseded_by for versions)"
   - "DW-S302 2026-08-30 - Pattern 4: the reviewer writes arc state for a cold reader (mandated State Board write - status / verified / next gate / turn / blocking)"
+  - "DW-S306 2026-08-30 - Pattern 4 codified as the supervised-build skill (Seed/Skills/); guide now points at the skill, field shape lives there"
+  - "DW-S309 2026-08-30 - meta-learning plants (review S267-S287): session-scale foreign-write verification pass (baseline bullet); new 'Inbound defect reports are claims, not evidence' section"
+  - "DW-S309 2026-08-30 - meta-learning plants (review S288-S300): check-the-recipient-is-open note-anatomy bullet; named 'Supervision earns its cost at every phase, value at the source' (8-instance family) in Choosing a pattern"
 maturity: working
 operator: Andrew
 seed_version: 1.3.1
@@ -34,7 +37,7 @@ The baseline is already in place if the Project Instructions and the MCP guide a
 - **Array fields clobber on contended files.** `update_frontmatter` replaces array fields wholesale even with `merge: true`, so a sibling's `edit_log` entry written between your read and your write is silently lost. The MCP guide names the safe append path.
 - **A stub claimed today is never stale.** The orientation sweep offers to reconcile stale stubs; it must be structurally incapable of offering a live sibling's stub. Three sessions can be live in one project on one day.
 - **Same day, same block: defer.** If you know a sibling advanced a shared block today (a ledger row, a decision-log section), leave that block to its close, or to the next close, rather than patching it too. A supervising session that had every reason to update a thread's ledger row left it to the build session's close for exactly this reason (DataWizard, 2026-08). Two patches to one block on one day is the collision the concurrency rule exists to prevent; the row is not urgent, the collision is expensive.
-- **Foreign writes are unverified writes.** A sibling instance - especially one running under another project's instructions - can leave a shared file in a state your own checks never saw (an unparseable frontmatter block, an unresolvable path). Treat the first read after a foreign write as a verification read, not a trusting one. Working Rule 5 has a write-side twin: what you did not write, you still verify before building on.
+- **Foreign writes are unverified writes.** A sibling instance - especially one running under another project's instructions - can leave a shared file in a state your own checks never saw (an unparseable frontmatter block, an unresolvable path). Treat the first read after a foreign write as a verification read, not a trusting one. Working Rule 5 has a write-side twin: what you did not write, you still verify before building on. The session-scale form: before building on a prior session's close, spend one context-light verification pass reading each of its claims against disk - including a fingerprint check of any script it shipped. It converts the log's claims into verified state for the cost of a single chunk; one such pass over a full close confirmed every claim landed before the next build stacked on it (DataWizard, 2026-08).
 
 ## Roles
 
@@ -104,7 +107,7 @@ Three consecutive load-bearing builds each had real defects pre-empted this way 
 
 **The gate is on the build side, not in the human's memory.** In a declared supervised build, "a review note with `status: reviewed` for chunk N exists in the exchange folder" is a **hard precondition** to writing chunk N. Before writing, the build session lists the folder and looks for that note. If it is absent, it **pauses and asks**: "Chunk N has no review note yet - relay it, or tell me to proceed unsupervised." The human may always answer "proceed unsupervised on chunk N" - the point is that skipping review becomes a **conscious choice on the record**, never a silent omission. This moves the gate from a diligence-dependent relay to the actor's own precondition check, the same move as putting the flag sweep at orientation: enforce the reader's path at a guaranteed choke point (Conventions Registry, "The reader-path principle").
 
-**The reviewer writes arc state for a cold reader.** A long-lived reviewer thread is a viewport, not a store: its context compacts or ends, and "where are we at on this arc" must not leave with it. At the end of every review it delivers, the reviewer updates the arc's State Board (the driver doc's canonical step state) with a fixed block: status, the last session it verified on disk, the next gate, whose turn it is (human / reviewer / builder / other project / named person), and the one blocking question. The test: a fresh instance can answer "where are we at" from the board alone, without the exchange folder or the reviewer's chat. The exchange note stays the message to the other instance; the board is where the state lives. The field shape is owned by the consuming project's tracking-surface design until the supervised-build skill codifies it.
+**The reviewer writes arc state for a cold reader.** A long-lived reviewer thread is a viewport, not a store: its context compacts or ends, and "where are we at on this arc" must not leave with it. At the end of every review it delivers, the reviewer updates the arc's State Board (the driver doc's canonical step state) with a fixed block: status, the last session it verified on disk, the next gate, whose turn it is (human / reviewer / builder / other project / named person), and the one blocking question. The test: a fresh instance can answer "where are we at" from the board alone, without the exchange folder or the reviewer's chat. The exchange note stays the message to the other instance; the board is where the state lives. The field shape is codified in the `supervised-build` skill.
 
 **Recorded human decisions get their own note.** When the human makes a design decision mid-build (an approval gate's shape, a threshold), the reviewer records it as a numbered note so the build session reads the decision from the folder, not from a chat it was not in.
 
@@ -112,7 +115,7 @@ Three consecutive load-bearing builds each had real defects pre-empted this way 
 
 **End with a whole-build sweep.** After the last chunk, a supervisor-tier pass over every artifact the build touched, ideally from a fresh instance. The lesson behind it: *unreviewed is where the defects live.* Three supervised chunks shipped clean or with pre-write catches; the one unsupervised chunk put three defects on disk, one of which would have mass-stamped a whole project's flags as expired on the first close after rollout (DataWizard, 2026-08).
 
-A skill for this loop is warranted on the second supervised build that uses this guide (codify on second use); until then the guide is the protocol.
+The `supervised-build` skill (`Seed/Skills/supervised-build/`) codifies this loop for both seats - load it when a supervised build is declared. This guide remains the rationale and owns the transport conventions.
 
 ## Transport - the Session Exchange folder
 
@@ -130,6 +133,7 @@ A skill for this loop is warranted on the second supervised build that uses this
 - **Frontmatter:** birth metadata per the YAML Schema, plus `audience:` (the session or role meant to act next), `source_session:`, `status:` (`awaiting-review` | `reviewed` | `awaiting-response` | `closed`; `active` for an open supervision series), `related:` (the charter, the previous note), and `chunk:` for supervised builds.
 - **Body:** a one-paragraph header stating what the note reviews and against what charter; a **verdict** first; then pins (must be decided before write), fixes (must land), minors (fold without discussion), and an offer or question for the other side. Cite the charter's finding numbers so the other side can trace.
 - **Turn-taking from convention, not memory:** the note with the highest `NN` whose `status` names the reader's turn is the one to act on.
+- **Check the recipient is still open before filing.** A supervision note filed after the supervised session has closed has no reader - the exchange folder is checked by live sessions, not by finished ones. If the recipient's stub or entry shows the session closed and the fix is small and well-specified, take it yourself (and record that you did) rather than queueing a note nobody will collect. (DataWizard, 2026-08)
 
 **Three reviewer habits** that belong with the transport because they govern what a note may claim and whether it lands:
 
@@ -150,6 +154,10 @@ A reviewer session supervised a build session through three chunks of a shared-i
 
 The run produced the protocol in Pattern 4: every relayed chunk was clean or caught pre-write; the one dropped relay was the one with defects; and the fix was to make the gate a build-side precondition rather than a better-remembered relay.
 
+## Inbound defect reports are claims, not evidence
+
+A bug report relayed from another instance - especially one carried through a human or another AI - can be confabulated: one relayed unbound-variable defect existed in no shipped version of the script it named (verified local == origin == raw fetch, plus full history). Before patching anything, verify the defect exists in the shipped artifact. If it does not reproduce, do not patch on faith - send a debug note back requesting the verbatim error output and an artifact fingerprint (a version stamp, a hash, the first lines of the file as the reporter has it), so the next round works from evidence instead of paraphrase. (DataWizard, 2026-08)
+
 ## Choosing a pattern
 
 | Situation | Pattern |
@@ -160,6 +168,8 @@ The run produced the protocol in Pattern 4: every relayed chunk was clean or cau
 | One load-bearing build, one plan | Second-model plan review (with an author-response round if the review raises design questions) |
 | A multi-chunk build with a reviewer available throughout | Supervised build, gate on the build side |
 | Any of the above needs a note to reach another instance | Session Exchange, per the note anatomy |
+
+**Supervision earns its cost at every phase, and the value is at the source.** Second-instance supervision has paid for itself everywhere it has been tried - plan review, detection passes, repair passes, and builds - and the catches share one mechanism: the reviewer re-reads the original gate, decision, or input at its source, or re-runs the shipped artifact, rather than reviewing the diff or the progress note (eight instances across one twelve-session window; DataWizard, 2026-08). When a session confirms this again, cite this statement instead of re-logging the confirmation - the pattern has graduated from discovered to load-bearing.
 
 **Codify on second use.** A coordination shape used twice gets its own section here. Each pattern above earned its place that way - the relay review was flagged for codification at its first use and written up at its sixth; the cost of the delay was five uses of a pattern that lived only in session logs.
 

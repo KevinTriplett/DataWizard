@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-18'
+updated: 2026-08-30
 operator: Andrew
 priority: high
 maturity: working
@@ -18,6 +18,9 @@ edit_log:
     team_attention* deprecation mapping + flagged_for non-canonical note"
   - "DW-S279 2026-08-18: generic-names sweep of examples (C2, Seed
     depersonalization; Flag Surfacing Chain B2)"
+  - "DW-S309 2026-08-30: placeholder sweep completed - Alice/Ben/Cara ->
+    Operator-A/B/C (16 residual uses the S279 sweep missed; S289 role-placeholder
+    rule; meta-learning review S288-S300)"
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -117,7 +120,7 @@ The following fields MUST be present in frontmatter when any new file is created
 | `type` | Content type from taxonomy | Discoverability via Dataview/Bases |
 | `created` | YYYY-MM-DD | When the file was born |
 | `updated` | YYYY-MM-DD (same as created) | Last modification date |
-| `operator` | First name (e.g. Alice) | Who created it |
+| `operator` | First name (e.g. Operator-A) | Who created it |
 | `edit_log` | Initial entry (e.g. "DW-S161 2026-06-09") | Provenance trail |
 
 **Required on section files additionally:**
@@ -142,7 +145,7 @@ Session close (session-closer Step 3.8) verifies these fields rather than applyi
 
 *These fields power multi-operator coordination: the shared team dashboard, the session-close flag workflow, and the orientation-time flag sweep. The canonical cluster is `flag*` (below). The older `team_attention*` names are deprecated -- see the mapping at the end of this section.*
 
-**`operator`**: The human team member whose session created or substantially updated this file. Set at creation time as part of the birth metadata contract (see above). Use first name only (e.g. `Alice`, `Ben`, `Cara`). Apply to:
+**`operator`**: The human team member whose session created or substantially updated this file. Set at creation time as part of the birth metadata contract (see above). Use first name only (e.g. `Operator-A`, `Operator-B`, `Operator-C`). Apply to:
 - Session log section files (always)
 - Content documents created or substantially updated during a session
 
@@ -152,9 +155,9 @@ This field was not applied to files before the birth metadata contract. Existing
 
 **`flag`**: ISO date (YYYY-MM-DD) the file was flagged. When present, the file is a live flag. Set `flag_by`, `flag_note`, and `flag_for` at the same time.
 
-**`flag_by`**: Who flagged the file. First name for human-confirmed flags (e.g. `Alice`). Use `Name (auto)` for auto-flags generated on ungraceful session close (e.g. `Alice (auto)`) -- this lets the dashboard render auto-flags differently and helps reviewers calibrate urgency.
+**`flag_by`**: Who flagged the file. First name for human-confirmed flags (e.g. `Operator-A`). Use `Name (auto)` for auto-flags generated on ungraceful session close (e.g. `Operator-A (auto)`) -- this lets the dashboard render auto-flags differently and helps reviewers calibrate urgency.
 
-**`flag_for`**: The operators the flag is addressed to, as a YAML list of first names (e.g. `[Alice, Ben]`). This is the routing field the orientation sweep matches against. When an operator acts on their item, remove their name (union-merge discipline). A conscious defer KEEPS the name -- the item re-surfaces due-first next session (marked `flag_status: deferred`) rather than vanishing, so a deferral is never mistaken for a handled item. Clear the whole cluster when the list empties. A single name may be written inline (`flag_for: Alice`) or as a one-item list.
+**`flag_for`**: The operators the flag is addressed to, as a YAML list of first names (e.g. `[Operator-A, Operator-B]`). This is the routing field the orientation sweep matches against. When an operator acts on their item, remove their name (union-merge discipline). A conscious defer KEEPS the name -- the item re-surfaces due-first next session (marked `flag_status: deferred`) rather than vanishing, so a deferral is never mistaken for a handled item. Clear the whole cluster when the list empties. A single name may be written inline (`flag_for: Operator-A`) or as a one-item list.
 
 **`flag_note`**: Required when `flag` is set. The context string, and it must **state the decision needed and what is blocked until it is made**. "Please review the tiers" fails; "Approve or amend the priority tiers -- outreach proceeds in the current order by default on silence" passes. Keep it to one line at a glance on the dashboard. If the note runs long or contains characters that stress YAML (colons, quotes, brackets), fold it -- use a block scalar (`flag_note: >-`) or a single-quoted string -- because an over-long or unescaped quoted note has broken frontmatter parsing in practice, after which a parser returns empty frontmatter silently and the flag reads as absent. A flag whose note breaks parsing is an undelivered flag.
 
@@ -165,10 +168,10 @@ This field was not applied to files before the birth metadata contract. Existing
 **`flag_status`** (optional): Lifecycle marker. `deferred` = the operator saw it and consciously deferred; the name stays on `flag_for` and the item re-surfaces due-first next session. `expired-unread` = past `flag_due` with no response; the expiry pass sets this and clears the names, recording that the default is now in effect.
 
 ```yaml
-operator: Alice
+operator: Operator-A
 flag: 2026-05-27
-flag_by: Alice
-flag_for: [Ben, Cara]
+flag_by: Operator-A
+flag_for: [Operator-B, Operator-C]
 flag_note: "Approve or amend the funder shortlist -- outreach proceeds in listed order on silence"
 flag_due: 2026-06-03
 flag_default: outreach proceeds in the listed order
@@ -280,7 +283,7 @@ If the text of a note was written by an AI agent, tag it as `ai-generated`. This
 ```yaml
 tags:
   - ai-generated
-generating_agent: Alice / Claude
+generating_agent: Operator-A / Claude
 ```
 
 `ai-generated` is a **tag**, not a content type - the note's `type:` should reflect what the content actually *is* (resource, document, companion, etc.), not who made it. This replaces the retired `AI-written` content type (D42).
@@ -295,7 +298,7 @@ generating_agent: Alice / Claude
 - Raw transcripts - these are recordings of human speech, not AI-generated text
 - Web clippings - the original author is human, AI just captured the content
 
-**The `generating_agent` field is optional but recommended.** Use the format `Operator / Agent` (e.g. `Ben Miller / Gemini`, `Alice / Claude`). If the agent is unknown (e.g. an imported doc where you know AI wrote it but not which model), just use the `ai-generated` tag without `generating_agent`.
+**The `generating_agent` field is optional but recommended.** Use the format `Operator / Agent` (e.g. `Operator-B / Gemini`, `Operator-A / Claude`). If the agent is unknown (e.g. an imported doc where you know AI wrote it but not which model), just use the `ai-generated` tag without `generating_agent`.
 
 ### Date Format
 
@@ -308,7 +311,7 @@ A cumulative YAML list tracking every session that modified a file. The last ent
 ```yaml
 edit_log:
   - "DW-S70 2026-05-23"
-  - "Alice 2026-05-24"
+  - "Operator-A 2026-05-24"
   - "WV-S45 2026-05-25"
 ```
 

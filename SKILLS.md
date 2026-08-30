@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-08-26'
+updated: '2026-08-30'
 edit_log:
   - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
     for pending-report model (D114)
@@ -22,6 +22,8 @@ edit_log:
   - "DW-S283 2026-08-24 - project-reconsolidation row -> v1.5 (Before You Start checklist: informal What's-next lists + FR/intake folder status-vs-shipped)"
   - "DW-S291 2026-08-26 - project-reconsolidation row -> v1.6 (Detect Now, Repair Later: cheap-disposition-bias guard)"
   - "DW-S289 2026-08-26 - session-closer row -> v4.6.3 (Step 4 Tool inventory bullet)"
+  - "DW-S306 2026-08-30 - supervised-build row added (v1.0, new skill: Pattern 4 codified)"
+  - "DW-S306 2026-08-30 - session-closer row -> v4.6.4 (row had missed the S303 bump)"
 ---
 
 # DataWizard Skills
@@ -35,15 +37,16 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | Skill | Type | Description |
 |---|---|---|
 | **project-guidelines** (v1.4) | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. Handles existing filename conventions gracefully. Includes `last_content_interests_review:` in new 0.0 templates. |
-| **session-closer** (v4.6.3) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. |
+| **session-closer** (v4.6.4) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. |
 | **side-quest** (v1.0) | Technique | Tracking a tangent from the project's current arc as a parallel stream in the session log. Routes a side quest's continuation into "Active quest threads" and protects the main arc's "What's next" from being overwritten, so parallel streams don't collide under concurrency. Triggers on: "let's go on a side quest," "continue the [X] side quest." |
+| **supervised-build** (v1.0) | Technique | Running a multi-chunk build under a per-chunk review relay with a reviewer instance (Coordination Patterns, Pattern 4). Loads in either seat: the build session gets the review gate as a hard precondition (no chunk written without a `status: reviewed` note - skipping is an on-record choice), the reviewer gets on-disk verification, run-don't-read script testing, and the mandated five-field State Board write so a cold instance can answer "where are we at" from the driver doc alone. |
 | **research-tracking** | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |
 | **tools-research** | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Batch mode includes harvest pre-filtering and two-speed processing. References research-tracking. |
 | **design-harvest** | Technique | Turning research findings into design doc updates, skill refinements, roadmap additions, and guideline improvements. The interpretive bridge between research (facts) and living docs (architecture). Includes target-section overlap check before planting. Completes the research lifecycle: tools-research (evaluate) -> research-tracking (track) -> design-harvest (integrate). |
 | **insight-capture** (v1.0) | Technique | Capture and plant insights from loaded context mid-session. When rich context is loaded after deep work, side quests, or design discussions, synthesizes patterns, plants them in the right permanent homes (design docs, build plans, action items, skills, protocol, MOC, decision log), and cross-references for discoverability. Includes a protocol nudge for instances to offer at the right moment. Triggers on: "capture insights," "insight capture," "let's capture," "capture," "squeeze the juice." |
 | **garden-synthesis** (v1.0) | Technique | Synthesizing a cluster of related seeds and seedpods into a coherent project concept -- a garden (taxonomy `type: garden`). Reads the seeds, synthesizes vision/model/offerings, researches allies across operator-configured knowledge layers, captures strategic insights (via insight-capture), and tags constituent seeds so membership is queryable vault-wide, with optional planter script and companion Base. Source locations resolve from `Vault Config.md`'s `## Garden Sources` block (git-ignored, per-operator), never hardcoded in a tracked Seed file. Triggers on: 'build a garden', 'synthesize a garden', 're-synthesize the [X] garden'. |
 | **meta-learning-review** (v1.5.2) | Technique | Review accumulated session learnings and plant them into skills, design docs, and protocol. Complements design-harvest: design-harvest plants external research findings, meta-learning-review plants operational learnings from session history. Triggered on the session-closer threshold nudge or on demand. |
-| **meta-learning-scan** (v1.4.0) | Technique | Automated scan of session log Learnings sections that produces a structured report for human review. Generates the report; meta-learning-review handles the planting. Use for scheduled meta-learning tasks or on demand before a review. |
+| **meta-learning-scan** (v1.4.1) | Technique | Automated scan of session log Learnings sections that produces a structured report for human review. Generates the report; meta-learning-review handles the planting. Use for scheduled meta-learning tasks or on demand before a review. |
 | **content-interests-review** (v1.4) | Technique | Reviewing and updating a project's Content Interests section in its 0.0 Project Guidelines. Detects drift between what the 0.0 says and what the project is actually doing. Includes outsider readability and consolidation passes to ensure routing-agent-friendly output. Handles shell+sections session logs for mature projects, quest-aware for trajectory signals, and young-project guidance for speculative interests. Feeds the dynamic Vault Project Map. |
 | **transcript-harvest** | Technique (stub) | Harvesting content from transcripts (video, podcast, meeting, voice memo) into project documents. |
 | **document-harvest** | Technique (stub) | Harvesting content from articles, clippings, and web content into project documents. |

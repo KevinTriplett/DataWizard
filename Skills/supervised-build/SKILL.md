@@ -11,7 +11,7 @@ description: >-
   before a single build (Pattern 3), a build with no reviewer available, or
   incidental concurrency between unrelated sessions.
 type: skill
-version: '1.0'
+version: '1.1'
 created: '2026-08-30'
 updated: '2026-08-30'
 operator: Andrew
@@ -19,6 +19,7 @@ edit_log:
   - "DW-S306 2026-08-30 - v1.0: codified from Coordination Patterns Pattern 4
     after four field runs; owns the reviewer's mandated State Board write
     (five fields) and the build-side review gate"
+  - "DW-S303 2026-08-30 - v1.1: real-file probe rule added to Reviewer verification (probe a copy of the hottest real file, not only fixtures; field-grounded)"
 ---
 
 # Supervised Build Skill
@@ -69,6 +70,8 @@ Per chunk:
 **Cheap fixes are yours.** Patch small, well-specified defects yourself in files you already have loaded; anything that requires the builder to re-read or rewrite a body goes into the review note as instructions. And check the builder's status before filing: a supervision note filed after the supervised session closed has no reader - land small fixes yourself and put the state on the board.
 
 **End with a whole-build sweep.** After the last chunk, a supervisor-tier pass over every artifact the build touched, ideally from a fresh instance. Unreviewed is where the defects live.
+
+**Probe the real thing, not only fixtures.** When verifying a shipped tool or script, include at least one probe against a copy of the hottest real production file it will touch (copied to scratch, never the original). Synthetic fixtures only exercise the failure modes their author imagined; the real file carries shapes nobody imagined - including pre-existing damage the tool must survive. Field grounding: a real-file probe during verification surfaced that the two hottest project files had silently unparseable frontmatter from an earlier manual write - a defect no fixture modeled, caught only because the probe target was real (2026-08).
 
 ## The State Board Write (mandated, reviewer-owned)
 

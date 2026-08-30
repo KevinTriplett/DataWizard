@@ -58,6 +58,7 @@ edit_log:
     S247-S255)"
   - "DW-S289 2026-08-26 - v4.6.3: Step 4 gains the Tool inventory bullet (designed / built / live rows in the project's 0.6 Registry; a designed-but-unbuilt tool is inventoried too) - the structural fix for a tool being re-designed in a collaborator project because the existing one was not on any reader's path"
   - "DW-S303 2026-08-30 - v4.6.4: Step 3.8 array-safe stamping - the update_frontmatter-for-efficiency line replaced with the append rule (bare array = wipe; append at the array tail, not the last item line; re-read-and-verify fallback)"
+  - "DW-S309 2026-08-30 - placeholder sweep: Alice/Ben/Cara -> Operator-A/B/C in examples (cosmetic, no version bump; S289 rule; meta-learning review S288-S300)"
 ---
 
 # Session Closer Skill
@@ -344,7 +345,7 @@ were encountered this session.
 - The session log section file (always)
 - Any content documents created or substantially updated this session
 
-Use the human operator's first name (e.g. `Alice`, `Ben`, `Cara`). This field powers the "Recent Team Activity" section of the team dashboard and makes authorship queryable via Bases/Dataview.
+Use the human operator's first name (e.g. `Operator-A`, `Operator-B`, `Operator-C`). This field powers the "Recent Team Activity" section of the team dashboard and makes authorship queryable via Bases/Dataview.
 
 **Team flag prompt (multi-operator projects only).** If the project has more than one operator, present the user with a list of files created or substantially updated this session. Pre-select:
 - Any file created this session with `priority: high`
@@ -358,7 +359,7 @@ Use the human operator's first name (e.g. `Alice`, `Ben`, `Cara`). This field po
 For each file the user selects:
 1. Add `flag: YYYY-MM-DD` (today's date) to its frontmatter
 2. Add `flag_by: FirstName` (the operator's first name)
-3. Add `flag_for:` as a YAML list of the operators who need to see it (e.g. if Alice flags it: `flag_for: [Ben, Cara]`) -- narrow it to the people it is actually relevant to
+3. Add `flag_for:` as a YAML list of the operators who need to see it (e.g. if Operator-A flags it: `flag_for: [Operator-B, Operator-C]`) -- narrow it to the people it is actually relevant to
 4. Set `flag_note:` to a one-line statement of **the decision needed and what is blocked until it is made** (the content requirement -- [[YAML Schema]] Team Coordination Fields; "please review the tiers" fails, "approve or amend the tiers -- outreach proceeds in listed order on silence" passes). Fold a long note per the same guidance so it cannot break frontmatter parsing
 5. Optionally set `flag_due:` (date a response is needed by) and `flag_default:` (what happens on silence after the due date). Ask for these on anything time-sensitive -- they are what let the expiry pass (Step 3.13) turn silence into a decision
 
