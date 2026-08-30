@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-26'
-version: '4.6.3'
+updated: '2026-08-30'
+version: '4.6.4'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -57,6 +57,7 @@ edit_log:
     before carrying, strike on resolution (S248; meta-learning review
     S247-S255)"
   - "DW-S289 2026-08-26 - v4.6.3: Step 4 gains the Tool inventory bullet (designed / built / live rows in the project's 0.6 Registry; a designed-but-unbuilt tool is inventoried too) - the structural fix for a tool being re-designed in a collaborator project because the existing one was not on any reader's path"
+  - "DW-S303 2026-08-30 - v4.6.4: Step 3.8 array-safe stamping - the update_frontmatter-for-efficiency line replaced with the append rule (bare array = wipe; append at the array tail, not the last item line; re-read-and-verify fallback)"
 ---
 
 # Session Closer Skill
@@ -290,7 +291,7 @@ For each file modified this session (from the "Files updated" and "Files created
 3. Append this session's identifier to `edit_log:` (solo-operator: `"DW-S70 2026-05-23"`; multi-operator: `"WV_2026-06-10_AA_01"` -- date is embedded in the ID). Deduplicate -- if the session already appears, don't add it again.
 4. For shell files whose sections were edited: bump the shell's `updated` field (but no `edit_log` on shells)
 
-Use `update_frontmatter` for efficiency -- it merges without requiring a full re-read.
+Scalars (`updated`, `status`) may go through `update_frontmatter` alone. For `edit_log:` and any other array, never pass a bare array -- `merge: true` merges top-level keys only, so a passed array replaces the existing one wholesale (silent history wipe; see the MCP Reliability guide, "Array wipe via merge: true"). Append instead: the array-append primitive (`stamp_editlog.py` once shipped, or a raw-tail insert placed after the *last line of the array* -- the line before the next top-level key, not the last `- ` line, since long entries wrap onto continuation lines); where neither is available, re-read the full array immediately before the write and pass it back verbatim with the new entry appended, then verify the entry count did not shrink.
 
 **Scope:** `edit_log` is required on section files, recommended on infrastructure files (0.x) and standalone docs. Shell files are exempt -- they are assembly surfaces whose edit history is captured by their sections' logs. See the [[YAML Schema]] edit_log section for the full convention.
 
