@@ -62,6 +62,8 @@ edit_log:
   - "DW-S309 2026-08-30: Optimistic-claim pattern gains the not-one-shot rider
     (re-check the token before any later write to the claimed resource;
     meta-learning review S267-S287)"
+  - "DW-S312 2026-08-30: Cadence entry repointed to the Review Automation
+    guide cadence table (D114 sweep; S312 Seed review)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -453,9 +455,9 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 
 ## Cadence
 
-**Rule:** periodic-review cadence numbers (health audit, meta-learning review, content-interest refresh) live in **exactly one place: the session-closer's thresholds table**. Every other doc describes the nudge without quoting a number. To change a cadence, edit that table; don't restate the value here. (D88)
+**Rule:** periodic-review cadence numbers (health audit, meta-learning review, content-interest refresh, backlog + FR triage) live in **exactly one place: the Review Automation guide's cadence table** (`Seed/Guides/Review Automation.md`). Every other doc describes the nudge without quoting a number. To change a cadence, edit that table; don't restate the value here. (D114, relocating D88)
 
-**Example:** "Run a health audit roughly every cadence interval" - the session-closer thresholds table holds the current number.
+**Example:** "Run a health audit roughly every cadence interval" - the Review Automation cadence table holds the current number.
 
 ---
 

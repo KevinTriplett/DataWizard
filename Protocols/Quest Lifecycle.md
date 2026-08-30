@@ -2,8 +2,7 @@
 title: Quest Lifecycle
 type: protocol
 created: '2026-05-29'
-updated: '2026-08-18'
-datawizard_protocol_version: '1.7'
+updated: '2026-08-30'
 maturity: draft
 edit_log:
   - 2026-08-04 - added overtaken and needs-review statuses (8-status lifecycle,
@@ -11,6 +10,8 @@ edit_log:
   - 2026-08-18 - added Task IDs (scan-max + verify-after-mint, counters retired,
     scoped definition rule, dedup taxonomy) and Assignment Conventions sections
     (D119)
+  - 2026-08-30 - dropped the retired datawizard_protocol_version pin (D93;
+    S312 Seed review)
 ---
 
 # Quest Lifecycle

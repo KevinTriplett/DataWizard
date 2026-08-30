@@ -6,7 +6,7 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-08-08'
+updated: '2026-08-30'
 version: '0.9'
 edit_log:
   - DW-S158 2026-06-08
@@ -19,11 +19,13 @@ edit_log:
   - "DW-S232 2026-08-04: added companion-vs-harvest default-granularity pointer
     (D112)"
   - "DW-S262 2026-08-08: added Harvest via embeddable synth note pointer (D116)"
+  - "DW-S312 2026-08-30: stale STUB status label corrected to Active (the full
+    workflow has long shipped; S312 Seed review)"
 ---
 
 # Transcript Harvest Skill
 
-**Status:** STUB — full workflow to be written. For now, follow this sequence.
+**Status:** Active
 
 ## Overview
 

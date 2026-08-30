@@ -4,11 +4,11 @@ description: >-
   Judgment-half audit of a DW project: consumes the dw_lint report for machine
   findings, then checks infrastructure completeness, MOC freshness, shell
   narrative order, and routes findings. Triggers on: 'DW review', 'audit this
-  project', 'check project health', or via session-closer periodic thresholds.
+  project', 'check project health', or when the review-automation cadence flags an audit due.
 type: skill
 version: '2.1'
 created: '2026-05-23'
-updated: '2026-08-24'
+updated: '2026-08-30'
 operator: Andrew
 edit_log:
   - "DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
@@ -19,6 +19,8 @@ edit_log:
   - "DW-S285 2026-08-24 - v2.1: J7 pointers-carry-no-status + cadence note (the
     check only protects if the audit runs); Manual Fallback 7 frontmatter-parses
     (C10 equivalent)"
+  - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: session-closer thresholds
+    references repointed to the Review Automation guide (S312 Seed review)"
 ---
 
 # Project Health Audit Skill
@@ -34,7 +36,7 @@ If the vault has no lint tooling (adopter without Python), use the Manual Fallba
 
 ## When to Use
 
-- When the session-closer's periodic thresholds prompt for an audit (cadence lives in the session-closer thresholds table — the single home per D88; this skill quotes no numbers)
+- When the scheduled review automation flags an audit as due (cadence lives in the Review Automation guide's cadence table — the single home per D114; this skill quotes no numbers)
 - When the user requests `DW review` or "audit this project"
 - After a major restructure, migration, or Seed version bump
 - When onboarding a new project to DW conventions
@@ -64,7 +66,7 @@ Ask the user which scope they want before starting. Tiers now govern judgment de
 | **Full** | J1-J6 | After major restructures or migrations |
 | **Incremental** | J3, J4 on files changed since last audit | Between full audits when drift is suspected |
 
-For audits triggered by session-closer thresholds, default to **Standard**.
+For audits triggered by the review-automation cadence, default to **Standard**.
 
 ## Judgment Checks
 
@@ -119,7 +121,7 @@ Scan the 0.0's Key Pointers section (and any ledger `home:` lines) for status wo
 
 ## How to Run
 
-1. **Scope** — ask the user (default Standard for threshold-triggered audits). For Incremental, use `last_health_audit:` in 0.0 frontmatter as the cutoff.
+1. **Scope** — ask the user (default Standard for cadence-triggered audits). For Incremental, use `last_health_audit:` in 0.0 frontmatter as the cutoff.
 2. **Step 0** — get the lint report (above).
 3. **Boundaries** — read 0.0 for folder structure. Skip `xArchive - ProjectName/` folders (D87 naming) unless explicitly directed.
 4. **Judgment checks** for the chosen tier. Use `get_frontmatter` / `list_directory` over full reads wherever possible.
@@ -181,6 +183,6 @@ For vaults without Python tooling, hand-run the old mechanical categories, conde
 
 - **dw_lint.py** (`Workshop - <Project>/Scripts/`) — the machine half; nightly scheduled task writes daily reports
 - **dw_moc.py** — MOC generator (D92); J2 checks its freshness
-- **session-closer thresholds table** — the single home for audit cadence (D88)
+- **Review Automation guide cadence table** — the single home for audit cadence (D114)
 - **Health Audit Log** (`0.8 Health Audit Log - ProjectName.md`) — cumulative trend record
 - **Decisions:** D84 (0.x tiers), D87 (xArchive), D88 (cadence home), D92 (generated MOC), D93 (version pins retired)

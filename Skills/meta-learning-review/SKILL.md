@@ -4,11 +4,11 @@ description: >-
   Use to review accumulated session learnings and plant them into skills, design
   docs, and protocol. Triggers on: 'review learnings', 'meta-learning review',
   'what have we learned recently', 'plant learnings', or when a meta-learning
-  report is ready for review. Also triggered by the session-closer's periodic
-  threshold nudge when a review is due.
+  report is ready for review. Also triggered when the scheduled review
+  automation has left a pending report.
 type: skill
-updated: '2026-08-24'
-version: '1.5.2'
+updated: 2026-08-30
+version: '1.5.3'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -35,6 +35,11 @@ edit_log:
   - "DW-S285 2026-08-24 - v1.5.2: Step 3 pattern-families name-it disposition
     (3+ instances -> one standing statement; pairs with meta-learning-scan
     v1.4.0)"
+  - "DW-S309 2026-08-30 - v1.5.3: Step 3 name-it disposition - pointer-entry
+    rule for families whose instances already have canonical homes (three
+    families named this way in the S267-S300 reviews)"
+  - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: threshold-nudge trigger
+    language replaced with the scheduled review-status check (S312 Seed review)"
 ---
 
 # Meta-Learning Review Skill
@@ -50,7 +55,7 @@ This is the interpretive complement to design-harvest. Design-harvest plants res
 ## When to Use
 
 - When a meta-learning report has been generated (by scheduled task or manually) and is ready for review
-- When the session-closer's periodic threshold nudge fires (a review is due)
+- When the scheduled review-status check has flagged a review as due (a pending report is waiting)
 - When the user says "review learnings," "what have we learned recently," or "plant learnings"
 - On demand, when the user wants to review recent session learnings without a pre-generated report
 
@@ -112,7 +117,7 @@ For each verified learning, assign a disposition:
 - **Superseded.** Distinct from already-done: the learning was never planted, but the need behind it evaporated or a later decision replaced it (a platform workaround made moot by an official-API route; a connector gap closed by an in-script adapter; a tool limitation removed by a tool update). Record what superseded it so the trail is traceable. Expect this class to grow with report age.
 - **Not planted (declined).** The learning is accurate but should not be planted as phrased - too minor for a guide, a one-off, or guidance that would route around a platform restriction. Record the reason in the review outcome; a silent drop looks like an oversight to the next reviewer.
 
-**Pattern families get a name-it disposition.** A report's Pattern Families section (meta-learning-scan v1.4.0+; for older reports, look for the same shape inside the cross-cutting observations) lists practices the project keeps rediscovering under different themes. A family with **three or more instances** is a **name-it** candidate: the plant is one standing statement of the practice - a Working Principles block, a Conventions Registry entry, a new guide, or a skill step - with the instances as its evidence, not N separate one-liners. Fewer than three: leave the family named in the Review Outcome so the next report can count against it. Naming is a design call (it usually implies a decision-log entry), so a name-it candidate is presented in Step 3.5 as its own item, and a family too large for a block (several sources, an open FR) goes to a dedicated session via an action item rather than being squeezed into the review. (Two families - multi-instance coordination, six instances; review-budget economy, four - surfaced this way; DataWizard, 2026-08.)
+**Pattern families get a name-it disposition.** A report's Pattern Families section (meta-learning-scan v1.4.0+; for older reports, look for the same shape inside the cross-cutting observations) lists practices the project keeps rediscovering under different themes. A family with **three or more instances** is a **name-it** candidate: the plant is one standing statement of the practice - a Working Principles block, a Conventions Registry entry, a new guide, or a skill step - with the instances as its evidence, not N separate one-liners. Fewer than three: leave the family named in the Review Outcome so the next report can count against it. Naming is a design call (it usually implies a decision-log entry), so a name-it candidate is presented in Step 3.5 as its own item, and a family too large for a block (several sources, an open FR) goes to a dedicated session via an action item rather than being squeezed into the review. When a family's instances already have canonical homes, the standing statement is a **pointer entry** over those homes, never a restatement - it satisfies the naming threshold without violating link-don't-restate, leaves nothing new to drift, and needs no decision-log entry (a wisdom-doc statement, not a convention change; three families named this way in one session - DataWizard, 2026-08). (Two families - multi-instance coordination, six instances; review-budget economy, four - surfaced this way; DataWizard, 2026-08.)
 
 **Cross-cutting observations get dispositions too.** The report's closing observations are not decoration - they are often the highest-value items in the batch (a "learnings of this class have no home" observation is what produces a new guide or a new triage bucket). Walk each one and assign it a disposition exactly like a learning.
 

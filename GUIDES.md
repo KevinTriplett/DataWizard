@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: 2026-08-26
+updated: 2026-08-30
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -22,6 +22,8 @@ edit_log:
   - DW-S280 2026-08-20 - extended the Git Hook and CI Behaviors row with the
     self-updating-script and working-tree-compare behaviors
   - "DW-S287 2026-08-26 - added the Process and coordination sub-table with the Multi-Instance Coordination Patterns guide"
+  - "DW-S312 2026-08-30 - Human Onboarding Doc Template archived (D62: START
+    HERE files retired) and dropped from the catalog; S312 Seed review"
 ---
 # DataWizard Guides
 
@@ -73,7 +75,6 @@ These learnings rot faster than any other kind because they have no design-doc h
 ### Onboarding and integrations
 | Guide | Covers |
 |---|---|
-| **Human Onboarding Doc Template** | Template for generating a per-project human onboarding guide. |
 | **Telegram Harvesting** | Harvesting Telegram exports into the vault; credentials stay outside git-tracked folders. |
 
 ### Maintainer notes

@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-08-26'
+updated: '2026-08-30'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -55,6 +55,7 @@ edit_log:
     unparseable YAML, unquoted colon (S285 live) (meta-learning review
     S256-S266)"
   - "DW-S286 2026-08-26 - Bulk Frontmatter Backfills section (insert never round-trip; invariant in the write path)"
+  - "DW-S311 2026-08-30 - Concurrency Practices: mtime CAS float-vs-int false-trip on the FUSE mount; prefer content guards"
 ---
 # MCP Reliability and Write Verification
 
@@ -215,6 +216,8 @@ When multiple instances are running on the same project:
 - *Sequential near-collisions* (you can see the other thread's stub): take the next number above the highest existing entry *and* above any `in-progress` stub another instance has claimed -- even if that leaves a gap. A burned number is harmless; reusing one, or back-filling a gap below a live higher-numbered session, invites cross-references that point at the wrong session. (Observed S195: S192 complete, S193 burned, an in-progress S194 side quest live -- the main-arc thread claimed S195.)
 
 Pair both with **deferring the shell embed to session close** -- only the closer touches the 0.2 shell, once -- which removes the second collision surface. Grounding: the S196/S197 simultaneous collision was caught only because post-write verification re-read the stub. Full design: [[Session Claiming Under Concurrency]]. (DW S195, S197)
+
+**mtime guards on the vault mount carry sub-second precision.** A compare-and-swap guard that snapshots a file's mtime and later asserts equality must compare like with like: shell `stat` prints integer seconds while a scripting runtime may return a float with a fractional part, so an integer-vs-float equality check false-trips and reads as a phantom concurrent write. Compare truncated integer values - or better, guard on content: assert the edit anchors are still unique and the session's own stamp is not already present, which also makes a retry idempotent. (DataWizard, 2026-08)
 
 **Content files can conflict if two instances harvest to the same destination.** If you know another instance is running and may be editing the same synth doc sections, coordinate via the user or avoid overlapping destinations.
 

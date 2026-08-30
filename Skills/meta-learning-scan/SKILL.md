@@ -3,8 +3,8 @@ name: meta-learning-scan
 description: >-
   Automated scan of session log Learnings sections that produces a structured
   report for human review. Use when setting up a scheduled meta-learning task,
-  when the user says 'scan learnings' or 'generate a learning report', when the
-  session-closer nudge fires for meta-learning review, or any time accumulated
+  when the user says 'scan learnings' or 'generate a learning report', when a
+  meta-learning review is due, or any time accumulated
   session learnings need to be extracted and organized before planting. This
   skill generates the report; the meta-learning-review skill handles the actual
   planting. Also use when the user wants to set up automated learning extraction
@@ -26,6 +26,8 @@ edit_log:
   - "DW-S309 2026-08-30 - v1.4.1: Step 5 - the report names its own scan window
     only; never enumerate the pending stack or prescribe the stamp target
     (S288-S300 report shipped a stale five-report stack narrative)"
+  - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: session-closer-nudge
+    trigger language replaced; stray cadence number dropped (S312 Seed review)"
 ---
 
 # Meta-Learning Scan
@@ -39,7 +41,7 @@ The scan is designed to run as a Cowork scheduled task without user interaction,
 ## When to Use
 
 - As a scheduled task running on a weekly or biweekly cadence
-- Manually, when the session-closer nudge fires (30+ sessions since last review)
+- Manually, when the scheduled review-status check has flagged a review as due
 - When the user says "scan learnings," "generate a meta-learning report," or "what have we learned recently"
 
 ### When NOT to Use
