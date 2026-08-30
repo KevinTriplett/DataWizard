@@ -5,12 +5,13 @@ edit_log:
     second-model plan review, supervised-build, and Session Exchange patterns
     from six uses; canonical home for the exchange-note handshake convention)
   - "DW-S289 2026-08-26 - third reviewer habit: flip the status on the doc the author will open (review delivered = reviewed doc says so; superseded_by for versions)"
+  - "DW-S302 2026-08-30 - Pattern 4: the reviewer writes arc state for a cold reader (mandated State Board write - status / verified / next gate / turn / blocking)"
 maturity: working
 operator: Andrew
 seed_version: 1.3.1
 title: Multi-Instance Coordination Patterns
 type: guide
-updated: 2026-08-26
+updated: 2026-08-30
 ---
 # Multi-Instance Coordination Patterns
 
@@ -102,6 +103,8 @@ Three consecutive load-bearing builds each had real defects pre-empted this way 
 5. Fixes land; reviewer re-verifies; next chunk.
 
 **The gate is on the build side, not in the human's memory.** In a declared supervised build, "a review note with `status: reviewed` for chunk N exists in the exchange folder" is a **hard precondition** to writing chunk N. Before writing, the build session lists the folder and looks for that note. If it is absent, it **pauses and asks**: "Chunk N has no review note yet - relay it, or tell me to proceed unsupervised." The human may always answer "proceed unsupervised on chunk N" - the point is that skipping review becomes a **conscious choice on the record**, never a silent omission. This moves the gate from a diligence-dependent relay to the actor's own precondition check, the same move as putting the flag sweep at orientation: enforce the reader's path at a guaranteed choke point (Conventions Registry, "The reader-path principle").
+
+**The reviewer writes arc state for a cold reader.** A long-lived reviewer thread is a viewport, not a store: its context compacts or ends, and "where are we at on this arc" must not leave with it. At the end of every review it delivers, the reviewer updates the arc's State Board (the driver doc's canonical step state) with a fixed block: status, the last session it verified on disk, the next gate, whose turn it is (human / reviewer / builder / other project / named person), and the one blocking question. The test: a fresh instance can answer "where are we at" from the board alone, without the exchange folder or the reviewer's chat. The exchange note stays the message to the other instance; the board is where the state lives. The field shape is owned by the consuming project's tracking-surface design until the supervised-build skill codifies it.
 
 **Recorded human decisions get their own note.** When the human makes a design decision mid-build (an approval gate's shape, a threshold), the reviewer records it as a numbered note so the build session reads the decision from the folder, not from a chat it was not in.
 

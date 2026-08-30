@@ -26,11 +26,12 @@ edit_log:
   - "LS-S73 2026-08-26 - Device Bridge: Control_Chrome page-read failure
     (get_page_content + execute_javascript) + claude-in-chrome alternative;
     device_bash background-process death"
+  - VC-S77 2026-08-30 Device Bridge: repo-to-Mac delivery recipe (cloud clone + tarball commit)
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-08-26
+updated: '2026-08-30'
 ---
 # Cowork Build Environment
 
@@ -92,6 +93,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **`device_bash` backgrounded processes do not survive the call.** Like the sandbox, a server started on the user's machine via `device_bash` with `&`, `nohup`, or even `setsid` is gone by the next `device_bash` call (same-shell `curl` 200, cross-shell 000 -- the call's process group is torn down on return). To exercise a device-side server, start it AND hit it within the SAME call; you cannot start it in one call and drive it from a separate browser/tool call. Test a device-hosted server this way, or (for a rendered-DOM check) stage the app into the sandbox and drive it with headless Playwright there. (Source: Location Scout, 2026-08)
 - **Cowork connects folders individually, by exact path.** Connecting a parent folder does not expose its siblings, and moving or renaming a connected folder on disk breaks its connection until it is re-added in the desktop app. If a session suddenly cannot see a folder it could see before, check whether the folder moved before debugging the tools. (Source: DataWizard, 2026-07)
 - **Workflow (multi-agent orchestration) tool: `args` arrived `undefined` once; subagents can reach the device bridge.** In one run the value passed as the Workflow's `args` input never reached the script (`args` was `undefined` inside it); inlining the data as constants in the script body is the reliable fallback, and a quick `log(JSON.stringify(args))` at the top of the script tells you which case you are in before any agent spends tokens. Separately, foreground Workflow subagents CAN reach the `remote-devices` bridge (vault reads, `device_bash`) by loading the tools via ToolSearch inside the subagent - the bridge is not restricted to the main loop. (Source: DataWizard, 2026-07)
+- **Deliver a git repo to the user's machine when `device_bash` has no network:** clone (shallow) in the cloud sandbox, `tar czf`, `SendUserFile` -> `device_commit_files` into the destination folder, then `tar xzf` with `device_bash` (the `.git` survives, so `git log`/`remote` work locally). ~12 MB tarballs land fine; park the tarball in a `_to_delete/` subfolder afterwards since the device shell cannot delete. (Source: VibeCut S77, 2026-08)
 - **Transport a multi-file edit script to the device without staging: base64 it.** A parse-guarded Python edit (frontmatter `edit_log` appends, section inserts across several vault files) runs cleanly device-side, but `device_bash` cannot see the sandbox's `/tmp`. Encode the script in the sandbox (`base64 -w0`) and decode it inside the `device_bash` command (`echo '<b64>' | base64 -d > script.py && python3 script.py <vault-path>`); an ~8KB script transports without issue, and the whole batch lands in one call with one verification pass. (Source: DataWizard, 2026-08)
 
 ## Verification Discipline for Builds
