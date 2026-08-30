@@ -35,6 +35,7 @@ finds an intended ID missing or duplicated.
 
 Behavioural spec: the block-stamper skill. Stdlib only; targets Python 3.8+.
 """
+# NOTE: these byte-faithful helpers are mirrored in stamp_editlog.py - keep the two in sync.
 import argparse
 import json
 import os

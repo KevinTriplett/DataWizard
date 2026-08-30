@@ -16,3 +16,6 @@ task-manager-config.md
 Scripts/.env
 Scripts/*.session
 Scripts/output/
+Scripts/t/
+Scripts/__pycache__/
+*.pyc

@@ -50,8 +50,10 @@ import datetime
 EOL_RE = re.compile(r"(\r\n|\r|\n)\Z")
 # A top-level frontmatter key: no leading whitespace, `name:` shape.
 TOPKEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*:")
-# A block array item line: two-space indent + "- ".
-ITEM_RE = re.compile(r"^\s+-\s")
+# A block array item line, at ANY indent (CR3: zero-indent items are legal YAML).
+# A wrapped continuation line that begins with "- " also matches here; harmless,
+# because before/after item counts stay consistent (S303 Round 2, small note).
+ITEM_RE = re.compile(r"^\s*-\s")
 FENCE_CLOSE_RE = re.compile(r"^---\s*\Z")
 
 
@@ -134,16 +136,18 @@ def needs_quote(v):
         return True
     if " #" in v:
         return True
+    if "\t" in v:  # tabs are illegal in YAML plain scalars (S303 Round 2)
+        return True
     return False
 
 
-def emit_item(value, eol):
+def emit_item(value, eol, indent="  "):
     if needs_quote(value):
         q = value.replace("\\", "\\\\").replace('"', '\\"')
         body = '"' + q + '"'
     else:
         body = value
-    return "  - " + body + eol
+    return indent + "- " + body + eol
 
 
 def unquote(v):
@@ -174,6 +178,7 @@ def existing_entries(lines, key_idx, close_idx):
         elif content.strip() == "":
             pass
         elif cur is not None:
+            # continuation (wrapped) line: join with a space, YAML-folded style
             cur = cur.rstrip() + " " + content.strip()
         i += 1
     if cur is not None:
@@ -184,7 +189,7 @@ def existing_entries(lines, key_idx, close_idx):
 def array_tail_index(lines, key_idx, close_idx):
     """F2: index of the last line belonging to the array (after which we
     insert), = last non-blank line before the next top-level key / close ---."""
-    last = key_idx
+    last = key_idx  # if the array is empty, tail is the key line itself
     i = key_idx + 1
     while i < close_idx:
         content = split_eol(lines[i])[0]
@@ -196,11 +201,55 @@ def array_tail_index(lines, key_idx, close_idx):
     return last
 
 
+def detect_item_indent(lines, key_idx, close_idx):
+    """CR3: the indent string of the first item line under the key, or None if
+    there are no items. New items are emitted at this indent so a zero-indent
+    (or any-indent) existing array never absorbs the new item as a continuation."""
+    i = key_idx + 1
+    while i < close_idx:
+        content = split_eol(lines[i])[0]
+        if TOPKEY_RE.match(content):
+            break
+        m = ITEM_RE.match(content)
+        if m:
+            return content[:len(m.group(0)) - 2]  # the indent before "- "
+        i += 1
+    return None
+
+
+def region_is_pure_array(lines, key_idx, close_idx):
+    """CR2 guard for an empty-remainder key: True only if every non-blank line in
+    the region is an item line or a deeper-indented continuation of one. A nested
+    mapping (or a comment) under an otherwise-empty key returns False, so the
+    caller refuses instead of appending an item that would corrupt the mapping."""
+    i = key_idx + 1
+    item_indent = None
+    while i < close_idx:
+        content = split_eol(lines[i])[0]
+        if TOPKEY_RE.match(content):
+            break
+        if content.strip() == "":
+            i += 1
+            continue
+        m = ITEM_RE.match(content)
+        if m:
+            item_indent = len(m.group(0)) - 2
+        else:
+            indent = len(content) - len(content.lstrip())
+            if item_indent is None or indent <= item_indent:
+                return False  # non-item line that is not a deeper continuation
+        i += 1
+    return True
+
+
 FLOW_RE = re.compile(r"^(?P<key>[A-Za-z_][\w-]*:)\s*\[(?P<body>.*)\]\s*\Z")
 
 
 def parse_flow(body):
-    """Split an inline YAML flow list body on top-level commas (quote-aware)."""
+    """Split an inline YAML flow list body on top-level commas. Simple-quote-aware
+    and bracket-depth-aware, NOT a full YAML parser: a YAML `\\"` escape inside a
+    double-quoted flow item is not handled (S303 Round 2 - acceptable, our items
+    do not contain escaped quotes)."""
     items, buf, depth, quote = [], "", 0, None
     for ch in body:
         if quote:
@@ -211,7 +260,7 @@ def parse_flow(body):
         if ch in "\"'":
             quote = ch
             buf += ch
-        elif ch in "\{{":
+        elif ch in "[{":
             depth += 1
             buf += ch
         elif ch in "]}":
@@ -242,6 +291,9 @@ def set_updated(lines, open_idx, close_idx, date):
     if idx is None:
         return False
     content, eol = split_eol(lines[idx])
+    # NB: rewrites the whole line, dropping any prior quoting style or trailing
+    # comment on updated: - fine, the reconciliation pass compares parsed dates
+    # (S303 Round 2, small note).
     lines[idx] = "updated: " + date + eol
     return True
 
@@ -259,11 +311,12 @@ def process_row(row, root, dry_run, create_key):
     eol = dominant_eol(lines)
     key_idx = find_key_line(lines, open_idx, close_idx, row.key)
 
+    # --- missing key -------------------------------------------------------
     if key_idx is None:
         if not create_key:
             row.status, row.outcome = "refused", "refused:key-absent (%s)" % row.key
             return
-        insert_at = close_idx
+        insert_at = close_idx  # before closing ---
         new = [row.key + ":" + eol, emit_item(row.entry, eol)]
         lines[insert_at:insert_at] = new
         status = "created+appended"
@@ -271,6 +324,7 @@ def process_row(row, root, dry_run, create_key):
         key_content = split_eol(lines[key_idx])[0]
         flow = FLOW_RE.match(key_content)
         if flow:
+            # --- flow style: normalize to block (F3) -----------------------
             items = parse_flow(flow.group("body"))
             if row.entry in items:
                 row.status, row.outcome = "duplicate-noop", "duplicate-noop (flow)"
@@ -282,15 +336,39 @@ def process_row(row, root, dry_run, create_key):
             lines[key_idx:key_idx + 1] = block
             status = "normalized+appended"
         else:
+            # --- CR1/CR2: refuse anything that is not a real array ----------
+            # The key line is "key:<remainder>". A non-empty remainder that
+            # FLOW_RE did not match means a scalar ("key: value"), a block
+            # scalar ("key: >-" / "key: |"), or a trailing comment. Appending an
+            # item line under any of those silently merges the entry into the
+            # existing value and --verify (which counts item-shaped lines with
+            # the same misreading parser) passes anyway. Only refusal at write
+            # time catches this class, so refuse. (S303 Round 2 CR1/CR2.)
+            remainder = key_content[len(row.key) + 1:].strip()
+            if remainder != "":
+                row.status, row.outcome = "refused", \
+                    "refused:not-an-array (scalar/block-scalar/comment after %s:)" % row.key
+                return
+            # Empty remainder: still refuse if the region holds a non-item line
+            # (a nested mapping under an otherwise-empty key).
+            if not region_is_pure_array(lines, key_idx, close_idx):
+                row.status, row.outcome = "refused", \
+                    "refused:not-an-array (non-item lines under %s:)" % row.key
+                return
+            # --- block style (possibly empty) ------------------------------
             existing = existing_entries(lines, key_idx, close_idx)
             if row.entry in existing:
                 row.status, row.outcome = "duplicate-noop", "duplicate-noop"
                 return
+            indent = detect_item_indent(lines, key_idx, close_idx)
+            if indent is None:
+                indent = "  "  # empty array: default to two-space items
             tail = array_tail_index(lines, key_idx, close_idx)
             insert_at = tail + 1
-            lines[insert_at:insert_at] = [emit_item(row.entry, eol)]
+            lines[insert_at:insert_at] = [emit_item(row.entry, eol, indent)]
             status = "appended"
 
+    # optional updated bump (F4)
     if row.updated:
         date = (datetime.date.today().isoformat()
                 if row.updated == "today" else row.updated)
