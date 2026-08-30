@@ -6,7 +6,7 @@ loading the array into a model context: a byte-faithful textual insert at the
 *tail of the array*, O(1) in the array's length. Sibling of stamp_blocks.py;
 shares its byte-faithful read/write helpers (keep the two in sync).
 
-Design: [[Frontmatter Array-Append Primitive - Design]] (RW-S70, Fable-reviewed
+Design: [[Frontmatter Array-Append Primitive - Design]] (RW-S73, Fable-reviewed
 DW-S303). This script is the executor twin of the append rule now in
 session-closer v4.6.4 Step 3.8.
 
