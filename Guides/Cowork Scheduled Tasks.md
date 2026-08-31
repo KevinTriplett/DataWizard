@@ -61,6 +61,8 @@ The Cowork cloud sandbox (where a scheduled task's fresh session runs) routes al
 
 Related: the sandbox is a Linux VM with the operator's folders mounted, not macOS itself, and a cloud-fired task cannot wake a sleeping machine. So a macOS-local scheduler (launchd + a `pmset` scheduled wake) cannot be set up from a Cowork session, and a cloud task cannot run "overnight while the laptop is closed." For unattended, machine-independent git automation -- especially overnight -- prefer **GitHub Actions cron** (native `GITHUB_TOKEN` write, no proxy, no machine). See the **Review Automation** guide for the worked example. (DW-S250)
 
+**Private-repo read scans from a scheduled cloud task: classic PAT, stored in the Claude Project.** For a daily scan that must READ a private repo owned by another user, a classic PAT (`repo` scope) is the workable credential - fine-grained PATs cannot be scoped to a repo under someone else's personal account, and a scoped read-only token is therefore unavailable; mitigate by binding the task's prompt to observe-only rules. Store the token in a project doc (e.g. `claude/<name>-token.md`) so the fresh scheduled session can fetch it via the Projects tool; have the prompt fail loudly (report, not silence) when the token is expired or the clone is refused. Read via `https://x-access-token:TOKEN@github.com/...` passed the git proxy interactively (Weave, 2026-08); confirm the first scheduled firing before trusting the cadence. (Source: Weave, 2026-08)
+
 ## See also
 
 - corpus-enrichment skill (`Workshop - DataWizard/Skills - DW Workshop/`) -- its Scheduled Task Setup section is the worked enrichment example

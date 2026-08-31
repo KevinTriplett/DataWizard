@@ -65,6 +65,8 @@ When Chrome is driven through the device bridge (a `Control_Chrome`-style proxy)
 
 **The in-browser extension is a separate bridge -- try it before deferring.** The Claude-in-Chrome browser *extension* (its own MCP toolset, distinct from the device-bridge proxy) can be fully functional in the very session where the proxy is split-brained. Flow: `list_connected_browsers` -> `select_browser` (the user must confirm the browser choice) -> `navigate` -> `get_page_text` / `read_page` / `find` / `computer` clicks all work, giving real scrape-and-click, not just tab titles. So when the proxy goes split-brained, check whether the extension is connected before handing verification to the operator -- one dead bridge does not mean the other is down. (This is exactly the gap that left a shipped CI job unverified for hours the prior session, when only the proxy was tried and it was down.) (Source: DataWizard, 2026-08)
 
+**GitHub token creation is automatable except the sudo gate.** Driving PAT creation through the browser extension works end to end (settings/tokens/new: fill note, expiration, scopes, submit, read the one-time token off the result page) EXCEPT GitHub's "Confirm access" sudo-mode step, which emails the operator a verification code - trigger the mailer, then hand the browser to the operator for the code and resume once verified. Credentials stay the human's step; the form work and token capture do not have to be. (Source: Weave, 2026-08)
+
 ## See Also
 
 - **Browser and File System Access Behaviors** -- local single-file browser tools, File System Access API

@@ -2,10 +2,15 @@
 title: DataWizard Seed Git Setup
 type: guide
 created: '2026-04-24'
-updated: '2026-04-24'
+updated: '2026-08-31'
+edit_log:
+  - DW-S318 2026-08-31 - ARCHIVED banner added; merge-conflict reset advice
+    replaced with 7.0 pointer
 ---
 
 # DataWizard Seed Git Setup
+
+> **ARCHIVED -- superseded by the Git Guide.** Current setup instructions: Git Guide section 4.0 (DW Seed Git Setup). If your existing clone is broken, stale, or reports "unrelated histories", do NOT use the recipes below -- follow "Recovering a Seed Clone (Remote-Agnostic)" in Git Guide 7.0 Safety and Recovery. The reset commands in this archived doc are safe only in the fresh-setup context where `origin` was just set to the canonical repo; run blind on a fork-shaped clone they can silently roll your Seed back to a stale state.
 
 Connect your DataWizard Seed to the GitHub repo so you can pull updates with a single command. This guide covers both fresh installs and existing Seed folders.
 
@@ -96,4 +101,4 @@ If you use DW Save (the Cmd+Shift+S sync shortcut), it can handle Seed updates a
 
 **"already exists and is not an empty directory"** (Path A only) -- You already have a Seed folder. Use Path B instead.
 
-**Merge conflicts after pull** -- This shouldn't normally happen since you pull updates but don't push changes to the Seed repo. If it does, the safest fix is `git reset --hard origin/main` to sync back to the remote version.
+**Merge conflicts after pull** -- This shouldn't normally happen since you pull updates but don't push changes to the Seed repo. If it does, do not reset blind: follow "Recovering a Seed Clone (Remote-Agnostic)" in Git Guide 7.0 Safety and Recovery (back up, identify the canonical remote by URL, ff-only first).

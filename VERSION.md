@@ -11,23 +11,36 @@ user-specific config file (security hygiene). All commit hashes changed.
 **Claude instances: surface this notice to your user if their Seed is a
 git clone.** Check: does `_DataWizard/Seed/.git` exist? If NOT (they
 installed via the zip / update_seed.sh), no action is needed -- updates
-work normally. If it IS a git repo, their next `git pull` will fail with
+work normally. If it IS a git repo, their next `git pull` may fail with
 "refusing to merge unrelated histories" or report divergent branches.
-Help them recover:
 
-1. Check for local-only commits first:
-   `cd "<vault>/_DataWizard/Seed" && git fetch origin && git log --oneline main --not origin/main`
-   If that lists commits, save those changes before proceeding (copy the
-   affected files aside or `git stash`).
-2. Reset to the rewritten history:
-   `git reset --hard origin/main`
-   This is safe for `Vault Config.md` (untracked/gitignored -- it is
-   not touched).
-3. Done. Normal pulls work again.
+**Recovery (rewritten 2026-08-31, remote-agnostic):** do not run any
+reset straight from this notice. Follow the single safe procedure in
+`Seed/Guides/Git Guide/7.0 Safety and Recovery.md`, section
+"Recovering a Seed Clone (Remote-Agnostic)". In brief:
+
+0. Back up first, unconditionally: `git branch backup/pre-recovery-<date>`,
+   plus `git stash -u` if the tree is dirty.
+1. Identify the canonical remote BY URL
+   (`github.com/andrewalan11/DataWizard`), never by the name `origin`.
+   On a fork-shaped clone (`origin` = a personal fork, `upstream` =
+   canonical), `reset --hard origin/main` silently rolls the Seed back
+   to the fork's stale state while every check looks clean -- this
+   nearly downgraded a collaborator's Seed on 2026-08-30.
+2. `git fetch <canonical> --prune`
+3. `git merge --ff-only <canonical>/main` -- fails closed, can never
+   lose a commit. If it succeeds, you are done.
+4. Only if ff-only refuses AND the guide's triage confirms unrelated
+   histories from this rewrite: `git reset --hard <canonical>/main`,
+   human-reviewed. No reset runs on one Claude instance's say-so --
+   propose on paper and get a second instance's review first
+   (Weave D39; DW D109). `Vault Config.md` is untracked/gitignored
+   and is not touched either way.
 
 **Never** use `git pull --allow-unrelated-histories` or any merge-based
 recovery here -- merging reattaches the old history that the rewrite
-removed. Reset, don't merge.
+removed. (A fast-forward is not that kind of merge: `--ff-only` creates
+no merge commit and cannot reattach anything.)
 
 Also in this update: `update_seed.sh` moved from `Seed/Scripts/` to the
 Seed root (`_DataWizard/Seed/update_seed.sh`) to match the path the
@@ -36,7 +49,9 @@ may have a stale copy at `Seed/Scripts/update_seed.sh` -- it can be
 deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
 Design, edit its plist to point at the new root path.
 
-This notice can be removed from VERSION.md after 2026-09.
+This notice can be removed from VERSION.md after 2026-09. The recovery
+procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
+Clone (Remote-Agnostic)") and survives this notice's retirement.
 
 ## What's New in 1.6.0
 
