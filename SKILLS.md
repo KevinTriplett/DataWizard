@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-08-30'
+updated: '2026-08-31'
 edit_log:
   - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
     for pending-report model (D114)
@@ -18,20 +18,34 @@ edit_log:
     project-reconsolidation row -> v1.4
   - DW-S285 2026-08-24 - meta-learning-review row -> v1.5.2; meta-learning-scan
     row -> v1.4.0 (pattern families)
-  - "DW-S285 2026-08-24 - project-health-audit row -> v2.1 (J7 pointer status, Manual Fallback 7 frontmatter parses)"
-  - "DW-S283 2026-08-24 - project-reconsolidation row -> v1.5 (Before You Start checklist: informal What's-next lists + FR/intake folder status-vs-shipped)"
-  - "DW-S291 2026-08-26 - project-reconsolidation row -> v1.6 (Detect Now, Repair Later: cheap-disposition-bias guard)"
-  - "DW-S289 2026-08-26 - session-closer row -> v4.6.3 (Step 4 Tool inventory bullet)"
-  - "DW-S306 2026-08-30 - supervised-build row added (v1.0, new skill: Pattern 4 codified)"
-  - "DW-S306 2026-08-30 - session-closer row -> v4.6.4 (row had missed the S303 bump)"
+  - DW-S285 2026-08-24 - project-health-audit row -> v2.1 (J7 pointer status,
+    Manual Fallback 7 frontmatter parses)
+  - "DW-S283 2026-08-24 - project-reconsolidation row -> v1.5 (Before You Start
+    checklist: informal What's-next lists + FR/intake folder status-vs-shipped)"
+  - "DW-S291 2026-08-26 - project-reconsolidation row -> v1.6 (Detect Now,
+    Repair Later: cheap-disposition-bias guard)"
+  - DW-S289 2026-08-26 - session-closer row -> v4.6.3 (Step 4 Tool inventory
+    bullet)
+  - "DW-S306 2026-08-30 - supervised-build row added (v1.0, new skill: Pattern 4
+    codified)"
+  - DW-S306 2026-08-30 - session-closer row -> v4.6.4 (row had missed the S303
+    bump)
   - "DW-S312 2026-08-30 - S312 Seed review catalog sync: 5 stale version rows
     corrected (block-stamper v2.0, project-guidelines v1.5, garden-synthesis
     v1.1, content-interests-review v1.4.2, supervised-build v1.1); stub labels
     dropped from transcript-harvest + document-harvest rows; corpus-enrichment
     added to the Workshop table; two D114 trigger-language fixes"
-  - "DW-S309 2026-08-30 - meta-learning-scan row -> v1.4.1, meta-learning-review row -> v1.5.3 (synced same-session as the bumps)"
-  - "DW-S311 2026-08-30 - project-reconsolidation row -> v1.7 (eight-lens batch: five-class surface checklist, gated-skill-drafts extension, name-match-supersession + instance-vs-Seed fate-split guards, phase-agnostic cheap-disposition guard); row taxonomy synced to include 'partitioned' (missed at v1.4)"
-  - "DW-S308 2026-08-31 - session-closer row -> v4.7.0 (Step 4 Operator Gate Queue feeding bullet, D126); row description gains the gate-queue clause"
+  - DW-S309 2026-08-30 - meta-learning-scan row -> v1.4.1, meta-learning-review
+    row -> v1.5.3 (synced same-session as the bumps)
+  - "DW-S311 2026-08-30 - project-reconsolidation row -> v1.7 (eight-lens batch:
+    five-class surface checklist, gated-skill-drafts extension,
+    name-match-supersession + instance-vs-Seed fate-split guards, phase-agnostic
+    cheap-disposition guard); row taxonomy synced to include 'partitioned'
+    (missed at v1.4)"
+  - DW-S308 2026-08-31 - session-closer row -> v4.7.0 (Step 4 Operator Gate
+    Queue feeding bullet, D126); row description gains the gate-queue clause
+  - DW-S313 2026-08-31 - block-stamper row -> v2.1 (manifest-as-you-cite +
+    degraded path), synced same-session as the bump
 ---
 
 # DataWizard Skills
@@ -60,7 +74,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **document-harvest** (v0.5) | Technique | Harvesting content from articles, clippings, and web content into project documents: triage-before-fetch, block citations, synth-note fan-out. |
 | **content-interest-scan** (v0.1, draft) | Technique | Scan material pools (_Clippings, Recall Vault, transcripts) against a project's 0.0 to surface unrouted content matching project interests. Three-pass scan (title, YAML, content). Two modes: per-project (default) and cross-project. Two scales: backlog (chunked, multi-session) and maintenance (nightly incremental). Depends on dw_ops.db. |
 | **harvest-router** | Technique | Scanning the vault for unharvested content and routing it to the right projects. Moves files to correct content folders, sets routing YAML, appends action items. The upstream skill in the harvest pipeline -- it routes, transcript-harvest and document-harvest execute. |
-| **block-stamper** (v2.0) | Technique | Stamp block IDs (^bN for documents, ^tN for transcript turns) on the paragraph or turn a citation points to - on-cite, sparse, byte-faithful; any same-vault doc is citable. Batch via stamp_blocks.py. Called by the enrichment, harvest, and synthesis passes at cite time. |
+| **block-stamper** (v2.1) | Technique | Stamp block IDs (^bN for documents, ^tN for transcript turns) on the paragraph or turn a citation points to - on-cite, sparse, byte-faithful; any same-vault doc is citable. Batch via stamp_blocks.py (capture the manifest as you cite); degraded path when the script can't run: queue the manifest + `citations: pending-stamp`, never hand-rolled edits or unstamped-anchor citations. Called by the enrichment, harvest, and synthesis passes at cite time. |
 | **dw-intro** (v1.0) | Technique | Plain-language introduction to DataWizard: what it is, how the pieces fit together, the five essential practices (Project Instructions, orientation, session closer, DW Save, the approval model), and a skills overview. Called by install-wizard during setup. Also triggers standalone on: 'what is DataWizard?', 'what can DW do?', 'explain DataWizard', 'how does DataWizard work?', 'tell me about DataWizard'. |
 | **install-wizard** (v1.3) | Technique | Interactive post-install setup for new DataWizard users. Picks up where the README left off: presents the dw-intro, verifies MCP connection (all tools), guides Project Instructions setup, explains git as the sync/collaboration layer, offers git onboarding. Triggers on: 'set up DataWizard', 'finish DataWizard setup', 'I just installed DataWizard'. |
 | **project-health-audit** (v2.1) | Technique | Judgment-half audit of a DW project: consumes the dw_lint report for machine findings (filenames, YAML, sync, links, types), then checks infrastructure completeness (D84), MOC regeneration freshness (D92), shell narrative order, and routes findings. Tiered scopes (Quick/Standard/Full/Incremental); manual fallback for vaults without lint tooling. Triggered via 'DW review' or the review-automation cadence. |

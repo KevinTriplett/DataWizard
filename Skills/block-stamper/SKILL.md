@@ -21,10 +21,15 @@ edit_log:
     only-real-stamps-count (next-unused), tight-list/wrapped-item and
     fence-adjacent placement, per-row read-modify-write wording (matching the
     stamp_blocks.py D1 fence fix + the list/link-ref fixes)"
+  - "DW-S313 2026-08-31 - v2.1: manifest-as-you-cite costing rule + degraded
+    path (queue the manifest, citations: pending-stamp flag; never hand-roll
+    edits, never cite unstamped anchors, never discard the mapping) - after a
+    consumer project's unattended run skipped stamping on a 400K+ source rather
+    than risk hand-rolled edits"
 name: block-stamper
 type: skill
-updated: 2026-08-26
-version: "2.0"
+updated: 2026-08-31
+version: "2.1"
 ---
 # Block Stamper Skill
 
@@ -147,6 +152,10 @@ organizers and developers for the Holo movement. ^t1
 
 Work out every block the citing document will point at, stamp the sources and verify the stamps landed, **then** write the citing document. Partial failure then leaves harmless orphan stamps (an ID nobody points at yet), never dangling citations (a link with no stamp) that break the reader path.
 
+### Manifest as you cite
+
+Capture the manifest **while reading the sources**, not in a second pass. As the citing pass reads a passage it intends to cite, it records the row on the spot -- `{"file", "locate", "prefix"?, "claim"?}`, where `locate` is the first ~8 words of the target paragraph or turn and `claim` (an extra key the script tolerates) names the claim the citation will support, preserving the mapping back to the citing document. The reading is already paid for, so each row costs a few tokens; captured this way, stamping a whole document's citations is one script call at the end. For a large source file this is the only sane costing -- never plan to re-locate passages in a later pass.
+
 ### One block, by hand (MCP fallback)
 
 1. Locate the exact source paragraph or turn being cited.
@@ -172,6 +181,16 @@ Under Cowork the script runs through the device shell; in Claude Code and GitHub
 - Headings, frontmatter, tables, fences, horizontal rules, and the other mechanical exclusions are refused, not stamped.
 - Reuse recognizes any existing trailing block ID (integer or human-minted) and reports `reused`.
 - A re-run over already-stamped blocks is a no-op (every row `reused`); the file is byte-identical.
+
+### Degraded path -- script unavailable, or an unattended run
+
+When a batch cannot be stamped safely at cite time -- no shell or Python where the run executes, a source file too large for comfortable MCP round-trips, or an unattended run that should not improvise -- three rules hold:
+
+- **Never hand-roll the edit.** No sed/awk or ad-hoc in-place scripting outside `stamp_blocks.py`, at any file size -- the script exists because improvised edits on large files corrupt them.
+- **Never cite an unstamped anchor.** A block citation written before its stamp verifiably exists is a dangling link -- the exact failure stamp-before-cite prevents.
+- **Never discard the mapping.** Write the cite-manifest to disk beside the citing document (or in the project's working folder), set `citations: pending-stamp` in the citing document's frontmatter, and cite file-level or section anchors in the interim. A later session then completes the job with one dry-run + verify script call and upgrades the citations, instead of re-reading the sources to reconstruct what cited what.
+
+Skipping the stamps with only a prose note ("can be done in a future session") is the failure mode this path exists to prevent: it discards the claim-to-passage mapping -- the most expensive thing the citing pass produced. The flag also makes deferral queryable: a `citations: pending-stamp` search is the worklist for a dedicated stamping session.
 
 ## Metadata exemption
 
