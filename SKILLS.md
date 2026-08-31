@@ -31,6 +31,7 @@ edit_log:
     added to the Workshop table; two D114 trigger-language fixes"
   - "DW-S309 2026-08-30 - meta-learning-scan row -> v1.4.1, meta-learning-review row -> v1.5.3 (synced same-session as the bumps)"
   - "DW-S311 2026-08-30 - project-reconsolidation row -> v1.7 (eight-lens batch: five-class surface checklist, gated-skill-drafts extension, name-match-supersession + instance-vs-Seed fate-split guards, phase-agnostic cheap-disposition guard); row taxonomy synced to include 'partitioned' (missed at v1.4)"
+  - "DW-S308 2026-08-31 - session-closer row -> v4.7.0 (Step 4 Operator Gate Queue feeding bullet, D126); row description gains the gate-queue clause"
 ---
 
 # DataWizard Skills
@@ -44,7 +45,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | Skill | Type | Description |
 |---|---|---|
 | **project-guidelines** (v1.5) | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. Handles existing filename conventions gracefully. Includes `last_content_interests_review:` in new 0.0 templates. |
-| **session-closer** (v4.6.4) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. |
+| **session-closer** (v4.7.0) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. Feeds the project's Operator Gate Queue at close (Registry-canonical schema). |
 | **side-quest** (v1.0) | Technique | Tracking a tangent from the project's current arc as a parallel stream in the session log. Routes a side quest's continuation into "Active quest threads" and protects the main arc's "What's next" from being overwritten, so parallel streams don't collide under concurrency. Triggers on: "let's go on a side quest," "continue the [X] side quest." |
 | **supervised-build** (v1.1) | Technique | Running a multi-chunk build under a per-chunk review relay with a reviewer instance (Coordination Patterns, Pattern 4). Loads in either seat: the build session gets the review gate as a hard precondition (no chunk written without a `status: reviewed` note - skipping is an on-record choice), the reviewer gets on-disk verification, run-don't-read script testing, and the mandated five-field State Board write so a cold instance can answer "where are we at" from the driver doc alone. |
 | **research-tracking** | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |

@@ -24,6 +24,7 @@ edit_log:
   - "DW-S287 2026-08-26 - added the Process and coordination sub-table with the Multi-Instance Coordination Patterns guide"
   - "DW-S312 2026-08-30 - Human Onboarding Doc Template archived (D62: START
     HERE files retired) and dropped from the catalog; S312 Seed review"
+  - "DW-S308 2026-08-31 - Operator Gate Queue - Template row added (D126 codification; template at Seed/Templates/)"
 ---
 # DataWizard Guides
 
@@ -66,6 +67,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub and intake sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
 | **Team Attention Rollout** | Activating the flag system on a multi-operator project: preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
 | **Flag Queue Page Template** | Copy-in template for a per-person flag queue page (Dataview): one section per operator over `flag_for` frontmatter, with the empty-due-last sort fix and the exact-name list-matching caveat. Render surface only -- the frontmatter is the mechanism. |
+| **Operator Gate Queue - Template** (`Seed/Templates/`) | Copy-in starter for a deployment-gate queue: class sections A-F + Parked + Deployed and one example G-row. The schema, lifecycle vocabulary, feeding rule, and exit ceremony are canonical in the Conventions Registry's Operator Gate Queue entry; wire the file as the third layer of the 0.5 action-items shell. |
 
 ### Process and coordination
 | Guide | Covers |

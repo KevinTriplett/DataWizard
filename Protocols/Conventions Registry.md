@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-08-30
+updated: 2026-08-31
 operator: Andrew
 priority: high
 maturity: working
@@ -62,8 +62,12 @@ edit_log:
   - "DW-S309 2026-08-30: Optimistic-claim pattern gains the not-one-shot rider
     (re-check the token before any later write to the claimed resource;
     meta-learning review S267-S287)"
-  - "DW-S312 2026-08-30: Cadence entry repointed to the Review Automation
-    guide cadence table (D114 sweep; S312 Seed review)"
+  - "DW-S312 2026-08-30: Cadence entry repointed to the Review Automation guide
+    cadence table (D114 sweep; S312 Seed review)"
+  - "DW-S308 2026-08-31: T13 codification (D126) - Operator Gate Queue entry
+    (lifecycle vocab, G-row schema, feeding, verify-before-working, exit
+    ceremony), Active Threads ledger row schema entry (Track 1), Model routing
+    entry (single home), Tracking Model deployment-gate fact-class row"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -391,6 +395,7 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 | Recommended entry point for the next session | the session log's "What's next" (one-session TTL) | everything else in "What's next" points, never restates |
 | Carried side/native task lists | a durable queue doc (e.g. a Native Run Queue) | "What's next" points |
 | Stream position (perpetual threads) | the stream-state note (D107) | db mirror optional, derived |
+| Deployment gate (built or decided, waiting on a specific actor) | Operator Gate Queue row | ledger / backlog / "What's next" point |
 
 Sub-rules:
 
@@ -405,6 +410,38 @@ Sub-rules:
 (D105, D107, D108; design: [[RTI Federation and Tracking Model - Stress Test S218]], [[RTI Federation - T1 Design Review S217]])
 
 **Example:** the T1 arc - ledger row says the arc is active and points at [[RTI Federation - Substrate Coherence Build Plan]]'s State Board; the board holds step state; the Backlog carries a pointer item; the Native Run Queue holds the carried native tasks; "What's next" says which of these to start on and points.
+
+---
+
+## Active Threads ledger row schema
+
+**Rule:** every arc row is a `### T{N} - Name` block carrying exactly seven fields: `status / last / home / quest / next / docs / history`. `next:` holds **current state only, ~5 lines max** - what the arc waits on and the single recommended next step - and points at the driver doc or its State Board for step state (link-don't-restate, applied to the ledger itself). Archaeology - "(Prior SNNN:)" chains, superseded next-steps, executed-plan detail - lives in the driver doc, the session log, or the Resolved archive, never in the row. `[SNNN note]` bullets are permitted as temporary carriers between closes; fold them into the canonical fields on the row's next substantive touch. `history:` stays a one-line session list. (DataWizard, 2026-08; D126)
+
+**Example:** a dieted `next:` reads "G-003 (operator-native, ~15 min) unblocks the Reddit feeder; then the TG bridge build per the reviewed Step 1 design. Step state: the driver doc State Board." - current state only; the prior plan's history lives in the session log.
+
+---
+
+## Operator Gate Queue
+
+**Rule:** deployment gates - work that is **built (or decided) but waiting on a specific actor** outside the default session path to bring it live - live in one canonical, cross-project queue file, the third layer of the 0.5 action-items shell (arcs / backlog / gates). Work any future session can pick up stays in the Backlog; a row enters the queue only when the actor is specific (operator-native, another project's session, a named person).
+
+- **Lifecycle vocabulary:** `designed -> built -> installed -> verified-live`. Terminal is verified-live: *verified live where production actually reads it*. `installed` covers deployed-but-unverified. Parking is orthogonal: any state may move to Parked, and the park reason names which is dormant - `project dormant`, `thread stale (project active)`, or `superseded by <what>`.
+- **Row schema (parser-first):** rows start at `### G-NNN Title`; fields are `- key: value` lines (multiple fields may share a line separated by ` | `): `who / project / arc / state / est`, `action`, `unblocks`, optional `clock` (decay/urgency fact) and `model` (see Model routing), `source / added`. Unknown keys are ignored; class membership (time-sensitive, quick unlocks, etc.) comes from the preceding `## ` header. IDs per the ID-families table: G-NNN, next free, never reused.
+- **Feeding, at close:** a session that builds or decides something either verifies it live before close or adds a gate row. The check rides the session-closer's existing infrastructure step - no new ceremony moment. A build that could not be verified live is recorded as `unverified`, never as pending-success ("built + pushed, dispatch unconfirmed" can be carrying a failure).
+- **Verify a gate's live state before working its row:** rows drift stale in both directions (understated done-ness is the inverse of a phantom dependency), so the first step on any gate is one targeted check of what actually exists (a file, a scheduler label, a config line) - then act on that and correct the row.
+- **Exit ceremony** - the moment a row reaches verified-live: (1) move it to the Deployed section, date-stamped; (2) register the asset in the 0.6 Registry's Infrastructure section with a one-line `verify:` (how to check it is still alive); (3) a 0.0 Key Pointer only if orientation-relevant; (4) the health audit sweeps the Infrastructure `verify:` lines. Gate queue = getting live; Registry = being live; health audit = staying live.
+
+A depersonalized starter file ships as `Seed/Templates/Operator Gate Queue - Template.md`. (DataWizard, 2026-08; D126; full rationale and ceremonies in the adopting project's design doc)
+
+**Example:** a session ships a scheduler job it cannot verify before close - it adds a `### G-NNN` row (`state: installed`, `clock:` if the value decays) instead of calling the work done; a later session runs the one targeted check, brings it live, and walks the row through the exit ceremony.
+
+---
+
+## Model routing
+
+**Rule:** when queuing session work for a later instance - a gate row's `model:` field, a What's-next `[model: X]` tag, the session-closer's next-session recap - suggest the model tier by work shape: **Opus-tier** is the default; **Fable-tier** (highest capability) earns its place on deep synthesis, audits, design reviews, canon writes, and multi-perspective judgment; **Sonnet-tier** suits mechanical, well-specified batches (metadata sweeps, triage marking, file moves). Keep names tier-generic - never pin a version, which goes stale. This entry is the single home for the routing heuristic; surfaces that use it point here instead of restating it. (DataWizard, 2026-08; D126)
+
+**Example:** `model: Sonnet-tier` on a metadata-sweep gate row; `[model: Fable-tier - synthesis + canon writes]` on a What's-next priority.
 
 ---
 

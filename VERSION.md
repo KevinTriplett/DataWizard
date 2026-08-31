@@ -1,5 +1,5 @@
 
-seed: 1.5.0
+seed: 1.6.0
 protocol: 1.8
 project_instructions: 4.6
 
@@ -37,6 +37,14 @@ deleted. If a launchd auto-update job was set up per the Seed Auto-Sync
 Design, edit its plist to point at the new root path.
 
 This notice can be removed from VERSION.md after 2026-09.
+
+## What's New in 1.6.0
+
+**Operator Gate Queue codified.** The deployment-gate tracker - built-or-decided work waiting on a specific actor to bring it live - graduates from pilot to canon after two full exit ceremonies in the field. The **Conventions Registry** gains three entries: **Operator Gate Queue** (lifecycle vocabulary `designed -> built -> installed -> verified-live`, parser-first G-row schema, feeding-at-close, verify-a-gate's-live-state-before-working-it, the exit ceremony into the project registry), **Active Threads ledger row schema** (seven fields; `next:` holds current state only, ~5 lines, pointing at the driver doc or State Board - link-don't-restate applied to the ledger itself), and **Model routing** (the single home for the tier heuristic: high-capability default; highest tier for synthesis, audits, reviews, canon writes; fast tier for mechanical batches) - plus a deployment-gate row in the Tracking Model fact-class table.
+
+**session-closer v4.7.0**: Step 4 gains the gate-queue feeding bullet (anything built but not verified-live gets a gate row when the actor is specific; `unverified` is named honestly, never pending-success); Step 4.5's model line points at the Registry instead of restating the heuristic; Step 2.6 handles sectioned ledgers (a shell of per-arc embed files - patch the arc's file, never the shell).
+
+**New: `Seed/Templates/Operator Gate Queue - Template.md`** - a depersonalized starter queue (classes A-F, Parked, Deployed, one example row), cataloged in GUIDES.md. First template in the new `Seed/Templates/` folder.
 
 ## What's New in 1.5.0
 

@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-30'
-version: '4.6.4'
+updated: '2026-08-31'
+version: '4.7.0'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -59,6 +59,7 @@ edit_log:
   - "DW-S289 2026-08-26 - v4.6.3: Step 4 gains the Tool inventory bullet (designed / built / live rows in the project's 0.6 Registry; a designed-but-unbuilt tool is inventoried too) - the structural fix for a tool being re-designed in a collaborator project because the existing one was not on any reader's path"
   - "DW-S303 2026-08-30 - v4.6.4: Step 3.8 array-safe stamping - the update_frontmatter-for-efficiency line replaced with the append rule (bare array = wipe; append at the array tail, not the last item line; re-read-and-verify fallback)"
   - "DW-S309 2026-08-30 - placeholder sweep: Alice/Ben/Cara -> Operator-A/B/C in examples (cosmetic, no version bump; S289 rule; meta-learning review S288-S300)"
+  - "DW-S308 2026-08-31 - v4.7.0: Step 4 gains the Operator Gate Queue feeding bullet (D126; replaces the tool-inventory gate line); Step 4.5 model heuristic slimmed to the Registry's Model routing pointer; Step 2.6 sectioned-ledger note"
 ---
 
 # Session Closer Skill
@@ -163,6 +164,8 @@ If the project maintains an **Active Threads ledger** -- a vantage-independent r
 - **New arc this session:** add a `### T{N}` block (next free number) with all fields; set `home:` to its durable backstop (an empty `home:` flags an arc with no task-level home -- a coverage gap).
 
 Patch in place and verify each change landed (Working Rule 5). The ledger lists **all** open arcs regardless of this session's focus -- do **not** deduplicate it against "What's next" (that vantage-dependence is the carry-forward flicker the ledger fixes; D105). In the session-log entry, the roster is replaced by a one-line pointer (see Output Format).
+
+A project's ledger may itself be sectioned (a shell of per-arc `![[embed]]` files): then each arc's block is its own section file - patch that file directly, and add or remove embed lines in the shell only when an arc opens or resolves.
 
 **Legacy in-entry roster (projects without a ledger) -- REQUIRED, not optional.** If the project has no Active Threads ledger, you MUST maintain the in-entry roster inside the session-log entry, described below. (Field failure, 2026-07, multi-operator project: three consecutive closes correctly detected the missing ledger, then dropped the roster entirely -- leaving that operator's open arcs invisible to the rest of the team.)
 
@@ -395,7 +398,8 @@ Check whether the session produced work that belongs in other files:
 - **Action items**: Check off completed items, add new ones. Optional but recommended. See the triage guidance below when the backlog needs cleanup.
 - **Decision log**: If decisions were made during the session (agreements, vision refinements, commitments, technical choices, scope changes), they belong as separate entries in the Decision Log. Note them in "What happened" and point to the Decision Log entry.
 - **Harvest ledger**: If harvesting was done during the session, verify the Harvest Ledger was updated as part of the harvest checklist. If not, update `0.4 Harvest Ledger - [Project].md` now.
-- **Tool inventory** (projects that keep one in their 0.6 Registry): if the session *designed* a tool or surface (a design doc now exists), *built* one (code now exists), or brought one *live*, add or update its row with the new state. A designed-but-unbuilt tool belongs in the inventory as much as a live one -- the inventory exists so a later instance in any project can ask "does something like this already exist?" before designing it again. If the built tool needs a native actor to go live, add its gate-queue row in the same pass.
+- **Tool inventory** (projects that keep one in their 0.6 Registry): if the session *designed* a tool or surface (a design doc now exists), *built* one (code now exists), or brought one *live*, add or update its row with the new state. A designed-but-unbuilt tool belongs in the inventory as much as a live one -- the inventory exists so a later instance in any project can ask "does something like this already exist?" before designing it again.
+- **Operator Gate Queue** (projects that keep one): scan the session's builds and decisions - anything built or decided but not verified-live where production reads it gets a gate row, but only when the actor is specific (operator-native, another project's session, a named person); work any future session can pick up stays in the action items. A build that could not be verified live is recorded as `unverified`, never pending-success. If a gate reached verified-live this session, run the exit ceremony (Deployed section, then a registry Infrastructure row with a `verify:` line). Schema, lifecycle vocabulary, and ceremony: the Conventions Registry's Operator Gate Queue entry.
 
 Write the changes directly. Exception: a Decision Log entry is judgment-class -- show its text and get approval before writing it (Step 2). Action items, the harvest ledger, and shell updates are written directly.
 
@@ -416,7 +420,7 @@ Full triage is a periodic activity, not a session-close requirement. The session
 Just before suggesting the thread name, give a brief, action-oriented recap -- never a generic "nice work, see you next time." Two or three sentences at most, spoken in chat only (not written to the vault):
 
 - **Next up:** one line naming the single most valuable thing to pick up next session. Pull it from "What's next" Priority 1 -- the specific task with its key file path, not a vague topic.
-- **Suggested model:** name the Claude model tier that best fits that task, with a 3-5 word reason. Match model to task shape -- a high-capability reasoning model (Opus-tier) for deep design, synthesis, architecture, or hard debugging; a faster model (Sonnet-tier) for mechanical, harvest, or well-specified execution work. Keep it tier-generic (Opus-tier / Sonnet-tier) rather than pinning a version number, which goes stale.
+- **Suggested model:** name the model tier that best fits that task, with a 3-5 word reason, per the Conventions Registry's Model routing entry - the single home for the heuristic. Keep it tier-generic rather than pinning a version, which goes stale.
 
 Keep it tight -- the recap and model line are the last thing the user reads before the thread name, so they should land as a clear "here's where to restart and what to run it on."
 
