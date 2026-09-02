@@ -1,5 +1,5 @@
 
-seed: 1.6.0
+seed: 1.6.1
 protocol: 1.8
 project_instructions: 4.6
 
@@ -52,6 +52,34 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.6.1
+
+**Windows updater unbroken (`update_seed.ps1`).** A single em dash on the
+sync-log line made the entire script unparseable under Windows PowerShell
+5.1: with no BOM, PS 5.1 reads `.ps1` files as ANSI, the em dash's bytes
+(E2 80 94) decode to `a`+`euro`+curly-quote, and PowerShell accepts curly
+quotes as string delimiters - the literal closes early and the parse
+collapses. Shipped broken in 1.2.0 (2026-08-15), so **no Windows operator
+has been able to run any Seed update or install auto-sync since** -
+silently (a script that never parses writes no Sync Log line). Diagnosed
+by Jay's instance (WV_2026-09-02_JC_02); verified byte-level on the
+maintainer clone (DW S325).
+
+**IMPORTANT - Windows installs at 1.6.0 or below cannot self-update to
+get this fix** (the broken script IS the update path). One-time manual
+re-download, from the vault root in PowerShell:
+
+    Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/andrewalan11/DataWizard/main/update_seed.ps1 -OutFile "_DataWizard\Seed\update_seed.ps1"
+
+then run the updater normally (add `-InstallAutosync` if the
+"DataWizard Seed Update" scheduled task was never created).
+
+**All Seed shell scripts are now pure ASCII.** Em dashes in
+`update_seed.sh` and `Scripts/datawizard-*.sh` replaced too - cosmetic
+there (bash tolerates UTF-8), but the same defect class. Standing rule:
+scripts that ship in the Seed stay ASCII-only; a non-ASCII byte in a
+BOM-less `.ps1` is a parse-time landmine on Windows.
 
 ## What's New in 1.6.0
 

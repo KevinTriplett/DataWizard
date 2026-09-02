@@ -1,5 +1,5 @@
 #!/bin/bash
-# datawizard-sync.sh — syncs all collaborative project repos via git
+# datawizard-sync.sh - syncs all collaborative project repos via git
 # Reads repo paths from ~/.datawizard-sync.conf (one path per line)
 # Manual use: bind to hotkey via Obsidian Shell Commands plugin
 # Safety net: schedule via launchd every 2 hours

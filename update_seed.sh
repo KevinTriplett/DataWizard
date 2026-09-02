@@ -1,5 +1,5 @@
 #!/bin/bash
-# update_seed.sh — Download or update the DataWizard Seed from GitHub
+# update_seed.sh - Download or update the DataWizard Seed from GitHub
 # Lives in _DataWizard/Seed/ (project root) and works from anywhere.
 #
 # Usage:
@@ -105,7 +105,7 @@ log_entry() {
       "" > "$SYNC_LOG"
   fi
 
-  echo "**$timestamp** — $message" >> "$SYNC_LOG"
+  echo "**$timestamp** - $message" >> "$SYNC_LOG"
   echo "$message"
 }
 

@@ -83,7 +83,7 @@ function Write-LogEntry {
         Set-Content -Path $SyncLog -Value $header -Encoding utf8
     }
     $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-    Add-Content -Path $SyncLog -Value ("**{0}** — {1}" -f $timestamp, $Message) -Encoding utf8
+    Add-Content -Path $SyncLog -Value ("**{0}** - {1}" -f $timestamp, $Message) -Encoding utf8
     Write-Host $Message
 }
 
