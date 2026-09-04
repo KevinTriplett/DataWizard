@@ -2,7 +2,7 @@
 title: "Review Automation"
 type: guide
 created: 2026-08-06
-updated: 2026-08-30
+updated: 2026-09-04
 operator: Andrew
 edit_log:
   - "DW-S250 2026-08-06 - created: pending-report model + review-cadence
@@ -18,6 +18,7 @@ edit_log:
     meta-learning review S256-S266)"
   - "DW-S307 2026-08-30 - triage row yield note: status-lag-not-junk +
     triage-as-decision-ripple-sweep (S307 cadence run)"
+  - 'DW-S330 2026-09-04 - Report locations moved to the infrastructure folder + declared single home (Weave FR WV_2026-09-02_AA_01)'
 ---
 
 # Review Automation
@@ -59,9 +60,11 @@ The backlog row is manual for now: no scan producer, no pending report, so the s
 
 A report that has been produced but not yet reviewed stays `pending-review`; the stamp advances only on completion, never at report-production time.
 
-## Report locations
+## Report locations (single home)
 
-`{home}/Workshop - {ProjectName}/Learning Reports/` for full-convention projects; `{home}/Learning Reports/` for flat projects.
+Review reports (meta-learning, health-audit, content-interests) are DW infrastructure, so they live with infrastructure: `{infrastructure folder}/Learning Reports/` - i.e. `{home}/_Infrastructure - {ProjectName}/Learning Reports/` for full-convention projects, or `{home}/_Infrastructure/Learning Reports/` where the infrastructure folder is unsuffixed. Flat-structure projects (no infrastructure folder) use `{home}/Learning Reports/`.
+
+This section is the single home for the report location; skills point here rather than restating it (link, don't restate). Projects with reports at the pre-2026-09 location (`{home}/Workshop - {ProjectName}/Learning Reports/`) make a one-time move. Rationale: a root- or workshop-level Learning Reports folder sits next to substantive project content and gets read as project material rather than DW machinery (Weave field report, WV_2026-09-02_AA_01).
 
 ## Scheduled automation
 

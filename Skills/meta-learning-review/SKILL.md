@@ -7,8 +7,8 @@ description: >-
   report is ready for review. Also triggered when the scheduled review
   automation has left a pending report.
 type: skill
-updated: 2026-08-30
-version: '1.5.3'
+updated: 2026-09-04
+version: '1.5.4'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -40,6 +40,7 @@ edit_log:
     families named this way in the S267-S300 reviews)"
   - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: threshold-nudge trigger
     language replaced with the scheduled review-status check (S312 Seed review)"
+  - 'DW-S330 2026-09-04 - v1.5.4: Step 1 read-path example moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
 ---
 
 # Meta-Learning Review Skill
@@ -85,7 +86,7 @@ When first adopting this skill on a project with many unreviewed sessions, expec
 
 **Detect the stack from frontmatter, not narrative.** List the project's learning reports folder and read each report's `status:`; the pending stack is exactly the reports marked `pending-review`. Session-log "N reports pending" counts drift within a few sessions (two consecutive entries said six while one report was already `reviewed`; a later entry said eight when the true count was seven). Also read the report's own header notes: a report generated as a skill test with a forced scan range is still a real report, but its already-planted rate will be unusually high.
 
-**Primary path (report exists):** Read the meta-learning report from the project's learning reports folder (e.g., `Workshop/Learning Reports/`). The report should contain extracted learnings organized by theme, with suggested updates.
+**Primary path (report exists):** Read the meta-learning report from the project's learning reports folder (e.g., `_Infrastructure/Learning Reports/`; canonical location: the Review Automation guide's "Report locations" section). The report should contain extracted learnings organized by theme, with suggested updates.
 
 **On-demand path (no report):** Read the Learnings sections from the last N session logs (where N is the number of sessions since the last review). Extract each discrete learning into a working list. Group by natural theme -- don't force a taxonomy. Common categories that emerge across projects include tool behavior, workflow patterns, architecture signals, and process observations, but use whatever categories fit the actual content.
 

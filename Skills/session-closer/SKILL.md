@@ -8,7 +8,7 @@ description: >-
   previous session.
 type: skill
 updated: '2026-09-04'
-version: '4.8.0'
+version: '4.8.1'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -76,6 +76,7 @@ edit_log:
     quote-on-write, trim-in-same-write) + origin field verification/backfill +
     manifest declared canonical per-file provenance, required at every close
     tier (D127)"
+  - 'DW-S330 2026-09-04 - v4.8.1: Step 3.10 listing path moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
 ---
 
 # Session Closer Skill
@@ -335,7 +336,7 @@ This catches the most common drift pattern -- adding sections without updating t
 
 The session-closer does **not** compute review staleness or nudge on session/day thresholds. Detecting that a health audit, meta-learning review, or Content Interests refresh is due -- and running the scan that produces a report -- is the job of the scheduled review automation (see the **Review Automation** guide). This step's only job is to surface reports those scans have already left waiting. None of this blocks session close.
 
-List the project's Learning Reports folder (`{home}/Workshop - {ProjectName}/Learning Reports/` for full-convention projects; `{home}/Learning Reports/` for flat). For any report file with `status: pending-review` (`Meta-Learning Report - *`, `Health Audit Report - *`, `Content Interests Report - *`), add one line to "What's next":
+List the project's Learning Reports folder (`{infrastructure folder}/Learning Reports/` for full-convention projects, e.g. `{home}/_Infrastructure - {ProjectName}/Learning Reports/`; `{home}/Learning Reports/` for flat; canonical location: the Review Automation guide's "Report locations" section). For any report file with `status: pending-review` (`Meta-Learning Report - *`, `Health Audit Report - *`, `Content Interests Report - *`), add one line to "What's next":
 
 "A [review type] report is waiting for your review: [filename]."
 

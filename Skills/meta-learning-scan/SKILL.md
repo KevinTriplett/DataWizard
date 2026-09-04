@@ -10,9 +10,9 @@ description: >-
   planting. Also use when the user wants to set up automated learning extraction
   for any DW project.
 type: skill
-version: '1.4.1'
+version: '1.4.2'
 created: '2026-06-01'
-updated: 2026-08-30
+updated: 2026-09-04
 edit_log:
   - DW-S185 2026-06-15 - platform/environment routing hint (Step 4 Deferred)
   - "DW-S243 2026-08-05 - v1.3: Step 3 header-variant note (### Findings treated
@@ -28,6 +28,7 @@ edit_log:
     (S288-S300 report shipped a stale five-report stack narrative)"
   - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: session-closer-nudge
     trigger language replaced; stray cadence number dropped (S312 Seed review)"
+  - 'DW-S330 2026-09-04 - v1.4.2: Step 5 write path moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
 ---
 
 # Meta-Learning Scan
@@ -134,9 +135,9 @@ When a deferred learning is a platform or environment behavior (scheduled-task q
 
 ### Step 5: Write report
 
-Write the report to the project's workshop or research area:
+Write the report to the project's infrastructure folder (canonical location: the Review Automation guide's "Report locations" section):
 
-**Full convention projects:** `{home}/Workshop - {ProjectName}/Learning Reports/Meta-Learning Report - {Abbrev} S{start}-S{end}.md`
+**Full convention projects:** `{infrastructure folder}/Learning Reports/Meta-Learning Report - {Abbrev} S{start}-S{end}.md` - the infrastructure folder Step 1 already discovered (e.g. `{home}/_Infrastructure - {ProjectName}/`)
 
 **Flat structure projects:** `{home}/Learning Reports/Meta-Learning Report - {Abbrev} S{start}-S{end}.md`
 
