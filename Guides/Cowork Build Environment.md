@@ -31,7 +31,7 @@ operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: '2026-08-30'
+updated: 2026-09-04
 ---
 # Cowork Build Environment
 
@@ -78,6 +78,8 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 
 - **WebFetch rate-limits (HTTP 429).** Space calls out; lean on WebSearch snippets when throttled. (Source: Weave, 2026-06/08)
 - **GitHub REST via web fetch is unreliable:** `api.github.com` returns empty content in some Cowork configurations, and unauthenticated REST shares a rate-limited egress (60/hr, often exhausted). Reliable paths, in order: `raw.githubusercontent.com` for file content (fetches even when the API is throttled), the repo's HTML pages for stars/forks/issues/license, Chrome `get_page_text` on an org's `/repositories` page for listings, or a user-run `gh api ... | paste`. For pulling a repo's files wholesale, a shallow `git clone --depth 1` beats fetching (see tools-research). (Source: VC S25; Weave, independent)
+
+- **Some sandbox configurations 403-block `api.github.com` AND github.com HTML pages outright** (proxy-level), while GitHub release-asset downloads (`github.com/<org>/<repo>/releases/download/...`, including `checksums.txt`) and the git protocol still work. A pinned release-asset URL is then the reliable way to install a released binary: fetch the release's `checksums.txt` to discover exact asset names, download, verify sha256 locally. (Source: DW S329)
 - **GitBook sources are agent-friendly:** append `.md` to any page URL for clean markdown; `llms.txt` is a full index; `?ask=` answers questions against the docs. (Source: Weave, 2026-06/08)
 - **Filing GitHub issues via pre-filled `issues/new?title=&body=` URLs** (URL-encode the body, open in the user's authed browser, human submits) is a robust, low-brittleness alternative to JS form-filling -- and keeps the irreversible public action on a third party's repo in human hands. The `return_to` param survives a login redirect. (Source: DW S230)
 

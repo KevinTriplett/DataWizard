@@ -7,6 +7,7 @@ operator: Andrew
 status: draft
 edit_log:
   - DW-S328 2026-09-04 - created (Chunk 1 - skeleton + Sections A-E; supervised build, S327 charter)
+  - DW-S328 2026-09-04 - Chunk 2 - Sections F-K written; GUIDES.md Surfaces and tools entry added
 ---
 
 # FSAccess GUI Pattern
@@ -79,24 +80,49 @@ The compare-before-write step narrows the race window; the post-write verify is 
 
 ## The surgical serializer
 
-_The load-bearing section: why a lossy parser rules out structure-to-text re-serialization, and the four requirements for surgical token edits that share the parser's own grammar. Written in the next pass._
+This is the load-bearing section: how the surface changes a file without corrupting it. The wrong approach is to parse a file to a structure, mutate the structure, and re-serialize the whole thing back to text. Two reasons rule it out. First, a re-serializer works from the parsed structure, and a parser routinely holds computed state that was never in the file - a value the surface derived at read time, such as a status the dependency resolver set to "blocked". Re-serializing emits that derived value as an authored token, writing the surface's own inference into the data. Second, a useful parser is lossy on token order and exact position - it normalizes as it reads - so byte-faithful reconstruction is impossible, and every untouched line comes back subtly reformatted. In a repo synced across a team, that turns one intended edit into a diff touching every line of the file: unreviewable, and a merge-conflict magnet.
+
+The pattern instead makes every write a **surgical token edit that shares the parser's own regex constants**. There is one grammar, used in both directions: the parser reads the first match of a token, and the writer replaces the first match of the same token - replace-first mirrors first-match parse. Four requirements, all load-bearing:
+
+1. **Locate the target line by trimmed equality against the real file text, and preserve its original bytes.** Match on the trimmed line, but keep the original leading indentation, trailing whitespace, and line ending (LF or CRLF) when writing the change back. Never reconstruct the line from the parsed representation - the parser trimmed it, so a reconstruction loses indentation and endings.
+2. **Exactly one match, or abort.** Zero matches or more than one both throw and write nothing. Unique IDs make collisions unlikely, but stale data contains duplicates, and a blind write into an ambiguous match is how the wrong line gets edited.
+3. **Never serialize computed state; flip only the token the operator edited, in isolation.** The edit changes exactly the one token the operator changed, taken from the explicit user action - never read back from the parsed structure, which may carry derived values (this requirement flows from the re-serializer problem above).
+4. **Test with whole-file byte-identity round-trips, not per-line checks.** The test mutates one token and asserts that every other byte in the file is unchanged AND that re-parsing the result yields the expected structure. Per-line tests miss exactly the corruption this section exists to prevent.
+
+One rule sits alongside requirement 3 whenever the grammar gives **parse-time precedence between two tokens that express overlapping state** - a completion mark and an inline status token, say, where the parser lets one win and ignores the other at read time. The surface writes only the winning channel and disables the edit that would emit the losing one. A token the parser ignores at read time is dead text; writing it is a silent no-op that looks to the operator like a successful edit. One channel per piece of state, and the UI does not offer the dead one.
+
+Supporting rules for the common cases. Frontmatter edits scan only between the opening and closing `---` fences, so a body line that happens to contain `key:` can never collide; when replacing a value, preserve that line's existing quote style, and insert the key if it is absent (quoting a new date-like value). A token clear consumes exactly one adjacent space, leaving no double space and no trailing space, and gets its own round-trip case. An inserted detail line goes at the end of the item's own detail block, with an indent fallback when the item has no existing detail lines to match. And if the convention stamps modification metadata on write - bumping an `updated:` field, say - fold that into the same guarded write idempotently, and re-tighten the byte-identity assertion to allow exactly the intended line plus the stamp line to change, every other byte identical.
 
 ## Parser certification against an oracle
 
-_Twinning a new parser against a reference parser (0-diff over the live corpus and an all-branch fixture), keeping canon corrections in the view layer, and what to do when no reference parser exists. Next pass._
+When the surface's parser twins an existing reference parser - a script that already reads the same files - the reference is the oracle, and the new parser must match it exactly: same files in, same structure out, zero diffs. Certify over two corpora: the live data, and a synthetic fixture that exercises every branch of the grammar (each token type, each detail kind, nesting, edge inputs). Keep canon corrections and display cleanup in the VIEW layer, never the parser, so the oracle comparison stays literal - the moment the parser "improves" on the reference, the diff stops being meaningful. Re-run the oracle diff at every parser change; a change confined to the view layer holds the property by construction and needs no re-run. Where no reference parser exists, write the fixture corpus first and treat it as the oracle - the certification target has to exist before the parser it certifies.
 
 ## Derived-surface rules
 
-_Generation stamp, silent-drop counters for every class of discarded input, embed-aware parsing, and rendering untracked sources as untracked rather than absent. Next pass._
+Any surface that renders a view computed from parsed files carries four obligations, because a derived view that is silently wrong is worse than no view.
+
+- **A generation stamp:** show what was read and when. A derived surface either regenerates automatically or displays its own freshness prominently; without the stamp, a stale render is indistinguishable from a fresh one.
+- **Silent-drop counters:** every class of input the parser discards gets a visible counter or warning - an unresolved embed, an unknown key, an unparseable item, a value it could not key. Skipping malformed input is usually the right behavior; the invisibility of the skip is the defect, because it turns dropped data into apparent absence.
+- **Embed-aware parsing:** follow transclusion or embed references when the source files use them. Sectioning of a tracked surface is a moving front - a file that was one document last week is a shell of embeds this week - and a parser that does not follow embeds silently under-counts as soon as that happens.
+- **Untracked, not absent:** a source the surface cannot yet read renders as an explicit "untracked" row, not as nothing. Absence is itself a signal the reader wants to see; a blank where a row belongs hides it.
 
 ## The surface as a data-integrity check
 
-_Validation on the surface everyone already opens - unresolved references, unknown values, missing IDs - as the same read that renders; read-only by default, writes an explicit guarded opt-in. Next pass._
+The validation the data needs - unresolved reference IDs, unknown status values, missing IDs, orphaned links - belongs on the surface everyone already opens, because the validation and the display are the same read: the parser already visited every file to render the view, so surfacing what it found wrong costs almost nothing and reaches the one place the team looks. Present the findings as header chips or counters. Keep the surface read-only by default; the write path is an explicit, guarded opt-in, never the resting posture - a surface people trust to look at should not also be one stray click away from changing files.
 
 ## Git-awareness scope
 
-_In: an mtime freshness banner that works at any grant scope. Optional garnish: branch display via readAux, root grant only. Out: commit and pull from the page. Next pass._
+In scope, and load-bearing: an **mtime freshness banner** - "pull before trusting this view" when the files look older than the repo's activity would suggest. It works at any grant scope, because file mtimes are always inside the granted subtree. Optional garnish: a branch display via `readAux('.git/HEAD')`, reachable only when the repo root itself was granted, so it degrades to nothing under a narrower grant. Out of scope: committing or pulling from the page - a browser page cannot drive git without a helper process, and the repo's existing sync habit is the transport. The surface's job is to read honestly and warn when the read may be stale, not to become a git client.
 
 ## Boundaries and testing floor
 
-_Desktop-Chromium-only, stated not papered over; no inter-page messaging; and the testing floor a conforming surface must clear before any write path touches real files. Next pass._
+State the boundaries plainly rather than papering over them. The write path is desktop-Chromium only - no other browser exposes writable folder access - and that is a design boundary, stated, not a bug to hide. There is no inter-surface messaging: two operators' open pages coordinate through the files and the repo's sync, never through each other.
+
+The testing floor a conforming surface must clear before it moves from a read view to one that writes real files:
+
+- the oracle diff (Parser certification) green over live data and the all-branch fixture;
+- the serializer round-trip suite (requirement 4 above) green, including the clear and insert edge cases;
+- a headless DOM end-to-end run - driving the real render and write code paths against injected fixture data - with zero console errors treated as a hard failure;
+- hands-on validation on a scratch copy of live data before any write path touches the real files.
+
+The headless-run mechanics (a mock adapter injected into a real DOM) and the rule that the shipped file carries no embedded data are runtime facts - see `Browser and File System Access Behaviors.md`, "Verifying a browser file-tool without a server."

@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: 2026-08-30
+updated: 2026-09-04
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -25,6 +25,7 @@ edit_log:
   - "DW-S312 2026-08-30 - Human Onboarding Doc Template archived (D62: START
     HERE files retired) and dropped from the catalog; S312 Seed review"
   - "DW-S308 2026-08-31 - Operator Gate Queue - Template row added (D126 codification; template at Seed/Templates/)"
+  - "DW-S328 2026-09-04 - added the Surfaces and tools sub-table with the FSAccess GUI Pattern guide"
 ---
 # DataWizard Guides
 
@@ -68,6 +69,11 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Team Attention Rollout** | Activating the flag system on a multi-operator project: preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
 | **Flag Queue Page Template** | Copy-in template for a per-person flag queue page (Dataview): one section per operator over `flag_for` frontmatter, with the empty-due-last sort fix and the exact-name list-matching caveat. Render surface only -- the frontmatter is the mechanism. |
 | **Operator Gate Queue - Template** (`Seed/Templates/`) | Copy-in starter for a deployment-gate queue: class sections A-F + Parked + Deployed and one example G-row. The schema, lifecycle vocabulary, feeding rule, and exit ceremony are canonical in the Conventions Registry's Operator Gate Queue entry; wire the file as the third layer of the 0.5 action-items shell. |
+
+### Surfaces and tools
+| Guide | Covers |
+|---|---|
+| **FSAccess GUI Pattern** | Building a repo-resident, no-server, no-refresh local GUI over files in a granted folder: the data adapter, permission and grant scope, operator identity, the concurrency guard, the surgical serializer, parser certification, derived-surface rules, and the testing floor. Runtime facts live in Browser and File System Access Behaviors. |
 
 ### Process and coordination
 | Guide | Covers |

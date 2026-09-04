@@ -3,12 +3,13 @@ created: 2026-08-18
 edit_log:
   - "DW-S279 2026-08-18 - created (Flag Surfacing Chain B2: canary protocol,
     diagnosis tree, executor chain, first-render expectations)"
+  - 'DW-S330 2026-09-04 - canary refinement: must arrive by sync, never created locally; no watch row trusted until a synced-in canary round-trips (WV_2026-09-02_JC_02)'
 maturity: working
 operator: Andrew
 seed_version: 1.2.0
 title: Team Attention Rollout
 type: guide
-updated: 2026-08-18
+updated: 2026-09-04
 ---
 # Team Attention Rollout
 
@@ -45,7 +46,7 @@ Silence becomes a decision through three layers, in order of immediacy: (1) the 
 ## Rollout protocol (the live test)
 
 1. Verify the preconditions above -- especially 1 and 2, per machine and per operator surface.
-2. **Plant one canary flag per operator**: a trivial note flagged for exactly that person, `flag_note` asking only "have your Claude take your name off this," a `flag_due` about a week out, and `flag_default: recorded as chain-broken for [name]`. The dated `flag_due` is deliberate and load-bearing: live corpora run almost entirely undated flags (one team's first measurement: 1 of 88, and that one a `null` literal), so without a dated canary the due-first sort path ships untested.
+2. **Plant one canary flag per operator**: a trivial note flagged for exactly that person, `flag_note` asking only "have your Claude take your name off this," a `flag_due` about a week out, and `flag_default: recorded as chain-broken for [name]`. The dated `flag_due` is deliberate and load-bearing: live corpora run almost entirely undated flags (one team's first measurement: 1 of 88, and that one a `null` literal), so without a dated canary the due-first sort path ships untested. **The canary must arrive by sync, never be created locally on the operator's machine**: plant it from another operator's machine or surface, so it reaches the person's vault by repo sync and is swept before anyone opens it locally. A locally created canary tests only frontmatter parsing - the observed delivery hole (WV_2026-09-02_JC_02) was in the MCP's serving of synced-never-opened files, and a locally-parsing canary passed while delivery on the same machine still failed. Corollary: no flag-watch row is trusted for an operator until a **synced-in** canary has round-tripped on that operator's machine.
 3. **Tell each person through the currently-working channel** (the working channel bootstraps its successor): "sometime this week, start a session in this project and do what it tells you."
 4. **Read the queue at the end of the week.** Name off = the whole chain verified for that person. Name still on = walk the diagnosis tree below and hold that specific hand.
 5. **The working channel stays canonical for that person until they pass.** No instance should treat the flag system as authoritative delivery for an operator who has not passed.

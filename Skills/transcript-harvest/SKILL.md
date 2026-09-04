@@ -6,8 +6,8 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-08-30'
-version: '0.9'
+updated: '2026-09-04'
+version: '0.9.1'
 edit_log:
   - DW-S158 2026-06-08
   - "MMM meta-learning plant 2026-06-09: added Step 4 (check existing vault
@@ -21,6 +21,7 @@ edit_log:
   - "DW-S262 2026-08-08: added Harvest via embeddable synth note pointer (D116)"
   - "DW-S312 2026-08-30: stale STUB status label corrected to Active (the full
     workflow has long shipped; S312 Seed review)"
+  - 'DW-S330 2026-09-04 - v0.9.1: See Also gains the shared-layer-redaction overlay pointer (required when the harvest destination is a shared layer)'
 ---
 
 # Transcript Harvest Skill
@@ -189,6 +190,7 @@ When processing large transcript batches (total word count exceeding ~50k words,
 
 ## See Also
 
+- [[shared-layer-redaction]] -- REQUIRED overlay whenever the harvest destination is a shared layer (a repo or folder readable by the people discussed in the material): run its per-passage test before anything enters the shared layer
 - [[Harvest Workflow Guide]] -- full walkthrough, edge cases, and the 3-step end-of-harvest checklist
 - [[YAML Schema]] -- harvest field definitions
 - [[Editorial Principles]] -- synthesis guidance

@@ -6,12 +6,13 @@ edit_log:
   - "DW-S279 2026-08-18 - fourth correction: null-literal normalization in
     field() (live-corpus catch during the whole-build verification sweep)"
   - "DW-S289 2026-08-26 - fifth correction: read_through_frontmatter() replaces the 8 KB read cap (live catch - a 10 KB edit_log-heavy frontmatter hid the queue's only dated flag from every surface; found during the Flag Workbench review)"
+  - 'DW-S330 2026-09-04 - fallback section: MCP stale-serving of synced-never-opened files (non-empty-but-wrong); flag-load-bearing reads filesystem-only (WV_2026-09-02_JC_02)'
 maturity: working
 operator: Andrew
 seed_version: 1.2.0
 title: Orientation Flag Sweep - Query Spec
 type: guide
-updated: 2026-08-26
+updated: 2026-09-04
 ---
 # Orientation Flag Sweep - Query Spec
 
@@ -125,6 +126,8 @@ Surface each of `top` with title (filename), `flag_note`, `flag_by`, `flag`, and
 ### Fallback (surfaces without filesystem access)
 
 Where an instance cannot run the script (no shell / no filesystem tool), use the MCP frontmatter search for `flag_for` as a candidate finder, then confirm each hit with `get_frontmatter`. **Treat a grep-matched file whose `get_frontmatter` returns empty as a parse failure, never as fields-absent** -- that is the silent-`{}` case above, and it is a real flag the fallback would otherwise drop. The MCP search also caps results, so on a large backlog the filesystem path is the only complete one; the fallback is a degraded mode, not an equivalent.
+
+The degradation is not only caps and empty-`{}` results: **the MCP can serve non-empty but wrong content for files that arrived by repo sync and were never opened locally.** Field case (WV_2026-09-02_JC_02, confirmed DW S325): an operator's disk copy was byte-identical to source (no BOM, zero CR, clean fences) while the same file read through the MCP came back CRLF throughout - frontmatter unparseable, every `flag*` field invisible, on the same machine where other files' full flag clusters parsed cleanly. A stale or transformed serving-layer copy cannot be detected from inside the MCP path, and it targets precisely the highest-value flags (notes freshly synced from another operator, never yet opened by the recipient). So on a multi-operator project, any flag-load-bearing read - the sweep, a dashboard, a watch row - must use the filesystem path; the MCP fallback is only for surfaces with truly no filesystem access, and silence from it is never evidence of absence.
 
 ## Sub-check (b) -- stale-stub reconciliation [all projects, incl. solo]
 

@@ -60,6 +60,7 @@ edit_log:
     false-trip on the FUSE mount; prefer content guards"
   - DW-S324 2026-09-04 - unquoted-colon entry aligned to D127
     single-quote-always rule
+  - 'DW-S330 2026-09-04 - Known Issues: stale serving of synced-never-opened files (CRLF copy not on disk; WV_2026-09-02_JC_02)'
 ---
 # MCP Reliability and Write Verification
 
@@ -78,6 +79,8 @@ As of May 2026, the Obsidian MCP has intermittent reliability issues when multip
 **Phantom reads.** `read_note` and `list_directory` return content for files that do not exist on the filesystem. This was observed when one instance read a full session log entry (with correct frontmatter and internally consistent content) for a file that was not present on disk. The phantom content was also visible in `list_directory` results.
 
 **Stale reads.** After a successful `patch_note`, a subsequent `read_note` on the same file may return the pre-patch version. This may overlap with the phantom read issue (the MCP serving cached pre-patch content).
+
+**Stale serving of synced files (read-side, no concurrency needed).** For files that arrived by repo sync and were never opened locally, the MCP can serve a stale or transformed copy that is not on disk: in the field case, the disk copy was byte-identical to source (no BOM, zero CR) while `read_note` returned CRLF-throughout content whose frontmatter would not parse - so every frontmatter field, `flag*` cluster included, read as absent. Undetectable from inside the MCP path; the tell is an empty or malformed frontmatter result on a file that visibly starts with `---` on disk. Verify against filesystem bytes (Tier 1), and treat empty-frontmatter-on-a-fenced-file as a parse failure to investigate, never as fields-absent. Targets exactly the notes that matter most on multi-operator projects: freshly synced, never yet opened. (WV_2026-09-02_JC_02, confirmed DW S325; upstream report drafted DW S330.)
 
 **Frontmatter wipe via merge: false.** `update_frontmatter` with `merge: false` replaces the entire frontmatter -- any field you omit is deleted. Always use `merge: true` (the default) unless intentionally replacing the full schema. If you must use `merge: false`, re-read frontmatter first and include every field.
 
