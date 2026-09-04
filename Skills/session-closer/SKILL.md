@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-31'
-version: '4.7.0'
+updated: '2026-09-04'
+version: '4.8.0'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -56,10 +56,26 @@ edit_log:
   - "DW-S284 2026-08-24 - v4.6.2: What's next standing-proposals rule - check
     before carrying, strike on resolution (S248; meta-learning review
     S247-S255)"
-  - "DW-S289 2026-08-26 - v4.6.3: Step 4 gains the Tool inventory bullet (designed / built / live rows in the project's 0.6 Registry; a designed-but-unbuilt tool is inventoried too) - the structural fix for a tool being re-designed in a collaborator project because the existing one was not on any reader's path"
-  - "DW-S303 2026-08-30 - v4.6.4: Step 3.8 array-safe stamping - the update_frontmatter-for-efficiency line replaced with the append rule (bare array = wipe; append at the array tail, not the last item line; re-read-and-verify fallback)"
-  - "DW-S309 2026-08-30 - placeholder sweep: Alice/Ben/Cara -> Operator-A/B/C in examples (cosmetic, no version bump; S289 rule; meta-learning review S288-S300)"
-  - "DW-S308 2026-08-31 - v4.7.0: Step 4 gains the Operator Gate Queue feeding bullet (D126; replaces the tool-inventory gate line); Step 4.5 model heuristic slimmed to the Registry's Model routing pointer; Step 2.6 sectioned-ledger note"
+  - "DW-S289 2026-08-26 - v4.6.3: Step 4 gains the Tool inventory bullet
+    (designed / built / live rows in the project's 0.6 Registry; a
+    designed-but-unbuilt tool is inventoried too) - the structural fix for a
+    tool being re-designed in a collaborator project because the existing one
+    was not on any reader's path"
+  - "DW-S303 2026-08-30 - v4.6.4: Step 3.8 array-safe stamping - the
+    update_frontmatter-for-efficiency line replaced with the append rule (bare
+    array = wipe; append at the array tail, not the last item line;
+    re-read-and-verify fallback)"
+  - "DW-S309 2026-08-30 - placeholder sweep: Alice/Ben/Cara -> Operator-A/B/C in
+    examples (cosmetic, no version bump; S289 rule; meta-learning review
+    S288-S300)"
+  - "DW-S308 2026-08-31 - v4.7.0: Step 4 gains the Operator Gate Queue feeding
+    bullet (D126; replaces the tool-inventory gate line); Step 4.5 model
+    heuristic slimmed to the Registry's Model routing pointer; Step 2.6
+    sectioned-ledger note"
+  - "DW-S324 2026-09-04 - v4.8.0: Step 3.8 rolling edit_log window (last 5,
+    quote-on-write, trim-in-same-write) + origin field verification/backfill +
+    manifest declared canonical per-file provenance, required at every close
+    tier (D127)"
 ---
 
 # Session Closer Skill
@@ -290,12 +306,12 @@ you got everything out of the source material in the first place.
 
 For each file modified this session (from the "Files updated" and "Files created" lists):
 
-1. Verify birth metadata is present (type, created, updated, operator, edit_log). Birth metadata should already exist from creation time (Working Rule 12); if any field is missing, add it now as a fallback.
+1. Verify birth metadata is present (type, created, updated, operator, origin, edit_log). Birth metadata should already exist from creation time (Working Rule 12); if any field is missing, add it now as a fallback. If `origin` is missing (a pre-D127 file), backfill it from the earliest edit_log entry, or from `created:` plus the file's operator when no edit_log exists.
 2. Verify `updated:` reflects today's date (YYYY-MM-DD)
-3. Append this session's identifier to `edit_log:` (solo-operator: `"DW-S70 2026-05-23"`; multi-operator: `"WV_2026-06-10_AA_01"` -- date is embedded in the ID). Deduplicate -- if the session already appears, don't add it again.
+3. Append this session's identifier to `edit_log:` (solo-operator: `'DW-S70 2026-05-23'`; multi-operator: `'WV_2026-06-10_AA_01'` -- date is embedded in the ID). **Always single-quote the entry**; an optional short clause of a few words may follow the date -- narrative belongs in the session log entry, not here. Deduplicate -- if the session already appears, don't add it again. Then trim to the window: `edit_log` keeps only the last 5 entries -- drop the oldest in the same write (D127; skip trimming in projects whose one-time pre-D127 cleanup has not yet run). Nothing is archived at trim time: the canonical per-file history is this entry's "Files created" / "Files updated" manifest, which is **required at every close tier**.
 4. For shell files whose sections were edited: bump the shell's `updated` field (but no `edit_log` on shells)
 
-Scalars (`updated`, `status`) may go through `update_frontmatter` alone. For `edit_log:` and any other array, never pass a bare array -- `merge: true` merges top-level keys only, so a passed array replaces the existing one wholesale (silent history wipe; see the MCP Reliability guide, "Array wipe via merge: true"). Append instead: the array-append primitive (`stamp_editlog.py` once shipped, or a raw-tail insert placed after the *last line of the array* -- the line before the next top-level key, not the last `- ` line, since long entries wrap onto continuation lines); where neither is available, re-read the full array immediately before the write and pass it back verbatim with the new entry appended, then verify the entry count did not shrink.
+Scalars (`updated`, `status`) may go through `update_frontmatter` alone. For `edit_log:` and any other array, never pass a bare array -- `merge: true` merges top-level keys only, so a passed array replaces the existing one wholesale (silent history wipe; see the MCP Reliability guide, "Array wipe via merge: true"). Append instead: the array-append primitive (`stamp_editlog.py` in `Seed/Scripts/`, or a raw-tail insert placed after the *last line of the array* -- the line before the next top-level key, not the last `- ` line, since long entries wrap onto continuation lines); where neither is available, re-read the full array immediately before the write and pass it back verbatim with the new entry appended, then verify the entry count did not shrink.
 
 **Scope:** `edit_log` is required on section files, recommended on infrastructure files (0.x) and standalone docs. Shell files are exempt -- they are assembly surfaces whose edit history is captured by their sections' logs. See the [[YAML Schema]] edit_log section for the full convention.
 

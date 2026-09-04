@@ -4,7 +4,7 @@ type: guide
 status: active
 maturity: working
 created: '2026-06-18'
-updated: 2026-08-30
+updated: 2026-09-04
 operator: Andrew
 tags:
   - protocol
@@ -35,11 +35,21 @@ edit_log:
   - "DW-S285 2026-08-24 - Additional principles: optimize for the operator's
     review budget, design for bursts, coverage guardrail (D120; S264 + design
     discussion)"
-  - "DW-S289 2026-08-26 - Additional principles: check the tool inventory before designing a tool (Flag Workbench / Quest GUI blind spot; inventory + pointer + tooling-review routing)"
-  - "DW-S286 2026-08-26 - Build discipline: make the invariant the write gate, not the post-check (bulk backfill)"
-  - "DW-S309 2026-08-30 - Design and spec review heuristics: give the enforcement scope and the operational scope one definition (meta-learning review S267-S287)"
-  - "DW-S309 2026-08-30 - Additional principles: ground-truth the substrate (named; pointer entry over its three canonical homes - 0.0 standing question 4, supervised-build skill, optimistic-claim pattern)"
-  - "DW-S309 2026-08-30 - Additional principles: an artifact is done when on the consumer's path AND verified in its runtime (named; 5-instance family, absorbs the built-vs-deployed watch; meta-learning review S288-S300)"
+  - "DW-S289 2026-08-26 - Additional principles: check the tool inventory before
+    designing a tool (Flag Workbench / Quest GUI blind spot; inventory + pointer
+    + tooling-review routing)"
+  - "DW-S286 2026-08-26 - Build discipline: make the invariant the write gate,
+    not the post-check (bulk backfill)"
+  - "DW-S309 2026-08-30 - Design and spec review heuristics: give the
+    enforcement scope and the operational scope one definition (meta-learning
+    review S267-S287)"
+  - "DW-S309 2026-08-30 - Additional principles: ground-truth the substrate
+    (named; pointer entry over its three canonical homes - 0.0 standing question
+    4, supervised-build skill, optimistic-claim pattern)"
+  - "DW-S309 2026-08-30 - Additional principles: an artifact is done when on the
+    consumer's path AND verified in its runtime (named; 5-instance family,
+    absorbs the built-vs-deployed watch; meta-learning review S288-S300)"
+  - DW-S324 2026-09-04 - principle 12 birth-metadata list gains origin (D127)
 ---
 # Working Principles
 
@@ -71,7 +81,7 @@ This is DW's three-layer pattern applied to its own protocol: the PI ([[DataWiza
 
 **11. MCP concurrency.** The session log shell (the 0.2 file) is a shared resource when more than one instance works a project at once. Patch it only at session close, verify immediately, and retry once before flagging a human, so concurrent patches don't silently collide.
 
-**12. Document metadata.** New files are born with their metadata (type, created, updated, operator, edit_log) rather than having it bolted on at session close, because sessions that never close would otherwise leave unattributed, undiscoverable files. On later edits, set `updated:` to the current date. The metadata is what makes the vault queryable by downstream pipelines. Full contract: [[YAML Schema]] Section 4.
+**12. Document metadata.** New files are born with their metadata (type, created, updated, operator, origin, edit_log) rather than having it bolted on at session close, because sessions that never close would otherwise leave unattributed, undiscoverable files. On later edits, set `updated:` to the current date. The metadata is what makes the vault queryable by downstream pipelines. Full contract: [[YAML Schema]] Section 4.
 
 **13. Frontmatter safety.** Always use `update_frontmatter` with `merge: true`. `merge: false` replaces the entire frontmatter block and silently deletes any field you didn't restate - this caused real data loss more than once. One default, no exceptions unless you genuinely intend to wipe fields.
 

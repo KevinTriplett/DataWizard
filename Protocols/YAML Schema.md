@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-08-30
+updated: 2026-09-04
 operator: Andrew
 priority: high
 maturity: working
@@ -19,8 +19,9 @@ edit_log:
   - "DW-S279 2026-08-18: generic-names sweep of examples (C2, Seed
     depersonalization; Flag Surfacing Chain B2)"
   - "DW-S309 2026-08-30: placeholder sweep completed - Alice/Ben/Cara ->
-    Operator-A/B/C (16 residual uses the S279 sweep missed; S289 role-placeholder
-    rule; meta-learning review S288-S300)"
+    Operator-A/B/C (16 residual uses the S279 sweep missed; S289
+    role-placeholder rule; meta-learning review S288-S300)"
+  - DW-S324 2026-09-04 - edit_log rolling window + origin field (D127)
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -121,7 +122,8 @@ The following fields MUST be present in frontmatter when any new file is created
 | `created` | YYYY-MM-DD | When the file was born |
 | `updated` | YYYY-MM-DD (same as created) | Last modification date |
 | `operator` | First name (e.g. Operator-A) | Who created it |
-| `edit_log` | Initial entry (e.g. "DW-S161 2026-06-09") | Provenance trail |
+| `origin` | Creation entry (e.g. 'DW-S161 2026-06-09'), immutable | Creation provenance |
+| `edit_log` | Seeded with the same entry as `origin`; thereafter a rolling last-5 window (D127) | Recent-touch window |
 
 **Required on section files additionally:**
 
@@ -304,22 +306,33 @@ generating_agent: Operator-A / Claude
 
 All frontmatter dates use plain `YYYY-MM-DD`. Do not use ISO datetime strings (`2026-05-22T00:00:00.000Z`) - plain dates are sufficient for DW's day-level tracking and parse consistently in Dataview.
 
-### The edit_log Field
+### The origin and edit_log Fields
 
-A cumulative YAML list tracking every session that modified a file. The last entry is the last editor; the full list is the provenance trail.
+**`origin`** is the immutable creation entry: which session (or person) created the file, in the same format as an edit_log entry. Written at birth, never modified thereafter.
+
+```yaml
+origin: 'DW-S161 2026-06-09 - created during the birth-metadata build'
+```
+
+**`edit_log`** is a rolling window of the last 5 sessions that modified the file, oldest first (append at the tail). It is a recency hint, not the history. The full per-file provenance trail's canonical home is the session log: every session entry's "Files created" / "Files updated" manifest (session-closer Output Format, Step 3.8), required at every close tier - plus git history where the vault is a repo. (D127; supersedes the earlier cumulative append-only contract.)
 
 ```yaml
 edit_log:
-  - "DW-S70 2026-05-23"
-  - "Operator-A 2026-05-24"
-  - "WV-S45 2026-05-25"
+  - 'DW-S70 2026-05-23'
+  - 'Operator-A 2026-05-24'
+  - 'WV-S45 2026-05-25 - repaired YAML break'
 ```
 
-- One entry per session (deduplicated). Append-only.
-- Agent edits: `"ProjectAbbrev-SNN YYYY-MM-DD"`. Human edits: `"Name YYYY-MM-DD"`.
+- **Always single-quote entries.** Unquoted colons and wrapped long lines have twice broken whole-file frontmatter parsing; quoting kills the failure class regardless of length.
+- One entry per session (deduplicated), stamped once per file at session close - not on every touch.
+- Entries are one compact line: session ID + date (agent edits `'ProjectAbbrev-SNN YYYY-MM-DD'`, human edits `'Name YYYY-MM-DD'`), plus an optional short clause of a few words. Narrative belongs in the session log entry, not here.
+- When appending would exceed 5 entries, drop the oldest **in the same write**. Nothing is copied anywhere at trim time: the trimmed history is already recorded in the session log manifests.
 - **Section files:** required. **Infrastructure files (0.x) and standalone docs:** recommended. **Shell files:** none - shells are assembly surfaces; their `updated` field bumps when sections change, but they do not accumulate a log.
-- Updated at session close via the session-closer (Step 3.9).
+- Preferred writer: `stamp_editlog.py` (quote-on-write, append-and-trim, `--manifest` batch mode). Hand edits are legal under the same contract: pass the full windowed list back in a single write (never a bare append via `update_frontmatter` merge - see the MCP Reliability guide's array-wipe warning).
+- SKILL.md files that used edit_log as a version changelog keep that history in a body `## Changelog` section instead; their frontmatter edit_log rolls like everywhere else.
+- Updated at session close via the session-closer (Step 3.8).
+- Migration note: trimming begins only after a project's one-time cleanup pass has archived its pre-D127 history; until then, append-only continues.
 
-Design rationale: `Workshop/Design/YAML Metadata Protocol Decisions.md`.
+Design rationale: D127 (rolling window + origin - link-don't-restate applied to provenance). Earlier: `Workshop/Design/YAML Metadata Protocol Decisions.md`.
 
 *Extracted from the DataWizard Universal Protocol (section 4.0) in the S182 demolition (D94). Structural and formatting conventions live in the [[Conventions Registry]].*
