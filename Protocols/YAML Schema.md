@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-09-04
+updated: 2026-09-05
 operator: Andrew
 priority: high
 maturity: working
@@ -22,6 +22,9 @@ edit_log:
     Operator-A/B/C (16 residual uses the S279 sweep missed; S289
     role-placeholder rule; meta-learning review S288-S300)"
   - DW-S324 2026-09-04 - edit_log rolling window + origin field (D127)
+  - DW-S332 2026-09-05 - added session_started/session_closed span fields + Date
+    Stamping and Time Sense section (clock-check rule; Multi-Day Sessions FR
+    changes 1-2)
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -99,6 +102,8 @@ Fields specific to session-log entry files, beyond the birth metadata every file
 | *(absent)* | Normal main-arc session entry |
 
 **`claim_id`**: A short random token (e.g. a 6-8 char hex nonce) stamped on a session-log *stub* at claim time to make session-claiming collision-evident under concurrency. After writing the stub, the claiming instance re-reads it and checks `claim_id`: if the on-disk value is not the one it wrote, a parallel instance won the slot, so it claims the next free identifier instead (PI Orientation Step 3, verify-after-claim). Ephemeral - present only while `status: in-progress`; the session-closer strips it when it overwrites the stub with the full entry at close. Design: [[Session Claiming Under Concurrency]].
+
+**`session_started` / `session_closed`**: The session's date span (both plain YYYY-MM-DD; equal for a single-day session). Sessions increasingly cross midnight or span days, and a single date cannot cover both ends. The claim stub sets `session_started:` at claim time; the session-closer sets `session_closed:` at close and reconciles any of the session's writes stamped with the start date that actually landed later. The session identifier keeps the start date - identity never changes mid-session; the span lives in these fields. On every ordinary document, `updated:` means the date of the actual write, never the session-start date. (Adopted 2026-09 from four-project field evidence; see Date Stamping and Time Sense below.)
 
 ### Infrastructure File Frontmatter
 
@@ -305,6 +310,10 @@ generating_agent: Operator-A / Claude
 ### Date Format
 
 All frontmatter dates use plain `YYYY-MM-DD`. Do not use ISO datetime strings (`2026-05-22T00:00:00.000Z`) - plain dates are sufficient for DW's day-level tracking and parse consistently in Dataview.
+
+### Date Stamping and Time Sense
+
+**Never stamp a date from memory or context - check the clock first.** Run `date` in the shell before a writing burst (in a sandboxed surface, the device shell: the environment header's date is set at thread start and has been observed both a day behind and a day ahead of the real clock). Prior stamps in the same session are not evidence of today's date; neither are sibling files' stamps - instances anchor on context (the previous session's dates, their own earlier writes, sibling stubs) and drift when a thread crosses midnight or resumes days later. One check per writing burst is enough; a session resuming after a break re-checks before its next write. For any close-time reconciliation, file mtimes - not beliefs or headers - are the evidence base. Field record: independently re-derived in five sessions across four projects (2026-07 to 2026-09), including an instance that mis-stamped its own claim stub from sibling-stub anchoring while triaging this very rule's feature request.
 
 ### The origin and edit_log Fields
 
