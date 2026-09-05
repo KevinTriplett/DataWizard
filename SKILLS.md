@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-09-04'
+updated: '2026-09-05'
 edit_log:
   - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
     for pending-report model (D114)
@@ -48,7 +48,12 @@ edit_log:
     degraded path), synced same-session as the bump
   - DW-S317 2026-08-31 - supervised-build row -> v1.2 (silent-drops probe),
     synced same-session as the bump
-  - 'DW-S330 2026-09-04 - shared-layer-redaction row added (v1.0, new skill from the RG-S9 FR); transcript-harvest row -> v0.9.1; catalog sync: session-closer row -> v4.8.1 (had missed S324), meta-learning-scan -> v1.4.2, meta-learning-review -> v1.5.4'
+  - "DW-S330 2026-09-04 - shared-layer-redaction row added (v1.0, new skill from
+    the RG-S9 FR); transcript-harvest row -> v0.9.1; catalog sync:
+    session-closer row -> v4.8.1 (had missed S324), meta-learning-scan ->
+    v1.4.2, meta-learning-review -> v1.5.4"
+  - DW-S333 2026-09-05 - supervised-build row -> v1.3 (harness-validation rule),
+    synced same-session as the bump
 ---
 
 # DataWizard Skills
@@ -64,7 +69,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **project-guidelines** (v1.5) | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. Handles existing filename conventions gracefully. Includes `last_content_interests_review:` in new 0.0 templates. |
 | **session-closer** (v4.8.1) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. Feeds the project's Operator Gate Queue at close (Registry-canonical schema). |
 | **side-quest** (v1.0) | Technique | Tracking a tangent from the project's current arc as a parallel stream in the session log. Routes a side quest's continuation into "Active quest threads" and protects the main arc's "What's next" from being overwritten, so parallel streams don't collide under concurrency. Triggers on: "let's go on a side quest," "continue the [X] side quest." |
-| **supervised-build** (v1.2) | Technique | Running a multi-chunk build under a per-chunk review relay with a reviewer instance (Coordination Patterns, Pattern 4). Loads in either seat: the build session gets the review gate as a hard precondition (no chunk written without a `status: reviewed` note - skipping is an on-record choice), the reviewer gets on-disk verification, run-don't-read script testing, and the mandated five-field State Board write so a cold instance can answer "where are we at" from the driver doc alone. |
+| **supervised-build** (v1.3) | Technique | Running a multi-chunk build under a per-chunk review relay with a reviewer instance (Coordination Patterns, Pattern 4). Loads in either seat: the build session gets the review gate as a hard precondition (no chunk written without a `status: reviewed` note - skipping is an on-record choice), the reviewer gets on-disk verification, run-don't-read script testing, harness validation against the real tool's output, and the mandated five-field State Board write so a cold instance can answer "where are we at" from the driver doc alone. |
 | **research-tracking** | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |
 | **tools-research** | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Batch mode includes harvest pre-filtering and two-speed processing. References research-tracking. |
 | **design-harvest** | Technique | Turning research findings into design doc updates, skill refinements, roadmap additions, and guideline improvements. The interpretive bridge between research (facts) and living docs (architecture). Includes target-section overlap check before planting. Completes the research lifecycle: tools-research (evaluate) -> research-tracking (track) -> design-harvest (integrate). |

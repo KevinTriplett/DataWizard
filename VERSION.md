@@ -1,5 +1,5 @@
 
-seed: 1.6.1
+seed: 1.6.2
 protocol: 1.8
 project_instructions: 4.6
 
@@ -52,6 +52,39 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.6.2
+
+**Fork-topology guard (`update_seed.sh`).** Git mode now verifies that
+`origin` points at the canonical repo (owner AND repo name matched by URL,
+https or ssh form, case-insensitive) before trusting any origin-based
+comparison. Previously a clone whose origin was a fork was measured against
+the fork alone: a fork-synced clone reported "Already current" while
+releases behind canonical (field-confirmed on a collaborator clone stuck at
+1.1.1 for months), and two error messages prescribed
+`git reset --hard origin/main` - the exact command that rolls a fork-shaped
+clone back to the fork's stale state (demonstrated live on the audit
+fixture: 1.6.0 -> 1.2.0). Now:
+
+- Fork-shaped clones get a WARNING naming the actual canonical remote (or
+  its absence), and the script also fetches canonical to measure real
+  staleness.
+- The staleness report is honest: "in sync with your FORK (origin), but N
+  commit(s) behind the canonical Seed repo", exit 3 - never a false
+  "Already current". A fork clone that IS current with canonical still
+  exits 2, with a note.
+- All four recovery messages (dirty tree, failed self-heal, ahead-of-origin,
+  failed fast-forward) point at Git Guide 7.0 "Recovering a Seed Clone
+  (Remote-Agnostic)" instead of prescribing reset commands - reset-as-
+  default-verb is retired from the script's entire error surface.
+- The zip-over-git self-heal is explicitly restricted to canonical-origin
+  clones.
+
+No remote is ever auto-repointed; all guards still fail closed. Audited in
+DW S318 (run-don't-read fixture audit), built and fixture-verified in DW
+S333 (nine-scenario regression matrix incl. ssh-form URLs, fork-owner
+anchoring, the canonical self-heal, and the upstream guard).
+`update_seed.ps1` needs no change - it refuses git clones entirely.
 
 ## What's New in 1.6.1
 

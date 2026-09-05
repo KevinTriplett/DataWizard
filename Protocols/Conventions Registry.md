@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-08-31
+updated: 2026-09-05
 operator: Andrew
 priority: high
 maturity: working
@@ -68,6 +68,9 @@ edit_log:
     (lifecycle vocab, G-row schema, feeding, verify-before-working, exit
     ceremony), Active Threads ledger row schema entry (Track 1), Model routing
     entry (single home), Tracking Model deployment-gate fact-class row"
+  - "DW-S332 2026-09-05: Link, don't restate gains 'Agent entry points are
+    pointers' (Engineering Doctrine FR candidate 3; rule largely existed -
+    extension sentence, not a new entry)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -81,6 +84,8 @@ This registry is that home for the conventions below. Skills, guides, and projec
 **Pointers carry no status.** A pointer - a 0.0 Key Pointer, a "see also", a ledger `home:` line - says *where* something lives, never *what state it is in*. "(codification pending, Backlog P3)" inside a pointer is a copy of the item's state, and it will lie the moment the item moves: one 0.0 kept announcing a convention as pending for two weeks after the Registry had adopted it. State lives at the canonical item (the Backlog line, the gate row, the frontmatter `status:`); a pointer that needs to say "pending" should instead link to the thing that is pending. (DataWizard, 2026-08.)
 
 The same law governs the **distribution layer**: copied state rots; only pointers stay true. A value copied out of its canonical home -- a version number restated in a collaborator doc, a "pinned" claim in a README, a recommended method repeated in setup instructions -- will eventually lie, because nothing forces the copy to update when the source changes. Point at the canonical source (VERSION.md, the config itself, this registry); where a copy is unavoidable, treat it as a release artifact the convention-flip sweep (below) must reconcile. Named from three instances in one arc, then re-demonstrated inside that same arc when a "pinned >=0.12.5" claim was found false across three docs while the running config said `@latest`. (D111; S226, S227, S230)
+
+**Agent entry points are pointers.** The same law governs agent-facing entry points: every surface an agent reads at startup - pasted project instructions, a CLAUDE.md or AGENTS.md, an IDE rules file, a tool-specific config - is a thin pointer to one canonical doctrine doc, never a copy of it. One canonical doc, N entry points: N tools reading one source cannot drift; N copies will. The Project Instructions' per-surface appendices already follow this; the rule extends it to every agent entry point a project adds. (DataWizard, 2026-09; from a production-repo harvest.)
 
 **Example:** Before this registry, the 0.x slot table appeared in three docs with three different slot lists. Now it appears once (below); the Protocol shell, the health-audit skill, and the project-guidelines skill link to it.
 

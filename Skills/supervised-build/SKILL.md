@@ -11,9 +11,9 @@ description: >-
   (Pattern 3), a build with no reviewer available, or incidental concurrency
   between unrelated sessions.
 type: skill
-version: '1.2'
+version: '1.3'
 created: '2026-08-30'
-updated: '2026-08-31'
+updated: '2026-09-05'
 operator: Andrew
 edit_log:
   - "DW-S306 2026-08-30 - v1.0: codified from Coordination Patterns Pattern 4
@@ -25,6 +25,11 @@ edit_log:
   - "DW-S317 2026-08-31 - v1.2: silent-drops probe added to Reviewer Steps (any
     silently discarded input gets a counter/warning; second field arc -
     stamp_blocks S294, dw_status S319 - met codify-on-second-use)"
+  - "DW-S333 2026-09-05 - v1.3: harness-validation rule added to Reviewer Steps
+    (validate the harness against the real tool's actual output; per-scenario
+    expected-message assertions) - second field arc of the
+    instrument-measures-itself class (S268 flag distribution, S333 insteadOf
+    harness) met codify-on-second-use"
 ---
 
 # Supervised Build Skill
@@ -77,6 +82,8 @@ Per chunk:
 **End with a whole-build sweep.** After the last chunk, a supervisor-tier pass over every artifact the build touched, ideally from a fresh instance. Unreviewed is where the defects live.
 
 **Probe the real thing, not only fixtures.** When verifying a shipped tool or script, include at least one probe against a copy of the hottest real production file it will touch (copied to scratch, never the original). Synthetic fixtures only exercise the failure modes their author imagined; the real file carries shapes nobody imagined - including pre-existing damage the tool must survive. Field grounding: a real-file probe during verification surfaced that the two hottest project files had silently unparseable frontmatter from an earlier manual write - a defect no fixture modeled, caught only because the probe target was real (2026-08).
+
+**Validate the harness against the real tool.** A fixture that stubs, rewrites, or simulates what a tool reports must be checked against what the tool actually prints - configured intent and effective output can differ (e.g. `git remote -v` prints insteadOf-rewritten URLs, not the configured ones). And every scenario asserts its expected message, never just the exit code, so a silently degraded harness cannot pass. Field grounding: a URL-guard regression harness built on insteadOf rewrites silently exercised only the guard's no-match path; per-scenario message assertions caught it, and incidentally proved the degraded path failed closed (2026-09). Same class as the live-distribution check: the measuring instrument measuring itself.
 
 **Probe for silent drops.** Ask of every parser or pipeline the build ships: where does this discard input without a trace? Any input the system drops silently - an unrecognized field, an annotated value, an unresolvable reference or embed, an unmappable record - gets a counter or a lint warning, never silence; the behavior (ignore, degrade, skip) is often right, the invisibility is the defect. Field grounding: two arcs, every review-found defect in this class - a stamper's silent wrong-line write (2026-08), and a status board whose annotated statuses, unknown keys, and missing embeds each vanished from counts until instrumented (2026-08).
 

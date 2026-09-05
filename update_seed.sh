@@ -18,20 +18,25 @@
 #
 # If the Seed is a git clone (Seed/.git exists), sync uses git fetch +
 # fast-forward merge instead of the zip download, and refuses to touch a
-# working tree with local changes or local commits.
+# working tree with local changes or local commits. Git mode verifies that
+# origin points at the canonical repo; a clone whose origin is a fork is
+# measured against the canonical remote too and is never certified current
+# by the fork alone (fork-topology guard, DW S318/S333).
 #
 # The Seed maintainer's machine must never auto-sync (upstream pushes,
 # everyone else pulls). Guard: a `seed_role` row containing `upstream` in
 # the vault's Vault Config.md blocks --install-autosync and sync runs.
 #
 # Exit codes: 0 = updated/ok, 1 = error, 2 = already current,
-#             3 = skipped (local git changes or upstream guard)
+#             3 = skipped (local git changes, fork-shaped clone, or upstream guard)
 
 set -euo pipefail
 
 main() {
 
 REPO_URL="https://github.com/andrewalan11/DataWizard/archive/refs/heads/main.zip"
+# Canonical repo slug (owner/name), derived from REPO_URL - single source.
+CANONICAL_SLUG=$(printf '%s' "$REPO_URL" | sed -E 's#^https://github\.com/([^/]+/[^/]+)/archive/.*$#\1#')
 TMP_DIR="/tmp/dw-seed-update"
 TMP_ZIP="/tmp/dw-seed.zip"
 AGENT_LABEL="com.datawizard.seed-update"
@@ -132,6 +137,24 @@ worktree_matches_origin() {
   fi
   rm -f "$tmp_index"
   return $rc
+}
+
+# --- Canonical-remote lookup ---
+# Prints the name of the remote whose fetch URL points at the canonical repo
+# (https or ssh form, case-insensitive), preferring origin; prints nothing
+# when no remote matches. Owner AND repo name must both match - a fork named
+# DataWizard under another owner is not canonical.
+find_canonical_remote() {
+  local names
+  names=$(git -C "$SEED_DIR" remote -v 2>/dev/null \
+    | grep -iE "github\.com[:/]${CANONICAL_SLUG}(\.git)?[[:space:]]" \
+    | grep -F '(fetch)' | awk '{print $1}') || true
+  if printf '%s\n' "$names" | grep -qx 'origin'; then
+    printf 'origin'
+  else
+    printf '%s' "$(printf '%s\n' "$names" | head -n 1)"
+  fi
+  return 0
 }
 
 # --- Uninstall autosync ---
@@ -253,6 +276,20 @@ if [ -d "$SEED_DIR/.git" ]; then
     exit 1
   fi
 
+  # Resolve the canonical remote before any comparison. Every check below
+  # measures origin; if origin is a fork, origin-based answers describe the
+  # fork's world, not the canonical Seed (fork-topology defect, DW S318).
+  CANONICAL_REMOTE="$(find_canonical_remote)"
+  ORIGIN_IS_CANONICAL=false
+  BEHIND_CANONICAL="unknown"
+  if [ "$CANONICAL_REMOTE" = "origin" ]; then
+    ORIGIN_IS_CANONICAL=true
+  elif [ -n "$CANONICAL_REMOTE" ]; then
+    log_entry "WARNING: this clone's origin is not the canonical Seed repo ($CANONICAL_SLUG); canonical is remote '$CANONICAL_REMOTE'. Sync measures your fork, not the canonical Seed."
+  else
+    log_entry "WARNING: no remote on this clone points at the canonical Seed repo ($CANONICAL_SLUG). Canonical staleness cannot be checked. See Git Guide 7.0 (Recovering a Seed Clone, Remote-Agnostic)."
+  fi
+
   # Fetch first so we can compare the working tree against origin/main.
   if ! git -C "$SEED_DIR" fetch origin main --quiet 2>/dev/null; then
     log_entry "ERROR: git fetch failed. Check network connection."
@@ -262,13 +299,23 @@ if [ -d "$SEED_DIR/.git" ]; then
   AHEAD=$(git -C "$SEED_DIR" rev-list --count origin/main..HEAD 2>/dev/null || echo 0)
   BEHIND=$(git -C "$SEED_DIR" rev-list --count HEAD..origin/main 2>/dev/null || echo 0)
 
+  # On a fork-shaped clone, also measure against the canonical remote so the
+  # report below can be honest about real staleness.
+  if [ "$ORIGIN_IS_CANONICAL" = false ] && [ -n "$CANONICAL_REMOTE" ]; then
+    if git -C "$SEED_DIR" fetch "$CANONICAL_REMOTE" main --quiet 2>/dev/null; then
+      BEHIND_CANONICAL=$(git -C "$SEED_DIR" rev-list --count "HEAD..$CANONICAL_REMOTE/main" 2>/dev/null \
+        || git -C "$SEED_DIR" rev-list --count HEAD..FETCH_HEAD 2>/dev/null \
+        || echo "unknown")
+    fi
+  fi
+
   # Never clobber local work: a tracked-file edit normally means the user has
   # changes to keep. But a "zip-over-git collision" (an earlier zip-mode run
   # copied files over a git clone without committing) leaves the tree dirty
   # while its content is byte-identical to origin/main -- a lossless case we
   # self-heal. Untracked files (e.g. a user's Vault Config.md) are fine.
   if [ -n "$(git -C "$SEED_DIR" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
-    if [ "$AHEAD" -eq 0 ] && worktree_matches_origin; then
+    if [ "$ORIGIN_IS_CANONICAL" = true ] && [ "$AHEAD" -eq 0 ] && worktree_matches_origin; then
       # Tracked working tree already equals origin/main and no local commits
       # exist: resetting HEAD to origin/main discards nothing.
       if git -C "$SEED_DIR" reset --hard --quiet origin/main 2>/dev/null; then
@@ -279,26 +326,43 @@ if [ -d "$SEED_DIR/.git" ]; then
         echo "Seed self-healed and up to date at $SEED_DIR"
         exit 0
       fi
-      log_entry "ERROR: detected a zip-over-git collision but the reset failed. Recover manually: git -C \"$SEED_DIR\" reset --hard origin/main"
+      log_entry "ERROR: detected a zip-over-git collision but the reset failed. Follow the recovery procedure in Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
       exit 1
     fi
-    log_entry "SKIPPED: Seed git working tree has local edits to tracked files. Commit, stash, or discard them, then sync again. If this is a stuck clone (files show as modified but are identical to the remote), recover with: git -C \"$SEED_DIR\" reset --hard origin/main -- this discards local changes, so use it only if you have no edits to keep. See the Seed VERSION.md recovery notes."
+    if [ "$ORIGIN_IS_CANONICAL" = true ]; then
+      log_entry "SKIPPED: Seed git working tree has local edits to tracked files. Commit, stash, or discard them, then sync again. If this is a stuck clone (files show as modified but are identical to the remote), follow the recovery procedure in Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic) - do not reset by hand."
+    else
+      log_entry "SKIPPED: Seed git working tree has local edits to tracked files, and this clone's origin is not the canonical Seed repo. Do NOT run 'git reset --hard origin/main' here - on a fork-shaped clone it can roll the Seed back to a stale state. Follow Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
+    fi
     exit 3
   fi
 
-  # Skip if local commits are ahead of origin (likely a maintainer or a fork)
+  # Skip if local commits are ahead of origin (maintainer work, or a
+  # fork-shaped clone whose HEAD origin has never seen)
   if [ "$AHEAD" -gt 0 ]; then
-    log_entry "SKIPPED: Seed git clone has $AHEAD local commit(s) ahead of origin/main. Push or reconcile them manually."
+    if [ "$ORIGIN_IS_CANONICAL" = true ]; then
+      log_entry "SKIPPED: Seed git clone has $AHEAD local commit(s) ahead of origin/main. Push or reconcile them manually."
+    else
+      log_entry "SKIPPED: this clone is $AHEAD commit(s) ahead of origin/main, but origin is not the canonical Seed repo - usually a fork-shaped clone, not unpushed work ($BEHIND_CANONICAL commit(s) behind canonical). Do not push or reset; fast-forward from the canonical remote per Git Guide 7.0 (Recovering a Seed Clone, Remote-Agnostic)."
+    fi
     exit 3
   fi
 
   if [ "$BEHIND" -eq 0 ]; then
-    log_entry "Already current (git, Seed $OLD_VERSION, PI $OLD_PI). No update needed."
-    exit 2
+    if [ "$ORIGIN_IS_CANONICAL" = true ]; then
+      log_entry "Already current (git, Seed $OLD_VERSION, PI $OLD_PI). No update needed."
+      exit 2
+    fi
+    if [ "$BEHIND_CANONICAL" = "0" ]; then
+      log_entry "Current with canonical (git, Seed $OLD_VERSION, PI $OLD_PI). Note: origin is a fork; sync tracks it, not the canonical Seed repo."
+      exit 2
+    fi
+    log_entry "SKIPPED: in sync with your FORK (origin), but $BEHIND_CANONICAL commit(s) behind the canonical Seed repo ($CANONICAL_SLUG). A stale fork reports current forever; this clone will not update until it syncs from canonical. Fast-forward from the canonical remote per Git Guide 7.0 (Recovering a Seed Clone, Remote-Agnostic)."
+    exit 3
   fi
 
   if ! git -C "$SEED_DIR" merge --ff-only origin/main --quiet; then
-    log_entry "ERROR: git fast-forward merge failed (divergent history?). See the Seed VERSION.md recovery notes; reset, don't merge."
+    log_entry "ERROR: git fast-forward merge failed (divergent history?). Do not merge and do not reset by hand - follow Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
     exit 1
   fi
 
