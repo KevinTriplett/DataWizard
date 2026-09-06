@@ -27,11 +27,15 @@ edit_log:
     (get_page_content + execute_javascript) + claude-in-chrome alternative;
     device_bash background-process death"
   - VC-S77 2026-08-30 Device Bridge: repo-to-Mac delivery recipe (cloud clone + tarball commit)
+  - "DW-S331 2026-09-06 - new section: SQLite on the Vault Mount (no-delete
+    policy -> WAL/DELETE/TRUNCATE fail, PERSIST-only rule, hot-journal off-mount
+    recovery recipe; call-timeout kills children + PID-namespace pgrep false
+    positive)"
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-09-04
+updated: 2026-09-06
 ---
 # Cowork Build Environment
 
@@ -74,6 +78,8 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **Staged large-file paths do not survive a session interruption/reclaim.** A staged tool-results directory was gone after a session gap; re-fetching was cheap and deterministic. Re-fetch instead of hunting for the old path. (Source: RW S51)
 - **`pkill -f <pattern>` kills the calling shell itself.** Cleaning up backgrounded test servers with `pkill -f hub_server` (or any `-f` pattern) matched the sandbox's own wrapper process and terminated the whole `bash` call - it exits 144 with NO output, including any echoes before the pkill, which reads as a mysterious total failure. Never use `pkill`/`killall` in the sandbox. Track each backgrounded PID from `$!` and `kill "$PID"` explicitly; to free a port, start the next server on a different port instead. (Source: Location Scout, 2026-08)
 
+- **The session's "Today's date" env line goes stale in long-lived sessions.** It is stamped at session start and can lag days behind real time. Run `date` in a shell before claiming session IDs or stamping birth metadata; a stale env date produced a misdated multi-operator session claim that had to be renamed mid-session. (Weave, 2026-09)
+
 ## Network and GitHub Data
 
 - **WebFetch rate-limits (HTTP 429).** Space calls out; lean on WebSearch snippets when throttled. (Source: Weave, 2026-06/08)
@@ -82,6 +88,18 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **Some sandbox configurations 403-block `api.github.com` AND github.com HTML pages outright** (proxy-level), while GitHub release-asset downloads (`github.com/<org>/<repo>/releases/download/...`, including `checksums.txt`) and the git protocol still work. A pinned release-asset URL is then the reliable way to install a released binary: fetch the release's `checksums.txt` to discover exact asset names, download, verify sha256 locally. (Source: DW S329)
 - **GitBook sources are agent-friendly:** append `.md` to any page URL for clean markdown; `llms.txt` is a full index; `?ask=` answers questions against the docs. (Source: Weave, 2026-06/08)
 - **Filing GitHub issues via pre-filled `issues/new?title=&body=` URLs** (URL-encode the body, open in the user's authed browser, human submits) is a robust, low-brittleness alternative to JS form-filling -- and keeps the irreversible public action on a third party's repo in human hands. The `return_to` param survives a login redirect. (Source: DW S230)
+
+## SQLite on the Vault Mount
+
+The mounted vault filesystem REFUSES file deletion, and three SQLite behaviors depend on deleting files. All fail with a bare `disk I/O error` (DataWizard, 2026-09):
+
+- `PRAGMA journal_mode=WAL` - the shm/wal lifecycle needs deletes. WAL is also sticky in the db file: one native WAL flip locks every sandbox session out of that db.
+- Default `DELETE` (and `TRUNCATE`) journal modes - commit-time journal removal fails, which aborts the WRITE at commit and leaves a HOT JOURNAL behind; every subsequent open of the db then fails until recovered.
+- **`PERSIST` is the only journal mode that works on both surfaces** (sandbox mount + native). Rule: route every connection through a shared connect() helper that sets `PRAGMA journal_mode=PERSIST`; never open a mounted db for writing with a raw default connection.
+
+Hot-journal recovery (deletes are refused, so recover off-mount): copy the db AND its `-journal` to a scratch dir outside the mount, open the copy once (SQLite recovers it there, where deletes work), run `PRAGMA integrity_check`, copy the recovered db back over the mounted one, then truncate the mounted journal to zero bytes (`: > file`). Never truncate a hot journal without recovering first.
+
+Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS its child processes (die-with-parent), and each call runs in its own PID namespace - `pgrep` matches your own probe command, so a killed job can look alive. Long jobs (LLM batch loops, big scans) must be sliced so each invocation fits one call; design the consumer idempotent so slices converge.
 
 ## Rendering (HTML to PDF)
 
@@ -93,6 +111,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **`device_commit_files` rejects an explicit `expectedMtimeMs: null`** -- omit the field entirely when no mtime guard is wanted. (Source: DW S229)
 - **`Control_Chrome` proxy: tab management works; page reads do not.** `list_tabs` / `open_url` / `switch_to_tab` are reliable, but `get_page_content` AND `execute_javascript` return "Google Chrome is not running" even with a live tab (intermittent in DW S230; consistent in LS S73). To read a live, logged-in page (e.g. Google Maps saved lists), use the **claude-in-chrome extension** instead -- once the user signs in, its screenshots + accessibility-tree DOM are reliable. Verify page state via `list_tabs` URL params, not by retrying the read. (Source: DW S230, Location Scout 2026-08)
 - **`device_bash` backgrounded processes do not survive the call.** Like the sandbox, a server started on the user's machine via `device_bash` with `&`, `nohup`, or even `setsid` is gone by the next `device_bash` call (same-shell `curl` 200, cross-shell 000 -- the call's process group is torn down on return). To exercise a device-side server, start it AND hit it within the SAME call; you cannot start it in one call and drive it from a separate browser/tool call. Test a device-hosted server this way, or (for a rendered-DOM check) stage the app into the sandbox and drive it with headless Playwright there. (Source: Location Scout, 2026-08)
+- **SQLite cannot write on the mounted vault from `device_bash` -- the mount lacks file locking.** Creating or writing a SQLite db on a connected folder's mount fails with `disk I/O error` (WAL) or `attempt to write a readonly database` (even `mode=ro` opens, which still need the lock), because the VM's FUSE mount does not support SQLite's locking. Native processes on the user's machine are unaffected (WAL dbs on the same folder work normally there). Pattern: build/write the db in the VM `$HOME`, `PRAGMA wal_checkpoint` + close (or fold to `journal_mode=DELETE`), `cp` the closed file onto the mount, and verify by byte-hash plus a `file:...?immutable=1` read -- never a plain open. (Source: DataWizard, 2026-09)
 - **Cowork connects folders individually, by exact path.** Connecting a parent folder does not expose its siblings, and moving or renaming a connected folder on disk breaks its connection until it is re-added in the desktop app. If a session suddenly cannot see a folder it could see before, check whether the folder moved before debugging the tools. (Source: DataWizard, 2026-07)
 - **Workflow (multi-agent orchestration) tool: `args` arrived `undefined` once; subagents can reach the device bridge.** In one run the value passed as the Workflow's `args` input never reached the script (`args` was `undefined` inside it); inlining the data as constants in the script body is the reliable fallback, and a quick `log(JSON.stringify(args))` at the top of the script tells you which case you are in before any agent spends tokens. Separately, foreground Workflow subagents CAN reach the `remote-devices` bridge (vault reads, `device_bash`) by loading the tools via ToolSearch inside the subagent - the bridge is not restricted to the main loop. (Source: DataWizard, 2026-07)
 - **Deliver a git repo to the user's machine when `device_bash` has no network:** clone (shallow) in the cloud sandbox, `tar czf`, `SendUserFile` -> `device_commit_files` into the destination folder, then `tar xzf` with `device_bash` (the `.git` survives, so `git log`/`remote` work locally). ~12 MB tarballs land fine; park the tarball in a `_to_delete/` subfolder afterwards since the device shell cannot delete. (Source: VibeCut S77, 2026-08)

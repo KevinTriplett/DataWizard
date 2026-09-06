@@ -112,6 +112,36 @@ log_entry() {
 
   echo "**$timestamp** - $message" >> "$SYNC_LOG"
   echo "$message"
+  trim_sync_log
+}
+
+# Keep the Seed Sync Log bounded without discarding history: the active note
+# keeps its header plus the last SYNC_LOG_KEEP entry lines; older entries are
+# appended to "Seed Sync Log Archive.md" beside it (created with a header on
+# first use). Entry lines start with "**"; the header is everything before the first.
+SYNC_LOG_KEEP=1000
+trim_sync_log() {
+  local first n excess tmp archive
+  first=$(grep -n -m1 '^\*\*' "$SYNC_LOG" 2>/dev/null | cut -d: -f1) || true
+  [ -n "$first" ] || return 0
+  n=$(wc -l < "$SYNC_LOG" | tr -d ' ')
+  excess=$((n - first + 1 - SYNC_LOG_KEEP))
+  [ "$excess" -gt 0 ] || return 0
+  archive="${SYNC_LOG%.md} Archive.md"
+  if [ ! -f "$archive" ]; then
+    printf '%s\n' "---" "title: Seed Sync Log Archive" "type: project-doc" \
+      "created: $(date '+%Y-%m-%d')" "updated: $(date '+%Y-%m-%d')" "---" "" \
+      "# Seed Sync Log Archive" "" \
+      "Older entries rotated out of Seed Sync Log.md by update_seed.sh (oldest first). Nothing is discarded." "" "---" "" > "$archive"
+  fi
+  tmp="$SYNC_LOG.tmp.$$"
+  if sed -n "${first},$((first + excess - 1))p" "$SYNC_LOG" >> "$archive" 2>/dev/null \
+     && { head -n $((first - 1)) "$SYNC_LOG"; tail -n "$SYNC_LOG_KEEP" "$SYNC_LOG"; } > "$tmp" 2>/dev/null; then
+    mv -f "$tmp" "$SYNC_LOG"
+  else
+    rm -f "$tmp"
+  fi
+  return 0
 }
 
 # --- Upstream guard ---

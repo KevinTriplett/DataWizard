@@ -283,7 +283,6 @@ _DataWizard/Seed/
   SKILLS.md              - Skills catalog (the authoritative list of all skills)
   Protocols/             - Operating rules: Conventions Registry, YAML Schema, Editorial Principles, Anti-Patterns, Content Type Taxonomy, Quest Lifecycle
   Skills/                - One folder per skill; SKILLS.md is the catalog
-  Agents/                - Agent instruction files
   Scripts/               - Classification, segmentation, routing, sync, and converter scripts
   Config/                - Default configuration (enrichment_defaults.yaml)
   Guides/                - Setup and reference guides (Git Guide, Vault Structure Guide, Filename Safety, Federation Guide, Seed Install and Update, MCP Reliability, Cowork Scheduled Tasks, and more)

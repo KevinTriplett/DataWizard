@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: '2026-09-04'
+updated: '2026-09-06'
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -60,7 +60,10 @@ edit_log:
     false-trip on the FUSE mount; prefer content guards"
   - DW-S324 2026-09-04 - unquoted-colon entry aligned to D127
     single-quote-always rule
-  - 'DW-S330 2026-09-04 - Known Issues: stale serving of synced-never-opened files (CRLF copy not on disk; WV_2026-09-02_JC_02)'
+  - "DW-S330 2026-09-04 - Known Issues: stale serving of synced-never-opened
+    files (CRLF copy not on disk; WV_2026-09-02_JC_02)"
+  - "DW-S332 2026-09-06 - Obsidian Behavioral Gotchas: write_note append joins
+    without a newline separator (leading-newline rule + column-1 verify)"
 ---
 # MCP Reliability and Write Verification
 
@@ -243,6 +246,8 @@ The takeaway for DW: when an operation might be undone or re-applied later, reco
 
 These are not MCP bugs but Obsidian behaviors that agents need to account for.
 
+**`write_note` append mode joins WITHOUT a newline separator.** Appended content is glued directly onto the file's last character, so appending a list item to a file whose last line lacks a trailing newline concatenates the new item onto the old one's line - the file stays valid-looking and every write reports success, but list parsing, greps, and Dataview all see one merged line. Three appended backlog items (plus a parallel session's fourth) chained onto one line this way. Rule: start appended content with a leading newline (or `\n\n` for a new block), and after an append verify the new content begins at column 1 (`grep -c "^- "` style) rather than trusting the success response. (DataWizard, 2026-09)
+
 **`move_note` does NOT auto-update wikilinks.** When you rename or relocate a note via `move_note`, Obsidian's MCP does not update wikilinks in other files that reference the moved note. After any rename or move, you must manually search the vault for references to the old path/name and patch them. Search vault-wide, not just within the current project -- wikilinks without paths can resolve across projects. (Source: MMM S08)
 
 **In-app renames and MCP moves drift in opposite directions.** Obsidian's *in-app* rename auto-updates inbound wikilinks across the vault; MCP `move_note` does not. Mixing the two -- an in-app rename plus an MCP move -- and then running a `replaceAll` link cleanup double-suffixes the links (the in-app half already fixed them, the `replaceAll` fixes them again). Rule: after any rename, grep the *current on-disk* link text before a `replaceAll` cleanup, so you only rewrite links that are actually stale. (Source: ReWoven S30; VibeCut S23, independent)
@@ -282,6 +287,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **`patch_note` can land literal `\n` escapes inside a multi-line `newString`.** A patch whose replacement spans several lines returned success but wrote the two-character sequence `\n` into the body where line breaks were intended, leaving a heading and its paragraph glued on one line. Always re-read a multi-line patch after success and check for literal backslash-n in the landed text; if present, repair with a second patch (or a filesystem edit) rather than assuming the first one rendered. (Source: DataWizard, 2026-08)
 
 **`filesystem:edit_file` can insert text inline when the anchor starts mid-line.** If the match anchor begins partway through a line, the inserted header text lands inline rather than on its own line. Dry-run first and include the preceding text in the anchor so the insertion point is unambiguous. (Source: Weave, 2026-07)
+
+- **read_note resolves by note title, not path.** A read with a stale folder path can still succeed if a note with that title exists anywhere in the vault, silently masking file moves by other operators. Before writing companion files "beside" an asset or citing a note's location, verify the path with a filesystem listing (find/ls), not a successful read_note. (Weave, 2026-09: a field-map relocation from a sorting pass was masked for a whole working chunk; companions were written to the old folder and had to be moved.)
 
 ## Incident Reference
 

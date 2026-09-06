@@ -482,7 +482,7 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 
 ## Carry the probe, not the snapshot
 
-**Rule:** A handoff, brief, or design doc that cites live state another session will act on ships the **query** (the grep/search) alongside or instead of the result, with the instruction to regenerate at execution time. A bare count is stale on arrival - in one design arc, live-state numbers went stale within hours of being written, twice. Corollary: never ship a truncated result (a `| head`-capped listing) as evidence - list the whole window or ship the probe. (DataWizard, 2026-08)
+**Rule:** A handoff, brief, or design doc that cites live state another session will act on ships the **query** (the grep/search) alongside or instead of the result, with the instruction to regenerate at execution time. A bare count is stale on arrival - in one design arc, live-state numbers went stale within hours of being written, twice. Corollary: never ship a truncated result (a `| head`-capped listing) as evidence - list the whole window or ship the probe. (DataWizard, 2026-08) ^b42
 
 **Example:** a repair handoff says "residual counter fields: run `grep -rl '^next_task_id' <quest folder>` at execution time" rather than "4 files have residual counters."
 
@@ -544,7 +544,7 @@ This is the general principle under the two entries adjacent to it (file placeme
 
 ## Attention requests live in the flag cluster, not banners
 
-**Rule:** A request for another operator's action is carried by the `flag*` cluster (YAML Schema, Team Coordination Fields), where the orientation sweep and dashboard queries find it -- never by a prose banner or callout alone. A banner may *repeat* a flagged request for a reader already in the file, but a banner is not a delivery mechanism: nothing queries prose, so an action-request that lives only in a banner reaches no one who is not already reading that file. (Flag Surfacing Chain, 2026-08; D117.)
+**Rule:** A request for another operator's action is carried by the `flag*` cluster (YAML Schema, Team Coordination Fields), where the orientation sweep and dashboard queries find it -- never by a prose banner or callout alone. A banner may *repeat* a flagged request for a reader already in the file, but a banner is not a delivery mechanism: nothing queries prose, so an action-request that lives only in a banner reaches no one who is not already reading that file. (Flag Surfacing Chain, 2026-08; D117.) ^b43
 
 **Example:** a callout reading "needs sign-off from another operator" at the top of a doc does not deliver -- set `flag_for` with a `flag_note` stating the decision, and let the sweep surface it; the callout may echo it for in-file readers.
 

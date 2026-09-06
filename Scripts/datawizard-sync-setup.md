@@ -1,13 +1,18 @@
 ---
 created: 2026-04-24
-updated: 2026-08-07
+updated: 2026-09-06
 type: guide
 scope: seed
 edit_log:
   - "DW-S227 2026-08-01 - Jay FR batch item b: scoped Windows platform note
     (Seed updates via update_seed.ps1; full DW Save PowerShell port flagged as
     future work)"
-  - "DW-S253 2026-08-07 - Chunk 5: added commit-guard install step (Step 3) + LLM-list item + ~/Scripts re-copy note; points at Git Guide 10.0"
+  - "DW-S253 2026-08-07 - Chunk 5: added commit-guard install step (Step 3) +
+    LLM-list item + ~/Scripts re-copy note; points at Git Guide 10.0"
+  - "DW-S337 2026-09-06 - FR items 1/2/4: Step 5 output-channel step +
+    relaunch/verify (notification-permission-after-relaunch) + hotkey-combo
+    verify; Step 4 cross-ref; Notifications fallback note; silent-notification
+    troubleshooting entry"
 ---
 
 # DataWizard Sync Setup Guide
@@ -94,6 +99,8 @@ bash ~/Scripts/datawizard-sync.sh
 
 You should see a macOS notification: either "DW Saved" with project names, "Everything up to date," or an error message.
 
+If no banner appears here, don't treat it as broken yet -- macOS may not surface the notification until Obsidian has been relaunched once (see Step 5, step 12). Confirm the run's result in `~/.datawizard-sync.log`.
+
 ## Step 5: Set Up the Hotkey (Cmd+Shift+S)
 
 This lets you "save" your work to git from inside Obsidian.
@@ -106,10 +113,14 @@ This lets you "save" your work to git from inside Obsidian.
 4. Paste: `bash ~/Scripts/datawizard-sync.sh`
 5. Click the gear button
 6. Set the alias to: `DW Save`
-7. Close that panel, go to Settings > Hotkeys
-8. Search for `DW Save`
-9. Click the plus button and set the hotkey to **Cmd+Shift+S**
-10. Close the Settings panel
+7. In the same gear settings modal, open the **Output** tab and set the **stdout** output channel to **Notification balloon**. It defaults to *Ignore*, so a fully successful save otherwise shows nothing in-app.
+8. Close that panel, go to Settings > Hotkeys
+9. Search for `DW Save`
+10. Click the plus button and set the hotkey to **Cmd+Shift+S**. After capturing, double-check the combo reads exactly **Cmd+Shift+S**.
+11. Close the Settings panel
+12. **Relaunch Obsidian, then verify.** Fully quit and reopen Obsidian, then press your DW Save hotkey once. On macOS the notification permission registers only after a fresh Obsidian launch -- before the relaunch the "DW Saved" banner may not appear even though the save succeeded. After relaunching you should see a "DW Saved" or "Everything up to date" notice.
+
+If you still see no notice, confirm the save landed before assuming failure: check `git log` in the repo or the repo page on GitHub. A silent notification path is not a failed save.
 
 Now Cmd+Shift+S in Obsidian will: save + push + notification.
 
@@ -210,6 +221,8 @@ For more aliases, you can instead add `source "/path/to/your/vault/_DataWizard/S
 - **"Everything up to date"** -- nothing new to sync
 - **"DW Sync Error"** + details + Basso sound -- something went wrong, check the log
 
+If the banner still doesn't surface after an Obsidian relaunch, the in-app **Notification balloon** (Step 5) is the reliable channel since it doesn't depend on `osascript`. A system-level fallback such as `terminal-notifier` can be added but is optional.
+
 ## Troubleshooting
 
 The log file lives at `~/.datawizard-sync.log`. Check it for details on any failures:
@@ -222,6 +235,7 @@ Common issues:
 - **"Sync conflict"**: You and a collaborator edited the same file between syncs. Open terminal, cd into the repo, and run `git status` to see what conflicted. Resolve manually (see Merge Conflicts below), then `git add .`, `git commit -m "resolve merge conflict"`, `git push`.
 - **"Push failed"**: Usually a network issue or expired auth token. Try `gh auth status` to check.
 - **"not found"**: A path in your config file doesn't exist. Check `~/.datawizard-sync.conf`.
+- **No notification, but saves are landing**: the stdout output channel may still be set to *Ignore* (Step 5, step 7), or notifications haven't registered yet -- relaunch Obsidian (Step 5, step 12). Confirm via `git log` / GitHub; the save most likely succeeded.
 
 ## Merge Conflicts
 

@@ -11,9 +11,9 @@ description: >-
   (Pattern 3), a build with no reviewer available, or incidental concurrency
   between unrelated sessions.
 type: skill
-version: '1.3'
+version: '1.3.1'
 created: '2026-08-30'
-updated: '2026-09-05'
+updated: '2026-09-06'
 operator: Andrew
 edit_log:
   - "DW-S306 2026-08-30 - v1.0: codified from Coordination Patterns Pattern 4
@@ -30,6 +30,7 @@ edit_log:
     expected-message assertions) - second field arc of the
     instrument-measures-itself class (S268 flag distribution, S333 insteadOf
     harness) met codify-on-second-use"
+  - 'DW-S327 2026-09-06 - v1.3.1: Shared Setup step 0 - charter authors grep the shared canon before scoping (field-grounded)'
 ---
 
 # Supervised Build Skill
@@ -50,6 +51,8 @@ Why the gate is structural: across the field runs that produced this skill, ever
 Both seats follow the guide's Transport conventions for filenames, frontmatter, and statuses - never improvise these; turn-taking runs on them.
 
 ## Shared Setup (once per build)
+
+0. **Charters for shared-canon content: grep the canon first.** When the build's deliverable lives in a shared canon location (a guide, protocol, or template collection), the charter author greps that collection for existing homes of every scoped topic BEFORE scoping sections, and the chunk-1 plan reports the division (what points where, what this build owns). A charter that scopes a section an existing doc already owns produces a restatement the reviewer must catch late; the grep moves the catch to authoring time. (Field grounding: a guide charter scoped a section that restated an existing runtime-behaviors guide; the reviewer's ground-truthing caught it at the chunk-1 gate, 2026-09.)
 
 1. **Confirm the declaration.** A supervised build is declared by the human or by the charter (build plan). If the declaration exists only in chat, record it in the chunk-1 plan note so it is on the record.
 2. **Name the parts:** the arc (the short name used in every exchange filename), the charter (the build plan or design doc the build executes), the **driver doc** that holds arc state, and the project's `Session Exchange/` folder.

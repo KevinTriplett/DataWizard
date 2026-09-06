@@ -2,7 +2,7 @@
 title: Git Hook and CI Behaviors
 type: guide
 created: 2026-08-05
-updated: 2026-08-24
+updated: 2026-09-06
 operator: Andrew
 status: active
 edit_log:
@@ -14,6 +14,9 @@ edit_log:
   - "DW-S284 2026-08-24 - shell portability section: GNU/BSD stat chain with
     numeric guard, bash 3.2, verify with bash -x on the real script (S252;
     meta-learning review S247-S255)"
+  - DW-S337 2026-09-06 - added the every-self-replacing-path verify bullet
+    (zip-mode guard confirmed by run-don't-read; post-fix recurrence = unwrapped
+    stale/hybrid running copy). FR item 5.
 ---
 
 # Git Hook and CI Behaviors
@@ -45,6 +48,7 @@ Runtime gotchas for **guard and automation scripts that run across a git-synced 
 - **Fix: wrap the whole executable body in a function invoked on the last line.** `main() { ... }` then `main "$@"`. The shell must parse through to the closing brace before it can run `main`, so the entire script is in memory before any self-replacing command executes - the fix is independent of file size. No re-indentation needed; the shell ignores indentation inside the function. Keep `set -euo pipefail` (or equivalent) above the wrap so options apply, and use `exit` inside `main` as normal (status propagates through the one call frame).
 - **Streamed-from-disk interpreters only.** POSIX sh/bash stream the script, so they are exposed. Interpreters that parse the whole script to an AST before executing (e.g. PowerShell) are immune and need no wrap - worth confirming per interpreter rather than wrapping reflexively.
 - **The last pre-fix run is unavoidable.** A machine still running the old unwrapped script will crash on its own bug during the update that installs the wrapped version (it copies the fix into place, then resumes into it). Every run after that is safe. Nothing can retroactively protect already-installed old copies; the fix stops recurrence, it does not rescue the transition run.
+- **Verify the wrap covers every self-replacing path, not just one.** A wrapped updater is safe only if the *whole* body is inside the function - both the zip-mode file copy and any git-mode `merge --ff-only` / `reset` that rewrites the script. Confirmed by running the shipped updater through an actual zip-mode self-overwrite, including a run where the running copy was longer than its replacement (a length change would expose any residual byte-offset seek): it completed cleanly, exit 0, no error. If the transient syntax error still appears on a supposedly post-fix update, the diagnosis is that the *running* (old) copy on that machine was never actually wrapped - a stale or hybrid copy predating the fix - not a regression in the current script; it self-corrects on the next run. (DataWizard, 2026-09)
 
 ## Comparing a synced working tree to the remote before a self-reset
 

@@ -9,8 +9,10 @@ description: >-
   correct folders, sets routing YAML, and appends action items to target
   projects.
 type: skill
-version: '1.1'
-updated: '2026-06-28'
+version: '1.2'
+updated: '2026-09-06'
+edit_log:
+  - 'DW-S312 2026-09-06 - v1.2: Fathom zero-token export folded from the retired Harvest Agent (D128)'
 ---
 # Harvest Router Skill
 
@@ -127,6 +129,20 @@ transcripts: [list with dates and titles]. Want me to export any of these?"
 
 Don't block the routing workflow on Fathom — check it, report gaps, then
 continue with what's already in the vault.
+
+**Zero-token export (preferred when exporting a missing meeting).** When the
+user asks to pull a Fathom meeting into the vault, try `fathom:export_meeting`
+FIRST, with `output_dir` set to the vault's `_Transcripts/` folder — Fathom
+writes the file directly, so the transcript body never passes through the
+context window. The export arrives pre-structured with `##` section headers
+(no segmentation needed). After export: confirm the file exists via
+frontmatter/file-info tools rather than reading it (a full read defeats the
+zero-token purpose), rename to the `YYYY-MM-DD Speaker Name.md` convention if
+the export used underscores, set `segmented: true`, then run the normal
+routing loop on it. If `export_meeting` fails (common for older recordings),
+fall back to `fathom:get_transcript`, write the content manually, and prompt
+for segmentation as usual. (Folded from the retired standalone Harvest Agent,
+D128.)
 
 ## The Routing Loop
 

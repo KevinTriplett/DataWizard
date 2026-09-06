@@ -4,17 +4,29 @@ edit_log:
   - DW-S287 2026-08-26 - created (absorbs the coordination-thread, relay-review,
     second-model plan review, supervised-build, and Session Exchange patterns
     from six uses; canonical home for the exchange-note handshake convention)
-  - "DW-S289 2026-08-26 - third reviewer habit: flip the status on the doc the author will open (review delivered = reviewed doc says so; superseded_by for versions)"
-  - "DW-S302 2026-08-30 - Pattern 4: the reviewer writes arc state for a cold reader (mandated State Board write - status / verified / next gate / turn / blocking)"
-  - "DW-S306 2026-08-30 - Pattern 4 codified as the supervised-build skill (Seed/Skills/); guide now points at the skill, field shape lives there"
-  - "DW-S309 2026-08-30 - meta-learning plants (review S267-S287): session-scale foreign-write verification pass (baseline bullet); new 'Inbound defect reports are claims, not evidence' section"
-  - "DW-S309 2026-08-30 - meta-learning plants (review S288-S300): check-the-recipient-is-open note-anatomy bullet; named 'Supervision earns its cost at every phase, value at the source' (8-instance family) in Choosing a pattern"
+  - "DW-S289 2026-08-26 - third reviewer habit: flip the status on the doc the
+    author will open (review delivered = reviewed doc says so; superseded_by for
+    versions)"
+  - "DW-S302 2026-08-30 - Pattern 4: the reviewer writes arc state for a cold
+    reader (mandated State Board write - status / verified / next gate / turn /
+    blocking)"
+  - DW-S306 2026-08-30 - Pattern 4 codified as the supervised-build skill
+    (Seed/Skills/); guide now points at the skill, field shape lives there
+  - "DW-S309 2026-08-30 - meta-learning plants (review S267-S287): session-scale
+    foreign-write verification pass (baseline bullet); new 'Inbound defect
+    reports are claims, not evidence' section"
+  - "DW-S309 2026-08-30 - meta-learning plants (review S288-S300):
+    check-the-recipient-is-open note-anatomy bullet; named 'Supervision earns
+    its cost at every phase, value at the source' (8-instance family) in
+    Choosing a pattern"
+  - "RG-S10 2026-09-06 - transport table: cross-vault row (Session Exchange
+    inside a shared repo), first use Regenerativa"
 maturity: working
 operator: Andrew
 seed_version: 1.3.1
 title: Multi-Instance Coordination Patterns
 type: guide
-updated: 2026-08-30
+updated: 2026-09-06
 ---
 # Multi-Instance Coordination Patterns
 
@@ -126,6 +138,7 @@ The `supervised-build` skill (`Seed/Skills/supervised-build/`) codifies this loo
 | Instance-to-instance within one project (reviews, review requests, chunk plans, supervision notes, recorded decisions, briefs, integration checks) | This project's `Session Exchange/` - both sides of an exchange file here |
 | Addressed to another project (a handoff, a feature request, a note for their instances) | That project's intake or `Session Exchange/`, never the origin's infrastructure folder; the origin keeps a session-log line |
 | A defect in a Seed-owned skill, guide, protocol, or script, found while working anywhere | Fix upstream in the Seed while the context is hot; record it in the session log; no round-trip |
+| Addressed to an instance in ANOTHER VAULT that shares a git repo with this project (a nested data repo, a collaborator's working folder) | A `Session Exchange/` folder inside the shared repo - the only surface both sides can write; the origin project names the folder in its 0.0 working conventions so its own orientation lists it. Draft in the vault, move in once cleared (the repo syncs to collaborators on push). First use: a review-note handoff to a collaborator's instance (Regenerativa, 2026-09) |
 
 **Note anatomy** (the exchange-note handshake convention - canonical here):
 
