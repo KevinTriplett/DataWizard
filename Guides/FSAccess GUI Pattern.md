@@ -4,10 +4,11 @@ type: guide
 created: 2026-09-04
 updated: 2026-09-04
 operator: Andrew
-status: draft
+status: active
 edit_log:
   - DW-S328 2026-09-04 - created (Chunk 1 - skeleton + Sections A-E; supervised build, S327 charter)
   - DW-S328 2026-09-04 - Chunk 2 - Sections F-K written; GUIDES.md Surfaces and tools entry added
+  - DW-S328 2026-09-04 - fold-in markers (B/D) resolved as generic-non-blocking (operator ruling); status draft -> active
 ---
 
 # FSAccess GUI Pattern
@@ -48,7 +49,7 @@ The canonical interface:
 
 Two rules on the contract. `listFiles()` returns name and mtime only, not text; `readFileText(name)` is the single-file re-read that the concurrency guard and the post-write verify both depend on, so it is a required method in its own right. A given implementation may prefetch text in its list call as an optimization - that is permitted, but it is not part of the interface, and a second implementer must not assume it. And mtime rides on both `listFiles()` and `readFileText()` because it is the freshness probe the whole surface reads from.
 
-Environment detection at startup selects the adapter. The baseline implementation is the File System Access adapter - desktop Chromium, and it must work; a hosted or bridged adapter is a second slot for contexts where direct file access is unavailable. The recommended stance is to design the interface for the direct-access and hosted cases now and treat an embedded artifact context as a later concern: an artifact context cannot use the File System Access API, IndexedDB, or `localStorage` (see `Browser and File System Access Behaviors.md`), so its adapter needs a bridged data path and a non-`localStorage` source for identity. [Fold-in point: raise here if the artifact-context probe has run.]
+Environment detection at startup selects the adapter. The baseline implementation is the File System Access adapter - desktop Chromium, and it must work; a hosted or bridged adapter is a second slot for contexts where direct file access is unavailable. The recommended stance is to design the interface for the direct-access and hosted cases now and treat an embedded artifact context as a later concern: an artifact context cannot use the File System Access API, IndexedDB, or `localStorage` (see `Browser and File System Access Behaviors.md`), so its adapter needs a bridged data path and a non-`localStorage` source for identity.
 
 ## Permission and grant scope
 
@@ -64,7 +65,7 @@ The surface holds a persisted identity - who this operator is - seeded from the 
 
 Any write that attributes - a note, a decision, a sign-off - must be **refused, not silently dropped,** when no identity is set. A silent drop looks like success and loses the write; a refusal tells the operator to set their identity first. When the surface matches an operator's display name against a handle, match case-insensitively - a display name and a handle that differ only in case are the same person, and a case-sensitive compare is a quiet mismatch that drops or misfiles attribution.
 
-Name the audit asymmetry in the surface's own terms so a team adopts it consciously: a self-asserted identity - the operator picks who they are - and an attributed identity - an authenticated sign-in - are not equal-strength trails. The direct-access surface is self-asserted; a hosted path may be authenticated. That is fine for a trusted team, but a self-asserted trail must never be read later as if it were authenticated. [Fold-in point: reconcile here if the hosted-adapter identity handling diverges.]
+Name the audit asymmetry in the surface's own terms so a team adopts it consciously: a self-asserted identity - the operator picks who they are - and an attributed identity - an authenticated sign-in - are not equal-strength trails. The direct-access surface is self-asserted; a hosted path may be authenticated. That is fine for a trusted team, but a self-asserted trail must never be read later as if it were authenticated.
 
 ## The concurrency guard
 

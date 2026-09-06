@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-09-05
+updated: 2026-09-06
 operator: Andrew
 priority: high
 maturity: working
@@ -68,7 +68,7 @@ edit_log:
     (lifecycle vocab, G-row schema, feeding, verify-before-working, exit
     ceremony), Active Threads ledger row schema entry (Track 1), Model routing
     entry (single home), Tracking Model deployment-gate fact-class row"
-  - "DW-S332 2026-09-05: Link, don't restate gains 'Agent entry points are
+  - "DW-S332 2026-09-06: Link, don't restate gains 'Agent entry points are
     pointers' (Engineering Doctrine FR C3); Archiving gains the mirror-pattern
     structure rule (Archive Mirror Pattern FR accepted)"
 ---

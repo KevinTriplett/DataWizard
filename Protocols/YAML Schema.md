@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-09-05
+updated: 2026-09-06
 operator: Andrew
 priority: high
 maturity: working
@@ -22,7 +22,7 @@ edit_log:
     Operator-A/B/C (16 residual uses the S279 sweep missed; S289
     role-placeholder rule; meta-learning review S288-S300)"
   - DW-S324 2026-09-04 - edit_log rolling window + origin field (D127)
-  - DW-S332 2026-09-05 - added session_started/session_closed span fields + Date
+  - DW-S332 2026-09-06 - added session_started/session_closed span fields + Date
     Stamping and Time Sense section (clock-check rule; Multi-Day Sessions FR
     changes 1-2)
 ---
@@ -313,7 +313,7 @@ All frontmatter dates use plain `YYYY-MM-DD`. Do not use ISO datetime strings (`
 
 ### Date Stamping and Time Sense
 
-**Never stamp a date from memory or context - check the clock first.** Run `date` in the shell before a writing burst (in a sandboxed surface, the device shell: the environment header's date is set at thread start and has been observed both a day behind and a day ahead of the real clock). Prior stamps in the same session are not evidence of today's date; neither are sibling files' stamps - instances anchor on context (the previous session's dates, their own earlier writes, sibling stubs) and drift when a thread crosses midnight or resumes days later. One check per writing burst is enough; a session resuming after a break re-checks before its next write. For any close-time reconciliation, file mtimes - not beliefs or headers - are the evidence base. Field record: independently re-derived in five sessions across four projects (2026-07 to 2026-09), including an instance that mis-stamped its own claim stub from sibling-stub anchoring while triaging this very rule's feature request.
+**Never stamp a date from memory or context - check the clock first.** Run `date` in the shell before a writing burst (in a sandboxed surface, the device shell: the environment header's date is set at thread start and has been observed both a day behind and a day ahead of the real clock). Prior stamps in the same session are not evidence of today's date; neither are sibling files' stamps - instances anchor on context (the previous session's dates, their own earlier writes, sibling stubs) and drift when a thread crosses midnight or resumes days later. One check per writing burst is enough; a session resuming after a break re-checks before its next write. For any close-time reconciliation, file mtimes - not beliefs or headers - are the evidence base. A single clock read is not proof either: a sandboxed VM's clock can be a day stale right after the machine wakes (it resyncs within minutes). When the date matters, cross-check a second source - a host clock or the mtime of a freshly generated artifact (e.g. the newest nightly report) - and re-read after a beat if they disagree. Field record: independently re-derived in five sessions across four projects (2026-07 to 2026-09), including an instance that mis-stamped its own claim stub from sibling-stub anchoring while triaging this very rule's feature request.
 
 ### The origin and edit_log Fields
 
