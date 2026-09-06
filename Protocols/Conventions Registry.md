@@ -69,8 +69,8 @@ edit_log:
     ceremony), Active Threads ledger row schema entry (Track 1), Model routing
     entry (single home), Tracking Model deployment-gate fact-class row"
   - "DW-S332 2026-09-05: Link, don't restate gains 'Agent entry points are
-    pointers' (Engineering Doctrine FR candidate 3; rule largely existed -
-    extension sentence, not a new entry)"
+    pointers' (Engineering Doctrine FR C3); Archiving gains the mirror-pattern
+    structure rule (Archive Mirror Pattern FR accepted)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -234,6 +234,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
 **Rule:** when a file is superseded or retired, **move it, don't delete it** (delete only empty stubs, with human confirmation).
 
 - **Where:** the project's `xArchive - ProjectName/` (or a vault-root `xArchive/` for vault-level files).
+- **Structure inside the archive root - the mirror pattern:** archived files go to a subfolder named after the working folder they came from (`xArchive - ProjectName/<working-folder-name>/`, created as needed). Provenance is preserved by subpath, and there is one place to look for anything retired. No local `Archive/` or per-folder archive subfolders inside working folders; any that exist get consolidated into the mirror as a deliberate link-aware pass (grep full-path references too), never by incremental drift. Field record: a 30-file working-docs audit executed under the pattern with zero link breakage; one filename collision, resolved by disambiguating rename (2026-08).
 - **How:**
   1. Move the file with `obsidian:move_note`, then fix references by hand. **`move_note` does NOT reliably update wikilinks** (proven 3x, S189: an MOC list entry, a `related:` frontmatter field, and a manifest table row all kept the old name). After the move, grep the literal old filename vault-wide and fix every reference - `[[wikilinks]]`, frontmatter `related:` fields, and list entries; lint's broken-link check confirms. (Full behavior: [[MCP Reliability and Write Verification]] guide.) Do **not** leave the file in place with just a notice - it must move.
   2. **Keep the original filename** so existing wikilinks still resolve.
