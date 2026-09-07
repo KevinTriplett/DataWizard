@@ -31,11 +31,12 @@ edit_log:
     policy -> WAL/DELETE/TRUNCATE fail, PERSIST-only rule, hot-journal off-mount
     recovery recipe; call-timeout kills children + PID-namespace pgrep false
     positive)"
+  - 'DW-S336 2026-09-07 - Device Bridge: commit_files same-path staleness; Verification: stub osascript in Mac harness runs'
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-09-06
+updated: 2026-09-07
 ---
 # Cowork Build Environment
 
@@ -115,6 +116,7 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **Cowork connects folders individually, by exact path.** Connecting a parent folder does not expose its siblings, and moving or renaming a connected folder on disk breaks its connection until it is re-added in the desktop app. If a session suddenly cannot see a folder it could see before, check whether the folder moved before debugging the tools. (Source: DataWizard, 2026-07)
 - **Workflow (multi-agent orchestration) tool: `args` arrived `undefined` once; subagents can reach the device bridge.** In one run the value passed as the Workflow's `args` input never reached the script (`args` was `undefined` inside it); inlining the data as constants in the script body is the reliable fallback, and a quick `log(JSON.stringify(args))` at the top of the script tells you which case you are in before any agent spends tokens. Separately, foreground Workflow subagents CAN reach the `remote-devices` bridge (vault reads, `device_bash`) by loading the tools via ToolSearch inside the subagent - the bridge is not restricted to the main loop. (Source: DataWizard, 2026-07)
 - **Deliver a git repo to the user's machine when `device_bash` has no network:** clone (shallow) in the cloud sandbox, `tar czf`, `SendUserFile` -> `device_commit_files` into the destination folder, then `tar xzf` with `device_bash` (the `.git` survives, so `git log`/`remote` work locally). ~12 MB tarballs land fine; park the tarball in a `_to_delete/` subfolder afterwards since the device shell cannot delete. (Source: VibeCut S77, 2026-08)
+- **`device_commit_files` re-sends the FIRST version of a reused `stagedPath`.** Committing an edited file under an outputs path that was already committed earlier in the session delivered the original bytes again (the call still reported "written"); a test run then exercised the stale script. Write each iteration to a NEW name (`script.v2.sh`, `.v3.sh` ...), commit that, and compare `md5sum` on both sides before running anything. The same-path staleness exists in the staging direction too (MCP Reliability guide, Known Issues). (Source: DataWizard, 2026-09)
 - **Transport a multi-file edit script to the device without staging: base64 it.** A parse-guarded Python edit (frontmatter `edit_log` appends, section inserts across several vault files) runs cleanly device-side, but `device_bash` cannot see the sandbox's `/tmp`. Encode the script in the sandbox (`base64 -w0`) and decode it inside the `device_bash` command (`echo '<b64>' | base64 -d > script.py && python3 script.py <vault-path>`); an ~8KB script transports without issue, and the whole batch lands in one call with one verification pass. (Source: DataWizard, 2026-08)
 
 ## Verification Discipline for Builds
@@ -123,6 +125,7 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **The isolated `/tmp` verification loop:** copy the source minus `node_modules` to `/tmp`, `npm ci --ignore-scripts` (skip heavy binaries, e.g. `ELECTRON_SKIP_BINARY_DOWNLOAD=1`), then run tests + typecheck + build there. The host machine never runs unverified code, and its `node_modules` stays pristine. (Source: VC S28, S33)
 - **Cloud-green is not host-green for environment-coupled globals.** A suite passing on the sandbox's Node can fail on the host's newer Node (e.g. Node 25+ ships built-in `localStorage` globals that shadow jsdom's in test workers). Verify env-coupled globals on the actual host runtime, not only in the cloud. (Source: VC S64)
 - **Unit + component green is not app-works.** Hundreds of passing pure-function and component tests can coexist with an app that crashes on first real interaction, because nothing renders the real app against real state. Keep an integration/smoke tier that does. (Source: VC S62)
+- **A fixture harness on a Mac fires real desktop notifications unless `osascript` is stubbed.** A script under test that calls `osascript -e 'display notification'` finds the real binary on macOS (the Linux VM has none, so cloud runs never show it): ~35 fixture scenarios produced ~35 live banners on the operator's screen. Put a stub `osascript` at the head of `PATH` before the first scenario (record calls to a file so a scenario can still assert a notification was attempted). Same class: scenarios that depend on a tool's *absence* must restrict `PATH` to system dirs, since the host machine may have the real tool (Homebrew `gh`). (Source: DataWizard, 2026-09)
 - **Verify your writes actually landed.** The recurring failure shape: an operation reports success but the work did not persist -- no push creds (commits never reach origin), `commit -am` skipping untracked files, stale-lock-blocked commits. Before trusting a git/build write: `git status -sb` (ahead/behind + untracked), `git fsck` (lock/object health), and confirm the push ran on the host. Mirrors Working Rule 5 and the MCP Reliability guide's verification protocol. (Source: VC S27-S34, cross-cutting)
 
 ## See Also

@@ -27,16 +27,29 @@ if [ ! -f "$hook_src" ]; then
   exit 1
 fi
 
-hooks_dir="$repo/.git/hooks"
-mkdir -p "$hooks_dir"
-cp "$hook_src" "$hooks_dir/pre-commit"
-chmod +x "$hooks_dir/pre-commit"
-
 # Keep the SYNC-BLOCKED.md breadcrumb out of git (per-clone, no tracked-file edit)
 exclude="$repo/.git/info/exclude"
 mkdir -p "$repo/.git/info"
 touch "$exclude"
 grep -qxF 'SYNC-BLOCKED.md' "$exclude" || echo 'SYNC-BLOCKED.md' >> "$exclude"
+
+# core.hooksPath guard: when a repo routes hooks to a tracked folder (the
+# shared-team alternative in Git Guide 10.0), git ignores .git/hooks/ entirely,
+# so copying there would report "Done" while changing nothing that runs.
+# Refuse and say where the live hook is instead (found on a maintainer repo, DW S336).
+hooks_path="$(git -C "$repo" config core.hooksPath 2>/dev/null || true)"
+if [ -n "$hooks_path" ]; then
+  case "$hooks_path" in /*) live="$hooks_path/pre-commit" ;; *) live="$repo/$hooks_path/pre-commit" ;; esac
+  echo "NOT installed: this repo sets core.hooksPath=$hooks_path, so git ignores .git/hooks/." >&2
+  echo "The hook git actually runs is: $live" >&2
+  echo "Update that tracked file to match $hook_src (commit it in the repo), or unset core.hooksPath first." >&2
+  exit 2
+fi
+
+hooks_dir="$repo/.git/hooks"
+mkdir -p "$hooks_dir"
+cp "$hook_src" "$hooks_dir/pre-commit"
+chmod +x "$hooks_dir/pre-commit"
 
 echo "Installed commit guard  -> $hooks_dir/pre-commit"
 echo "Excluded SYNC-BLOCKED.md via .git/info/exclude"

@@ -55,6 +55,7 @@ Pages that render client-side (JS apps) may expose little or nothing to a plain 
 **Token-cap overflow saves to a temp file.** When a page exceeds the token cap, `web_fetch` errors and saves the content to a temp file. In practice, search-result summaries plus one canonical readable page were decision-grade -- budget for this rather than retrying the same oversized fetch. (Source: RW S23)
 
 - Cowork WebFetch can refuse arbitrary URLs with PROVENANCE_REQUIRED: a permission prompt goes to the human and, unanswered, the fetch fails - fatal for unattended runs. Workaround that held everywhere tested (Weave, 2026-09): run a web search naming the target first, then fetch the URLs the search returns - search-derived URLs carry provenance. Design scheduled web checks search-first, and report still-blocked sources as unverified rather than retrying.
+- The provenance gate is not universal: in an attended Cowork session WebFetch fetched an arbitrary Firebase-hosted page directly with no prompt (Weave, 2026-09). Plan search-first for unattended runs; do not assume the gate in attended ones. Separately, WebFetch sees only server-rendered HTML - a JS-rendered page returned just its toolbar and snapshot stamp; use Chrome MCP (see Reading Client-Rendered Pages) for the content.
 
 ## Google Docs via Chrome
 
