@@ -64,7 +64,11 @@ edit_log:
     files (CRLF copy not on disk; WV_2026-09-02_JC_02)"
   - "DW-S332 2026-09-06 - Obsidian Behavioral Gotchas: write_note append joins
     without a newline separator (leading-newline rule + column-1 verify)"
-  - 'DW-S336 2026-09-07 - git-on-mount: S304/S336 extension (status orphans a lock on a clean tree; safe-read list)'
+  - "DW-S336 2026-09-07 - git-on-mount: S304/S336 extension (status orphans a
+    lock on a clean tree; safe-read list)"
+  - "EMC-S6 2026-09-07 - Verification Protocol Tier 1: filesystem MCP server
+    outputSchema draft-07 dialect failure (all filesystem__* tools erroring,
+    unrelated to vault state)"
 ---
 # MCP Reliability and Write Verification
 
@@ -158,6 +162,8 @@ Use the `Read`, `Glob`, or `Grep` tools to check the file directly on the filesy
 - **For `update_frontmatter`:** Use `Read` on the file and confirm the frontmatter field was updated.
 
 If filesystem tools cannot reach the vault (common in Cowork -- the vault path may not be connected), request access via `request_cowork_directory` at the start of the session. This is especially important when running concurrent instances. Note that `device_stage_files` cannot verify Obsidian-MCP writes when the vault path is not a Cowork-connected folder -- in that layout `obsidian:read_note` (Tier 2) is the verification path for MCP-written content. (Source: Weave, 2026-07)
+
+**Caveat -- the `filesystem` MCP server itself can be broken, not just unreachable.** On one Cowork device link, every `mcp__remote-devices__filesystem__*` tool (`read_text_file`, `list_directory`, `get_file_info`) failed on every call with `Tool '<name>' has an invalid outputSchema: JSON Schema declares an unsupported dialect ("$schema": "http://json-schema.org/draft-07/schema#"). The default validator supports JSON Schema 2020-12 only` -- a client-side schema-validation bug in that MCP server's tool definitions, unrelated to the vault or any specific file. Retrying does not help (confirmed on a second attempt after other tool calls in between). This is a different failure than "vault path not connected" (which the paragraph above covers) -- the tools are loaded and callable, they just error before touching the filesystem. When this happens, fall back to Tier 2 (`obsidian:read_note` / `get_notes_info`) for verification and tell the user Tier 1 is unavailable this session; do not keep retrying. (Source: Evolutionary Media Commons, 2026-09)
 
 **Caveat -- re-staging does not refresh the snapshot.** `device_stage_files` called again on a path that was already staged this session can return the original snapshot: the staged file's metadata looks fresh but its content is the version from the first stage, so a verification read against it "confirms" a write that is not there (or misses one that is). To verify a write made after the first stage, read the live file instead -- a `device_bash` `cat`/`grep` on the mounted vault path, or an `obsidian:read_note` -- rather than re-staging. (Source: DataWizard, 2026-08)
 
