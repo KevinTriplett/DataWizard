@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: '2026-09-05'
+updated: 2026-09-08
 edit_log:
   - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
     for pending-report model (D114)
@@ -54,6 +54,7 @@ edit_log:
     v1.4.2, meta-learning-review -> v1.5.4"
   - DW-S333 2026-09-05 - supervised-build row -> v1.3 (harness-validation rule),
     synced same-session as the bump
+  - DW-S343 2026-09-08 - 7 skill rows version-synced for C14 (supervised-build -> v1.3.1; 6 unversioned rows stamped)
 ---
 
 # DataWizard Skills

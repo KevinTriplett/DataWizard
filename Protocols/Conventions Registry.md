@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-09-06
+updated: 2026-09-08
 operator: Andrew
 priority: high
 maturity: working
@@ -71,6 +71,7 @@ edit_log:
   - "DW-S332 2026-09-06: Link, don't restate gains 'Agent entry points are
     pointers' (Engineering Doctrine FR C3); Archiving gains the mirror-pattern
     structure rule (Archive Mirror Pattern FR accepted)"
+  - DW-S343 2026-09-08 - retired-convention signatures flip-ceremony line added (points at Seed/Config/retired-signatures.yaml)
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -345,6 +346,7 @@ Optional fields when relevant: **Supersedes** `D[n]`, **Resolves** `Q[n]`, **See
 - **Numbering:** sequential (`D01`, `D02`, ...); never reuse a number. Supersede by marking the old entry and referencing the new one - preserve the full history of thinking.
 - **Open questions** use `Q[number]`; when resolved, mark `Resolved -> D[number]`.
 - **Protocol-updated flag** (D77) on every convention-changing entry makes uncodified changes greppable (`grep "Protocol updated: No"`).
+- **Retired-convention signatures:** when a decision retires a convention *form* (a filename shape, a frontmatter field, a set phrasing), add its signature phrase to `Seed/Config/retired-signatures.yaml` so the retired-signature lint check (C15) catches regressions -- part of the convention-flip ceremony. That file's header points back here.
 - One decision log per project, created at bootstrap.
 
 **Which log to update:**
