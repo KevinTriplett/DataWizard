@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: 2026-09-04
+updated: 2026-09-08
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -26,6 +26,7 @@ edit_log:
     HERE files retired) and dropped from the catalog; S312 Seed review"
   - "DW-S308 2026-08-31 - Operator Gate Queue - Template row added (D126 codification; template at Seed/Templates/)"
   - "DW-S328 2026-09-04 - added the Surfaces and tools sub-table with the FSAccess GUI Pattern guide"
+  - "DW-S349 2026-09-08 - Reader-Facing Prose Style row added (Process and coordination)"
 ---
 # DataWizard Guides
 
@@ -79,6 +80,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | Guide | Covers |
 |---|---|
 | **Multi-Instance Coordination Patterns** | Several instances on one project: the incidental-concurrency baseline (claim, patch-at-close, same-day-block deferral, foreign-write verification), the roles table, and four deliberate patterns - coordination thread, relay review, second-model plan review, supervised build with a build-side check-before-write gate - plus the Session Exchange transport and the exchange-note handshake convention (canonical home), with a worked six-note supervision run. |
+| **Reader-Facing Prose Style** | The writing standard for documents a person reads start to finish: a synthesis of eight public style and humanizing rulesets into seven diseases, 15 binding rules, and a count-based verification pass. Mandatory load for the model-casting writer seat; invoked by the research and harvest skills whenever the deliverable is read-aloud-class. |
 
 ### Onboarding and integrations
 | Guide | Covers |

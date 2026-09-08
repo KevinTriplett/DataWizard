@@ -6,8 +6,8 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-09-04'
-version: '0.9.1'
+updated: '2026-09-08'
+version: '0.9.2'
 edit_log:
   - DW-S158 2026-06-08
   - "MMM meta-learning plant 2026-06-09: added Step 4 (check existing vault
@@ -22,6 +22,8 @@ edit_log:
   - "DW-S312 2026-08-30: stale STUB status label corrected to Active (the full
     workflow has long shipped; S312 Seed review)"
   - 'DW-S330 2026-09-04 - v0.9.1: See Also gains the shared-layer-redaction overlay pointer (required when the harvest destination is a shared layer)'
+  - "DW-S349 2026-09-08 - v0.9.2: Reader-Facing Output rule added (load the
+    Reader-Facing Prose Style guide when the destination is read-aloud-class)"
 ---
 
 # Transcript Harvest Skill
@@ -187,6 +189,10 @@ When processing large transcript batches (total word count exceeding ~50k words,
 - Preserve tensions and disagreements -- don't flatten nuance.
 - Include speaker attribution where relevant.
 - Extract `lexicon_candidates` if the transcript contains novel language or framings.
+
+## Reader-Facing Output
+
+If the harvest destination is a document a person will read start to finish - a research resource, a brief, a report, an onboarding doc - load `Seed/Guides/Reader-Facing Prose Style.md` before drafting prose there and run its verification pass before shipping. Segmentation headers, routing YAML, tracking rows, and triage verdicts are exempt.
 
 ## See Also
 

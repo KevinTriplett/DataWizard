@@ -8,13 +8,15 @@ description: >-
   of flagged items, or any link or resource that needs investigation. Covers
   both single-target deep dives and batch triage passes.
 type: skill
-updated: '2026-08-18'
-version: '1.4'
+updated: '2026-09-08'
+version: '1.4.1'
 edit_log:
   - "DW-S243 2026-08-05 - v1.3: Parallel Fan-Out section (mandatory spot-verify,
     roster batching, research-before-tiering) + Common Mistakes bullet"
   - "DW-S273 2026-08-18 - v1.4: fetch-before-cite hard rule in Phase 1 + Common
     Mistakes bullet"
+  - "DW-S349 2026-09-08 - v1.4.1: Reader-Facing Output rule added (load the
+    Reader-Facing Prose Style guide for read-aloud-class deliverables)"
 ---
 
 # Tools Research
@@ -248,6 +250,10 @@ Even at light depth, record the evaluation. A brief verdict saying
   paths read as confident and slip through if you skip the verification pass.
 - **Citing from memory.** A citation on an unfetched source is fabricated
   authority -- the fetch-before-cite rule in Phase 1 is not optional.
+
+## Reader-Facing Output
+
+If the deliverable is a document a person will read start to finish - a research resource, a brief, a report, an onboarding doc - load `Seed/Guides/Reader-Facing Prose Style.md` before drafting and run its verification pass before shipping. Tracking rows, findings notes, and triage verdicts are exempt.
 
 ## See Also
 

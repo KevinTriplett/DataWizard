@@ -72,6 +72,7 @@ edit_log:
     pointers' (Engineering Doctrine FR C3); Archiving gains the mirror-pattern
     structure rule (Archive Mirror Pattern FR accepted)"
   - DW-S343 2026-09-08 - retired-convention signatures flip-ceremony line added (points at Seed/Config/retired-signatures.yaml)
+  - "DW-S349 2026-09-08 - Model routing entry gains the model-casting pointer (role casting + dated version table live in the skill)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -448,6 +449,8 @@ A depersonalized starter file ships as `Seed/Templates/Operator Gate Queue - Tem
 ## Model routing
 
 **Rule:** when queuing session work for a later instance - a gate row's `model:` field, a What's-next `[model: X]` tag, the session-closer's next-session recap - suggest the model tier by work shape: **Opus-tier** is the default; **Fable-tier** (highest capability) earns its place on deep synthesis, audits, design reviews, canon writes, and multi-perspective judgment; **Sonnet-tier** suits mechanical, well-specified batches (metadata sweeps, triage marking, file moves). Keep names tier-generic - never pin a version, which goes stale. This entry is the single home for the routing heuristic; surfaces that use it point here instead of restating it. (DataWizard, 2026-08; D126)
+
+Role-level casting (orchestrator-synthesizer / researcher / writer) and the one dated version-specific casting table live in the `model-casting` skill, which defers to this entry for queued-work tags.
 
 **Example:** `model: Sonnet-tier` on a metadata-sweep gate row; `[model: Fable-tier - synthesis + canon writes]` on a What's-next priority.
 

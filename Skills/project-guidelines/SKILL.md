@@ -6,8 +6,8 @@ description: >-
   migration', 'write project guidelines', 'set up a new project', or any mention
   of 0.0 files needing creation or updates.
 type: skill
-version: '1.5'
-updated: '2026-08-18'
+version: '1.5.1'
+updated: '2026-09-08'
 ---
 
 # Project Guidelines Skill
@@ -57,7 +57,7 @@ Adapt depth to project complexity. Lightweight projects need only 1, 2, 6, 7, 8.
 
 **7. Key pointers** — canonical docs, config files, repos, URLs. Name the project's **intake folders** here (where inbound feature requests, bug reports, skill requests, and handoffs from other projects land) so outbound items from other projects have a named target. The three-class file-placement rule (infrastructure / inbound / outbound-at-target-intake) lives in the Conventions Registry — point to it rather than restating it.
 
-**8. Working conventions** — project-SPECIFIC rules only. Don't repeat universal protocol.
+**8. Working conventions** — project-SPECIFIC rules only. Don't repeat universal protocol. Recommended default line for any project that produces documents people read: "Reader-facing documents follow `Seed/Guides/Reader-Facing Prose Style.md` - load it before drafting, run its verification pass before shipping."
 
 **9. Content Interests** (use this exact header: `## Content Interests`) — what a routing agent should flag for this project. "Flag if you see:" list. Be specific to the project's domain -- "local TTS models for podcast production" not "AI tools." The standardized header enables the dynamic Vault Project Map to embed this section. For detailed guidance on writing Content Interests, see the content-interests-review skill.
 
