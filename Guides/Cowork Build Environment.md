@@ -33,11 +33,12 @@ edit_log:
     positive)"
   - 'DW-S336 2026-09-07 - Device Bridge: commit_files same-path staleness; Verification: stub osascript in Mac harness runs'
   - 'DW-S341 2026-09-07 - SQLite/shell: pkill -f self-match on the device shell; Device Bridge: background-process survival correction; Verification: headless-Chromium recipe for mount-built GUIs'
+  - 'DW-S348 2026-09-08 - Device Bridge: desktop-app artifacts have no URL and freeze data; stage-by-id + template-and-generator exit (GUI Hub session)'
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-09-07
+updated: 2026-09-08
 ---
 # Cowork Build Environment
 
@@ -119,6 +120,7 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **Deliver a git repo to the user's machine when `device_bash` has no network:** clone (shallow) in the cloud sandbox, `tar czf`, `SendUserFile` -> `device_commit_files` into the destination folder, then `tar xzf` with `device_bash` (the `.git` survives, so `git log`/`remote` work locally). ~12 MB tarballs land fine; park the tarball in a `_to_delete/` subfolder afterwards since the device shell cannot delete. (Source: VibeCut S77, 2026-08)
 - **`device_commit_files` re-sends the FIRST version of a reused `stagedPath`.** Committing an edited file under an outputs path that was already committed earlier in the session delivered the original bytes again (the call still reported "written"); a test run then exercised the stale script. Write each iteration to a NEW name (`script.v2.sh`, `.v3.sh` ...), commit that, and compare `md5sum` on both sides before running anything. The same-path staleness exists in the staging direction too (MCP Reliability guide, Known Issues). (Source: DataWizard, 2026-09)
 - **Transport a multi-file edit script to the device without staging: base64 it.** A parse-guarded Python edit (frontmatter `edit_log` appends, section inserts across several vault files) runs cleanly device-side, but `device_bash` cannot see the sandbox's `/tmp`. Encode the script in the sandbox (`base64 -w0`) and decode it inside the `device_bash` command (`echo '<b64>' | base64 -d > script.py && python3 script.py <vault-path>`); an ~8KB script transports without issue, and the whole batch lands in one call with one verification pass. (Source: DataWizard, 2026-08)
+- **Desktop-app Cowork artifacts have no web URL and freeze their data.** An artifact created in the desktop app lives only inside that app: no claude.ai link exists to embed or share, data baked in at build never refreshes, and pages that call MCP tools run only inside the app - as launchable or shared surfaces they are dead ends. `device_stage_files` with `artifact_ids` retrieves an artifact's current HTML by id for review or salvage; a proven exit is template + generator: keep the artifact's HTML as a page shell, re-inject fresh JSON from the source database with a small script, and serve the output as a plain local file. (Source: DataWizard, 2026-09)
 
 ## Verification Discipline for Builds
 

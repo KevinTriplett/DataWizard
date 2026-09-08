@@ -2,13 +2,14 @@
 title: FSAccess GUI Pattern
 type: guide
 created: 2026-09-04
-updated: 2026-09-04
+updated: 2026-09-08
 operator: Andrew
 status: active
 edit_log:
   - DW-S328 2026-09-04 - created (Chunk 1 - skeleton + Sections A-E; supervised build, S327 charter)
   - DW-S328 2026-09-04 - Chunk 2 - Sections F-K written; GUIDES.md Surfaces and tools entry added
   - DW-S328 2026-09-04 - fold-in markers (B/D) resolved as generic-non-blocking (operator ruling); status draft -> active
+  - DW-S348 2026-09-08 - Permission and grant scope: pickers do not run inside embedded frames; embedding surfaces need an open-in-own-tab path (field finding, launcher-hub embed)
 ---
 
 # FSAccess GUI Pattern
@@ -58,6 +59,8 @@ Grant the narrowest folder that holds the data, not the repo root. Least exposur
 Persist the grant so returning operators are not re-prompted, restore it silently on load, and re-check permission rather than assuming it still holds. Upgrading a read grant to read-write is a permission prompt on the same handle, never a re-pick - the scope does not change, only the mode. (The persistence mechanism, the one-prompt upgrade, gesture safety, and the fact that a folder grant cannot read anything above it are runtime facts - see `Browser and File System Access Behaviors.md`.)
 
 One interaction convention the runtime forces into the UI: keep **Connect** and **Reconnect** as two separate affordances. Connect always opens a fresh picker; Reconnect re-attaches or upgrades a remembered grant. Collapsing them into one button lets a stored handle hijack the primary action, so an operator who wants to point at a different folder cannot. Two buttons, two jobs. Re-read the data on window focus and offer a manual reload, so a surface left open overnight is never trusted stale.
+
+The pickers do not run inside an embedded frame: a page iframed by another surface (a launcher or hub page) will find `showDirectoryPicker` missing or blocked even when served same-origin, and the connect flow fails with "not a function". Any surface that embeds an FSAccess page must therefore carry an open-in-its-own-tab affordance, and the grant step happens there. Treat the embedded context as read-only-at-best until verified in the target browser - whether a persisted grant restores inside the frame is runtime-dependent, so test it rather than assuming either way.
 
 ## Operator identity and attribution
 
