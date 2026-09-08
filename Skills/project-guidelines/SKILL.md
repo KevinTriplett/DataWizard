@@ -8,6 +8,8 @@ description: >-
 type: skill
 version: '1.5.1'
 updated: '2026-09-08'
+edit_log:
+  - "DW-S349 2026-09-08 - v1.5.1: Working Conventions template gains the recommended Reader-Facing Prose Style line (edit_log added this session as Step 3.8 fallback; prior history predates the field)"
 ---
 
 # Project Guidelines Skill

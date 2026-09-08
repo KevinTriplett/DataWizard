@@ -7,6 +7,7 @@ operator: Andrew
 status: active
 edit_log:
   - DW-S349 2026-09-08 - created; synthesis of 8 public style/humanizing skills (survey + meta-pattern extraction)
+  - DW-S349 2026-09-08 - Exemplar section added; deep-layer pointer to the Reference companion
 ---
 
 # Reader-Facing Prose Style
@@ -65,6 +66,18 @@ The operative distillation. These are checked in the verification pass.
 14. End when the content ends. No summary paragraph, no uplifting closer, no engagement-bait question.
 15. Never change substance while editing style. Every claim, number, quote, and conclusion survives intact.
 
+## Exemplar
+
+Before, exhibiting diseases 1 through 5 in four lines:
+
+> Here's the key insight: Mondragon's model isn't just a business structure - it's a living tapestry of economic solidarity. By leveraging shared institutions - a bank, a university, a social-security mutual - the federation has navigated seven decades of challenges, underscoring the pivotal role of binding rules in fostering resilience and marking a turning point in cooperative economics.
+
+Announcing opener, manufactured antithesis, significance inflation, banned vocabulary, two figures packed per sentence, every sentence the same weight. After:
+
+> Mondragon is a federation of worker-owned cooperatives that has run for seventy years on shared institutions: a bank, a university, and a social-security mutual. The binding rules matter most. They govern how money, risk, and people move between otherwise independent enterprises, which is why the federation survived recessions that killed standalone cooperatives.
+
+Nothing was lost but the decoration, and the after version carries more information.
+
 ## The verification pass
 
 Run this on every finished reader-facing draft. The checks are counts and scans, not impressions - a mental read-through always sounds varied to the model that wrote it.
@@ -95,3 +108,5 @@ This guide synthesizes, with thanks:
 | [lguz/humanize-writing-skill](https://github.com/lguz/humanize-writing-skill) | MIT | Three-pass model, tiered banned-word dictionary |
 
 Related Seed docs: the Conventions Registry (Model routing entry - which model should be writing in the first place), the model-casting skill (roles and execution), Filename Safety (character rules this guide's own text follows).
+
+Deep layer: `Reader-Facing Prose Style - Reference.md` (same folder) holds the full survey - per-source profiles, complete merged catalogs, countable thresholds, domain calibrations, advanced techniques, and where the sources disagreed. Load it only when this guide's rules are not resolving a problem, or when revising this guide.

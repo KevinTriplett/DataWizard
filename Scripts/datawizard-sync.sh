@@ -4,12 +4,21 @@
 # Modes:
 #   datawizard-sync.sh            sync (default): loop repos, stage/commit/pull/push
 #   datawizard-sync.sh --doctor   read-only health checklist (never changes anything)
-#   datawizard-sync.sh --install  one-command setup / repair (not in this version yet)
+#   datawizard-sync.sh --install  one-command setup / repair (Mac); safe to re-run,
+#                                 every step checks before it writes, backs up first
+#   datawizard-sync.sh --dry-run  --install that only reports what it would change
 # Options:
-#   --vault <path>   vault root override (normally derived from the script location
-#                    or from the conf file - see resolve_vault below)
-#   --auto           marks a scheduled run (launchd / Task Scheduler) in the log and
-#                    status note; the installer's plist passes this
+#   --vault <path>     vault root override (normally derived from the script location
+#                      or from the conf file - see resolve_vault below)
+#   --auto             marks a scheduled run (launchd / Task Scheduler) in the log and
+#                      status note; the installer's plist passes this
+#   --yes              install: no questions (new repos are added without asking;
+#                      steps that need Obsidian quit are reported instead of waited for)
+#   --exclude <path>   install: a repo found in the vault that must not be synced
+#                      (remembered in the conf; repeatable)
+#   --hotkey <combo>   install: hotkey to bind, e.g. Mod+Alt+S (default Mod+Shift+S;
+#                      Mod = Cmd on Mac, Ctrl on Windows)
+#   --interval <min>   install: minutes between scheduled saves (default 120)
 #
 # Reads repo paths from ~/.datawizard-sync.conf (one path per line).
 # Manual use: bind to a hotkey via the Obsidian Shell Commands plugin.
@@ -62,20 +71,29 @@ notify() {
   fi
 }
 
-# Read the conf into PROJECTS[]. Blank lines and # comments are skipped.
-# Lines beginning "exclude:" are reserved for the installer's repo discovery
-# (design 4.2) and are skipped here so a regenerated conf parses unchanged.
+# Read the conf into PROJECTS[] (repo paths) and EXCLUDES[] (repos found in the
+# vault that are deliberately not synced - "exclude: <path>" lines, written by
+# --install per design 4.2). Blank lines and # comments are skipped. Sync mode
+# only uses PROJECTS; --doctor and --install use EXCLUDES too.
 read_conf() {
-  PROJECTS=()
+  PROJECTS=(); EXCLUDES=()
   [ -f "$CONF" ] || return 1
-  local line
+  local line v
   while IFS= read -r line || [ -n "$line" ]; do
     case "$line" in
-      ''|\#*|exclude:*) continue ;;
+      ''|\#*) continue ;;
+      exclude:*) v="${line#exclude:}"; v="${v#"${v%%[! ]*}"}"; v="${v%/}"; [ -n "$v" ] && EXCLUDES+=("$v"); continue ;;
     esac
-    PROJECTS+=("$line")
+    PROJECTS+=("${line%/}")
   done < "$CONF"
   return 0
+}
+
+# is_excluded PATH -> 0 when PATH is on the conf's exclude list
+is_excluded() {
+  local e
+  for e in "${EXCLUDES[@]}"; do [ "$e" = "${1%/}" ] && return 0; done
+  return 1
 }
 
 # Resolve the vault root, in order: --vault, the script's own location when it
@@ -420,14 +438,29 @@ human_age() {
   else echo "$((s/86400)) days ago"; fi
 }
 
-# Reads the Shell Commands data.json and Obsidian hotkeys.json (python3, stdlib
-# only) and prints key=value lines the bash side consumes. Kept as one helper so
-# the JSON handling lives in exactly one place for --doctor and, later, --install.
-inspect_plugin_config() {  # DATA_JSON HOTKEYS_JSON
-  python3 - "$1" "$2" <<'PY'
-import json, sys
-data_path, hk_path = sys.argv[1], sys.argv[2]
+# The one place the Shell Commands data.json, Obsidian hotkeys.json and
+# community-plugins.json are read or written (python3, stdlib only). Prints
+# key=value lines the bash side consumes. Modes:
+#   inspect  read-only report (used by --doctor): data_parse, entry_how, entry_id,
+#            entry_cmd, entry_stdout, entry_stderr, hk_parse, hotkey, orphans, holder
+#   plan     the inspect keys, then one "change=<what>" line per edit --install would
+#            make and one "todo=<what>" line per thing it will not do by itself
+#   apply    plan, then make the changes: back up each file it touches
+#            (<file>.dwsave-backup-<timestamp>, never overwritten), write through a
+#            temp file, re-parse to verify; prints "written=<file>" per file
+# Arguments: MODE DATA_JSON HOTKEYS_JSON [MANIFEST_JSON COMMUNITY_PLUGINS_JSON
+#            TARGET_SCRIPT HOTKEY_COMBO]
+# The file byte layout is not preserved (2-space JSON, like Obsidian's own saves);
+# every key that was there stays there.
+plugin_config() {
+  python3 - "$@" <<'PY'
+import json, sys, os, time
+a = (sys.argv[1:] + [""] * 9)[:9]
+mode, data_path, hk_path, manifest_path, cp_path, target, combo_arg, lazy_path = a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]
 FIXED_ID = "dwsave0001"; ALIAS = "DW Save"; PREFIX = "obsidian-shellcommands:shell-command-"
+PLUGIN_ID = "obsidian-shellcommands"; DEFAULT_COMBO = "Mod+Shift+S"
+changes = []; todos = []; infos = []; written = []
+
 def combo(binds):
     out = []
     for b in binds or []:
@@ -435,12 +468,39 @@ def combo(binds):
         key = b.get("key", "")
         out.append((mods + "+" if mods else "") + key)
     return " / ".join(out)
-try:
-    d = json.load(open(data_path, encoding="utf-8"))
-    print("data_parse=ok")
-except Exception as e:
-    print("data_parse=fail:%s" % e.__class__.__name__); d = None
-entry = None; how = "none"; ids = []
+def parse_combo(s):
+    parts = [p.strip() for p in (s or "").split("+") if p.strip()]
+    if not parts: return None
+    return [{"modifiers": parts[:-1], "key": parts[-1]}]
+def same_bind(x, y):
+    return set(x.get("modifiers", []) or []) == set(y.get("modifiers", []) or []) and str(x.get("key", "")).upper() == str(y.get("key", "")).upper()
+def holds(binds, want):
+    return any(same_bind(b, want[0]) for b in (binds or []))
+def load(path):
+    try:
+        with open(path, encoding="utf-8") as f: return json.load(f), "ok"
+    except FileNotFoundError: return None, "missing"
+    except Exception as e: return None, "fail:%s" % e.__class__.__name__
+def backup(path):
+    if not os.path.exists(path): return
+    stamp = time.strftime("%Y%m%d%H%M%S")
+    dst = "%s.dwsave-backup-%s" % (path, stamp)
+    n = 0
+    while os.path.exists(dst):
+        n += 1; dst = "%s.dwsave-backup-%s-%d" % (path, stamp, n)
+    with open(path, "rb") as s, open(dst, "wb") as d: d.write(s.read())
+def save(path, obj):
+    backup(path)
+    tmp = path + ".dwsave-tmp"
+    with open(tmp, "w", encoding="utf-8") as f: json.dump(obj, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, path)
+    with open(path, encoding="utf-8") as f: json.load(f)   # verify it parses
+    written.append(path)
+
+# --- data.json: report (all modes) ---
+d, d_state = load(data_path)
+print("data_parse=" + ("ok" if d_state == "ok" else d_state))
+entry = None; how = "none"; ids = []; cmds = []
 if isinstance(d, dict):
     cmds = d.get("shell_commands") or []
     ids = [c.get("id", "") for c in cmds if isinstance(c, dict)]
@@ -457,13 +517,9 @@ if entry is not None:
     oh = entry.get("output_handlers") or {}
     print("entry_stdout=" + str(((oh.get("stdout") or {}).get("handler")) or ""))
     print("entry_stderr=" + str(((oh.get("stderr") or {}).get("handler")) or ""))
-try:
-    h = json.load(open(hk_path, encoding="utf-8"))
-    print("hk_parse=ok")
-except FileNotFoundError:
-    print("hk_parse=missing"); h = {}
-except Exception as e:
-    print("hk_parse=fail:%s" % e.__class__.__name__); h = {}
+h, h_state = load(hk_path)
+print("hk_parse=" + h_state)
+if not isinstance(h, dict): h = {} if h_state == "missing" else None
 if isinstance(h, dict):
     if entry is not None:
         b = h.get(PREFIX + str(entry.get("id", "")))
@@ -473,11 +529,157 @@ if isinstance(h, dict):
     holders = []
     for k, v in h.items():
         if entry is not None and k == PREFIX + str(entry.get("id", "")): continue
-        for b in v or []:
-            if set(b.get("modifiers", []) or []) == {"Mod", "Shift"} and str(b.get("key", "")).upper() == "S":
-                holders.append(k)
+        if holds(v, parse_combo(DEFAULT_COMBO)): holders.append(k)
     print("holder=" + ",".join(holders))
+if mode == "inspect": sys.exit(0)
+
+# --- plan: what --install would change ---
+target_cmd = 'bash "%s"' % target
+data_dirty = False; hk_dirty = False; cp_dirty = False; old_id = None
+
+# community-plugins.json: enable the plugin. The Lazy Plugin Loader plugin rewrites
+# this file on every launch from its own settings: "disabled" would undo an enable
+# here (found live on the maintainer machine, DW S344), a delayed start keeps the
+# plugin out of the file on purpose. Read its setting first.
+lazy = None
+if lazy_path:
+    lz, lz_state = load(lazy_path)
+    if isinstance(lz, dict):
+        lazy = ((lz.get("desktop") or {}).get("plugins") or {}).get(PLUGIN_ID) or (lz.get("plugins") or {}).get(PLUGIN_ID)
+        lazy = (lazy or {}).get("startupType") if isinstance(lazy, dict) else None
+cp, cp_state = load(cp_path)
+if cp_state == "missing": cp = []
+if not isinstance(cp, list):
+    todos.append("%s does not parse (%s) - not touched; fix it or delete it and re-run" % (cp_path, cp_state))
+elif PLUGIN_ID not in cp:
+    if lazy == "disabled":
+        todos.append("the Lazy Plugin Loader has 'Shell commands' set to Disabled, and it rewrites community-plugins.json on every launch - enabling it here would not stick; in Obsidian: Settings > Lazy Plugin Loader > Shell commands > Instant, then re-run this installer")
+    elif lazy in ("short", "long"):
+        infos.append("the Shell Commands plugin is loaded by the Lazy Plugin Loader (startup: %s) - that is fine, it is left as is" % lazy)
+    else:
+        cp.append(PLUGIN_ID); cp_dirty = True
+        changes.append("enable the Shell Commands plugin (community-plugins.json)")
+
+# data.json: the DW Save command
+if d_state == "missing":
+    ver = ""
+    m, m_state = load(manifest_path)
+    if isinstance(m, dict): ver = str(m.get("version", ""))
+    d = {"settings_version": ver, "shell_commands": []} if ver else {"shell_commands": []}
+    cmds = d["shell_commands"]; data_dirty = True
+    changes.append("create the plugin's data.json (settings_version %s from the installed manifest)" % (ver or "unset"))
+elif d_state != "ok" or not isinstance(d, dict):
+    todos.append("%s does not parse (%s) - not touched; in Obsidian, open the Shell commands settings once (the plugin rebuilds it), then re-run" % (data_path, d_state))
+    d = None
+if isinstance(d, dict):
+    if not isinstance(d.get("shell_commands"), list):
+        d["shell_commands"] = []; cmds = d["shell_commands"]; data_dirty = True
+    desired = {
+        "id": FIXED_ID,
+        "platform_specific_commands": {"darwin": target_cmd, "default": target_cmd},
+        "alias": ALIAS, "icon": "lucide-save",
+        "output_handlers": {"stdout": {"handler": "notification", "convert_ansi_code": True},
+                            "stderr": {"handler": "notification", "convert_ansi_code": True}},
+        "output_handling_mode": "buffered", "command_palette_availability": "enabled",
+    }
+    if entry is None:
+        new = {"id": FIXED_ID, "platform_specific_commands": {}, "shells": {}, "alias": ALIAS,
+               "icon": "lucide-save", "confirm_execution": False, "ignore_error_codes": [],
+               "input_contents": {"stdin": None}, "output_handlers": {},
+               "output_wrappers": {"stdout": None, "stderr": None}, "output_channel_order": "stdout-first",
+               "output_handling_mode": "buffered", "execution_notification_mode": None, "events": {},
+               "debounce": None, "command_palette_availability": "enabled", "preactions": [],
+               "variable_default_values": {}}
+        new.update(desired); cmds.append(new); entry = new; data_dirty = True
+        changes.append("add the DW Save command to the plugin (id %s, runs %s, result balloon on)" % (FIXED_ID, target))
+    else:
+        diffs = []
+        cur_id = str(entry.get("id", ""))
+        if cur_id != FIXED_ID:
+            old_id = cur_id; diffs.append("migrate it from the pre-installer id %s to the fixed id %s" % (cur_id, FIXED_ID))
+        psc = entry.get("platform_specific_commands") or {}
+        # the plugin runs the darwin entry when present, else default; either is fine
+        if (psc.get("darwin") or psc.get("default")) != target_cmd:
+            diffs.append("point it at %s" % target)
+        oh = entry.get("output_handlers") or {}
+        so = (oh.get("stdout") or {}).get("handler")
+        if so != "notification":
+            diffs.append("turn the result balloon on (stdout handler: %s -> notification)" % (so or "unset"))
+        if (oh.get("stderr") or {}).get("handler") != "notification":
+            diffs.append("route errors to a notification too")
+        if entry.get("alias") != ALIAS: diffs.append("restore the alias 'DW Save'")
+        if diffs:
+            # only the fields above are managed; icon / output mode / palette availability
+            # are set on new entries and left as the user has them on existing ones
+            for key in ("id", "platform_specific_commands", "alias", "output_handlers"):
+                entry[key] = desired[key]
+            data_dirty = True
+            changes.append("update the DW Save command: " + "; ".join(diffs))
+    # a leftover pre-installer duplicate next to the fixed-id entry (a half-finished migration)
+    dups = [c for c in cmds if isinstance(c, dict) and c is not entry and c.get("alias") == ALIAS]
+    for c in dups:
+        cmds.remove(c); data_dirty = True
+        changes.append("remove a duplicate DW Save command (id %s)" % c.get("id", ""))
+    ids = [c.get("id", "") for c in cmds if isinstance(c, dict)]
+
+# hotkeys.json: the binding
+if h is None:
+    todos.append("%s does not parse (%s) - not touched; the hotkey was not set" % (hk_path, h_state))
+elif isinstance(d, dict):
+    our_key = PREFIX + FIXED_ID
+    want = parse_combo(combo_arg) or parse_combo(DEFAULT_COMBO)
+    want_str = combo(want)
+    if old_id:
+        old_key = PREFIX + old_id
+        if old_key in h:
+            if our_key not in h:
+                h[our_key] = h.pop(old_key); hk_dirty = True
+                changes.append("re-link the hotkey (%s) from the old command id to %s" % (combo(h[our_key]), FIXED_ID))
+            else:
+                h.pop(old_key); hk_dirty = True
+                changes.append("remove the old command's hotkey binding (id %s)" % old_id)
+    current = h.get(our_key)
+    if not current:
+        holders = [k for k, v in h.items() if k != our_key and holds(v, want)]
+        if holders:
+            todos.append("%s is already bound to %s - the installer will not take it; unbind it in Obsidian (Settings > Hotkeys), or choose another combo: --hotkey Mod+Alt+S" % (want_str, ", ".join(holders)))
+        else:
+            h[our_key] = want; hk_dirty = True
+            changes.append("bind %s to DW Save" % want_str)
+    else:
+        if combo_arg and not holds(current, want):
+            holders = [k for k, v in h.items() if k != our_key and holds(v, want)]
+            if holders:
+                todos.append("%s is already bound to %s - the installer will not take it; DW Save stays on %s" % (want_str, ", ".join(holders), combo(current)))
+            else:
+                h[our_key] = want; hk_dirty = True
+                changes.append("change the DW Save hotkey from %s to %s" % (combo(current), want_str))
+        elif not holds(current, parse_combo(DEFAULT_COMBO)):
+            infos.append("DW Save stays bound to %s (not the documented %s - pass --hotkey to change it)" % (combo(current), DEFAULT_COMBO))
+    for k in list(h):
+        if k.startswith(PREFIX) and k[len(PREFIX):] not in ids:
+            h.pop(k); hk_dirty = True
+            changes.append("remove a hotkey bound to a Shell Commands entry that no longer exists (id %s) - it did nothing" % k[len(PREFIX):])
+
+for c in changes: print("change=" + c)
+for t in todos: print("todo=" + t)
+for i in infos: print("info=" + i)
+if mode != "apply": sys.exit(0)
+
+# --- apply ---
+try:
+    if cp_dirty: save(cp_path, cp)
+    if data_dirty: save(data_path, d)
+    if hk_dirty: save(hk_path, h)
+except Exception as e:
+    print("error=write failed: %s: %s" % (e.__class__.__name__, e)); sys.exit(1)
+for w in written: print("written=" + w)
 PY
+}
+
+# Read-only view (the --doctor seam; unchanged output).
+inspect_plugin_config() {  # DATA_JSON HOTKEYS_JSON
+  plugin_config inspect "$1" "$2"
 }
 
 run_doctor() {
@@ -539,6 +741,7 @@ run_doctor() {
       listed=0
       if [ "$CONF_OK" -eq 1 ]; then
         for p in "${PROJECTS[@]}"; do [ "${p%/}" = "$repo" ] && listed=1; done
+        is_excluded "$repo" && { d_info "$(basename "$repo") is on the exclude list (not synced, by choice)"; listed=1; }
       fi
       if [ "$listed" -eq 0 ]; then
         found=$((found+1))
@@ -604,6 +807,8 @@ EOF_FIND
       else
         d_ok "launchd agent file present ($plist)"
       fi
+      grep -q '<string>--auto</string>' "$plist" 2>/dev/null || d_warn "the agent does not pass --auto (pre-installer plist) - scheduled runs are not marked in the log or status note; re-run --install"
+      grep -q '<key>PATH</key>' "$plist" 2>/dev/null || d_warn "the agent sets no PATH (pre-installer plist) - launchd gives it /usr/bin:/bin only, so a Homebrew gh is invisible to scheduled runs; re-run --install"
       if launchctl print "gui/$(id -u)/com.datawizard.sync" >/dev/null 2>&1 || launchctl list 2>/dev/null | grep -q 'com.datawizard.sync'; then
         d_ok "launchd agent is loaded"
       else
@@ -629,7 +834,19 @@ EOF_FIND
       d_fail "Shell Commands plugin is not installed - in Obsidian: Settings > Community plugins > Browse > install 'Shell commands', then re-run --install"
     else
       d_ok "plugin folder present ($(grep -o '"version": *"[^"]*"' "$pdir/manifest.json" 2>/dev/null | head -n 1 | sed 's/.*: *//' | tr -d '"'))"
+      local lazy_state=""
+      [ -f "$obs/plugins/lazy-plugins/data.json" ] && command -v python3 >/dev/null 2>&1 && lazy_state=$(python3 - "$obs/plugins/lazy-plugins/data.json" <<'PYL' 2>/dev/null
+import json, sys
+try:
+    d = json.load(open(sys.argv[1], encoding="utf-8"))
+    p = ((d.get("desktop") or {}).get("plugins") or {}).get("obsidian-shellcommands") or (d.get("plugins") or {}).get("obsidian-shellcommands") or {}
+    print(p.get("startupType", "") if isinstance(p, dict) else "")
+except Exception: print("")
+PYL
+)
       if grep -q '"obsidian-shellcommands"' "$obs/community-plugins.json" 2>/dev/null; then d_ok "plugin is enabled (community-plugins.json)"
+      elif [ "$lazy_state" = "short" ] || [ "$lazy_state" = "long" ]; then d_ok "plugin is loaded by the Lazy Plugin Loader (startup: $lazy_state) - not in community-plugins.json by design"
+      elif [ "$lazy_state" = "disabled" ]; then d_fail "plugin is set to Disabled in the Lazy Plugin Loader, which removes it from community-plugins.json on every launch - the hotkey does nothing until it loads; in Obsidian: Settings > Lazy Plugin Loader > Shell commands > Instant, then relaunch"
       else d_fail "plugin is installed but not enabled - re-run --install (or enable 'Shell commands' in Settings > Community plugins)"; fi
       if [ ! -f "$pdir/data.json" ]; then
         d_fail "plugin has no data.json yet (installed but never configured) - re-run --install"
@@ -751,16 +968,370 @@ EOF_PY
 }
 
 # ---------------------------------------------------------------------------
-# Install mode (chunk 3) - placeholder in this version
+# Install mode (design Section 4; chunk 3) - one-command setup and repair.
+# Every step checks before it writes, prints one plain line, and backs up any
+# file it changes (<file>.dwsave-backup-<timestamp>, never overwritten). A
+# second run on a healthy machine changes nothing and says so. --dry-run runs
+# the same checks and prints what it WOULD change, writing nothing at all.
+# Lines: [ok] already right  [done] changed  [dry] would change  [todo] needs
+# you  [warn] left alone on purpose  [info].
 # ---------------------------------------------------------------------------
 
+INS_DONE=0; INS_TODO=0; INS_DRY=0
+i_ok()   { echo " [ok]   $1"; }
+i_todo() { INS_TODO=$((INS_TODO+1)); echo " [todo] $1"; }
+i_warn() { echo " [warn] $1"; }
+i_info() { echo " [info] $1"; }
+i_head() { echo; echo "$1"; }
+# i_act WHAT -> prints "[done] WHAT" and returns 0 (do it), or in --dry-run prints
+# "[dry] would WHAT" and returns 1 (skip it). Use as: if i_act "..."; then <write>; fi
+i_act() {
+  if [ "$DRY_RUN" = true ]; then INS_DRY=$((INS_DRY+1)); echo " [dry]  would $1"; return 1; fi
+  INS_DONE=$((INS_DONE+1)); echo " [done] $1"; return 0
+}
+# backup_file PATH -> copies PATH to PATH.dwsave-backup-<timestamp> (kept forever)
+backup_file() {
+  [ -f "$1" ] || return 0
+  local dst="$1.dwsave-backup-$(date '+%Y%m%d%H%M%S')" n=0
+  while [ -e "$dst" ]; do n=$((n+1)); dst="$1.dwsave-backup-$(date '+%Y%m%d%H%M%S')-$n"; done
+  cp -p "$1" "$dst"
+}
+# confirm QUESTION -> 0 = yes. --yes answers yes; --dry-run answers yes (nothing is
+# written anyway); otherwise asks on the terminal.
+confirm() {
+  [ "$ASSUME_YES" = true ] && return 0
+  [ "$DRY_RUN" = true ] && return 0
+  local ans
+  printf '%s [y/N] ' "$1"
+  read -r ans || ans=""
+  case "$ans" in y|Y|yes|YES) return 0 ;; *) return 1 ;; esac
+}
+obsidian_running() { pgrep -x Obsidian >/dev/null 2>&1 || pgrep -x obsidian >/dev/null 2>&1; }
+
 run_install() {
-  echo "DW Save: --install is not in this version of the Seed yet. Follow datawizard-sync-setup.md, or update the Seed (bash _DataWizard/Seed/update_seed.sh) and try again."
-  exit 2
+  local os; os=$(uname 2>/dev/null)
+  local mode_word="install"; [ "$DRY_RUN" = true ] && mode_word="dry run (nothing will be written)"
+  echo "DW Save $mode_word - $(ts)"
+
+  # --- 0. where ---
+  i_head "0. Vault"
+  read_conf || true
+  if ! resolve_vault || [ ! -d "$VAULT_ROOT" ]; then
+    echo " [todo] vault root not found - run this from the Seed copy (<vault>/_DataWizard/Seed/Scripts/datawizard-sync.sh) or pass --vault <path>"
+    exit 2
+  fi
+  if [ ! -d "$VAULT_ROOT/.obsidian" ]; then
+    echo " [todo] $VAULT_ROOT has no .obsidian folder - is this the vault root? (pass --vault <path>)"
+    exit 2
+  fi
+  i_ok "vault root: $VAULT_ROOT (from $VAULT_SOURCE)"
+  local SEED_DIR="$VAULT_ROOT/_DataWizard/Seed" TARGET="$SCRIPT_ABS"
+  if [ -f "$SEED_DIR/Scripts/datawizard-sync.sh" ]; then
+    TARGET="$SEED_DIR/Scripts/datawizard-sync.sh"
+    if [ "$TARGET" != "$SCRIPT_ABS" ]; then
+      i_info "you are running a copy at $SCRIPT_ABS; Obsidian and the scheduler will be pointed at the Seed copy, which updates itself: $TARGET"
+    fi
+  else
+    i_warn "no Seed copy of the script at $SEED_DIR/Scripts - Obsidian and the scheduler will point at this copy ($SCRIPT_ABS), which does not update itself"
+  fi
+
+  # --- 1. tools ---
+  i_head "1. Tools"
+  if command -v git >/dev/null 2>&1; then i_ok "git present ($(git --version 2>/dev/null | head -n 1))"
+  else
+    if [ "$os" = "Darwin" ]; then i_todo "git not found - run: xcode-select --install (Apple's dialog does the rest), then re-run this installer"
+    else i_todo "git not found - install git, then re-run this installer"; fi
+    echo; echo "DW Save install stopped: git is required."; exit 1
+  fi
+  if command -v gh >/dev/null 2>&1; then i_ok "gh present ($(gh --version 2>/dev/null | head -n 1))"
+  elif command -v brew >/dev/null 2>&1; then
+    if i_act "install the GitHub CLI with Homebrew (brew install gh - takes a minute)"; then
+      if brew install gh >/dev/null 2>&1 && command -v gh >/dev/null 2>&1; then :
+      else i_todo "brew install gh did not complete - run it yourself, then re-run this installer"; fi
+    fi
+  else
+    if [ "$os" = "Darwin" ]; then i_todo "gh (GitHub CLI) not found and Homebrew is not installed - install Homebrew (brew.sh) and re-run, or install gh from cli.github.com"
+    else i_todo "gh (GitHub CLI) not found - install it from cli.github.com, then re-run"; fi
+  fi
+  local SIGNED_IN=0
+  if command -v gh >/dev/null 2>&1; then
+    if gh auth status >/dev/null 2>&1; then SIGNED_IN=1; i_ok "signed in to GitHub"
+    elif [ "$ASSUME_YES" = true ]; then i_todo "not signed in to GitHub - run: gh auth login --web, then re-run this installer"
+    elif i_act "sign you in to GitHub (gh auth login --web opens your browser)"; then
+      if gh auth login --web && gh auth status >/dev/null 2>&1; then SIGNED_IN=1
+      else i_todo "GitHub sign-in did not complete - run: gh auth login --web, then re-run this installer"; fi
+    fi
+  fi
+  local HAVE_PY=0
+  if command -v python3 >/dev/null 2>&1; then HAVE_PY=1; i_ok "python3 present (needed to edit the Obsidian plugin config)"
+  else i_todo "python3 not found - the Obsidian wiring (step 5) is skipped; on a Mac it comes with the Xcode Command Line Tools (xcode-select --install)"; fi
+
+  # --- 2. repos ---
+  i_head "2. Repos to sync (~/.datawizard-sync.conf)"
+  local HAD_CONF=0; [ -f "$CONF" ] && HAD_CONF=1
+  local KEEP=() DEAD=() NEW=() EXC=() p e repo gitdir listed found_root=0
+  # existing entries: kept when they still resolve to a repo with an origin
+  for p in "${PROJECTS[@]}"; do
+    p="${p%/}"
+    if [ ! -d "$p" ]; then DEAD+=("$p (folder not found)")
+    elif ! git -C "$p" rev-parse --is-inside-work-tree >/dev/null 2>&1; then DEAD+=("$p (not a git repo)")
+    elif ! git -C "$p" remote get-url origin >/dev/null 2>&1; then DEAD+=("$p (no origin remote - nothing to push to)")
+    else KEEP+=("$p"); fi
+  done
+  # exclude list: the conf's, plus --exclude, plus the vault root itself unless it is
+  # already a synced entry (design 8.1 ruling: never start pushing the whole vault)
+  for e in "${EXCLUDES[@]}"; do EXC+=("${e%/}"); done
+  for e in "${EXCLUDE_ARGS[@]}"; do EXC+=("${e%/}"); done
+  in_list() { local x="$1"; shift; local y; for y in "$@"; do [ "$y" = "$x" ] && return 0; done; return 1; }
+  # discovery to depth 4 (the doctor's rule): skip .obsidian/.trash/node_modules, skip no-origin
+  while IFS= read -r gitdir; do
+    [ -n "$gitdir" ] || continue
+    repo="${gitdir%/.git}"
+    case "$repo" in */.obsidian/*|*/.trash/*|*/node_modules/*|*/.obsidian|*/.trash|*/node_modules) continue ;; esac
+    git -C "$repo" remote get-url origin >/dev/null 2>&1 || continue
+    in_list "$repo" "${KEEP[@]}" && continue
+    if [ "$repo" = "$VAULT_ROOT" ]; then
+      found_root=1
+      in_list "$repo" "${EXC[@]}" || EXC+=("$repo")
+      continue
+    fi
+    in_list "$repo" "${EXC[@]}" && continue
+    NEW+=("$repo")
+  done <<EOF_FIND
+$(find "$VAULT_ROOT" -maxdepth 4 -name .git \( -type d -o -type f \) -prune 2>/dev/null | sort)
+EOF_FIND
+  for p in "${KEEP[@]}"; do i_ok "$(basename "$p") - kept ($p)"; done
+  for p in "${DEAD[@]}"; do i_warn "dropped from the list: $p - the old list is kept in a backup next to the conf"; done
+  [ "$found_root" -eq 1 ] && i_info "the vault itself is a git repo - it is NOT synced by DW Save (kept on the exclude list); list it in the conf yourself if you really want the whole vault pushed"
+  for p in "${EXC[@]}"; do [ "$p" = "$VAULT_ROOT" ] || i_info "$(basename "$p") is on the exclude list - not synced, by choice ($p)"; done
+  if [ ${#NEW[@]} -gt 0 ]; then
+    echo " [info] found ${#NEW[@]} repo(s) in the vault that are not in the list yet:"
+    for p in "${NEW[@]}"; do echo "          $(basename "$p")  ($(git -C "$p" remote get-url origin 2>/dev/null))  $p"; done
+    [ "$DRY_RUN" = true ] && i_info "the real install asks before adding them (--yes skips the question)"
+    if confirm "        Add them? Every repo on the list is committed and pushed on each save."; then
+      for p in "${NEW[@]}"; do KEEP+=("$p"); done
+    else
+      i_warn "not added - re-run to add them later, or keep them out for good with: --exclude \"<path>\""
+    fi
+  fi
+  if [ ${#KEEP[@]} -eq 0 ]; then
+    i_todo "no repos to sync - clone a shared project into the vault (or check that its origin is set) and re-run"
+  fi
+  # push access, read-only: can we reach each origin with the credentials git will use?
+  for p in "${KEEP[@]}"; do
+    if GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes" git -C "$p" ls-remote --exit-code origin HEAD >/dev/null 2>&1; then
+      i_ok "$(basename "$p"): GitHub reachable with your saved credentials"
+    else
+      i_warn "$(basename "$p"): could not reach its origin - offline, or git is not authorized to push; if you are online, run: gh auth setup-git   (lets git use your GitHub sign-in; this installer does not change git's settings itself)"
+    fi
+  done
+  # write the conf only when its content changes
+  local NEWCONF="" nl='
+'
+  NEWCONF="# DW Save repo list - one repo path per line; every repo here is committed, pulled and pushed on each save.${nl}# Lines starting with \"exclude:\" are repos found in the vault that are deliberately NOT synced.${nl}# Re-run 'datawizard-sync.sh --install' after cloning a new shared project; it adds the repo here (and asks first)."
+  for p in "${EXC[@]}"; do NEWCONF="$NEWCONF${nl}exclude: $p"; done
+  for p in "${KEEP[@]}"; do NEWCONF="$NEWCONF${nl}$p"; done
+  if [ -f "$CONF" ] && [ "$(cat "$CONF")" = "$NEWCONF" ]; then
+    i_ok "repo list unchanged ($CONF)"
+  else
+    local what="write the repo list ($CONF)"; [ "$HAD_CONF" -eq 1 ] && what="update the repo list ($CONF; the previous version is backed up next to it)"
+    if i_act "$what"; then
+      backup_file "$CONF"
+      printf '%s\n' "$NEWCONF" > "$CONF"
+    fi
+  fi
+
+  # --- 3. commit guard ---
+  i_head "3. Commit guard (pre-commit hook in every synced repo)"
+  local hook_src="" installer="" hooks_dir hp live marker
+  [ -f "$SEED_DIR/Scripts/hooks/pre-commit" ] && hook_src="$SEED_DIR/Scripts/hooks/pre-commit"
+  [ -z "$hook_src" ] && [ -f "$(dirname "$SCRIPT_ABS")/hooks/pre-commit" ] && hook_src="$(dirname "$SCRIPT_ABS")/hooks/pre-commit"
+  [ -n "$hook_src" ] && [ -f "$(dirname "$hook_src")/../install-git-hooks.sh" ] && installer="$(dirname "$hook_src")/../install-git-hooks.sh"
+  if [ -z "$hook_src" ]; then
+    i_todo "the Seed's hook (Scripts/hooks/pre-commit) was not found - update the Seed (bash _DataWizard/Seed/update_seed.sh) and re-run; commit guard skipped"
+  else
+    for p in "${KEEP[@]}"; do
+      hp=$(git -C "$p" config core.hooksPath 2>/dev/null)
+      if [ -n "$hp" ]; then
+        case "$hp" in /*) hooks_dir="$hp" ;; *) hooks_dir="$p/$hp" ;; esac
+        live="$hooks_dir/pre-commit"
+        if [ -f "$live" ] && cmp -s "$hook_src" "$live"; then i_ok "$(basename "$p"): commit guard installed (via core.hooksPath=$hp)"
+        elif [ -f "$live" ]; then i_todo "$(basename "$p"): git runs a team hook here ($live, via core.hooksPath=$hp) and it differs from the Seed's - this installer does not edit tracked team files; update that file in the repo (copy from $hook_src)"
+        else i_todo "$(basename "$p"): core.hooksPath=$hp is set but $live does not exist - add the Seed's Scripts/hooks/pre-commit there (a tracked team file; this installer does not write it)"; fi
+        continue
+      fi
+      live="$p/.git/hooks/pre-commit"
+      if [ -f "$live" ] && cmp -s "$hook_src" "$live"; then
+        i_ok "$(basename "$p"): commit guard installed"
+      elif [ -f "$live" ] && ! grep -q "DataWizard commit guard" "$live" 2>/dev/null; then
+        i_warn "$(basename "$p"): has its own pre-commit hook (not DataWizard's) - left alone; to use the DW guard, merge $hook_src into it yourself"
+      else
+        local why="install the commit guard in $(basename "$p")"; [ -f "$live" ] && why="update the commit guard in $(basename "$p") to the Seed's version (old one backed up next to it)"
+        if i_act "$why"; then
+          backup_file "$live"
+          if [ -n "$installer" ]; then bash "$installer" "$p" >/dev/null 2>&1
+          else mkdir -p "$p/.git/hooks"; cp "$hook_src" "$live"; chmod +x "$live"
+               mkdir -p "$p/.git/info"; touch "$p/.git/info/exclude"; grep -qxF 'SYNC-BLOCKED.md' "$p/.git/info/exclude" || echo 'SYNC-BLOCKED.md' >> "$p/.git/info/exclude"; fi
+          cmp -s "$hook_src" "$live" || i_todo "$(basename "$p"): the hook did not land at $live - run: bash \"$installer\" \"$p\""
+        fi
+      fi
+    done
+  fi
+
+  # --- 4. safety net ---
+  i_head "4. Safety net (scheduled save every $INTERVAL_MIN minutes)"
+  if [ "$os" != "Darwin" ]; then
+    i_info "scheduled saves are set up on macOS only in this version (Windows ships with the PowerShell port) - skipped"
+  else
+    local plist="$HOME/Library/LaunchAgents/com.datawizard.sync.plist" label="com.datawizard.sync" want="$HOME/.dwsave-plist-want.$$"
+    cat > "$want" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>$label</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>$TARGET</string>
+        <string>--auto</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>StartInterval</key>
+    <integer>$((INTERVAL_MIN * 60))</integer>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/datawizard-sync.out</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/datawizard-sync.err</string>
+</dict>
+</plist>
+PLIST
+    local loaded=0 need_write=1
+    if launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || launchctl list 2>/dev/null | grep -q "$label"; then loaded=1; fi
+    [ -f "$plist" ] && cmp -s "$want" "$plist" && need_write=0
+    if [ "$need_write" -eq 0 ] && [ "$loaded" -eq 1 ]; then
+      i_ok "launchd agent installed and loaded ($plist)"
+    else
+      local ok_lint=1
+      if command -v plutil >/dev/null 2>&1 && ! plutil -lint "$want" >/dev/null 2>&1; then ok_lint=0; fi
+      if [ "$ok_lint" -eq 0 ]; then
+        i_todo "the generated launchd plist does not validate (plutil -lint) - not installed; this is a bug in the installer, please report it with: plutil -lint \"$want\""
+        want=""   # keep the file for the report
+      else
+        local what="install the launchd agent ($plist: runs the Seed copy with --auto every $INTERVAL_MIN min and at login)"
+        if [ "$need_write" -eq 0 ]; then what="load the launchd agent (file was present but not loaded)"
+        elif [ -f "$plist" ]; then what="update the launchd agent (old plist backed up next to it; adds --auto, the PATH fix, and the Seed path)"; fi
+        if i_act "$what"; then
+          if [ "$need_write" -eq 1 ]; then
+            mkdir -p "$HOME/Library/LaunchAgents"; backup_file "$plist"; cp "$want" "$plist"
+          fi
+          launchctl bootout "gui/$(id -u)/$label" >/dev/null 2>&1 || true
+          if ! launchctl bootstrap "gui/$(id -u)" "$plist" >/dev/null 2>&1; then launchctl load "$plist" >/dev/null 2>&1 || true; fi
+          if launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || launchctl list 2>/dev/null | grep -q "$label"; then
+            i_info "the agent runs a first scheduled save right away (RunAtLoad) - a status note appears in _DataWizard/ shortly"
+          else
+            i_todo "the plist was written but launchd did not load it - log out and back in, then run --doctor; if it is still not loaded: launchctl load \"$plist\""
+          fi
+        fi
+      fi
+    fi
+    [ -n "$want" ] && rm -f "$want"
+  fi
+
+  # --- 5. Obsidian wiring ---
+  i_head "5. Obsidian (Shell Commands plugin, DW Save command, hotkey)"
+  local obs="$VAULT_ROOT/.obsidian" pdir="$VAULT_ROOT/.obsidian/plugins/obsidian-shellcommands" WIRED=0
+  if [ ! -d "$pdir" ]; then
+    i_todo "the Shell Commands plugin is not installed - in Obsidian: Settings > Community plugins > Browse > install 'Shell commands' (no need to enable or configure it), then re-run this installer; it finishes the rest"
+  elif [ "$HAVE_PY" -eq 0 ]; then
+    i_todo "python3 is needed to edit the plugin config safely - skipped (see step 1)"
+  else
+    i_ok "plugin folder present ($(grep -o '"version": *"[^"]*"' "$pdir/manifest.json" 2>/dev/null | head -n 1 | sed 's/.*: *//' | tr -d '"'))"
+    local k v PLAN_CHANGES=() PLAN_TODOS=() PLAN_INFOS=() PLAN_ERR="" PLAN_RAN=0
+    while IFS='=' read -r k v; do
+      case "$k" in data_parse) PLAN_RAN=1 ;; change) PLAN_CHANGES+=("$v") ;; todo) PLAN_TODOS+=("$v") ;; info) PLAN_INFOS+=("$v") ;; error) PLAN_ERR="$v" ;; esac
+    done <<EOF_PLAN
+$(plugin_config plan "$pdir/data.json" "$obs/hotkeys.json" "$pdir/manifest.json" "$obs/community-plugins.json" "$TARGET" "$HOTKEY_ARG" "$obs/plugins/lazy-plugins/data.json" 2>/dev/null)
+EOF_PLAN
+    for v in "${PLAN_INFOS[@]}"; do i_info "$v"; done
+    for v in "${PLAN_TODOS[@]}"; do i_todo "$v"; done
+    if [ "$PLAN_RAN" -eq 0 ]; then
+      i_todo "the plugin config could not be inspected (the python3 helper failed) - nothing was changed; run --doctor and report this"
+    elif [ ${#PLAN_CHANGES[@]} -eq 0 ]; then
+      i_ok "plugin enabled, DW Save command present with the balloon on, hotkey bound - nothing to change"
+    else
+      local go=1
+      if [ "$DRY_RUN" = true ] && obsidian_running; then
+        i_info "Obsidian is running - the real install asks you to quit it before making the changes below (it writes these settings back from memory otherwise)"
+      elif [ "$DRY_RUN" != true ] && obsidian_running; then
+        if [ "$ASSUME_YES" = true ]; then
+          go=0
+          for v in "${PLAN_CHANGES[@]}"; do i_todo "would $v - but Obsidian is running and would overwrite the change from memory; quit Obsidian fully (Cmd+Q) and re-run this installer"; done
+        else
+          echo " [info] Obsidian is running. It keeps these settings in memory and writes them back over any edit, so the changes below are only safe while it is closed."
+          local tries=0 ans
+          while obsidian_running && [ $tries -lt 3 ]; do
+            tries=$((tries+1))
+            printf '        Quit Obsidian fully (Cmd+Q), then press Enter here (or type s to skip the Obsidian step): '
+            read -r ans || ans="s"
+            case "$ans" in s|S) break ;; esac
+          done
+          if obsidian_running; then
+            go=0
+            for v in "${PLAN_CHANGES[@]}"; do i_todo "would $v - skipped because Obsidian is still running; quit it and re-run this installer"; done
+          fi
+        fi
+      fi
+      if [ "$go" -eq 1 ]; then
+        for v in "${PLAN_CHANGES[@]}"; do i_act "$v" || true; done
+        if [ "$DRY_RUN" != true ]; then
+          local WROTE=() APPLY_ERR=""
+          while IFS='=' read -r k v; do
+            case "$k" in written) WROTE+=("$v") ;; error) APPLY_ERR="$v" ;; esac
+          done <<EOF_APPLY
+$(plugin_config apply "$pdir/data.json" "$obs/hotkeys.json" "$pdir/manifest.json" "$obs/community-plugins.json" "$TARGET" "$HOTKEY_ARG" "$obs/plugins/lazy-plugins/data.json" 2>/dev/null)
+EOF_APPLY
+          if [ -n "$APPLY_ERR" ] || [ ${#WROTE[@]} -eq 0 ]; then
+            i_todo "the plugin config could not be written (${APPLY_ERR:-no file written}) - nothing was changed; run --doctor and report this"
+          else
+            for v in "${WROTE[@]}"; do i_info "wrote $v (previous version backed up next to it)"; done
+            WIRED=1
+          fi
+        fi
+      fi
+    fi
+  fi
+
+  # --- 6. wrap up ---
+  echo
+  if [ "$DRY_RUN" = true ]; then
+    echo "DW Save dry run: $INS_DRY change(s) would be made, $INS_TODO item(s) would need you. Nothing was written. Run with --install to apply."
+    exit 0
+  fi
+  if [ "$WIRED" -eq 1 ]; then
+    echo "Next: open Obsidian, then press Cmd+Shift+S (or your DW Save hotkey). You should see a 'DW Saved' balloon."
+    echo "      If you do not, run: bash \"$TARGET\" --doctor"
+  elif [ "$INS_DONE" -eq 0 ] && [ "$INS_TODO" -eq 0 ]; then
+    echo "DW Save is already fully installed - nothing changed."
+    exit 0
+  fi
+  if [ "$INS_TODO" -gt 0 ]; then
+    echo "DW Save install: $INS_DONE change(s) made, $INS_TODO item(s) need you (marked [todo] above). Re-run this installer after; it only touches what is still missing."
+    exit 1
+  fi
+  echo "DW Save install: $INS_DONE change(s) made, nothing left to do. Run --doctor any time to check."
+  exit 0
 }
 
 usage() {
-  sed -n '2,13p' "$SCRIPT_PATH" | sed 's/^# \{0,1\}//'
+  sed -n '2,22p' "$SCRIPT_PATH" | sed 's/^# \{0,1\}//'
 }
 
 # ---------------------------------------------------------------------------
@@ -771,18 +1342,28 @@ main() {
   MODE="sync"
   VAULT_ARG=""
   AUTO_RUN=false
+  DRY_RUN=false; ASSUME_YES=false; EXCLUDE_ARGS=(); HOTKEY_ARG=""; INTERVAL_MIN=120
   while [ $# -gt 0 ]; do
     case "$1" in
       --install) MODE="install" ;;
+      --dry-run) MODE="install"; DRY_RUN=true ;;
       --doctor)  MODE="doctor" ;;
       --auto)    AUTO_RUN=true ;;
+      --yes|-y)  ASSUME_YES=true ;;
       --vault)   shift; VAULT_ARG="${1:-}"; [ -n "$VAULT_ARG" ] || { echo "DW Save: --vault needs a path"; exit 2; } ;;
       --vault=*) VAULT_ARG="${1#--vault=}" ;;
+      --exclude) shift; [ -n "${1:-}" ] || { echo "DW Save: --exclude needs a path"; exit 2; }; EXCLUDE_ARGS+=("$1") ;;
+      --exclude=*) EXCLUDE_ARGS+=("${1#--exclude=}") ;;
+      --hotkey)  shift; HOTKEY_ARG="${1:-}"; [ -n "$HOTKEY_ARG" ] || { echo "DW Save: --hotkey needs a combo like Mod+Alt+S"; exit 2; } ;;
+      --hotkey=*) HOTKEY_ARG="${1#--hotkey=}" ;;
+      --interval) shift; INTERVAL_MIN="${1:-}" ;;
+      --interval=*) INTERVAL_MIN="${1#--interval=}" ;;
       -h|--help) usage; exit 0 ;;
       *) echo "DW Save: unknown option '$1' (try --help)"; exit 2 ;;
     esac
     shift
   done
+  case "$INTERVAL_MIN" in ''|*[!0-9]*|0) echo "DW Save: --interval needs a number of minutes (got '$INTERVAL_MIN')"; exit 2 ;; esac
   SCRIPT_ABS="$(cd "$(dirname "$SCRIPT_PATH")" 2>/dev/null && pwd)/$(basename "$SCRIPT_PATH")"
 
   case "$MODE" in
