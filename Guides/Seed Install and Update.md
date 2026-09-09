@@ -13,12 +13,13 @@ edit_log:
     -InstallAutosync) replace the manual plist and Task Scheduler recipes;
     sleep/wake catch-up semantics documented; upstream seed_role guard;
     git-clone-aware sync
+  - "WV_2026-09-07_AA_03 2026-09-09 - Upstream Operator Note: diagnostic corollary (missing sync log on an upstream clone is expected; check seed_role first)"
 operator: Andrew
 purpose: Canonical guide for installing, manually updating, and auto-syncing the
   DataWizard Seed
 title: Seed Install and Update
 type: guide
-updated: 2026-08-15
+updated: 2026-09-09
 ---
 # Seed Install and Update
 
@@ -201,5 +202,7 @@ While verifying, check whether the human's Project Instructions version matches.
 The Seed maintainer (whoever publishes the Seed to GitHub) does NOT run auto-sync. Their local Seed is the upstream source -- running `update_seed.sh` / `update_seed.ps1` would overwrite local edits with the last push to GitHub. This guide's install/update automation is for downstream operators only.
 
 **The scripts enforce this.** A `seed_role` row containing `upstream` in the vault's `Vault Config.md` (untracked, user-specific) makes both scripts refuse to sync or install auto-sync on that machine (exit 3, logged). The maintainer should carry that row; downstream operators should not.
+
+**Diagnostic corollary.** On an upstream machine there is no launchd/Task Scheduler job and no `Seed Sync Log.md` - by design, not by defect. The clone stays current by *pushing* (`git log` shows push-side auto-sync commits). Before reading a missing sync log as "auto-sync never ran," check `seed_role` in `Vault Config.md`; a Weave review note recommended installing auto-sync on the maintainer's own machine before this was caught (Weave, 2026-09).
 
 **Announcement norm.** After each Seed push, the maintainer posts a one-line announcement to the operator/team channel: the new `seed:` / `project_instructions:` versions and whether operators must re-paste Project Instructions. This is the push-side counterpart to the local-only version check instances run at orientation -- without it, operators have no signal that a new Seed shipped (both the zip and npx caches update silently). With auto-sync installed, downstream Seeds pick up a push within a day on their own -- the announcement still matters for PI re-pastes, which no script can do for the user.

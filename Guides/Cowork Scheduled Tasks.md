@@ -3,7 +3,7 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: 2026-08-24
+updated: 2026-09-09
 operator: Andrew
 edit_log:
   - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
@@ -14,6 +14,7 @@ edit_log:
   - DW-S285 2026-08-24 - scope widened to native schedulers; added launchd/cron
     no-PATH-no-profile section (S261, closes Backlog P1) + hybrid
     on-demand/backstop trigger pattern (S261) (meta-learning review S256-S266)
+  - "WV_2026-09-07_AA_03 2026-09-09 - added: the report lives only in the run's own session (verify content by paste; persist via a Project state doc)"
 ---
 
 # Cowork Scheduled Tasks
@@ -54,6 +55,10 @@ An unattended macOS job started by launchd or cron inherits neither the shell pr
 ## Hybrid trigger: on-demand primary plus an idempotent scheduled backstop
 
 For a human-fired, lapse-sensitive ingest (message capture, a save-queue pull, a recording handoff), pair an on-demand trigger the operator fires when it matters (a hotkey, a menu action) with a cheap scheduled run that catches the lapses. The scheduled run must be idempotent - it processes only what the on-demand run has not, via a cursor or existing-output check - so the two never double-process and the operator never has to remember which ran. The on-demand path gives immediacy; the backstop bounds how stale the capture can get when the operator forgets. Portable to any feeder that has both a "now" moment and a daily floor. (DataWizard, 2026-08)
+
+## The report lives only in the run's own session
+
+An observe-and-report task's output (its push notification / final message) is not written anywhere a later interactive session can read - not the vault, not the Project. `list_triggers` shows only the run's status, timing and session id. To verify a report's *content* against its spec, the operator pastes it into the reviewing session (identify the run by the task's exact name and firing time; several tasks often fire within the same half hour). If a report must be machine-readable later, have the task write a state doc to the Project (the flag-watch pattern) - do not expect the message itself to persist. (Weave, 2026-09)
 
 ## Cloud git proxy and sandbox limits
 
