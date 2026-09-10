@@ -20,7 +20,11 @@
 # Installed per-clone by install-git-hooks.sh (.git/hooks/ is not synced).
 # Bypass a genuine false positive once with:  git commit --no-verify
 #
-# NOTE: the conflict-marker awk grammar below is kept byte-identical to
+# A bare '=======' is ALSO a valid markdown setext heading underline, so it is
+# only treated as a conflict marker when the same file also contains '<<<<<<<'.
+# A real conflict always has the opening marker; a setext heading never does.
+#
+# NOTE: the conflict-marker awk grammar below is kept in sync with
 # ci/check-conflict-markers.yml -- one grammar, two surfaces. Edit both together.
 
 set -uo pipefail
@@ -37,10 +41,12 @@ scan_conflicts() {
     { sub(/\r$/, ""); s = $0; sub(/^ ? ? ?/, "", s) }
     s ~ /^```/ || s ~ /^~~~/ { infence = !infence; next }
     infence { next }
-    s ~ /^<<<<<<</ || s ~ /^=======$/ || s ~ /^>>>>>>>/ || s ~ /^\|\|\|\|\|\|\|/ {
-      print fname ":" FNR ": " $0; hit = 1
-    }
-    END { exit (hit ? 1 : 0) }'
+    s ~ /^<<<<<<</ { print fname ":" FNR ": " $0; hit = 1; sawopen = 1; next }
+    s ~ /^>>>>>>>/ || s ~ /^\|\|\|\|\|\|\|/ { print fname ":" FNR ": " $0; hit = 1; next }
+    s ~ /^=======$/ { eq[++neq] = fname ":" FNR ": " $0 }
+    END {
+      if (sawopen && neq) { for (i = 1; i <= neq; i++) print eq[i]; hit = 1 }
+      exit (hit ? 1 : 0) }'
 }
 
 while IFS= read -r -d '' path; do
