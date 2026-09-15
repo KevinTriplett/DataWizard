@@ -73,16 +73,28 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# --- Determine vault root ---
-if [ -z "$VAULT_ROOT" ]; then
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  # Script lives at _DataWizard/Seed/update_seed.sh
-  # Vault root is 2 levels up
-  VAULT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+# --- Determine Seed directory ---
+# The script always sits at the Seed root. Zip install: _DataWizard/Seed/.
+# Git clone: _DataWizard/ (the repo root IS the Seed payload; no Seed/ level).
+if [ -n "$VAULT_ROOT" ]; then
+  if [ -d "$VAULT_ROOT/_DataWizard/Seed" ]; then
+    SEED_DIR="$VAULT_ROOT/_DataWizard/Seed"
+  else
+    SEED_DIR="$VAULT_ROOT/_DataWizard"
+  fi
+else
+  SEED_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 fi
 
-SEED_DIR="$VAULT_ROOT/_DataWizard/Seed"
-SYNC_LOG="$VAULT_ROOT/_DataWizard/Seed Sync Log.md"
+# The _DataWizard folder: parent of Seed/ in a zip install, the Seed dir itself in a clone
+if [ "$(basename "$SEED_DIR")" = "Seed" ]; then
+  DW_DIR="$(dirname "$SEED_DIR")"
+else
+  DW_DIR="$SEED_DIR"
+fi
+
+VAULT_ROOT="$(dirname "$DW_DIR")"
+SYNC_LOG="$DW_DIR/Seed Sync Log.md"
 VAULT_CONFIG="$SEED_DIR/Vault Config.md"
 
 log_entry() {
