@@ -4,6 +4,9 @@
 # DataWizard commit guard breadcrumb (per-clone, regenerated; never commit)
 SYNC-BLOCKED.md
 
+# Seed Sync Log is local only
+Seed\ Sync\ Log.md
+
 # Obsidian workspace (per-user, not for sync)
 .obsidian/
 .trash/
