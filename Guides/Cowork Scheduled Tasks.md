@@ -3,21 +3,25 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: 2026-08-06
+updated: 2026-09-09
 operator: Andrew
 edit_log:
   - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
     scheduled-task learnings)
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
     (pointer)
-  - "DW-S250 2026-08-06 - added Cloud git proxy and sandbox limits section (D115)"
+  - DW-S250 2026-08-06 - added Cloud git proxy and sandbox limits section (D115)
+  - DW-S285 2026-08-24 - scope widened to native schedulers; added launchd/cron
+    no-PATH-no-profile section (S261, closes Backlog P1) + hybrid
+    on-demand/backstop trigger pattern (S261) (meta-learning review S256-S266)
+  - "WV_2026-09-07_AA_03 2026-09-09 - added: the report lives only in the run's own session (verify content by paste; persist via a Project state doc)"
 ---
 
 # Cowork Scheduled Tasks
 
 > Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
 
-Operational guidance for running DataWizard automation as Cowork scheduled tasks (the nightly meta-learning and content-interest scans, hourly enrichment batches, and similar). These are platform behaviors learned from running real scheduled tasks; design task prompts and cadences around them.
+Operational guidance for running DataWizard automation as Cowork scheduled tasks (the nightly meta-learning and content-interest scans, hourly enrichment batches, and similar), plus the native-scheduler facts (launchd, cron) that the same automation runs into when it moves onto the operator's machine. These are platform behaviors learned from running real scheduled tasks; design task prompts and cadences around them.
 
 ## Timezone: use the operator's actual offset
 
@@ -44,11 +48,25 @@ A task that runs without a human in the loop needs all of:
 
 - **Runtime-constructed URLs.** `web_fetch` inside a scheduled task rejects URLs constructed at runtime (discovered mid-run rather than passed in the prompt). For URLs the run discovers, route through the Chrome MCP instead.
 
+## Native schedulers (launchd, cron): no PATH, no profile
+
+An unattended macOS job started by launchd or cron inherits neither the shell profile (`.zshrc`, `.bash_profile`) nor the GUI-login PATH, so the `python3`, `node`, or Homebrew binary that works in Terminal is not found when the job fires - the job fails silently or runs a different interpreter. In the job's script, pin the concrete interpreter path (a pyenv or system python by absolute path) and export the toolchain PATH explicitly (`/opt/homebrew/bin`, the pyenv shims, whatever the script needs) before any command runs; never rely on the environment the job "should" have. Verify by running the script through the scheduler once (a `launchctl start` or a near-future fire) rather than from Terminal, since Terminal is exactly the environment the job does not get. (DataWizard, 2026-08)
+
+## Hybrid trigger: on-demand primary plus an idempotent scheduled backstop
+
+For a human-fired, lapse-sensitive ingest (message capture, a save-queue pull, a recording handoff), pair an on-demand trigger the operator fires when it matters (a hotkey, a menu action) with a cheap scheduled run that catches the lapses. The scheduled run must be idempotent - it processes only what the on-demand run has not, via a cursor or existing-output check - so the two never double-process and the operator never has to remember which ran. The on-demand path gives immediacy; the backstop bounds how stale the capture can get when the operator forgets. Portable to any feeder that has both a "now" moment and a daily floor. (DataWizard, 2026-08)
+
+## The report lives only in the run's own session
+
+An observe-and-report task's output (its push notification / final message) is not written anywhere a later interactive session can read - not the vault, not the Project. `list_triggers` shows only the run's status, timing and session id. To verify a report's *content* against its spec, the operator pastes it into the reviewing session (identify the run by the task's exact name and firing time; several tasks often fire within the same half hour). If a report must be machine-readable later, have the task write a state doc to the Project (the flag-watch pattern) - do not expect the message itself to persist. (Weave, 2026-09)
+
 ## Cloud git proxy and sandbox limits
 
 The Cowork cloud sandbox (where a scheduled task's fresh session runs) routes all git through a proxy that only permits repos in the session's authorized "sources." A push to a repo outside that set is refused at the environment level -- even with a valid credential in the URL -- with `access denied by the git proxy: <owner>/<repo> is not in this session's authorized repository set`. Reads may still pass through a URL-embedded token, but writes are gated. This is the most likely cause of a scheduled task that "gate-denies" or silently fails to push: a personal access token does not buy past the proxy; the repo has to be an authorized source.
 
 Related: the sandbox is a Linux VM with the operator's folders mounted, not macOS itself, and a cloud-fired task cannot wake a sleeping machine. So a macOS-local scheduler (launchd + a `pmset` scheduled wake) cannot be set up from a Cowork session, and a cloud task cannot run "overnight while the laptop is closed." For unattended, machine-independent git automation -- especially overnight -- prefer **GitHub Actions cron** (native `GITHUB_TOKEN` write, no proxy, no machine). See the **Review Automation** guide for the worked example. (DW-S250)
+
+**Private-repo read scans from a scheduled cloud task: classic PAT, stored in the Claude Project.** For a daily scan that must READ a private repo owned by another user, a classic PAT (`repo` scope) is the workable credential - fine-grained PATs cannot be scoped to a repo under someone else's personal account, and a scoped read-only token is therefore unavailable; mitigate by binding the task's prompt to observe-only rules. Store the token in a project doc (e.g. `claude/<name>-token.md`) so the fresh scheduled session can fetch it via the Projects tool; have the prompt fail loudly (report, not silence) when the token is expired or the clone is refused. Read via `https://x-access-token:TOKEN@github.com/...` passed the git proxy interactively (Weave, 2026-08); confirm the first scheduled firing before trusting the cadence. (Source: Weave, 2026-08)
 
 ## See also
 

@@ -8,12 +8,14 @@ description: >-
   refreshing. Also triggered by the scheduled Content Interests audit.
 type: skill
 version: '1.4.2'
-updated: '2026-06-23'
+updated: '2026-08-30'
 edit_log:
   - DW-S196 2026-06-22 - repointed session-closer step refs to the renamed
     periodic threshold checks step (v4.0 renumber)
   - "DW-S198 2026-06-23 - D88 sweep: defer cadence quotes to session-closer
     threshold step"
+  - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: threshold-check
+    references repointed to the Review Automation guide (S312 Seed review)"
 ---
 
 # Content Interests Review Skill
@@ -26,12 +28,12 @@ This skill detects that drift by comparing the 0.0's Content Interests against r
 
 ## When to Use
 
-- A project's Content Interests are due for a refresh per the session-closer's periodic threshold checks (the single home for the cadence number -- D88)
+- A project's Content Interests are due for a refresh per the Review Automation guide's cadence table (the single home for the cadence number -- D114)
 - A project has no Content Interests section yet
 - The project's scope or direction has shifted significantly (new collaborators, new tools, new domains)
 - Before a Vault Project Map refresh
-- During orientation, if `last_content_interests_review:` in the 0.0 frontmatter indicates a review is due (per the session-closer's periodic threshold checks -- the single home for the cadence) and the project's direction appears to have shifted since then
-- The session-closer nudges this in "What's next" when thresholds are met (in session-closer's periodic threshold checks step, full closes only)
+- During orientation, if `last_content_interests_review:` in the 0.0 frontmatter indicates a review is due (per the Review Automation guide's cadence table -- the single home for the cadence) and the project's direction appears to have shifted since then
+- The session-closer surfaces a pending Content Interests report in "What's next" at a full close (Step 3.10; staleness detection is scheduled automation per the Review Automation guide)
 - User says "update content interests," "what should we be flagging for this project," "review our routing info"
 
 ### When NOT to Use
@@ -171,5 +173,5 @@ For projects with multiple distinct domains, organize Content Interests into sho
 - **project-guidelines**: Defines the Content Interests format (Section 9). Use project-guidelines for creating a 0.0 from scratch; use this skill for reviewing and refreshing an existing Content Interests section.
 - **harvest-router**: Reads Content Interests to decide where flagged content goes. Accurate Content Interests directly improve routing quality.
 - **Vault Project Map**: The dynamic map embeds each project's Content Interests section. When you update Content Interests via this skill, the map auto-updates.
-- **session-closer** (v1.9+): its periodic threshold checks step checks `last_content_interests_review:` and nudges in "What's next" when the threshold is met (that step is the single home for the cadence number -- D88). The project instance judges whether a review is actually needed -- time alone doesn't determine drift.
+- **session-closer**: at a full close it surfaces any pending Content Interests report in "What's next" (Step 3.10). Staleness detection and the cadence number live in the Review Automation guide (D114). The project instance judges whether a review is actually needed -- time alone doesn't determine drift.
 - **content-interest-scan**: Scans material pools against what this skill produces. The scanner consumes Content Interests as its matching filter -- well-structured, specific interests yield precise matches; vague interests match too broadly. When updating Content Interests, consider scannability.

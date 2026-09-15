@@ -2,8 +2,11 @@
 title: Vault Structure Guide
 type: document
 created: '2026-03-07'
-updated: '2026-06-11'
+updated: '2026-08-30'
 status: active
+edit_log:
+  - "DW-S312 2026-08-30 - stale-warning banner added (pre-demolition content;
+    full rewrite queued under D97; S312 Seed review)"
 tags:
   - DataWizard
   - setup
@@ -12,6 +15,8 @@ tags:
 ---
 
 # Vault Structure Guide
+
+> ⚠️ **Stale - read with care (2026-08-30, S312 Seed review).** Parts of this guide predate the S182 protocol demolition and the current Seed layout: the `_DataWizard/` internal structure shown below (`00 - Guides for Humans/`, `01 - Project/`, START HERE files, the Universal Protocol monolith) is retired (D62, D94), the type count is outdated (the taxonomy is v2.7 with 19 active types), and the YAML section duplicates the [[YAML Schema]]. Current canon: [[Conventions Registry]] (folders, naming, meta-folders, shell + sections), [[YAML Schema]] (frontmatter), [[Content Type Taxonomy]] (types). The content-folder recommendations (`_Clippings/`, `_Companions/` with mirrored subfolders, `_!nbox/`, private-vs-shared naming) remain broadly accurate. A full rewrite is queued (D97); this banner comes out with it.
 
 *How to organize your Obsidian vault for DataWizard. This guide covers folder conventions, naming standards, and the YAML frontmatter schema.*
 

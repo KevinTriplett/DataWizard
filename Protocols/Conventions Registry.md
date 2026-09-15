@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-10'
+updated: 2026-09-08
 operator: Andrew
 priority: high
 maturity: working
@@ -28,6 +28,51 @@ edit_log:
   - "WV_2026-08-10_AA_01 2026-08-10: added Operator personal / scratch folders
     section (Weave-origin, generalized + depersonalized; DW decision-log entry
     pending)"
+  - "DW-S272 2026-08-18: added File placement -- three classes + Attention
+    requests live in the flag cluster (Flag Surfacing Chain, D117)"
+  - "DW-S278 2026-08-18: added ID families table (task-ID pointer row),
+    optimistic-claim pattern, carry-the-probe, and ceremony-placement entries
+    (D119)"
+  - "DW-S279 2026-08-18: added The reader-path principle (named; Flag Surfacing
+    Chain B2)"
+  - "DW-S278 2026-08-18: inbound notes rehomed to per-project Session Exchange
+    folders; _Infrastructure is infra-only, never notes (operator ruling)"
+  - "DW-S284 2026-08-24: Archiving gains the consolidate-to-one-home survivor
+    diff (S191); one-liners: SQLite is local / markdown is shared (D103, D107;
+    S192) + per-adopter config at the consumption surface (D96; S187)
+    (meta-learning review S186-S197)"
+  - "DW-S285 2026-08-24: File placement gains the Seed-owned-assets exception
+    (fix upstream while hot, no FR round-trip; S235) (meta-learning review
+    S231-S246)"
+  - "DW-S285 2026-08-24: Decision-log conventions: decision numbers are
+    project-local namespaces (S262; meta-learning review S256-S266)"
+  - "DW-S285 2026-08-24: Link, don't restate gains \"Pointers carry no status\"
+    (S285 pre-close reflection; 0.0 Key Pointer rot)"
+  - "DW-S287 2026-08-26: File placement gains a pointer to the Multi-Instance
+    Coordination Patterns guide (exchange-note anatomy + handshake, canonical
+    there)"
+  - "DW-S289 2026-08-26: File placement gains 'Rows count as outbound items too'
+    (an addressed gate/inventory/backlog row needs a reader-side artifact on the
+    target's orientation path; origin row points) - Flag Workbench review, Quest
+    GUI blind spot"
+  - "DW-S293 2026-08-26: Citation format gains synthesis-provenance rules --
+    generated-docs/obligation-tiers, evidence-vs-root, reach + metadata
+    exemption, block-ID tolerance, Seed-may-carry-block-IDs (D121-D123;
+    synthesis provenance Phase 1)"
+  - "DW-S309 2026-08-30: Optimistic-claim pattern gains the not-one-shot rider
+    (re-check the token before any later write to the claimed resource;
+    meta-learning review S267-S287)"
+  - "DW-S312 2026-08-30: Cadence entry repointed to the Review Automation guide
+    cadence table (D114 sweep; S312 Seed review)"
+  - "DW-S308 2026-08-31: T13 codification (D126) - Operator Gate Queue entry
+    (lifecycle vocab, G-row schema, feeding, verify-before-working, exit
+    ceremony), Active Threads ledger row schema entry (Track 1), Model routing
+    entry (single home), Tracking Model deployment-gate fact-class row"
+  - "DW-S332 2026-09-06: Link, don't restate gains 'Agent entry points are
+    pointers' (Engineering Doctrine FR C3); Archiving gains the mirror-pattern
+    structure rule (Archive Mirror Pattern FR accepted)"
+  - DW-S343 2026-09-08 - retired-convention signatures flip-ceremony line added (points at Seed/Config/retired-signatures.yaml)
+  - "DW-S349 2026-09-08 - Model routing entry gains the model-casting pointer (role casting + dated version table live in the skill)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -38,7 +83,11 @@ The single home for DataWizard's structural and formatting conventions. When a c
 
 This registry is that home for the conventions below. Skills, guides, and project docs that touch these topics should link here (e.g., "companion naming: see the Conventions Registry") rather than carrying their own copy. The same principle governs the rest of the Seed: the YAML Schema owns field definitions, the Filename Safety guide owns the character map, the session-closer owns cadence numbers, the Content Type Taxonomy owns `type:` values. When you find a convention restated somewhere, replace the copy with a pointer.
 
+**Pointers carry no status.** A pointer - a 0.0 Key Pointer, a "see also", a ledger `home:` line - says *where* something lives, never *what state it is in*. "(codification pending, Backlog P3)" inside a pointer is a copy of the item's state, and it will lie the moment the item moves: one 0.0 kept announcing a convention as pending for two weeks after the Registry had adopted it. State lives at the canonical item (the Backlog line, the gate row, the frontmatter `status:`); a pointer that needs to say "pending" should instead link to the thing that is pending. (DataWizard, 2026-08.)
+
 The same law governs the **distribution layer**: copied state rots; only pointers stay true. A value copied out of its canonical home -- a version number restated in a collaborator doc, a "pinned" claim in a README, a recommended method repeated in setup instructions -- will eventually lie, because nothing forces the copy to update when the source changes. Point at the canonical source (VERSION.md, the config itself, this registry); where a copy is unavoidable, treat it as a release artifact the convention-flip sweep (below) must reconcile. Named from three instances in one arc, then re-demonstrated inside that same arc when a "pinned >=0.12.5" claim was found false across three docs while the running config said `@latest`. (D111; S226, S227, S230)
+
+**Agent entry points are pointers.** The same law governs agent-facing entry points: every surface an agent reads at startup - pasted project instructions, a CLAUDE.md or AGENTS.md, an IDE rules file, a tool-specific config - is a thin pointer to one canonical doctrine doc, never a copy of it. One canonical doc, N entry points: N tools reading one source cannot drift; N copies will. The Project Instructions' per-surface appendices already follow this; the rule extends it to every agent entry point a project adds. (DataWizard, 2026-09; from a production-repo harvest.)
 
 **Example:** Before this registry, the 0.x slot table appeared in three docs with three different slot lists. Now it appears once (below); the Protocol shell, the health-audit skill, and the project-guidelines skill link to it.
 
@@ -141,6 +190,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
 - Numbering starts at `1.0` (`0.x` is reserved for infrastructure files). Section headers use plain numeric prefixes matching the filenames - no Roman numerals.
 - Section YAML carries `parent: "[[Shell Name]]"` and `section: N` (matching the filename prefix); each section file opens with `*Part of the [[Shell Name]]*`.
 - **5+ sections** in a document - create the section subfolder rather than leaving the files loose.
+- **Splitting an existing file:** write the section files first and verify they landed, *then* rewrite the original as the shell. The extract exists on disk before the destructive step, so no content is ever at risk if the rewrite fails or is interrupted. (DataWizard, 2026-06)
 - Empty folders can't be deleted via MCP (the vault FUSE mount blocks it); when files are moved out, the human deletes the empty folder manually in Obsidian.
 
 **Example:** `0.2 Session Log - DataWizard.md` is a shell of `![[...]]` embeds; each entry is a file in `_Sections - DataWizard/Session Log/`, numbered from `1.0`.
@@ -186,6 +236,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
 **Rule:** when a file is superseded or retired, **move it, don't delete it** (delete only empty stubs, with human confirmation).
 
 - **Where:** the project's `xArchive - ProjectName/` (or a vault-root `xArchive/` for vault-level files).
+- **Structure inside the archive root - the mirror pattern:** archived files go to a subfolder named after the working folder they came from (`xArchive - ProjectName/<working-folder-name>/`, created as needed). Provenance is preserved by subpath, and there is one place to look for anything retired. No local `Archive/` or per-folder archive subfolders inside working folders; any that exist get consolidated into the mirror as a deliberate link-aware pass (grep full-path references too), never by incremental drift. Field record: a 30-file working-docs audit executed under the pattern with zero link breakage; one filename collision, resolved by disambiguating rename (2026-08).
 - **How:**
   1. Move the file with `obsidian:move_note`, then fix references by hand. **`move_note` does NOT reliably update wikilinks** (proven 3x, S189: an MOC list entry, a `related:` frontmatter field, and a manifest table row all kept the old name). After the move, grep the literal old filename vault-wide and fix every reference - `[[wikilinks]]`, frontmatter `related:` fields, and list entries; lint's broken-link check confirms. (Full behavior: [[MCP Reliability and Write Verification]] guide.) Do **not** leave the file in place with just a notice - it must move.
   2. **Keep the original filename** so existing wikilinks still resolve.
@@ -193,6 +244,7 @@ For the full cross-platform character map (forbidden characters, replacements, s
   4. Note the archive in the session log; remove the file from active MOC listings.
 - **Filename exception:** if the replacement reuses the same filename (e.g., a regenerated file), the archived copy must be renamed to avoid collision; add the reason in parentheses, e.g. `0.1 MOC - ProjectName (hand-curated, superseded SNNN).md`.
 - **Don't archive:** files that are merely old but still active; files you only moved; content outside your project scope (flag those to the human).
+- **Consolidating to one home:** when the archive is the retired half of a duplicate-to-one-home merge, diff the retired file against the survivor *before* archiving and carry over any load-bearing content the survivor lacks. Confirming "the duplicate is archived" is not the closeout; "the survivor carries everything" is. (A protocol demolition archived a federation-guide duplicate whose "full copies only" rule the surviving guide did not have; caught two weeks later. DataWizard, 2026-06.)
 
 (14.0 salvage, D87)
 
@@ -223,6 +275,16 @@ Block-default changes *which anchor you reach for*, not *when you stamp*: stampi
 ```
 
 Companions are block-default; **harvest destinations keep section-default with block/turn-when-specific** (their label-format precision is a separate open question). This section is the canonical statement of why the two regimes differ - skills point here rather than restating it.
+
+**Generated documents and obligation tiers.** The block-default spans **every document generated under the protocols**, not only companions -- design docs, reports, decision entries, session-log section files, exchange reviews, and plant records. Which classes must cite is set by obligation tier (Tier 1: outward-facing deliverables and decision entries; Tier 2: design docs, reports and reviews, research-index entries, plant records; Tier 3: trackers, backlogs, stubs, and coordination chatter carry no obligation); the synthesis-provenance design plan holds the full tier table. Granularity follows the **evidence unit, not the document class**: a paragraph or turn takes a block stamp whatever file it lives in; a whole section takes the section anchor above.
+
+**Evidence vs edit-provenance root.** A bare session-reference token -- `(S###)` -- is a *root*: "born in, or written in, that session," asserting nothing about reading. It stays legal and is never lint-flagged per token. An *evidence* citation carries the block anchor -- `([[Session Note#^b3|S###]])` -- and asserts the block was read and supports the claim. Same visible label, different anchor; the two render identically in reading mode. Where no vault source exists, use the honest root rather than inventing a hop. Bare tokens are tightened toward evidence on touch, never in bulk; a machine cannot tell the two apart, so there is no per-token lint finding.
+
+**Reach and the metadata exemption.** A block stamp is a one-line append in reach on **any document in the same vault**, regardless of owner -- never fall back to a section anchor out of politeness toward a collaborator's file. Out of reach only: read-only mounts, other vaults, PDFs, and a document a sibling has visibly claimed mid-edit today. Stamping a document does **not** bump `updated:` or add an `edit_log` entry -- a stamp changes no content.
+
+**Block-ID tolerance.** Reuse **any** existing trailing block ID on the target line -- an instance-minted integer (`^b7`) or a human-minted Obsidian ID (`^3f9a2c` from "Copy link to block"); never add a second ID to one line. For a citing document that draws on several blocks, batch the stamping with `stamp_blocks.py` (Seed/Scripts) via a manifest rather than round-tripping by hand.
+
+**Seed text may carry block IDs.** A plant record cites the guide paragraph it planted (`[[Guide Name#^b41]]`) and the origin block the learning came from; block IDs in Seed text are allowed and expected. Session identifiers and vault names remain forbidden in Seed text.
 
 Rules: citations go at the **end** of a statement; one per claim is usually enough; ISO dates; a `#anchor` must exactly match a heading in the source (this is why transcripts are segmented before harvesting). **Cite only what you have read** - a citation asserts the cited block was actually read, not recalled. **Colliding basenames:** when two files share a basename, path-qualify the link so Obsidian resolves deterministically - `([[Folder/Name#^b7|§]])`.
 
@@ -280,9 +342,12 @@ Use it when multiple collaborators send frequent short messages. Keep individual
 
 Optional fields when relevant: **Supersedes** `D[n]`, **Resolves** `Q[n]`, **See** `[[doc]]`, a status note for provisional decisions.
 
+**Decision numbers are project-local namespaces.** `D25` in one project's log is unrelated to `D25` in another's. A cross-project note (handoff, feature request, review) that cites a decision number is citing the *source* project's log unless it says otherwise - resolve every inbound D-reference against the target project's Decision Log before acting on it, and when writing outbound, qualify the number with the project (`Weave D25`). An inbound request once cited a source-project decision as if it were the target's; the target's same-numbered decision was about something else entirely. (DataWizard, 2026-08)
+
 - **Numbering:** sequential (`D01`, `D02`, ...); never reuse a number. Supersede by marking the old entry and referencing the new one - preserve the full history of thinking.
 - **Open questions** use `Q[number]`; when resolved, mark `Resolved -> D[number]`.
 - **Protocol-updated flag** (D77) on every convention-changing entry makes uncodified changes greppable (`grep "Protocol updated: No"`).
+- **Retired-convention signatures:** when a decision retires a convention *form* (a filename shape, a frontmatter field, a set phrasing), add its signature phrase to `Seed/Config/retired-signatures.yaml` so the retired-signature lint check (C15) catches regressions -- part of the convention-flip ceremony. That file's header points back here.
 - One decision log per project, created at bootstrap.
 
 **Which log to update:**
@@ -339,6 +404,7 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 | Recommended entry point for the next session | the session log's "What's next" (one-session TTL) | everything else in "What's next" points, never restates |
 | Carried side/native task lists | a durable queue doc (e.g. a Native Run Queue) | "What's next" points |
 | Stream position (perpetual threads) | the stream-state note (D107) | db mirror optional, derived |
+| Deployment gate (built or decided, waiting on a specific actor) | Operator Gate Queue row | ledger / backlog / "What's next" point |
 
 Sub-rules:
 
@@ -356,11 +422,90 @@ Sub-rules:
 
 ---
 
+## Active Threads ledger row schema
+
+**Rule:** every arc row is a `### T{N} - Name` block carrying exactly seven fields: `status / last / home / quest / next / docs / history`. `next:` holds **current state only, ~5 lines max** - what the arc waits on and the single recommended next step - and points at the driver doc or its State Board for step state (link-don't-restate, applied to the ledger itself). Archaeology - "(Prior SNNN:)" chains, superseded next-steps, executed-plan detail - lives in the driver doc, the session log, or the Resolved archive, never in the row. `[SNNN note]` bullets are permitted as temporary carriers between closes; fold them into the canonical fields on the row's next substantive touch. `history:` stays a one-line session list. (DataWizard, 2026-08; D126)
+
+**Example:** a dieted `next:` reads "G-003 (operator-native, ~15 min) unblocks the Reddit feeder; then the TG bridge build per the reviewed Step 1 design. Step state: the driver doc State Board." - current state only; the prior plan's history lives in the session log.
+
+---
+
+## Operator Gate Queue
+
+**Rule:** deployment gates - work that is **built (or decided) but waiting on a specific actor** outside the default session path to bring it live - live in one canonical, cross-project queue file, the third layer of the 0.5 action-items shell (arcs / backlog / gates). Work any future session can pick up stays in the Backlog; a row enters the queue only when the actor is specific (operator-native, another project's session, a named person).
+
+- **Lifecycle vocabulary:** `designed -> built -> installed -> verified-live`. Terminal is verified-live: *verified live where production actually reads it*. `installed` covers deployed-but-unverified. Parking is orthogonal: any state may move to Parked, and the park reason names which is dormant - `project dormant`, `thread stale (project active)`, or `superseded by <what>`.
+- **Row schema (parser-first):** rows start at `### G-NNN Title`; fields are `- key: value` lines (multiple fields may share a line separated by ` | `): `who / project / arc / state / est`, `action`, `unblocks`, optional `clock` (decay/urgency fact) and `model` (see Model routing), `source / added`. Unknown keys are ignored; class membership (time-sensitive, quick unlocks, etc.) comes from the preceding `## ` header. IDs per the ID-families table: G-NNN, next free, never reused.
+- **Feeding, at close:** a session that builds or decides something either verifies it live before close or adds a gate row. The check rides the session-closer's existing infrastructure step - no new ceremony moment. A build that could not be verified live is recorded as `unverified`, never as pending-success ("built + pushed, dispatch unconfirmed" can be carrying a failure).
+- **Verify a gate's live state before working its row:** rows drift stale in both directions (understated done-ness is the inverse of a phantom dependency), so the first step on any gate is one targeted check of what actually exists (a file, a scheduler label, a config line) - then act on that and correct the row.
+- **Exit ceremony** - the moment a row reaches verified-live: (1) move it to the Deployed section, date-stamped; (2) register the asset in the 0.6 Registry's Infrastructure section with a one-line `verify:` (how to check it is still alive); (3) a 0.0 Key Pointer only if orientation-relevant; (4) the health audit sweeps the Infrastructure `verify:` lines. Gate queue = getting live; Registry = being live; health audit = staying live.
+
+A depersonalized starter file ships as `Seed/Templates/Operator Gate Queue - Template.md`. (DataWizard, 2026-08; D126; full rationale and ceremonies in the adopting project's design doc)
+
+**Example:** a session ships a scheduler job it cannot verify before close - it adds a `### G-NNN` row (`state: installed`, `clock:` if the value decays) instead of calling the work done; a later session runs the one targeted check, brings it live, and walks the row through the exit ceremony.
+
+---
+
+## Model routing
+
+**Rule:** when queuing session work for a later instance - a gate row's `model:` field, a What's-next `[model: X]` tag, the session-closer's next-session recap - suggest the model tier by work shape: **Opus-tier** is the default; **Fable-tier** (highest capability) earns its place on deep synthesis, audits, design reviews, canon writes, and multi-perspective judgment; **Sonnet-tier** suits mechanical, well-specified batches (metadata sweeps, triage marking, file moves). Keep names tier-generic - never pin a version, which goes stale. This entry is the single home for the routing heuristic; surfaces that use it point here instead of restating it. (DataWizard, 2026-08; D126)
+
+Role-level casting (orchestrator-synthesizer / researcher / writer) and the one dated version-specific casting table live in the `model-casting` skill, which defers to this entry for queued-work tags.
+
+**Example:** `model: Sonnet-tier` on a metadata-sweep gate row; `[model: Fable-tier - synthesis + canon writes]` on a What's-next priority.
+
+---
+
+## ID families
+
+**Rule:** Every identifier family answers three questions in one place: where a value is *defined*, what scope it must be *unique* in, and how the next one is *minted*. One row per family; a new family adds its row here at creation instead of improvising - the triad is cheap to fill while the thinking is hot and expensive to reconstruct after drift. (DataWizard, 2026-08)
+
+| Family | Format | Definition site | Minting rule | Uniqueness scope |
+|---|---|---|---|---|
+| Session IDs | `SNNN` (solo) / composite (multi-operator) | session log section folder (claim stub) | optimistic claim: next free above highest entry and any in-progress stub | project |
+| Decision IDs | `DNN` | decision log entry | next sequential; never reused - supersede instead | project |
+| Open questions | `QNN` | decision log open questions | next sequential | project |
+| Thread IDs | `TNN` | Active Threads ledger row | next free on arc open | project |
+| Gate IDs | `G-NNN` | Operator Gate Queue row | next free at queue feed | project |
+| Quest IDs | `XX-Q-NNN` | quest file frontmatter (`quest_id`) | next free across active quests + archive | project |
+| Task IDs | `PREFIX-NNNNN` | checkbox line in the quest layer | scan-max + verify-after-mint - see the **Quest Lifecycle** protocol (canonical home) | project (scan scope = active quests + archive + quest index) |
+| Intake titles (FRs, bug reports) | descriptive filename | the intake folder | filename uniqueness; descriptive, not coded | intake folder |
+
+The Task IDs row is the worked example: its definition-site / scope / minting triad took a three-session design arc to settle after live collisions in two projects; filling the row at family creation is the cheap alternative.
+
+**Example:** a new "experiment IDs" family gets its row (format, definition site, minting rule, scope) before the first ID is minted.
+
+---
+
+## Optimistic-claim pattern
+
+**Rule:** When two sessions can contend for one resource (an ID slot, a filename, a shared row), claim it by **writing, then reading back, then retrying on loss**: write your claim, re-read to confirm your value survived, and on loss take the next free slot and re-verify. No locks, no coordinator - convergence comes from each claimant renumbering only its own claim. Named instances, each canonical in its own home: session claims (the orientation claim ceremony), MCP write verification, task-ID minting (Quest Lifecycle). Any future two-sessions-one-resource problem is answered by "apply the optimistic-claim pattern, scope = X" - not a new design session. The verify is not one-shot: a claim can be lost after a successful read-back, so any later write to the claimed resource re-checks the token first. (DataWizard, 2026-08)
+
+**Example:** two parallel sessions both mint task ID N+1; each re-searches after writing, at least one sees the double definition, renumbers its own line, and re-verifies.
+
+---
+
+## Carry the probe, not the snapshot
+
+**Rule:** A handoff, brief, or design doc that cites live state another session will act on ships the **query** (the grep/search) alongside or instead of the result, with the instruction to regenerate at execution time. A bare count is stale on arrival - in one design arc, live-state numbers went stale within hours of being written, twice. Corollary: never ship a truncated result (a `| head`-capped listing) as evidence - list the whole window or ship the probe. (DataWizard, 2026-08) ^b42
+
+**Example:** a repair handoff says "residual counter fields: run `grep -rl '^next_task_id' <quest folder>` at execution time" rather than "4 files have residual counters."
+
+---
+
+## Ceremony joins existing ceremony moments
+
+**Rule:** A new verification or bookkeeping step must attach to an existing ceremony moment - orientation, the write/mint moment, or session close - never create a new one. Individually-justified checks accrete; the ceremony diet survives only if the number of *moments* stays fixed even as checks move in and out of them. (DataWizard, 2026-08)
+
+**Example:** task-ID uniqueness is checked at the mint moment (verify-after-mint) and at existing lint/audit cadence - not via a new session-closer step.
+
+---
+
 ## Cadence
 
-**Rule:** periodic-review cadence numbers (health audit, meta-learning review, content-interest refresh) live in **exactly one place: the session-closer's thresholds table**. Every other doc describes the nudge without quoting a number. To change a cadence, edit that table; don't restate the value here. (D88)
+**Rule:** periodic-review cadence numbers (health audit, meta-learning review, content-interest refresh, backlog + FR triage) live in **exactly one place: the Review Automation guide's cadence table** (`Seed/Guides/Review Automation.md`). Every other doc describes the nudge without quoting a number. To change a cadence, edit that table; don't restate the value here. (D114, relocating D88)
 
-**Example:** "Run a health audit roughly every cadence interval" - the session-closer thresholds table holds the current number.
+**Example:** "Run a health audit roughly every cadence interval" - the Review Automation cadence table holds the current number.
 
 ---
 
@@ -371,6 +516,42 @@ Sub-rules:
 - **Git push before batch ops:** before running any script that bulk-moves or modifies vault files, commit and push first. `git checkout .` is then the undo if a batch run goes wrong.
 - **Sweep on a convention flip:** when a convention or default here changes, grep the Seed and project docs for the *old* rule's signature phrases and reconcile each hit - convert it to a pointer, fix the stale value, or consciously retain it (retention is the last resort, and record the retained ones). Patching only the sections you remember misses drift. (S225 Build 3.)
 - **Seed content ships depersonalized:** the Seed goes to other users, so Seed-bound content stays generic -- no vault names, collaborator names, or operator initials. Render provenance as `(project, date)` -- e.g. `(Weave, 2026-08)` -- matching the environment guides' existing style. Frontmatter-provenance policy and the legacy sweep are tracked in the DW Backlog's Seed de-personalization sweep item. (S227, S243)
+- **SQLite is local, markdown is shared:** per-project databases are gitignored, and a SQLite file on a file-sync folder (Dropbox, iCloud) with concurrent writers can corrupt - so cross-machine sharing is always text: committed rendered markdown plus a key export, never the live db. The db is a rebuildable local cache; markdown is the durable shared record; they round-trip via render / migrate scripts. Applies to every db-backed store (operational db, intake queue). (D103, D107; DataWizard, 2026-06)
+- **Per-adopter config lives at the consumption surface,** never in a shipped git-tracked file - a pull clobbers it. Paths go in the gitignored `Vault Config.md`; the project home folder goes in the pasted Project Instructions or the vault-root CLAUDE.md. Same class as the Vault Config gitignore decision. (D96; DataWizard, 2026-06)
+
+---
+
+## File placement -- three classes
+
+**Rule:** Files sort into three placement classes by *audience*, not by the writer's location:
+
+- **Project infrastructure** -- the 0.x series, `Conventions/`, `Quests/`: lives in `_Infrastructure - ProjectName/`.
+- **Inbound notes** -- notes FROM another project (or DW) addressed TO this project (handoffs, "Note from X - ..."): live in the target project's **`Session Exchange/`** folder (created on first use; under the project's Workshop folder when one exists, else at the project's shared root), because this project's instances are the audience. Infrastructure folders (`_Infrastructure - ProjectName/`) hold infrastructure files ONLY - never notes; a note filed there mixes audience-facing mail into the 0.x surface. (Operator ruling, DataWizard, 2026-08.)
+- **Outbound items** -- feature requests, bug reports, skill requests, or handoffs addressed to ANOTHER project: file directly at the **target project's intake folder**, never in the origin's `_Infrastructure/`. The origin keeps only a session-log line recording what was filed where; a pointer stub is optional and discouraged (it becomes clutter). **Exception - Seed-owned assets:** a defect in a Seed skill, guide, protocol, or script that surfaces while working in another project is fixed upstream in the Seed directly, while the context is hot, and recorded in that project's session log - not filed as a feature request and round-tripped. The outbound-intake rule exists because another project's repo is theirs to change; the Seed is shared, so the instance that found the defect is already the right one to fix it. (Weave field reports fixed same-day in the Seed, 2026-08.)
+
+Each project names its intake folders in its 0.0 so "the target's intake" is unambiguous; without a named intake, writers fall back to origin-side filing. **Rationale:** an item routed by the writer's convenience (file it where I am) rather than the reader's path (file it where they look) fails silently while looking like infrastructure -- the same failure class as an undelivered flag. One project accumulated eleven outbound feature requests in its own `_Infrastructure/`, unread, before the pattern was caught. (Weave pilot, 2026-08; Flag Surfacing Chain.)
+
+**Example:** a DataWizard feature request written during a Weave session is filed in `_DataWizard/Workshop - DataWizard/Feature Requests/`, with a one-line record in the Weave session log -- not in Weave's `_Infrastructure/`.
+
+**Rows count as outbound items too.** The rule is about audience, and a *row* addressed to another project's actor -- a deployment-gate entry ("a session in project X should vendor this"), a tool-inventory row built for project X, a backlog line naming their operator -- has the same audience as a file and fails the same way: it sits in the origin's infrastructure, which the target's instances never open. So an addressed row must have a **reader-side artifact on the target's orientation path** -- a flag on a note in that project, or an exchange note in its `Session Exchange/` with `audience:` set -- and the origin row *points* at it. The origin row alone is a note-to-self. (A tool built for a collaborator project sat in the origin's gate queue for three weeks while the collaborator designed the same tool again; caught in review, 2026-08.)
+
+The anatomy of a Session Exchange note - filename pattern, `audience` / `status` handshake, turn-taking - and the coordination patterns that use it live in `Guides/Multi-Instance Coordination Patterns.md` (canonical home); this entry governs placement only.
+
+---
+
+## The reader-path principle
+
+**Rule:** Route every coordination artifact by the reader's path, not the writer's convenience: *artifacts routed by the writer's convenience rather than the reader's path fail silently, while looking like infrastructure.* The design test for any coordination feature -- a flag, a handoff, a request, a notice -- is: who reads this, and does their path cross it? If nothing in the reader's routine (orientation, a swept folder, a queried field) crosses the artifact, it is undelivered no matter how well it is written. Orientation is the one guaranteed choke point where a reader's path can be enforced.
+
+This is the general principle under the two entries adjacent to it (file placement by audience; attention via the flag cluster) and under the orientation sweep itself (D117). Evidence class: one project measured its flag system at 0% delivery twice, accumulated eleven outbound feature requests unread in its own infrastructure folder, and left a five-month fork diagnosis buried in an unrelated note -- all artifacts that looked done at write time. (Flag Surfacing Chain, 2026-08; rollout guidance in `Seed/Guides/Team Attention Rollout.md`.)
+
+---
+
+## Attention requests live in the flag cluster, not banners
+
+**Rule:** A request for another operator's action is carried by the `flag*` cluster (YAML Schema, Team Coordination Fields), where the orientation sweep and dashboard queries find it -- never by a prose banner or callout alone. A banner may *repeat* a flagged request for a reader already in the file, but a banner is not a delivery mechanism: nothing queries prose, so an action-request that lives only in a banner reaches no one who is not already reading that file. (Flag Surfacing Chain, 2026-08; D117.) ^b43
+
+**Example:** a callout reading "needs sign-off from another operator" at the top of a doc does not deliver -- set `flag_for` with a `flag_note` stating the decision, and let the sweep surface it; the callout may echo it for in-file readers.
 
 ---
 

@@ -1,18 +1,23 @@
 ---
 type: project-doc
 title: START HERE For Humans — Template
-status: active
+status: archived
 created: '2026-03-10'
-updated: '2026-06-18'
+updated: '2026-08-30'
 tags:
   - protocol
   - AI-collaboration
   - DataWizard
 edit_log:
   - DW-S189 2026-06-18
+  - DW-S312 2026-08-30 - archived (START HERE files retired per D62; human
+    onboarding lives in the 0.0 via the project-guidelines skill; S312 Seed
+    review)
 ---
 
 # START HERE - For Humans — Template
+
+> ⚠️ **Archived (2026-08-30).** START HERE files are retired (D62) - human onboarding lives in the project's 0.0, written via the project-guidelines skill. Do not create new START HERE files from this template. Retained for historical reference. (S312 Seed review)
 
 Use this template when creating a `START HERE - For Humans.md` for a new project. Replace everything in `[brackets]` with project-specific content.
 

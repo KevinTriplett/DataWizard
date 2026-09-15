@@ -7,8 +7,8 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-08-08'
-version: '4.4.1'
+updated: '2026-09-04'
+version: '4.8.1'
 edit_log:
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
@@ -38,6 +38,45 @@ edit_log:
     send-off, delivered just before the thread name (Step 5 unchanged)"
   - "DW-S258 2026-08-08 - v4.4.1: Step 5 presents the thread name in a fenced
     code block (renders as a one-click-to-copy box in chat)"
+  - "DW-S270 2026-08-15 - v4.5.0: Step 3 stub overwrite + move_note rename
+    replaces delete_note (no destructive-op permission prompt); rename
+    verification step added"
+  - "DW-S272 2026-08-18 - v4.6.0: flag anatomy at set-time + budget +
+    defer-keeps-name (3.12); expiry pass (new 3.13, sole automatic writer of
+    expired-unread); sweep-trace carry-forward (Step 3 + Output Format);
+    approval-gate restated to lean form (Steps 2-4: files-touched + What's next
+    only, three judgment-class stop-and-asks kept); KY_06 hardening (3.9
+    add-not-offer + orphan sweep excl. in-progress stubs; parallel-instance
+    whole-window listing + collision recovery; 4 Common Mistakes)"
+  - DW-S279 2026-08-18 - generic-names sweep of the two 3.12 examples (C2, Seed
+    depersonalization; Flag Surfacing Chain B2)
+  - "DW-S284 2026-08-24 - v4.6.1: Step 3.5 gains the Environment / tool-behavior
+    triage class routing to the Platform and Environment Behaviors cluster (S216
+    support-session failure mode; meta-learning review S210-S220)"
+  - "DW-S284 2026-08-24 - v4.6.2: What's next standing-proposals rule - check
+    before carrying, strike on resolution (S248; meta-learning review
+    S247-S255)"
+  - "DW-S289 2026-08-26 - v4.6.3: Step 4 gains the Tool inventory bullet
+    (designed / built / live rows in the project's 0.6 Registry; a
+    designed-but-unbuilt tool is inventoried too) - the structural fix for a
+    tool being re-designed in a collaborator project because the existing one
+    was not on any reader's path"
+  - "DW-S303 2026-08-30 - v4.6.4: Step 3.8 array-safe stamping - the
+    update_frontmatter-for-efficiency line replaced with the append rule (bare
+    array = wipe; append at the array tail, not the last item line;
+    re-read-and-verify fallback)"
+  - "DW-S309 2026-08-30 - placeholder sweep: Alice/Ben/Cara -> Operator-A/B/C in
+    examples (cosmetic, no version bump; S289 rule; meta-learning review
+    S288-S300)"
+  - "DW-S308 2026-08-31 - v4.7.0: Step 4 gains the Operator Gate Queue feeding
+    bullet (D126; replaces the tool-inventory gate line); Step 4.5 model
+    heuristic slimmed to the Registry's Model routing pointer; Step 2.6
+    sectioned-ledger note"
+  - "DW-S324 2026-09-04 - v4.8.0: Step 3.8 rolling edit_log window (last 5,
+    quote-on-write, trim-in-same-write) + origin field verification/backfill +
+    manifest declared canonical per-file provenance, required at every close
+    tier (D127)"
+  - 'DW-S330 2026-09-04 - v4.8.1: Step 3.10 listing path moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
 ---
 
 # Session Closer Skill
@@ -93,7 +132,7 @@ Throughout this skill, examples use solo-operator format. For multi-operator pro
 
 Pick **lite** or **full**, and state which you chose (D98).
 
-- **Lite close** -- for sessions with no new conventions, no harvest, and few file touches. Do only: the log entry (What happened / Learnings-if-any / What's next), frontmatter validation (Step 2.5), write + embed (Step 3, including the section-shell sync), metadata verification (Step 3.8), and the thread name (Step 5). Skip the knowledge-transfer / convention / residual triage (Steps 3.5-3.7), the pending-review report check (Step 3.10), the file-size check (Step 3.11), and the team-flag prompt (Step 3.12) -- the lite preconditions make these no-ops. You may still check off an action item you completed.
+- **Lite close** -- for sessions with no new conventions, no harvest, and few file touches. Do only: the log entry (What happened / Learnings-if-any / What's next), frontmatter validation (Step 2.5), write + embed (Step 3, including the section-shell sync), metadata verification (Step 3.8), and the thread name (Step 5). Skip the knowledge-transfer / convention / residual triage (Steps 3.5-3.7), the pending-review report check (Step 3.10), the file-size check (Step 3.11), the team-flag prompt (Step 3.12), and the flag expiry pass (Step 3.13) -- the lite preconditions make these no-ops. You may still check off an action item you completed.
 - **Full close** -- everything below. Use it whenever the session established or changed a convention, did harvest, made decisions, or touched many files.
 
 When in doubt, go full. State the chosen tier in one line before proceeding (e.g. "Closing S196 as a full close -- touched the closer skill plus several infra files").
@@ -108,7 +147,9 @@ Scan the conversation for:
 
 ### Step 2: Draft the session log entry
 
-Follow the output format below. Write the full entry and present it in chat for user approval. **Present the "What's next" section separately in chat** so the user can review and confirm the plan for next session before it gets written to the vault.
+Follow the output format below. Write the close artifacts directly to the vault -- there is no pre-write approval gate for routine closes. The chat deliverable is exactly two things: the **files touched** (created / updated / moved) and **What's next**. Everything else -- log-entry composition, frontmatter stamping, edit_logs, ledger updates -- happens in the vault, not in chat.
+
+**Always stop and ask first, before writing, for judgment-class items:** a Decision Log entry (it binds future sessions), a status change on someone else's work (you are speaking for another operator), or a claim about what a third party said (misattribution risk). A blanket gate everyone silently skips erodes the rules that matter (ceremony diet, S196); this restatement concentrates the gate where the write is genuinely irreversible or speaks for others. Scope: this governs the close ceremony only -- the PI Working Rules (share plan first, show edits) still govern live working sessions.
 
 > **Harvest sessions:** For sessions that are primarily harvest work, the session log entry may already be partially written as part of the end-of-harvest checklist (which includes a session log update). In that case, the session closer adds Learnings and What's Next to the existing entry rather than writing a full entry from scratch. Check whether a partial entry already exists before drafting.
 
@@ -141,6 +182,8 @@ If the project maintains an **Active Threads ledger** -- a vantage-independent r
 
 Patch in place and verify each change landed (Working Rule 5). The ledger lists **all** open arcs regardless of this session's focus -- do **not** deduplicate it against "What's next" (that vantage-dependence is the carry-forward flicker the ledger fixes; D105). In the session-log entry, the roster is replaced by a one-line pointer (see Output Format).
 
+A project's ledger may itself be sectioned (a shell of per-arc `![[embed]]` files): then each arc's block is its own section file - patch that file directly, and add or remove embed lines in the shell only when an arc opens or resolves.
+
 **Legacy in-entry roster (projects without a ledger) -- REQUIRED, not optional.** If the project has no Active Threads ledger, you MUST maintain the in-entry roster inside the session-log entry, described below. (Field failure, 2026-07, multi-operator project: three consecutive closes correctly detected the missing ledger, then dropped the roster entirely -- leaving that operator's open arcs invisible to the rest of the team.)
 
 Read the previous session's "Active quest threads" section (if it exists). For each thread:
@@ -157,15 +200,17 @@ If the previous session has no quest threads section (pre-S158 entries), scan th
 
 The quest threads section prevents long-running workstreams from falling off the radar when they aren't the active focus. "What's next" is the immediate handoff; quest threads are the background map of parallel work that isn't currently prioritized.
 
+**Standing proposals: check before carrying, strike on resolution.** A line that recurs across handoffs ("consider building skill X", "the Y refresh is still pending") is not evidence that anything happened - it is evidence that each closer copied it from the last one. Before carrying such a line forward, check whether it has resolved (a skill built, a report reviewed, a gate cleared); when it has, strike it explicitly in this entry rather than letting it drop silently, so the next reader knows it ended rather than wondering if it was lost. One proposal propagated through roughly ten handoffs after its spec was already complete. (DataWizard, 2026-08)
+
 **Side-quest sessions.** When the session was a side quest (frontmatter `stream: side-quest`), its continuation belongs here as a named thread -- and its "What's next" must carry the *main arc* forward unchanged rather than the tangent. See the `side-quest` skill.
 
-### Step 3: Get approval and write
+### Step 3: Write the close artifacts
 
-Present the draft. The user may want to edit, add context, or adjust priorities. Once approved:
+Write the entry directly (judgment-class items excepted -- see Step 2). Then:
 1. Re-read the session log shell to get the current section number and embed list
-2. Write the new section file with the final title to the session log folder. Solo-operator: `99.0 Session 113 - Brief Title.md` (use section number as prefix). Multi-operator: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix). See Session Identifier Format for full details.
-3. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): **first confirm the stub is yours** -- match its `claim_id` to the one you stamped at orientation (or, if absent, its focus line and `operator`). Never delete or overwrite a parallel instance's in-progress stub (the S178/S179 collision); if it isn't yours, leave it and claim the next available identifier. Once confirmed yours, delete it using `delete_note`. The stub and the final entry have different filenames, so writing the final entry does NOT remove the stub -- you must explicitly delete it. The final entry does not carry `claim_id` -- it is a claim-time field only (see [[YAML Schema]] Session Log Fields).
-4. Add the session embed to the shell. Under verify-after-claim (PI Orientation Step 3) the stub is NOT embedded at claim, so you are normally adding the embed fresh at close -- patch it into the shell in reverse-chronological position. (Legacy fallback: if an older workflow already left a stub embed in the shell, replace it with the final filename rather than adding a duplicate.)
+2. **If a session stub exists from orientation** (a section file with `status: in-progress` and "in progress" in the filename): **first confirm the stub is yours** -- match its `claim_id` to the one you stamped at orientation (or, if absent, its focus line and `operator`). Never overwrite a parallel instance's in-progress stub (the S178/S179 collision); if it isn't yours, leave it and claim the next available identifier. Once confirmed yours, **the stub becomes the entry -- no delete needed**: overwrite it in place with the full final entry (`write_note`, overwrite mode, complete frontmatter -- overwrite replaces the whole file, which drops `claim_id` and `status: in-progress`; the final entry never carries either, see [[YAML Schema]] Session Log Fields), then rename it to the final title with `move_note`. **Carry the sweep trace forward:** the orientation flag-sweep wrote a one-line compliance trace into the stub (PI Orientation Step 6); keep that line in the final entry (see Output Format) so it survives the overwrite -- a lost trace reads as a broken sweep, not as "nothing was waiting." Solo-operator final name: `99.0 Session 113 - Brief Title.md` (section number as prefix). Multi-operator: `WV_2026-06-10_AA_01 - Brief Title.md` (session ID as prefix). See Session Identifier Format for full details. Nothing links to the stub filename (the shell embed is added fresh in step 4), so the rename needs no link repair. If no stub exists (older claim workflow, or the stub was lost), write the new section file with the final title directly.
+3. **Verify the rename landed**: re-list the session log folder and confirm the final filename exists and the "in progress" filename is gone. If the rename failed, the full entry is intact under the stub filename -- retry the rename once; if it still fails, keep the stub filename, tell the user, and use the actual on-disk filename in step 4. (A complete entry stranded under an "in progress" name cannot be double-claimed -- its `status: in-progress` and `claim_id` are gone, and claims always go above the highest identifier -- but rename it next session.)
+4. Add the session embed to the shell, using the filename verified in step 3. Under verify-after-claim (PI Orientation Step 3) the stub is NOT embedded at claim, so you are normally adding the embed fresh at close -- patch it into the shell in reverse-chronological position. (Legacy fallback: if an older workflow already left a stub embed in the shell, replace it with the final filename rather than adding a duplicate.)
 
 > **Parallel instance check:** Before writing, re-list the session log
 > section folder and verify the target identifier doesn't already exist
@@ -176,6 +221,21 @@ Present the draft. The user may want to edit, add context, or adjust priorities.
 > Compare stub *content*, not just filenames -- match the `claim_id`
 > (or focus line) to your session before reusing or replacing any
 > in-progress stub.
+>
+> **List the whole window, never a truncated one.** Do not claim or
+> verify an identifier from `ls | head -n`, `ls -t | head -n`, or any
+> listing capped for readability -- newest-first ordering hides
+> same-day siblings written minutes apart, and the file already
+> holding your number may sort anywhere. Filter to the date and read
+> every result.
+>
+> **If you discover a collision after writing,** renumber *your own*
+> file, never anyone else's, and update every reference in one pass:
+> the filename, `section`/`title` in frontmatter, the `## ` heading,
+> the shell embed, and any `edit_log` or provenance lines you already
+> stamped into other files this session. A half-renamed session is
+> worse than a collision -- the stale references still resolve to
+> something plausible.
 
 > **Flat-file fallback:** If the project's session log hasn't been migrated to shell + sections yet, skip the section file and embed steps. Instead, patch the entry directly into the flat session log file -- insert below the header, above existing entries.
 
@@ -191,6 +251,7 @@ For each finding, decision, or detailed context that emerged during the session,
 - **Design-doc**: Technical finding that future task-specific work needs. Identify the specific target doc and plant it there. Example: an edge case discovered during a build belongs in the relevant design doc, not just the session log.
 - **Skill-update**: Process improvement that should change how a skill works. Patch the skill now or add a specific action item naming the skill and what to change.
 - **Protocol-update**: Convention change that affects all projects. Handled by Step 3.6 (convention-change check) -- flag it there if not already caught.
+- **Environment / tool-behavior**: A platform, MCP, sandbox, git, or shell gotcha (a tool that fails in a specific way, a mount or sync limitation, an auth or permission quirk). These have a standing home -- the **Platform and Environment Behaviors** guide cluster (`Seed/GUIDES.md` lists the members: MCP Reliability, Cowork Build Environment, Git Guide troubleshooting, Chrome and web tools, scheduled tasks, and so on). Route each one to the cluster guide it fits and plant it now; a one-line entry with `(project, YYYY-MM)` provenance is enough. Support and debugging sessions produce these in batches and are the sessions most likely to close with "files updated: none" -- six environment facts from one such session sat unrouted for two months until a meta-learning review found them. Do not leave them as session-log-only.
 
 **Insight-capture awareness.** If the insight-capture skill was invoked mid-session, its report lists what was planted and where. Use that as a starting point -- verify nothing additional surfaced since the capture ran, rather than doing a full from-scratch triage. If no insight-capture was run, do the full triage as usual.
 
@@ -246,12 +307,12 @@ you got everything out of the source material in the first place.
 
 For each file modified this session (from the "Files updated" and "Files created" lists):
 
-1. Verify birth metadata is present (type, created, updated, operator, edit_log). Birth metadata should already exist from creation time (Working Rule 12); if any field is missing, add it now as a fallback.
+1. Verify birth metadata is present (type, created, updated, operator, origin, edit_log). Birth metadata should already exist from creation time (Working Rule 12); if any field is missing, add it now as a fallback. If `origin` is missing (a pre-D127 file), backfill it from the earliest edit_log entry, or from `created:` plus the file's operator when no edit_log exists.
 2. Verify `updated:` reflects today's date (YYYY-MM-DD)
-3. Append this session's identifier to `edit_log:` (solo-operator: `"DW-S70 2026-05-23"`; multi-operator: `"WV_2026-06-10_AA_01"` -- date is embedded in the ID). Deduplicate -- if the session already appears, don't add it again.
+3. Append this session's identifier to `edit_log:` (solo-operator: `'DW-S70 2026-05-23'`; multi-operator: `'WV_2026-06-10_AA_01'` -- date is embedded in the ID). **Always single-quote the entry**; an optional short clause of a few words may follow the date -- narrative belongs in the session log entry, not here. Deduplicate -- if the session already appears, don't add it again. Then trim to the window: `edit_log` keeps only the last 5 entries -- drop the oldest in the same write (D127; skip trimming in projects whose one-time pre-D127 cleanup has not yet run). Nothing is archived at trim time: the canonical per-file history is this entry's "Files created" / "Files updated" manifest, which is **required at every close tier**.
 4. For shell files whose sections were edited: bump the shell's `updated` field (but no `edit_log` on shells)
 
-Use `update_frontmatter` for efficiency -- it merges without requiring a full re-read.
+Scalars (`updated`, `status`) may go through `update_frontmatter` alone. For `edit_log:` and any other array, never pass a bare array -- `merge: true` merges top-level keys only, so a passed array replaces the existing one wholesale (silent history wipe; see the MCP Reliability guide, "Array wipe via merge: true"). Append instead: the array-append primitive (`stamp_editlog.py` in `Seed/Scripts/`, or a raw-tail insert placed after the *last line of the array* -- the line before the next top-level key, not the last `- ` line, since long entries wrap onto continuation lines); where neither is available, re-read the full array immediately before the write and pass it back verbatim with the new entry appended, then verify the entry count did not shrink.
 
 **Scope:** `edit_log` is required on section files, recommended on infrastructure files (0.x) and standalone docs. Shell files are exempt -- they are assembly surfaces whose edit history is captured by their sections' logs. See the [[YAML Schema]] edit_log section for the full convention.
 
@@ -263,9 +324,11 @@ For each section file created or renamed this session, verify its parent shell c
 
 1. Identify the parent shell from the section's `parent:` frontmatter field
 2. Read the shell and check that each new section filename appears in an `![[...]]` embed
-3. If any are missing, flag them and offer to add the embeds to the shell in the appropriate position
+3. **If any are missing, add them** in the appropriate position -- do not merely flag and offer. A missing embed is a silent failure, not a user preference.
 
-This catches the most common drift pattern -- adding sections without updating the shell -- at the point of creation. Skip this step if no section files were created or renamed this session.
+**Then sweep for orphans from parallel instances.** Do not limit the check to your own files. List every section file in the folder from the last two days, **excluding in-progress stubs** (skip any file whose name contains "in progress" or whose frontmatter has `status: in-progress` -- under verify-after-claim those are deliberately unembedded until close, PI Orientation Step 3 and this skill's Step 3), and confirm each completed entry has a matching embed in the shell. Add any that are missing. (Two days fits a high-cadence multi-operator day; widen it for projects that run fewer, longer sessions, or tie it to "since the last entry visible in the shell.") Why this matters: an unembedded entry is invisible -- the shell is what orientation reads, so a section file that exists but is not embedded is never found, and the handoff fails silently while the tree looks clean and fully synced. Verify against the actual file listing, not from memory. Never edit another instance's entry *content* -- only add its embed.
+
+This catches the most common drift pattern -- adding sections without updating the shell -- at the point of creation, plus the parallel-instance variant where one instance writes its entry and skips the patch. Skip the your-own-files check if no section files were created or renamed this session; still run the orphan sweep on a full close.
 
 ### Step 3.10: Pending review reports (full closes only)
 
@@ -273,7 +336,7 @@ This catches the most common drift pattern -- adding sections without updating t
 
 The session-closer does **not** compute review staleness or nudge on session/day thresholds. Detecting that a health audit, meta-learning review, or Content Interests refresh is due -- and running the scan that produces a report -- is the job of the scheduled review automation (see the **Review Automation** guide). This step's only job is to surface reports those scans have already left waiting. None of this blocks session close.
 
-List the project's Learning Reports folder (`{home}/Workshop - {ProjectName}/Learning Reports/` for full-convention projects; `{home}/Learning Reports/` for flat). For any report file with `status: pending-review` (`Meta-Learning Report - *`, `Health Audit Report - *`, `Content Interests Report - *`), add one line to "What's next":
+List the project's Learning Reports folder (`{infrastructure folder}/Learning Reports/` for full-convention projects, e.g. `{home}/_Infrastructure - {ProjectName}/Learning Reports/`; `{home}/Learning Reports/` for flat; canonical location: the Review Automation guide's "Report locations" section). For any report file with `status: pending-review` (`Meta-Learning Report - *`, `Health Audit Report - *`, `Content Interests Report - *`), add one line to "What's next":
 
 "A [review type] report is waiting for your review: [filename]."
 
@@ -302,7 +365,7 @@ were encountered this session.
 - The session log section file (always)
 - Any content documents created or substantially updated this session
 
-Use the human operator's first name (e.g. `Andrew`, `Kaliya`, `Jay`). This field powers the "Recent Team Activity" section of the team dashboard and makes authorship queryable via Bases/Dataview.
+Use the human operator's first name (e.g. `Operator-A`, `Operator-B`, `Operator-C`). This field powers the "Recent Team Activity" section of the team dashboard and makes authorship queryable via Bases/Dataview.
 
 **Team flag prompt (multi-operator projects only).** If the project has more than one operator, present the user with a list of files created or substantially updated this session. Pre-select:
 - Any file created this session with `priority: high`
@@ -316,16 +379,35 @@ Use the human operator's first name (e.g. `Andrew`, `Kaliya`, `Jay`). This field
 For each file the user selects:
 1. Add `flag: YYYY-MM-DD` (today's date) to its frontmatter
 2. Add `flag_by: FirstName` (the operator's first name)
-3. Ask for a one-line `flag_note`, or suggest a default based on the file title/context
-4. Add `flag_for:` as a YAML list of all other team operators (e.g. if Andrew flags it: `flag_for: [Kaliya, Jay, Kevin]`). The user can adjust the list if it's only relevant to specific people.
+3. Add `flag_for:` as a YAML list of the operators who need to see it (e.g. if Operator-A flags it: `flag_for: [Operator-B, Operator-C]`) -- narrow it to the people it is actually relevant to
+4. Set `flag_note:` to a one-line statement of **the decision needed and what is blocked until it is made** (the content requirement -- [[YAML Schema]] Team Coordination Fields; "please review the tiers" fails, "approve or amend the tiers -- outreach proceeds in listed order on silence" passes). Fold a long note per the same guidance so it cannot break frontmatter parsing
+5. Optionally set `flag_due:` (date a response is needed by) and `flag_default:` (what happens on silence after the due date). Ask for these on anything time-sensitive -- they are what let the expiry pass (Step 3.13) turn silence into a decision
+
+**Flag budget: at most 2-3 new flags per close.** Forcing triage keeps the queue meaningful; a flag on everything trains operators to skip the sweep. If more than three files feel flag-worthy, pick the ones that genuinely need another operator's eyes before their next session.
 
 **Re-flagging a file that already carries an unresolved flag: merge, never overwrite.** Union the existing `flag_for` list with the new recipients (preserving names who haven't dismissed yet), keep or combine the `flag_note` so both notices survive, and update `flag`/`flag_by` to the newer flagging. `flag_for` is a shared unread-queue -- overwriting it silently erases other operators' pending notifications. (Field catch, 2026-08: a re-flag would have erased two operators' unread state on a Decision Log flag; the closing session merged instead.)
 
 **On ungraceful session close** (context exhausted before the user can confirm): auto-flag any `priority: high` files created this session using `flag_by: "FirstName (auto)"` and `flag_for:` listing all other team operators. The human can review and remove auto-flags in a subsequent session.
 
-**Team read dismiss (multi-operator projects only).** During orientation or at any point in the session when the operator reads a file that has a `flag_for` list containing their name, remove their name from the `flag_for` list using `update_frontmatter`. When the list is empty, all operators have seen the item -- anyone can then clear the `flag`, `flag_by`, `flag_note`, and `flag_for` fields to remove it from the dashboard entirely.
+**Team read dismiss (multi-operator projects only).** When the operator handles a file whose `flag_for` contains their name, update the flag by their response: **acting on it** removes their name from `flag_for` (`update_frontmatter`); a **conscious defer** keeps their name and sets `flag_status: deferred`, so the item re-surfaces due-first at their next orientation rather than vanishing (defer is not dismissal -- F3 of the Flag Surfacing Chain). When the `flag_for` list empties through handling, all operators have seen the item -- anyone can then clear the `flag`, `flag_by`, `flag_note`, `flag_for`, and any `flag_due`/`flag_default`/`flag_status` fields to remove it from the dashboard entirely.
 
 **Solo operators:** Apply the `operator` field as usual. Skip the team flag prompt and team read tracking -- there are no other operators to notify. The field is still useful if the project gains team members later.
+
+### Step 3.13: Flag expiry pass (multi-operator projects only, full closes)
+
+> Solo projects and lite closes skip this step. **Scope: only flags set on or after the Flag Surfacing Chain ship date (Seed 1.3.0 -- see VERSION.md's What's New).** Flags that predate delivery are a pre-existing backlog handled by a dedicated triage session; never mass-expire them here (at rollout, entire per-person queues are older than any age threshold -- expiring them would stamp `expired-unread` on flags that were never deliverable).
+
+Scan the project for live flags (`flag` present, `flag` date on/after the ship date) that are **not** already `flag_status: deferred`. A deferred flag was consciously read (F3 put that on the record) -- never overwrite it. A flag in scope is **expired** when:
+
+- it carries a `flag_due` and today is past `flag_due` (silence became a decision at the deadline the flagger set), OR
+- it has no `flag_due` and its `flag` date is more than **21 days** old (the backstop so undated flags still eventually resolve).
+
+For each expired flag, do one of:
+
+- **Refresh** -- if the ask is still live, re-stamp `flag` to today and set or update `flag_due` and a real `flag_note`, so it re-enters the queue with a fresh clock.
+- **Expire** -- set `flag_status: expired-unread`, clear the `flag_for` names, and record in the `flag_note` that the `flag_default` (if any) is now in effect.
+
+This pass is the **only automatic writer of `flag_status: expired-unread`** and the only automatic name-clearer -- the orientation sweep is read-only (PI Orientation Step 6 / [[Orientation Flag Sweep - Query Spec]]). It runs at close because close already patches shared surfaces. Dated flags expire on the flagger's own deadline; undated flags get the 21-day backstop; deferred flags are exempt (already read). An `expired-unread` flag is itself the record that delivery failed.
 
 ### Step 4: Update related infrastructure files
 
@@ -333,8 +415,10 @@ Check whether the session produced work that belongs in other files:
 - **Action items**: Check off completed items, add new ones. Optional but recommended. See the triage guidance below when the backlog needs cleanup.
 - **Decision log**: If decisions were made during the session (agreements, vision refinements, commitments, technical choices, scope changes), they belong as separate entries in the Decision Log. Note them in "What happened" and point to the Decision Log entry.
 - **Harvest ledger**: If harvesting was done during the session, verify the Harvest Ledger was updated as part of the harvest checklist. If not, update `0.4 Harvest Ledger - [Project].md` now.
+- **Tool inventory** (projects that keep one in their 0.6 Registry): if the session *designed* a tool or surface (a design doc now exists), *built* one (code now exists), or brought one *live*, add or update its row with the new state. A designed-but-unbuilt tool belongs in the inventory as much as a live one -- the inventory exists so a later instance in any project can ask "does something like this already exist?" before designing it again.
+- **Operator Gate Queue** (projects that keep one): scan the session's builds and decisions - anything built or decided but not verified-live where production reads it gets a gate row, but only when the actor is specific (operator-native, another project's session, a named person); work any future session can pick up stays in the action items. A build that could not be verified live is recorded as `unverified`, never pending-success. If a gate reached verified-live this session, run the exit ceremony (Deployed section, then a registry Infrastructure row with a `verify:` line). Schema, lifecycle vocabulary, and ceremony: the Conventions Registry's Operator Gate Queue entry.
 
-Propose specific changes for each file. Get approval before writing.
+Write the changes directly. Exception: a Decision Log entry is judgment-class -- show its text and get approval before writing it (Step 2). Action items, the harvest ledger, and shell updates are written directly.
 
 #### Action items triage guidance
 
@@ -353,7 +437,7 @@ Full triage is a periodic activity, not a session-close requirement. The session
 Just before suggesting the thread name, give a brief, action-oriented recap -- never a generic "nice work, see you next time." Two or three sentences at most, spoken in chat only (not written to the vault):
 
 - **Next up:** one line naming the single most valuable thing to pick up next session. Pull it from "What's next" Priority 1 -- the specific task with its key file path, not a vague topic.
-- **Suggested model:** name the Claude model tier that best fits that task, with a 3-5 word reason. Match model to task shape -- a high-capability reasoning model (Opus-tier) for deep design, synthesis, architecture, or hard debugging; a faster model (Sonnet-tier) for mechanical, harvest, or well-specified execution work. Keep it tier-generic (Opus-tier / Sonnet-tier) rather than pinning a version number, which goes stale.
+- **Suggested model:** name the model tier that best fits that task, with a 3-5 word reason, per the Conventions Registry's Model routing entry - the single home for the heuristic. Keep it tier-generic rather than pinning a version, which goes stale.
 
 Keep it tight -- the recap and model line are the last thing the user reads before the thread name, so they should land as a clear "here's where to restart and what to run it on."
 
@@ -400,6 +484,8 @@ seed_version: "[seed: from VERSION.md]"
 
 ## Session N: YYYY-MM-DD (Brief Title)          ← solo-operator
 ## WV_2026-06-10_AA_01: Brief Title              ← multi-operator
+
+*Orientation sweep trace (carried verbatim from the claim stub, PI Orientation Step 6): `flag sweep [PI v4.6]: N surfaced, M handled, K deferred | stubs: P stale, Q reconciled | intake: R new`. Solo projects carry the `n/a (solo)` form; a missing line means the sweep did not run -- do not omit it.*
 
 ### What happened
 
@@ -508,6 +594,10 @@ The session title should capture the main theme in 3-8 words. Use plain hyphens,
 - **Over-narrating "What happened."** This isn't a diary. Dense, scannable, focused on what a future reader needs to know.
 - **Duplicating "What's next" in quest threads.** If a workstream is already a Priority item in "What's next," don't repeat it in quest threads. The quest threads section exists for background work that's NOT the immediate focus -- things the next instance might forget about because they're not on the priority list. When all active threads are already priorities, omit the section entirely.
 - **Following a stale "What's next" without re-evaluating.** If the previous session's "What's next" was written because that session was low on context (not because the items are the highest-value work), a fresh session should re-evaluate priorities rather than following the stale plan. The "What's next" reflects the best guess at the time -- a fresh context window with full project awareness may see a better path (S114).
+- **Reporting a clean version-control state as if it answered "is the vault up to date."** Committed, pushed, and conflict-free says nothing about whether documents still describe reality -- trackers, indexes, and dashboard-feeding frontmatter (`deadline`, `next_action`, `status`, `stage`) can be days stale inside a perfectly clean tree. When asked whether things are current, check the *documents* and say which ones you checked.
+- **Writing a correction banner that enumerates what it fixed without verifying each location.** "Sections 1, 6, 9, and 10 are corrected below" is a claim; if one was missed the banner is worse than none -- it stops the next reader from checking the very place the error survives. Verify every location you name, or describe the correction without enumerating.
+- **Trusting a companion or summary doc's account of a conversation.** Compressions invent certainty: a synthesis reading "X told A and B" may rest on a transcript line "I've told them," which does not establish who heard it. For anything that shapes how you approach a person or commitment, read the source, not the summary.
+- **Fragmenting one continuous session into multiple entries.** If work resumes after a close on the same day, amend the existing entry (retitling if its scope grew) rather than opening a second -- a split handoff is harder to follow. Start a new entry only when the day rolls over, or when the work is a genuinely separate workstream and the earlier entry is already committed.
 
 ## Relationship to Other Files
 

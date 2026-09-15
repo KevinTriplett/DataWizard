@@ -1,4 +1,4 @@
-# datawizard-aliases.sh — DataWizard shell aliases
+# datawizard-aliases.sh - DataWizard shell aliases
 # Source this from ~/.zshrc:  source "/Users/kevintriplett/ObsidianNoSync/_DataWizard/Scripts/datawizard-aliases.sh"
 # Edit this file (not ~/.zshrc) to change aliases; reload with `source ~/.zshrc` or open a new shell.
 

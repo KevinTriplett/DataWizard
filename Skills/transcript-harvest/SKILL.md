@@ -6,8 +6,8 @@ description: >-
   transcripts with harvest_status: pending, or any transcript with harvest_for
   YAML set. Covers video, podcast, meeting, and voice memo transcripts.
 type: skill
-updated: '2026-08-08'
-version: '0.9'
+updated: '2026-09-08'
+version: '0.9.2'
 edit_log:
   - DW-S158 2026-06-08
   - "MMM meta-learning plant 2026-06-09: added Step 4 (check existing vault
@@ -19,11 +19,16 @@ edit_log:
   - "DW-S232 2026-08-04: added companion-vs-harvest default-granularity pointer
     (D112)"
   - "DW-S262 2026-08-08: added Harvest via embeddable synth note pointer (D116)"
+  - "DW-S312 2026-08-30: stale STUB status label corrected to Active (the full
+    workflow has long shipped; S312 Seed review)"
+  - 'DW-S330 2026-09-04 - v0.9.1: See Also gains the shared-layer-redaction overlay pointer (required when the harvest destination is a shared layer)'
+  - "DW-S349 2026-09-08 - v0.9.2: Reader-Facing Output rule added (load the
+    Reader-Facing Prose Style guide when the destination is read-aloud-class)"
 ---
 
 # Transcript Harvest Skill
 
-**Status:** STUB — full workflow to be written. For now, follow this sequence.
+**Status:** Active
 
 ## Overview
 
@@ -185,8 +190,13 @@ When processing large transcript batches (total word count exceeding ~50k words,
 - Include speaker attribution where relevant.
 - Extract `lexicon_candidates` if the transcript contains novel language or framings.
 
+## Reader-Facing Output
+
+If the harvest destination is a document a person will read start to finish - a research resource, a brief, a report, an onboarding doc - load `Seed/Guides/Reader-Facing Prose Style.md` before drafting prose there and run its verification pass before shipping. Segmentation headers, routing YAML, tracking rows, and triage verdicts are exempt.
+
 ## See Also
 
+- [[shared-layer-redaction]] -- REQUIRED overlay whenever the harvest destination is a shared layer (a repo or folder readable by the people discussed in the material): run its per-passage test before anything enters the shared layer
 - [[Harvest Workflow Guide]] -- full walkthrough, edge cases, and the 3-step end-of-harvest checklist
 - [[YAML Schema]] -- harvest field definitions
 - [[Editorial Principles]] -- synthesis guidance

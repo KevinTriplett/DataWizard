@@ -6,18 +6,31 @@ description: "Use when reconciling a project's tracking surfaces against reality
   what the session logs actually show. A periodic four-source reconciliation
   audit that diffs every record of open work against recent session-log ground
   truth, classifies divergences (slipped / stalled / orphaned / done-but-open /
-  contradiction / duplication / model-gap), and writes a reconsolidation report.
-  Trigger on: 'run a reconsolidation pass', 'reconsolidation audit', 'reconcile
-  the open work', 'the trackers have drifted', or when a periodic
-  tracking-health review is due. Distinct from semantic divergence/framing-drift
-  reconciliation during harvest."
+  contradiction / duplication / model-gap / partitioned), and writes a
+  reconsolidation report. Trigger on: 'run a reconsolidation pass',
+  'reconsolidation audit', 'reconcile the open work', 'the trackers have
+  drifted', or when a periodic tracking-health review is due. Distinct from
+  semantic divergence/framing-drift reconciliation during harvest."
 type: skill
-version: "1.2"
-updated: 2026-08-05
+version: "1.7"
+updated: 2026-08-30
 created: 2026-06-29
 edit_log:
   - "DW-S246 2026-08-05 - v1.2: 'wired but never exercised' lens added to Before
     You Start (S225 Backlog item; meta-learning review S221-S230)"
+  - "DW-S284 2026-08-24 - v1.3: Method step 3
+    verify-cross-project-state-before-flagging note (S213); step 1 partial-read
+    claim superseded (get_note_outline + read_note_lines) (meta-learning review
+    S210-S220)"
+  - "DW-S285 2026-08-24 - v1.4: Divergence Taxonomy gains 'partitioned'
+    (operator-private views, no shared surface; S235) + description list updated
+    (meta-learning review S231-S246)"
+  - "DW-S283 2026-08-24 - v1.5: Before You Start surface checklist expanded to
+    three vantage-dependent classes - adds informal lists inside 'What's next'
+    (S170-S179 held item, S215) and the feature-request/intake folder
+    status-vs-shipped (S158-S169 reconsolidation pass); also adds a repair-lag guard to Detect Now, Repair Later (forcing function - clear the oldest held-fix batch before the next detection pass)"
+  - "DW-S291 2026-08-26 - v1.6: Detect Now, Repair Later gains a cheap-disposition-bias guard - the executing instance drifts toward the least-work close and can rationalize past the gate/decision a crack rides on; re-read the source before disposing (first repair-session field-test)"
+  - "DW-S311 2026-08-30 - v1.7: eight-lens batch (S295/S297/S298 + S309/S310 riders) - pre-roster + linear-stack folded into surface class (b); architecture-doc + decision-log-pivot added as classes (d)/(e); wired-never-exercised extended to gated skill drafts; name-match-supersession guard added (with the S310 bulk-mode mechanism) + instance-vs-Seed fate-split guard; cheap-disposition guard consolidated phase-agnostic and bidirectional; in-text session refs depersonalized to (project, YYYY-MM) style"
 ---
 
 # Project Reconsolidation Skill
@@ -44,20 +57,20 @@ The name is borrowed from memory reconsolidation: a record is most editable righ
 ## Before You Start
 
 1. Read this skill fully.
-2. Enumerate the project's tracking surfaces: every place that claims to record open or parallel work. In a DataWizard project these are typically the session-log thread roster (or the Active Threads ledger, once it exists), 0.5 Action Items, 0.7 Quest Log, and 0.9 Dashboard plus quest frontmatter. **Also include any multi-phase driver/plan document acting as a de-facto arc** - a finite plan doc (an action plan, a build-plan roadmap) that is the main arc for a stretch of sessions is easy to miss because no orientation ever re-reads it, yet its checkboxes rot and its residuals orphan when it winds down (the S180-S189 pass found exactly this). Other systems will have their own set. The point is to list all of them, because the audit is the diff between them.
+2. Enumerate the project's tracking surfaces: every place that claims to record open or parallel work. In a DataWizard project these are typically the session-log thread roster (or the Active Threads ledger, once it exists), 0.5 Action Items, 0.7 Quest Log, and 0.9 Dashboard plus quest frontmatter. **Also include five surface classes that are easy to miss because no orientation re-reads them, yet each carries real open work that orphans when it slips:** (a) any multi-phase driver/plan document acting as a de-facto arc - a finite plan doc (an action plan, a build-plan roadmap) that is the main arc for a stretch of sessions, whose checkboxes rot and whose residuals orphan when it winds down (a DataWizard pass found exactly this, 2026-06); (b) informal lists living inside "What's next" - walk-away build queues, carried side-task lists - which persist only while each session echoes them forward, orphaning the work the moment a session stops (one window's stack dropped an enrichment campaign and a rescrape before a pass caught it; DataWizard, 2026-06). In windows that predate the project's roster or ledger convention, the "What's next" stack IS the roster: diff it as the primary carry-forward surface, not the fallback. And know the stack's structural limit even while it holds: a single linear priority stack echoed forward can only carry-until-dropped - it cannot distinguish *resolved* from *abandoned*, so it is safe for what it holds and blind to the carried-to-deferred transition (DataWizard, 2026-08); (c) the feature-request or intake folder, diffed as status frontmatter versus what actually shipped - FRs filed and then completed or superseded between periodic triage passes keep their file-time status indefinitely, invisible to the action-items backstop and the roster alike (one pass found two: one still "proposed" though superseded, one still "in-progress" though shipped; DataWizard, 2026-08); (d) the project's canonical architecture or overview doc (in a DataWizard project, the 0.0 Project Guidelines) - read every orientation but never diffed against what actually runs; an architecture or pipeline section can present a deferred target as the current system and stay silent on the live path, and every orientation re-read then reinforces the stale picture (DataWizard, 2026-08); (e) the decision log, diffed for pivots that never landed in it - a strategy change recorded only in a session entry is an unlogged pivot, invisible to every future reader of the log; when the strategy the session logs show being *lived* and the strategy the decision log *records* disagree, the missing decision entry is itself the crack (DataWizard, 2026-08). Other systems will have their own set. The point is to list all of them, because the audit is the diff between them.
 3. Pick the window. Reconsolidation works one bounded slice of session history at a time, most recent first. A week (~15-20 entries) is a good unit. Trying to reconcile the whole project at once exhausts context before the synthesis lands.
 4. Confirm where the report goes (in DW: `Workshop - [Project]/Reconsolidation Reports/`).
-5. **Carry the "wired but never exercised" lens.** When the window contains a canon promotion, a newly wired skill, or a capability flipped to "standard," check whether a first production exercise was scheduled and has actually run. Fully wired + zero production reps is a finding in its own right: the S225 citation-arc review found a canon promoted at S201 with no reps five weeks later, alongside two more capabilities in the same state. Canon promotions should name their first production exercise and when it runs -- flag any that don't. (S225, S232)
+5. **Carry the "wired but never exercised" lens.** When the window contains a canon promotion, a newly wired skill, or a capability flipped to "standard," check whether a first production exercise was scheduled and has actually run. Fully wired + zero production reps is a finding in its own right: one citation-arc review found a canon promoted five weeks earlier with no reps since, alongside two more capabilities in the same state (DataWizard, 2026-08). Canon promotions should name their first production exercise and when it runs -- flag any that don't. The lens extends to skill drafts that hard-require a freshly built capability: a v0.1 skill gated on a just-built dependency needs its first run scheduled - explicitly, with a date or trigger - or it dies with (or before) the dependency (DataWizard, 2026-08).
 
 ## The Method
 
 Reconciliation diffs every record of "what is open" against the ground truth of recent session logs, then flags where they disagree. The session logs are the ground truth because they are written at the moment work happened; the tracking surfaces are summaries that can rot. When a surface and the logs disagree, trust the logs and repair the surface.
 
-1. **Extract per-session signals by grep, not full reads.** For each session in the window, pull the thread roster, the "What's next" section, the status, and the files touched. Use search over the shell and section files rather than reading each entry whole. `read_note` returns the entire file with no partial read, so full reads of twenty entries will blow the context budget before analysis begins. Grep the fields you need.
+1. **Extract per-session signals by grep, not full reads.** For each session in the window, pull the thread roster, the "What's next" section, the status, and the files touched. Use search over the shell and section files rather than reading each entry whole - full reads of twenty entries will blow the context budget before analysis begins. Grep the fields you need; where the MCP server offers partial reads (`get_note_outline` + `read_note_lines` on current mcpvault), read just the roster and "What's next" sections. Older servers return the whole file on every `read_note`, which is why the grep-first rule exists.
 
 2. **Diff the carry-forward chain.** Walk the thread roster session by session and track membership in and out. A roster that is regenerated by hand each session flickers: arcs drop out and reappear, the main arc vanishes during sessions that are actively working it. The flicker is the symptom you are looking for; record exactly which arcs dropped in which sessions, because that is the evidence the roster cannot be trusted as a ledger.
 
-3. **Cross-check every live arc against every surface.** Build the ground-truth inventory of genuinely active arcs from the logs, then look up each arc in each tracking surface. The gaps are the findings: an arc with no durable home anywhere, a quest marked active that no session has touched in months, a surface that lists work nobody is doing.
+3. **Cross-check every live arc against every surface.** Build the ground-truth inventory of genuinely active arcs from the logs, then look up each arc in each tracking surface. The gaps are the findings: an arc with no durable home anywhere, a quest marked active that no session has touched in months, a surface that lists work nobody is doing. **Before flagging a cross-project item as a crack, verify the other project's state directly** when it is reachable - one directory listing or frontmatter read is cheaper than a chase. A handoff that looked open for weeks turned out to have been executed on the other side within days and simply never reported back; the "done-but-open" collapsed the moment someone looked. (DataWizard, 2026-06)
 
 4. **Classify each divergence** using the taxonomy below.
 
@@ -74,10 +87,19 @@ Classify each disagreement so the report is scannable and the fixes sort themsel
 - **contradiction** - two surfaces assert incompatible states for the same item.
 - **duplication / divergence** - the same arc tracked twice, or one surface tracking a different set than another.
 - **model-gap** - records that do not fit the schema or vocabulary at all (from method step 5). Distinct from the others: the fix is to the schema, not the record.
+- **partitioned** - on a multi-operator project, each operator maintains a private view of open work (their own roster, quest list, or "next" note) and no shared surface reconciles them; every view is internally consistent and the project-level picture does not exist. Distinct from *slipped*, which is time-based flicker within one surface: here the flicker is across operators, and repairing any one view does nothing. The fix is a shared ledger that every operator's close writes to (the Active Threads pattern), not a merge of the private views. First seen on a four-operator project's first reconciliation (Weave, 2026-08).
 
 ## Detect Now, Repair Later
 
 Separate detection from repair across two sessions. The audit session produces the report and the inventory; a later session executes the fixes. This is deliberate, not just context budgeting. Detection wants the whole window held at once for cross-cutting pattern-spotting; repair wants a clean head and one fix at a time. Folding them together tends to produce rushed fixes made while still mid-analysis.
+
+**Guard against repair-lag.** The split has a failure mode worth naming: detection is satisfying - it produces a report and a clean check-off - while repair is unglamorous bookkeeping, so held-fix batches accumulate faster than they are executed and "repair later" quietly becomes "repair never." One project let a held-fix batch sit roughly 68 sessions across three further detection passes before anyone noticed. Give repair a forcing function: before running the next detection window, first clear the oldest outstanding held-fix batch, so repair never falls more than one window behind detection.
+
+**Guard against cheap-disposition bias - at every phase.** Because closing an item feels like progress, an instance drifts toward whichever disposition costs the least work, and the bias operates at every phase of this skill: at detection time (waving a divergence through as not-a-crack), at disposition time (retire the paused thing, accept the current split, call it superseded), and at repair time (rationalizing past the gate or decision the crack exists to honor). The tells: reading a gate as weaker than written (a "decide later" gate treated as "do nothing now"), or reversing a logged decision by editing a downstream doc instead of the decision itself, which silently drops the rationale that lives only in the decision. And the bias cuts both ways: it produces premature "dead" as readily as premature "superseded" - retiring a paused arc is exactly as cheap as declaring it covered. Before disposing of anything, re-read the gate or decision it rides on at its source and honor it as written; if the honest disposition is more work than the cheap one, that gap is usually the signal the cheap one was wrong. An independent reviewer re-reading the source catches this reliably - a strong use of a second instance on a repair plan.
+
+**Guard against name-match supersession.** "Superseded" needs a scope test, not a name match: diff the old item's full scope against what the new system actually covers. When the coverage is partial, name the uncovered residual and home it somewhere that will resurface it - otherwise the disposition silently retires the residual along with the name. Two dispositions in one repair session looked superseded by name and each left a live residual that surfaced only when the scope was tested (DataWizard, 2026-08). The test fails hardest in bulk-recommendation mode: in one triage session the recipe-driven half of the dispositions was flawless while both erroneous name-match retirements came from the freehand sweep - a written recipe forces the source re-read; freehand bulk disposition does not (DataWizard, 2026-08). Make the test un-skippable: any bulk supersession or absorption verdict carries a one-line "X covers the whole old scope because..." justification, and freehand bulk retirements get an independent review even in a strong-model session - the risk is the mode, not the model tier.
+
+**Split instance fate from shipped-asset fate.** When a crack touches an asset that ships in the project's portable kit, decide the local instance artifact's fate and the shipped asset's fate separately. An instance outgrowing a capability - or growing a better local tool - is not grounds to strip the kit capability that adopters rely on; that is depersonalization in reverse, a local fact overwriting the generic product (DataWizard, 2026-08).
 
 When you do repair, split the fixes:
 

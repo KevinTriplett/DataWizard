@@ -2,12 +2,15 @@
 title: Editing the Claude Desktop Config
 type: guide
 created: '2026-03-21'
-updated: '2026-06-22'
+updated: '2026-08-24'
 status: active
 scope: seed
 edit_log:
   - "DW-S195 2026-06-22 - normalized to type: guide, added scope: seed; joined
     the Platform and Environment Behaviors cluster"
+  - DW-S285 2026-08-24 - quit-before-edit rule (app rewrites config on quit),
+    TextEdit .rtf risk, raw sed repair with app closed (S234; meta-learning
+    review S231-S246)
 ---
 
 # Editing the Claude Desktop Config
@@ -28,7 +31,9 @@ The Claude Desktop config file controls which MCP servers Claude can use — Obs
 
 The config is a `.json` file. You can open it with any text editor:
 
-- **TextEdit** — right-click the file → Open With → TextEdit. Works but be careful: TextEdit sometimes converts straight quotes to curly quotes, which breaks JSON. If you use TextEdit, go to TextEdit → Settings → uncheck "Smart quotes" first.
+**Quit Claude Desktop before you edit, not only after.** Claude Desktop rewrites `claude_desktop_config.json` when it quits, so an edit made while the app is running can be silently overwritten the next time it closes - the order is quit (Cmd+Q), edit, save, reopen. (Source: DataWizard, 2026-08)
+
+- **TextEdit** — right-click the file → Open With → TextEdit. Works but be careful: TextEdit sometimes converts straight quotes to curly quotes, which breaks JSON. If you use TextEdit, go to TextEdit → Settings → uncheck "Smart quotes" first. It can also save the file as rich text (`.rtf`) if the format was ever switched; confirm the saved file is still plain `.json`. When a hand edit has already gone wrong, a raw `sed` replacement on the file in Terminal with the app closed is the most reliable repair.
 - **VS Code** — best option if you have it installed. Validates JSON syntax and highlights errors. Right-click → Open With → Visual Studio Code.
 - **Terminal** — `open -a TextEdit ~/Library/Application\ Support/Claude/claude_desktop_config.json` or use `nano` / `vim` if you're comfortable with terminal editors.
 

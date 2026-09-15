@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: '2026-08-06'
+updated: 2026-09-08
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -13,6 +13,20 @@ edit_log:
   - DW-S245 2026-08-05 - added the Git Hook and CI Behaviors guide to the
     Platform cluster
   - DW-S250 2026-08-06 - added the Review Automation guide
+  - DW-S273 2026-08-18 - added Chrome MCP and Web Tool Behaviors + Cowork Build
+    Environment guides to the Platform cluster
+  - DW-S272 2026-08-18 - added the Orientation Flag Sweep - Query Spec guide
+    (Flag Surfacing Chain, referenced by PI v4.6)
+  - DW-S279 2026-08-18 - added the Team Attention Rollout and Flag Queue Page
+    Template rows (Flag Surfacing Chain B2)
+  - DW-S280 2026-08-20 - extended the Git Hook and CI Behaviors row with the
+    self-updating-script and working-tree-compare behaviors
+  - "DW-S287 2026-08-26 - added the Process and coordination sub-table with the Multi-Instance Coordination Patterns guide"
+  - "DW-S312 2026-08-30 - Human Onboarding Doc Template archived (D62: START
+    HERE files retired) and dropped from the catalog; S312 Seed review"
+  - "DW-S308 2026-08-31 - Operator Gate Queue - Template row added (D126 codification; template at Seed/Templates/)"
+  - "DW-S328 2026-09-04 - added the Surfaces and tools sub-table with the FSAccess GUI Pattern guide"
+  - "DW-S349 2026-09-08 - Reader-Facing Prose Style row added (Process and coordination)"
 ---
 # DataWizard Guides
 
@@ -30,7 +44,9 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **MCP Reliability and Write Verification** | Obsidian MCP failure modes (ghost writes, phantom/stale reads, frontmatter wipe), the write-verification protocol, concurrency practice, and sandbox/git gotchas. |
 | **Editing the Claude Desktop Config** | Finding and safely editing `claude_desktop_config.json` to add MCP servers or grant folder access; JSON pitfalls and recovery. |
 | **Browser and File System Access Behaviors** | Runtime gotchas for a single-file browser tool that reads/writes local files: File System Access API (Chromium-only, `file://`, IndexedDB handle persistence, read→readwrite upgrade, user-gesture rule, folder-scoped grants), artifact contexts blocking local storage, DOM/CSS gotchas (`hidden` vs class `display`, `color-scheme`), and headless mock-adapter verification. |
-| **Git Hook and CI Behaviors** | Where guard/automation scripts run across a git-synced repo's environments: local hooks (install-per-clone, `core.hooksPath` supersedes `.git/hooks/`), mobile Obsidian Git (isomorphic-git runs no hooks - CI is the only mobile net), and awk-in-CI being mawk (interval + grouped-alternation panic; write mawk-safe). Git how-to stays in the Git Guide; this covers execution-environment facts. |
+| **Git Hook and CI Behaviors** | Where guard/automation scripts run across a git-synced repo's environments: local hooks (install-per-clone, `core.hooksPath` supersedes `.git/hooks/`), mobile Obsidian Git (isomorphic-git runs no hooks - CI is the only mobile net), and awk-in-CI being mawk (interval + grouped-alternation panic; write mawk-safe), self-updating scripts overwriting themselves mid-run (`main()` wrap), and safely comparing a synced working tree to the remote before a reset (throwaway `read-tree` index). Git how-to stays in the Git Guide; this covers execution-environment facts. |
+| **Chrome MCP and Web Tool Behaviors** | Driving external sites via Chrome MCP and web fetch: interaction limits (OAuth popups, devicePixelRatio), client-rendered page read recipes, web_fetch token-cap behavior, and Google Docs / Apps Script gotchas. Local single-file browser tools stay in Browser and File System Access Behaviors. |
+| **Cowork Build Environment** | Building codebases from the Cowork sandbox: git-on-mount build workflow (lock cleanup, no push creds, `git add -A`), Node/npm/Electron and Python toolchain gotchas, shell/file-tool quirks, network and GitHub-data workarounds, WeasyPrint rendering, device-bridge specifics, and build-verification discipline (isolated /tmp loop, typecheck+build+smoke). |
 
 ## Other Guides
 
@@ -50,11 +66,25 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Obsidian Bases Reference** | Using Obsidian Bases for DW dashboards and filtered views. |
 | **Working Principles** | The reasoning behind the Working Rules - the "why" under the behavioral contract. |
 | **Review Automation** | The three periodic reviews (health audit, meta-learning, Content Interests): the pending-report model, the cadence table (single home), and how scheduled automation detects staleness so the session-closer only surfaces waiting reports. |
+| **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub and intake sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
+| **Team Attention Rollout** | Activating the flag system on a multi-operator project: preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
+| **Flag Queue Page Template** | Copy-in template for a per-person flag queue page (Dataview): one section per operator over `flag_for` frontmatter, with the empty-due-last sort fix and the exact-name list-matching caveat. Render surface only -- the frontmatter is the mechanism. |
+| **Operator Gate Queue - Template** (`Seed/Templates/`) | Copy-in starter for a deployment-gate queue: class sections A-F + Parked + Deployed and one example G-row. The schema, lifecycle vocabulary, feeding rule, and exit ceremony are canonical in the Conventions Registry's Operator Gate Queue entry; wire the file as the third layer of the 0.5 action-items shell. |
+
+### Surfaces and tools
+| Guide | Covers |
+|---|---|
+| **FSAccess GUI Pattern** | Building a repo-resident, no-server, no-refresh local GUI over files in a granted folder: the data adapter, permission and grant scope, operator identity, the concurrency guard, the surgical serializer, parser certification, derived-surface rules, and the testing floor. Runtime facts live in Browser and File System Access Behaviors. |
+
+### Process and coordination
+| Guide | Covers |
+|---|---|
+| **Multi-Instance Coordination Patterns** | Several instances on one project: the incidental-concurrency baseline (claim, patch-at-close, same-day-block deferral, foreign-write verification), the roles table, and four deliberate patterns - coordination thread, relay review, second-model plan review, supervised build with a build-side check-before-write gate - plus the Session Exchange transport and the exchange-note handshake convention (canonical home), with a worked six-note supervision run. |
+| **Reader-Facing Prose Style** | The writing standard for documents a person reads start to finish: a synthesis of eight public style and humanizing rulesets into seven diseases, 15 binding rules, and a count-based verification pass. Mandatory load for the model-casting writer seat; invoked by the research and harvest skills whenever the deliverable is read-aloud-class. |
 
 ### Onboarding and integrations
 | Guide | Covers |
 |---|---|
-| **Human Onboarding Doc Template** | Template for generating a per-project human onboarding guide. |
 | **Telegram Harvesting** | Harvesting Telegram exports into the vault; credentials stay outside git-tracked folders. |
 
 ### Maintainer notes

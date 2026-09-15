@@ -4,11 +4,11 @@ description: >-
   Judgment-half audit of a DW project: consumes the dw_lint report for machine
   findings, then checks infrastructure completeness, MOC freshness, shell
   narrative order, and routes findings. Triggers on: 'DW review', 'audit this
-  project', 'check project health', or via session-closer periodic thresholds.
+  project', 'check project health', or when the review-automation cadence flags an audit due.
 type: skill
-version: '2.0'
+version: '2.1'
 created: '2026-05-23'
-updated: '2026-08-05'
+updated: '2026-08-30'
 operator: Andrew
 edit_log:
   - "DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
@@ -16,6 +16,11 @@ edit_log:
   - DW-S185 2026-06-15 - subagent delegation context note (Handling Large
     Projects)
   - "DW-S242 2026-08-05 - Manual Fallback: added conflict-marker backstop check"
+  - "DW-S285 2026-08-24 - v2.1: J7 pointers-carry-no-status + cadence note (the
+    check only protects if the audit runs); Manual Fallback 7 frontmatter-parses
+    (C10 equivalent)"
+  - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: session-closer thresholds
+    references repointed to the Review Automation guide (S312 Seed review)"
 ---
 
 # Project Health Audit Skill
@@ -31,7 +36,7 @@ If the vault has no lint tooling (adopter without Python), use the Manual Fallba
 
 ## When to Use
 
-- When the session-closer's periodic thresholds prompt for an audit (cadence lives in the session-closer thresholds table — the single home per D88; this skill quotes no numbers)
+- When the scheduled review automation flags an audit as due (cadence lives in the Review Automation guide's cadence table — the single home per D114; this skill quotes no numbers)
 - When the user requests `DW review` or "audit this project"
 - After a major restructure, migration, or Seed version bump
 - When onboarding a new project to DW conventions
@@ -61,7 +66,7 @@ Ask the user which scope they want before starting. Tiers now govern judgment de
 | **Full** | J1-J6 | After major restructures or migrations |
 | **Incremental** | J3, J4 on files changed since last audit | Between full audits when drift is suspected |
 
-For audits triggered by session-closer thresholds, default to **Standard**.
+For audits triggered by the review-automation cadence, default to **Standard**.
 
 ## Judgment Checks
 
@@ -108,9 +113,15 @@ Read 3-5 key files (0.0, newest session entry, one section file, one recently-mo
 
 Flag files where YAML `updated:` is more than ~30 days older than filesystem mtime — suggests edits outside DW sessions. Git operations reset mtimes, so advisory only; frontmatter dates are authoritative.
 
+### J7: Pointers Carry No Status
+
+Scan the 0.0's Key Pointers section (and any ledger `home:` lines) for status words - "pending", "not yet", "TBD", "in progress" - attached to a pointer. A pointer states where something lives, never what state it is in; state belongs at the canonical item, and a pointer carrying it is a copy that rots (Conventions Registry, "Pointers carry no status"). Words that are part of a *description* ("holds review-pending notes") are fine; words that assert the pointed-to item's *state* are the finding. Fix: drop the state clause or replace it with a link to the item that holds the state. Cheap probe: `grep -inE 'pending|not yet|TBD|in progress'` over the section, then read each hit.
+
+**A note on cadence.** The machine half only protects a project if the audit actually runs: a project whose Backlog frontmatter had been unparseable for four sessions (C10 would have caught it on day one) had simply not been audited in seventy sessions. The review-cadence table in the Review Automation guide is the trigger; if the health-audit row there is stale, that is itself the first finding to report. (DataWizard, 2026-08)
+
 ## How to Run
 
-1. **Scope** — ask the user (default Standard for threshold-triggered audits). For Incremental, use `last_health_audit:` in 0.0 frontmatter as the cutoff.
+1. **Scope** — ask the user (default Standard for cadence-triggered audits). For Incremental, use `last_health_audit:` in 0.0 frontmatter as the cutoff.
 2. **Step 0** — get the lint report (above).
 3. **Boundaries** — read 0.0 for folder structure. Skip `xArchive - ProjectName/` folders (D87 naming) unless explicitly directed.
 4. **Judgment checks** for the chosen tier. Use `get_frontmatter` / `list_directory` over full reads wherever possible.
@@ -166,11 +177,12 @@ For vaults without Python tooling, hand-run the old mechanical categories, conde
 4. **Filename safety** — no `? | * < > " \ :`, tab, NBSP, CR, em-dashes, curly quotes, consecutive spaces, trailing space before extension (see `Seed/Guides/Filename Safety.md`).
 5. **Stale conventions** — `~`-prefix meta-folders, Roman-numeral section headers, `_Archive - ` folder naming (D87: xArchive), missing `- ProjectName` suffixes, shells with inline content.
 6. **Conflict markers** — vault-wide grep for unresolved conflict-marker lines (the `<<<` / `===` / `>>>` triples) at the start of a line, outside fenced code blocks. The commit guard (Git Guide §10) prevents these at source; this is the catch-after-the-fact backstop. Whitelist fenced/example contexts so conflict-resolution tutorials do not re-flag every run.
+7. **Frontmatter parses** — run every `.md` frontmatter block through a YAML parser (a ten-line Python loop) and list the failures; an unparseable block makes MCP `get_frontmatter` return `{}` silently and puts the file one `update_frontmatter` away from losing its metadata. The usual cause is an unquoted `edit_log` entry containing `: `. (Lint C10 covers this where the tooling exists.)
 
 ## Related
 
 - **dw_lint.py** (`Workshop - <Project>/Scripts/`) — the machine half; nightly scheduled task writes daily reports
 - **dw_moc.py** — MOC generator (D92); J2 checks its freshness
-- **session-closer thresholds table** — the single home for audit cadence (D88)
+- **Review Automation guide cadence table** — the single home for audit cadence (D114)
 - **Health Audit Log** (`0.8 Health Audit Log - ProjectName.md`) — cumulative trend record
 - **Decisions:** D84 (0.x tiers), D87 (xArchive), D88 (cadence home), D92 (generated MOC), D93 (version pins retired)

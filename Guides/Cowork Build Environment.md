@@ -1,0 +1,144 @@
+---
+created: 2026-08-18
+edit_log:
+  - DW-S273 2026-08-18 - created from the Cowork Build Environment Guide FR (VC
+    S23-S34 build cluster + Weave sandbox/network items + DW S221-S230
+    device-bridge items + RW S51 staged-path item); seeded from the field-tested
+    VibeCut Build Environment Notes
+  - "DW-S284 2026-08-24 - Shell quirks: Write-tool overwrite-unread refusal as
+    concurrency guard (S208); zsh inline-comment handoff gotcha (S204)
+    (meta-learning review S198-S209)"
+  - "DW-S284 2026-08-24 - Device Bridge: Cowork folder connections are
+    exact-path, no sibling exposure, break on move (S216; meta-learning review
+    S210-S220)"
+  - DW-S284 2026-08-24 - zsh handoff bullet extended with the bash heredoc
+    delivery recipe (S252; meta-learning review S247-S255)
+  - "DW-S285 2026-08-24 - Device Bridge: Workflow tool args-undefined fallback +
+    subagents reach the bridge via ToolSearch (S231; meta-learning review
+    S231-S246)"
+  - "DW-S287 2026-08-26 - Shell quirks: environment date can lag the operator's
+    local date"
+  - "DW-S288 2026-08-26 - Device Bridge: base64 script transport for device-side
+    batch edits"
+  - "LS-S72 2026-08-26 - Shell quirks: pkill -f kills the calling sandbox shell
+    (exit 144); Rendering: Playwright headless runs in some configs +
+    .cjs/localhost-route recipes (Location Scout)"
+  - "LS-S73 2026-08-26 - Device Bridge: Control_Chrome page-read failure
+    (get_page_content + execute_javascript) + claude-in-chrome alternative;
+    device_bash background-process death"
+  - VC-S77 2026-08-30 Device Bridge: repo-to-Mac delivery recipe (cloud clone + tarball commit)
+  - "DW-S331 2026-09-06 - new section: SQLite on the Vault Mount (no-delete
+    policy -> WAL/DELETE/TRUNCATE fail, PERSIST-only rule, hot-journal off-mount
+    recovery recipe; call-timeout kills children + PID-namespace pgrep false
+    positive)"
+  - 'DW-S336 2026-09-07 - Device Bridge: commit_files same-path staleness; Verification: stub osascript in Mac harness runs'
+  - 'DW-S341 2026-09-07 - SQLite/shell: pkill -f self-match on the device shell; Device Bridge: background-process survival correction; Verification: headless-Chromium recipe for mount-built GUIs'
+  - 'DW-S348 2026-09-08 - Device Bridge: desktop-app artifacts have no URL and freeze data; stage-by-id + template-and-generator exit (GUI Hub session)'
+  - "DW-S351 2026-09-08 - Shell quirks: unquoted heredoc executes backticks/$() in the body (quote the delimiter)"
+operator: Andrew
+scope: seed
+title: Cowork Build Environment
+type: guide
+updated: 2026-09-08
+---
+# Cowork Build Environment
+
+> Guide for Claude instances building real codebases from inside Cowork -- a mounted folder plus a Linux sandbox. Covers the git-on-mount build workflow, language toolchains, shell and file-tool quirks, network workarounds, rendering, and the device bridge.
+>
+> **Scope.** Obsidian MCP failure modes, FUSE-mount write/delete restrictions, and the general write-verification protocol live in **MCP Reliability and Write Verification** -- this guide cross-references rather than restates them. Chrome MCP and web-page reading recipes live in **Chrome MCP and Web Tool Behaviors**.
+>
+> Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
+
+Field provenance: the core cluster was re-learned session after session across a real Electron-app build (the git-on-mount lock failure alone recurred six times before becoming routine). This guide is the standing home so the next build session finds these without re-deriving them.
+
+## Git on a Cowork-Mounted Folder
+
+The MCP Reliability guide documents the underlying restriction (the sandbox can create but not unlink files on the mount, so working-tree git ops orphan lock files). Build-workflow consequences:
+
+- **Clear locks after every commit batch.** Commits can succeed while leaving stale `.git/index.lock`, `HEAD.lock`, and tmp object files that `rm` refuses ("Operation not permitted"). Clear via the file-delete permission path (e.g. `allow_cowork_file_delete` + `rm`, or the rename-aside fallback in the MCP Reliability guide), then verify with `git fsck`. Make this routine, not incident response. (Source: VC S27-S33, 6 recurrences)
+- **The sandbox has no GitHub credentials and can never `git push`.** Pushes must run on the user's machine. A session log claiming commits were "pushed" is only trustworthy if the push actually ran there -- verify with `git status -sb` (ahead/behind), never assume. One session found three commits marked "pushed" that had never reached origin. (Source: VC S31)
+- **`git commit -am` only stages modified tracked files** -- new files stay untracked and silently uncommitted. Use `git add -A`. One first-try commit left a whole session's new files behind. (Source: VC S34)
+- **Cloning into a Dropbox-synced folder fails** ("unable to unlink .git/config.lock") because Dropbox locks files mid-sync. Clone to `/tmp` first, then `cp -R` into place. (Source: VC S24)
+
+## Node / npm / Electron
+
+- **Never share `node_modules` across platforms.** `npm install` in the Linux sandbox against a Mac-mounted `node_modules` strips the other platform's os/cpu-gated native deps (rollup/esbuild), breaking the Mac side until `npm ci`. Verify builds in an isolated `/tmp` copy (below); a `tsc` typecheck needs no natives and runs safely on the mount. (Source: VC S33)
+- **Backgrounded installs die.** Each bash call runs in its own `bwrap --unshare-pid --die-with-parent` namespace, so `npm ci &` dies when the call returns. Run long installs foreground; the npm cache persists across calls, so they converge in 1-2 passes. (Source: VC S31)
+- **Dev watchers miss external edits on the mount.** electron-vite's dev watcher kept serving a stale build after files were edited via file tools. Restart the dev server after edits; for main/preload changes do a clean restart (`rm -rf out node_modules/.vite && npm run dev`). (Source: VC S30, S34)
+
+## Python and Packages
+
+- **`pip` has no package index from the sandbox in some configurations (HTTP 403).** numpy is typically preinstalled; graph/scientific extras (`networkx`, `igraph`, `scipy`) may not be installable. Hand-roll in numpy or write the script for local (native) execution. Packages installed on the user's machine are invisible -- the sandbox is an isolated Linux environment. (Source: Weave, 2026-06/08. Other configurations allow installs -- probe before planning around the restriction.)
+- **`str.lstrip("www.")` strips a character *set*, not a prefix** -- it corrupted `weave-...` to `eave-...` and silently poisoned dedup keys. Use `re.sub(r"^www\.", "", s)`. Dry-run-before-apply is what caught it. (Source: DW S224)
+
+## Shell and File-Tool Quirks
+
+- **bash `timeout_ms` caps at 45000, and a validation failure rejects the ENTIRE call** -- including any file writes packed into the same command string. Write files with the Write tool, not heredocs, when a call might fail validation. (Source: Weave, 2026-06/08)
+- **The Edit tool requires a prior Read-tool read.** A `cat` via bash does not register; the Edit fails. (Source: VC S23)
+- **The Write tool refuses to overwrite an existing file it has not Read** -- but creates genuinely new files without complaint. This is a feature under concurrency: it is what stopped one session from clobbering a sibling session's freshly written claim stub. Treat the refusal as a signal to re-read (the file may have changed under you), not as an error to force past. See the concurrency practices in the MCP Reliability guide. (Source: DataWizard, 2026-06)
+- **No trailing `#` comments in commands handed to the user's Terminal.** zsh interactive shells (the macOS default) do not honor inline `#` comments unless `INTERACTIVE_COMMENTS` is set; bash does. A handed-off command like `git pull  # then verify` reaches zsh with `#`, `then`, `verify` as arguments, and zsh also breaks on `()` inside a pasted comment line. Put explanations on their own line above the command, and hand multi-line blocks over as a heredoc - `bash <<'SH'` ... `SH` - so the whole block runs under bash regardless of the operator's interactive shell. (Source: DataWizard, 2026-06, 2026-08)
+- **Quote the heredoc delimiter when the body is literal text.** An unquoted heredoc (`<<EOF`) is subject to full shell expansion: backticks and `$(...)` inside the body EXECUTE as commands and their (usually empty) output is silently substituted into the text - markdown code spans in a note body are enough to trip it, corrupting the written file with no error. Use `<<'EOF'` for any body that must land verbatim; when variables must expand too, write the file from a short python read-modify-write instead of mixing expansion into prose. (Source: DataWizard, 2026-09)
+- **The environment's stated date can lag the operator's local date by a day.** A session started late in the UTC evening reports the previous day in its environment header while the operator's timezone has rolled over. Check `date` in the operator's timezone (device-side, e.g. `TZ=Europe/Berlin date`) before the first stamp and again at close; one session stamped six files with the wrong date before catching it. (Source: DataWizard, 2026-08)
+- **`bash wc -w` returns 0 for cloud-synced files** the mount serves as cloud-only placeholders. Use `obsidian:get_notes_info` for sizes instead. (Source: VC S32)
+- **Staged large-file paths do not survive a session interruption/reclaim.** A staged tool-results directory was gone after a session gap; re-fetching was cheap and deterministic. Re-fetch instead of hunting for the old path. (Source: RW S51)
+- **`pkill -f <pattern>` kills the calling shell itself.** Cleaning up backgrounded test servers with `pkill -f hub_server` (or any `-f` pattern) matched the sandbox's own wrapper process and terminated the whole `bash` call - it exits 144 with NO output, including any echoes before the pkill, which reads as a mysterious total failure. Never use `pkill`/`killall` in the sandbox. Track each backgrounded PID from `$!` and `kill "$PID"` explicitly; to free a port, start the next server on a different port instead. (Source: Location Scout, 2026-08)
+
+- **The session's "Today's date" env line goes stale in long-lived sessions.** It is stamped at session start and can lag days behind real time. Run `date` in a shell before claiming session IDs or stamping birth metadata; a stale env date produced a misdated multi-operator session claim that had to be renamed mid-session. (Weave, 2026-09)
+
+## Network and GitHub Data
+
+- **WebFetch rate-limits (HTTP 429).** Space calls out; lean on WebSearch snippets when throttled. (Source: Weave, 2026-06/08)
+- **GitHub REST via web fetch is unreliable:** `api.github.com` returns empty content in some Cowork configurations, and unauthenticated REST shares a rate-limited egress (60/hr, often exhausted). Reliable paths, in order: `raw.githubusercontent.com` for file content (fetches even when the API is throttled), the repo's HTML pages for stars/forks/issues/license, Chrome `get_page_text` on an org's `/repositories` page for listings, or a user-run `gh api ... | paste`. For pulling a repo's files wholesale, a shallow `git clone --depth 1` beats fetching (see tools-research). (Source: VC S25; Weave, independent)
+
+- **Some sandbox configurations 403-block `api.github.com` AND github.com HTML pages outright** (proxy-level), while GitHub release-asset downloads (`github.com/<org>/<repo>/releases/download/...`, including `checksums.txt`) and the git protocol still work. A pinned release-asset URL is then the reliable way to install a released binary: fetch the release's `checksums.txt` to discover exact asset names, download, verify sha256 locally. (Source: DW S329)
+- **GitBook sources are agent-friendly:** append `.md` to any page URL for clean markdown; `llms.txt` is a full index; `?ask=` answers questions against the docs. (Source: Weave, 2026-06/08)
+- **Filing GitHub issues via pre-filled `issues/new?title=&body=` URLs** (URL-encode the body, open in the user's authed browser, human submits) is a robust, low-brittleness alternative to JS form-filling -- and keeps the irreversible public action on a third party's repo in human hands. The `return_to` param survives a login redirect. (Source: DW S230)
+
+## SQLite on the Vault Mount
+
+The mounted vault filesystem REFUSES file deletion, and three SQLite behaviors depend on deleting files. All fail with a bare `disk I/O error` (DataWizard, 2026-09):
+
+- `PRAGMA journal_mode=WAL` - the shm/wal lifecycle needs deletes. WAL is also sticky in the db file: one native WAL flip locks every sandbox session out of that db.
+- Default `DELETE` (and `TRUNCATE`) journal modes - commit-time journal removal fails, which aborts the WRITE at commit and leaves a HOT JOURNAL behind; every subsequent open of the db then fails until recovered.
+- **`PERSIST` is the only journal mode that works on both surfaces** (sandbox mount + native). Rule: route every connection through a shared connect() helper that sets `PRAGMA journal_mode=PERSIST`; never open a mounted db for writing with a raw default connection.
+
+Hot-journal recovery (deletes are refused, so recover off-mount): copy the db AND its `-journal` to a scratch dir outside the mount, open the copy once (SQLite recovers it there, where deletes work), run `PRAGMA integrity_check`, copy the recovered db back over the mounted one, then truncate the mounted journal to zero bytes (`: > file`). Never truncate a hot journal without recovering first.
+
+Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS its child processes (die-with-parent), and each call runs in its own PID namespace - `pgrep` matches your own probe command, so a killed job can look alive. The mirror image bites on the device shell: `pkill -f <name>` matches the `bash -c` process running YOUR OWN command line (it contains the literal name), so it kills your shell mid-script (exit 143, output truncated, later commands never run). Kill by a pattern assembled at runtime - `pkill -f "$(printf 'intake_gu%s' i.py)"` - or by port, and put the kill in its own call (DataWizard, 2026-09). Long jobs (LLM batch loops, big scans) must be sliced so each invocation fits one call; design the consumer idempotent so slices converge.
+
+## Rendering (HTML to PDF)
+
+- **Use WeasyPrint, not headless Chromium.** Headless Chromium / Playwright segfaults in the Cowork sandbox. WeasyPrint (via pip, where installable) renders HTML to PDF faithfully, including `@font-face`. Caveat: WeasyPrint ignores page breaks *inside* flex containers -- keep break-sensitive content out of flex layouts. (Source: RW S31.5)
+- **Headless Chromium via Playwright DOES run in some configurations** -- despite the segfault note above (config-dependent). A sandbox with `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers` preinstalled ran `chromium.launch({headless:true})` reliably for driving a local Leaflet app and asserting rendered DOM (count-honesty checks). Probe with a one-line launch before assuming segfault. Two recipes that matter: (1) require Playwright from a `.cjs` file, not `.mjs` (a `.mjs` forces ESM and `require` is undefined); (2) when serving the app over `http://127.0.0.1`, a blanket `route('**', r=>r.abort())` also aborts the page navigation itself - allow the localhost host through and abort only external hosts. (Source: Location Scout, 2026-08)
+
+## Device Bridge
+
+- **`device_commit_files` rejects an explicit `expectedMtimeMs: null`** -- omit the field entirely when no mtime guard is wanted. (Source: DW S229)
+- **`Control_Chrome` proxy: tab management works; page reads do not.** `list_tabs` / `open_url` / `switch_to_tab` are reliable, but `get_page_content` AND `execute_javascript` return "Google Chrome is not running" even with a live tab (intermittent in DW S230; consistent in LS S73). To read a live, logged-in page (e.g. Google Maps saved lists), use the **claude-in-chrome extension** instead -- once the user signs in, its screenshots + accessibility-tree DOM are reliable. Verify page state via `list_tabs` URL params, not by retrying the read. (Source: DW S230, Location Scout 2026-08)
+- **`device_bash` backgrounded processes do not survive the call** *(unreliable in both directions - see the 2026-09 correction at the end of this bullet)*. Like the sandbox, a server started on the user's machine via `device_bash` with `&`, `nohup`, or even `setsid` is gone by the next `device_bash` call (same-shell `curl` 200, cross-shell 000 -- the call's process group is torn down on return). To exercise a device-side server, start it AND hit it within the SAME call; you cannot start it in one call and drive it from a separate browser/tool call. Test a device-hosted server this way, or (for a rendered-DOM check) stage the app into the sandbox and drive it with headless Playwright there. (Source: Location Scout, 2026-08) **Correction (DataWizard, 2026-09):** a `setsid python3 <http server> &` started in one `device_bash` call DID survive across later calls that day (answered curl minutes later; had to be killed explicitly). Treat persistence as undefined: never depend on a background process being there next call, and always kill what you started.
+- **SQLite cannot write on the mounted vault from `device_bash` -- the mount lacks file locking.** Creating or writing a SQLite db on a connected folder's mount fails with `disk I/O error` (WAL) or `attempt to write a readonly database` (even `mode=ro` opens, which still need the lock), because the VM's FUSE mount does not support SQLite's locking. Native processes on the user's machine are unaffected (WAL dbs on the same folder work normally there). Pattern: build/write the db in the VM `$HOME`, `PRAGMA wal_checkpoint` + close (or fold to `journal_mode=DELETE`), `cp` the closed file onto the mount, and verify by byte-hash plus a `file:...?immutable=1` read -- never a plain open. (Source: DataWizard, 2026-09)
+- **Cowork connects folders individually, by exact path.** Connecting a parent folder does not expose its siblings, and moving or renaming a connected folder on disk breaks its connection until it is re-added in the desktop app. If a session suddenly cannot see a folder it could see before, check whether the folder moved before debugging the tools. (Source: DataWizard, 2026-07)
+- **Workflow (multi-agent orchestration) tool: `args` arrived `undefined` once; subagents can reach the device bridge.** In one run the value passed as the Workflow's `args` input never reached the script (`args` was `undefined` inside it); inlining the data as constants in the script body is the reliable fallback, and a quick `log(JSON.stringify(args))` at the top of the script tells you which case you are in before any agent spends tokens. Separately, foreground Workflow subagents CAN reach the `remote-devices` bridge (vault reads, `device_bash`) by loading the tools via ToolSearch inside the subagent - the bridge is not restricted to the main loop. (Source: DataWizard, 2026-07)
+- **Deliver a git repo to the user's machine when `device_bash` has no network:** clone (shallow) in the cloud sandbox, `tar czf`, `SendUserFile` -> `device_commit_files` into the destination folder, then `tar xzf` with `device_bash` (the `.git` survives, so `git log`/`remote` work locally). ~12 MB tarballs land fine; park the tarball in a `_to_delete/` subfolder afterwards since the device shell cannot delete. (Source: VibeCut S77, 2026-08)
+- **`device_commit_files` re-sends the FIRST version of a reused `stagedPath`.** Committing an edited file under an outputs path that was already committed earlier in the session delivered the original bytes again (the call still reported "written"); a test run then exercised the stale script. Write each iteration to a NEW name (`script.v2.sh`, `.v3.sh` ...), commit that, and compare `md5sum` on both sides before running anything. The same-path staleness exists in the staging direction too (MCP Reliability guide, Known Issues). (Source: DataWizard, 2026-09)
+- **Transport a multi-file edit script to the device without staging: base64 it.** A parse-guarded Python edit (frontmatter `edit_log` appends, section inserts across several vault files) runs cleanly device-side, but `device_bash` cannot see the sandbox's `/tmp`. Encode the script in the sandbox (`base64 -w0`) and decode it inside the `device_bash` command (`echo '<b64>' | base64 -d > script.py && python3 script.py <vault-path>`); an ~8KB script transports without issue, and the whole batch lands in one call with one verification pass. (Source: DataWizard, 2026-08)
+- **Desktop-app Cowork artifacts have no web URL and freeze their data.** An artifact created in the desktop app lives only inside that app: no claude.ai link exists to embed or share, data baked in at build never refreshes, and pages that call MCP tools run only inside the app - as launchable or shared surfaces they are dead ends. `device_stage_files` with `artifact_ids` retrieves an artifact's current HTML by id for review or salvage; a proven exit is template + generator: keep the artifact's HTML as a page shell, re-inject fresh JSON from the source database with a small script, and serve the output as a plain local file. (Source: DataWizard, 2026-09)
+
+- **`device_bash` localhost is the VM's, not the Mac's.** A `curl localhost:<port>` inside `device_bash` probes only the mount VM - connection refused (000) says nothing about servers the operator runs natively on the Mac. Never use the device shell to check whether a Mac-hosted server is up; ask the operator, or verify the change in the sandbox with a staged copy (see the headless-Chromium recipe below). (Source: Location Scout, 2026-09)
+
+## Verification Discipline for Builds
+
+- **Minimum verification for a handoff = typecheck + build + smoke test.** Typecheck plus production build cannot catch runtime init failures; a headless jsdom component-init test reproduced an app black-screen in seconds. Include a mounted-component smoke test. (Source: VC S27)
+- **The isolated `/tmp` verification loop:** copy the source minus `node_modules` to `/tmp`, `npm ci --ignore-scripts` (skip heavy binaries, e.g. `ELECTRON_SKIP_BINARY_DOWNLOAD=1`), then run tests + typecheck + build there. The host machine never runs unverified code, and its `node_modules` stays pristine. (Source: VC S28, S33)
+- **Cloud-green is not host-green for environment-coupled globals.** A suite passing on the sandbox's Node can fail on the host's newer Node (e.g. Node 25+ ships built-in `localStorage` globals that shadow jsdom's in test workers). Verify env-coupled globals on the actual host runtime, not only in the cloud. (Source: VC S64)
+- **Unit + component green is not app-works.** Hundreds of passing pure-function and component tests can coexist with an app that crashes on first real interaction, because nothing renders the real app against real state. Keep an integration/smoke tier that does. (Source: VC S62)
+- **A fixture harness on a Mac fires real desktop notifications unless `osascript` is stubbed.** A script under test that calls `osascript -e 'display notification'` finds the real binary on macOS (the Linux VM has none, so cloud runs never show it): ~35 fixture scenarios produced ~35 live banners on the operator's screen. Put a stub `osascript` at the head of `PATH` before the first scenario (record calls to a file so a scenario can still assert a notification was attempted). Same class: scenarios that depend on a tool's *absence* must restrict `PATH` to system dirs, since the host machine may have the real tool (Homebrew `gh`). (Source: DataWizard, 2026-09)
+- **Verify a GUI built against the mount by running it in the cloud sandbox under headless Chromium.** A stdlib web GUI (localhost server + embedded page) written to the user's vault cannot be seen from the sandbox (device VM localhost is not the sandbox's) and cannot be screenshotted from the device shell. Recipe that worked first time (DataWizard, 2026-09): copy the scripts plus a scratch db to a connected non-vault folder, `device_stage_files` them, run the server in the sandbox (`setsid nohup ... &`; `pkill` your own pattern kills the shell - see the SQLite section), drive it with Playwright (`chromium.launch({executablePath:'/opt/pw-browsers/chromium'})` - keyboard, selects, hover, colorScheme emulation) and `Read` the PNGs. Zero page errors in the console listener is the acceptance line; the screenshots go to the operator. Do the real first run on the operator's machine afterwards - the sandbox run proves the page, not the mount.
+- **Verify your writes actually landed.** The recurring failure shape: an operation reports success but the work did not persist -- no push creds (commits never reach origin), `commit -am` skipping untracked files, stale-lock-blocked commits. Before trusting a git/build write: `git status -sb` (ahead/behind + untracked), `git fsck` (lock/object health), and confirm the push ran on the host. Mirrors Working Rule 5 and the MCP Reliability guide's verification protocol. (Source: VC S27-S34, cross-cutting)
+
+## See Also
+
+- **MCP Reliability and Write Verification** -- FUSE-mount restrictions, Obsidian MCP failure modes, write verification
+- **Chrome MCP and Web Tool Behaviors** -- driving external sites, client-rendered page reading
+- **Git Hook and CI Behaviors** -- where guard/automation scripts run across a repo's environments
+- **Cowork Scheduled Tasks** -- unattended-run requirements

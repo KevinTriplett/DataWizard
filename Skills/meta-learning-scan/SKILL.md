@@ -3,20 +3,32 @@ name: meta-learning-scan
 description: >-
   Automated scan of session log Learnings sections that produces a structured
   report for human review. Use when setting up a scheduled meta-learning task,
-  when the user says 'scan learnings' or 'generate a learning report', when the
-  session-closer nudge fires for meta-learning review, or any time accumulated
+  when the user says 'scan learnings' or 'generate a learning report', when a
+  meta-learning review is due, or any time accumulated
   session learnings need to be extracted and organized before planting. This
   skill generates the report; the meta-learning-review skill handles the actual
   planting. Also use when the user wants to set up automated learning extraction
   for any DW project.
 type: skill
-version: '1.3'
+version: '1.4.2'
 created: '2026-06-01'
-updated: '2026-08-05'
+updated: 2026-09-04
 edit_log:
   - DW-S185 2026-06-15 - platform/environment routing hint (Step 4 Deferred)
   - "DW-S243 2026-08-05 - v1.3: Step 3 header-variant note (### Findings treated
     as learnings-equivalent)"
+  - "DW-S284 2026-08-24 - v1.3.1: Step 5 test_run frontmatter flag for
+    skill-test scans (the S118-S137 test report surfaced unflagged in the DW
+    stack)"
+  - "DW-S285 2026-08-24 - v1.4.0: Step 4 pattern-families cross-theme pass +
+    report template section (from the S231-S246 / S256-S266 review: two unnamed
+    families found only in prose)"
+  - "DW-S309 2026-08-30 - v1.4.1: Step 5 - the report names its own scan window
+    only; never enumerate the pending stack or prescribe the stamp target
+    (S288-S300 report shipped a stale five-report stack narrative)"
+  - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: session-closer-nudge
+    trigger language replaced; stray cadence number dropped (S312 Seed review)"
+  - 'DW-S330 2026-09-04 - v1.4.2: Step 5 write path moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
 ---
 
 # Meta-Learning Scan
@@ -30,7 +42,7 @@ The scan is designed to run as a Cowork scheduled task without user interaction,
 ## When to Use
 
 - As a scheduled task running on a weekly or biweekly cadence
-- Manually, when the session-closer nudge fires (30+ sessions since last review)
+- Manually, when the scheduled review-status check has flagged a review as due
 - When the user says "scan learnings," "generate a meta-learning report," or "what have we learned recently"
 
 ### When NOT to Use
@@ -119,11 +131,13 @@ When a deferred learning is a platform or environment behavior (scheduled-task q
 
 **Post-review scan timing.** If the scan runs after a manual review in the same session window, items planted during that review will correctly appear as "already planted." This is expected behavior, not an error -- the scan reflects current vault state, which is exactly what the review skill needs.
 
+**Pattern families.** After grouping by theme, make a second pass across *all* themes for learnings that are instances of the same unnamed practice - a way of working the project keeps rediscovering without having named it (a coordination role, a review habit, a scoping test). Platform facts self-plant into standing guides and design facts self-plant into design docs; the residue that needs a human to act on it is exactly these unnamed practices, and they hide because each instance is filed under a different theme. For each family found, give it a provisional name, list its instances (session + one line each), and count them; where prior reports in the folder are cheap to grep, include instances from them too. Write the families as their own section (template below). Three or more instances is the review skill's threshold for naming the practice in a standing doc rather than planting the instances one by one. (Two families with six and four instances went unnamed across two reports until a reviewer noticed them in prose; DataWizard, 2026-08.)
+
 ### Step 5: Write report
 
-Write the report to the project's workshop or research area:
+Write the report to the project's infrastructure folder (canonical location: the Review Automation guide's "Report locations" section):
 
-**Full convention projects:** `{home}/Workshop - {ProjectName}/Learning Reports/Meta-Learning Report - {Abbrev} S{start}-S{end}.md`
+**Full convention projects:** `{infrastructure folder}/Learning Reports/Meta-Learning Report - {Abbrev} S{start}-S{end}.md` - the infrastructure folder Step 1 already discovered (e.g. `{home}/_Infrastructure - {ProjectName}/`)
 
 **Flat structure projects:** `{home}/Learning Reports/Meta-Learning Report - {Abbrev} S{start}-S{end}.md`
 
@@ -141,6 +155,10 @@ learnings_extracted: {count}
 last_review_session: "{Abbrev}-S{last_reviewed}"
 status: pending-review
 ```
+
+If the scan was run as a **skill test** - a forced scan range, or the reviewed-through stamp temporarily overridden - add `test_run: true` to the frontmatter and say so in the report's first line. The review skill detects the pending stack from frontmatter, and a test-generated report is indistinguishable from a real one without the flag; one such report sat in a project's stack for three months before anyone read the body note that explained its origin.
+
+**The report names its own scan window only.** Do not enumerate the project's pending-report stack in the report body, and do not prescribe the stamp target for the review - both are derived from report frontmatter at review time (the review skill's Step 1 and Step 5), and a narrative version goes stale between generation and review. One report shipped a five-report "pending stack" of which three were already `reviewed`, plus a stamp instruction that would have skipped the ordering rule (DataWizard, 2026-08).
 
 **Report structure:**
 
@@ -181,6 +199,17 @@ status: pending-review
 {Any patterns that span multiple themes -- e.g., "the design-harvest workflow
 is self-planting most findings, leaving only process heuristics unplanted"
 or "tool behavior learnings are accumulating without a clear home doc."}
+
+## Pattern Families
+
+{One block per family found in Step 4's cross-theme pass. Omit the section
+only if none were found - say so explicitly rather than leaving it out.}
+
+### {Provisional family name} - {N} instances
+- S{n}: {one-line instance}
+- S{n}: {one-line instance}
+- {prior report S{a}-S{b}}: {instance, if cheap to include}
+Suggested home if named: {Working Principles block | Conventions Registry entry | new guide | skill step}
 ```
 
 ### Step 6: Signal completion

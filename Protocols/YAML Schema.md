@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: '2026-08-08'
+updated: 2026-09-06
 operator: Andrew
 priority: high
 maturity: working
@@ -13,6 +13,18 @@ edit_log:
   - "DW-S198 2026-06-23: added claim_id stub field"
   - "DW-S262 2026-08-08: added embed_targets field (embeddable synth-note
     harvest; D116)"
+  - "DW-S272 2026-08-18: Section 4 reconciled to flag* canonical (F1); added
+    flag_due/flag_default/flag_status + flag_note content requirement +
+    team_attention* deprecation mapping + flagged_for non-canonical note"
+  - "DW-S279 2026-08-18: generic-names sweep of examples (C2, Seed
+    depersonalization; Flag Surfacing Chain B2)"
+  - "DW-S309 2026-08-30: placeholder sweep completed - Alice/Ben/Cara ->
+    Operator-A/B/C (16 residual uses the S279 sweep missed; S289
+    role-placeholder rule; meta-learning review S288-S300)"
+  - DW-S324 2026-09-04 - edit_log rolling window + origin field (D127)
+  - DW-S332 2026-09-06 - added session_started/session_closed span fields + Date
+    Stamping and Time Sense section (clock-check rule; Multi-Day Sessions FR
+    changes 1-2)
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -91,6 +103,8 @@ Fields specific to session-log entry files, beyond the birth metadata every file
 
 **`claim_id`**: A short random token (e.g. a 6-8 char hex nonce) stamped on a session-log *stub* at claim time to make session-claiming collision-evident under concurrency. After writing the stub, the claiming instance re-reads it and checks `claim_id`: if the on-disk value is not the one it wrote, a parallel instance won the slot, so it claims the next free identifier instead (PI Orientation Step 3, verify-after-claim). Ephemeral - present only while `status: in-progress`; the session-closer strips it when it overwrites the stub with the full entry at close. Design: [[Session Claiming Under Concurrency]].
 
+**`session_started` / `session_closed`**: The session's date span (both plain YYYY-MM-DD; equal for a single-day session). Sessions increasingly cross midnight or span days, and a single date cannot cover both ends. The claim stub sets `session_started:` at claim time; the session-closer sets `session_closed:` at close and reconciles any of the session's writes stamped with the start date that actually landed later. The session identifier keeps the start date - identity never changes mid-session; the span lives in these fields. On every ordinary document, `updated:` means the date of the actual write, never the session-start date. (Adopted 2026-09 from four-project field evidence; see Date Stamping and Time Sense below.)
+
 ### Infrastructure File Frontmatter
 
 All 0.x infrastructure files (0.0 Project Guidelines, 0.1 MOC, 0.2 Session Log, 0.3 Decision Log, etc.) MUST include in frontmatter:
@@ -112,8 +126,9 @@ The following fields MUST be present in frontmatter when any new file is created
 | `type` | Content type from taxonomy | Discoverability via Dataview/Bases |
 | `created` | YYYY-MM-DD | When the file was born |
 | `updated` | YYYY-MM-DD (same as created) | Last modification date |
-| `operator` | First name (e.g. Andrew) | Who created it |
-| `edit_log` | Initial entry (e.g. "DW-S161 2026-06-09") | Provenance trail |
+| `operator` | First name (e.g. Operator-A) | Who created it |
+| `origin` | Creation entry (e.g. 'DW-S161 2026-06-09'), immutable | Creation provenance |
+| `edit_log` | Seeded with the same entry as `origin`; thereafter a rolling last-5 window (D127) | Recent-touch window |
 
 **Required on section files additionally:**
 
@@ -135,30 +150,54 @@ Session close (session-closer Step 3.8) verifies these fields rather than applyi
 
 ### Team Coordination Fields
 
-*Phase 0 of the Team Attention System. These fields power the shared team dashboard and the session-close team flag workflow. Full design: [[Team Attention System - Cross-Pollination and Unread Content Surfacing]].*
+*These fields power multi-operator coordination: the shared team dashboard, the session-close flag workflow, and the orientation-time flag sweep. The canonical cluster is `flag*` (below). The older `team_attention*` names are deprecated -- see the mapping at the end of this section.*
 
-**`operator`**: The human team member whose session created or substantially updated this file. Set at creation time as part of the birth metadata contract (see above). Use first name only (e.g. `Andrew`, `Kaliya`, `Jay`). Apply to:
+**`operator`**: The human team member whose session created or substantially updated this file. Set at creation time as part of the birth metadata contract (see above). Use first name only (e.g. `Operator-A`, `Operator-B`, `Operator-C`). Apply to:
 - Session log section files (always)
 - Content documents created or substantially updated during a session
 
 This field was not applied to files before the birth metadata contract. Existing files gain it when next touched; no bulk backfill needed.
 
-**`team_attention`**: ISO date (YYYY-MM-DD) the file was flagged for team review. Set during session close via the team flag prompt. When present, the file appears in the dashboard's "Flagged for Team Attention" section. Always set `team_attention_by` and `team_attention_note` at the same time.
+**The `flag*` cluster.** A flag is a request for a specific operator's attention on a specific file, surfaced to them at orientation (the flag sweep) and on the team dashboard. The cluster is the delivery interface: queries read it, session close writes it.
 
-**`team_attention_by`**: Who flagged the file. Use the operator's first name for human-confirmed flags (e.g. `Kaliya`). Use `Name (auto)` for auto-flags generated on ungraceful session close (e.g. `Kaliya (auto)`). This distinction lets the dashboard display auto-flags differently and helps reviewers calibrate how much urgency to assign.
+**`flag`**: ISO date (YYYY-MM-DD) the file was flagged. When present, the file is a live flag. Set `flag_by`, `flag_note`, and `flag_for` at the same time.
 
-**`team_attention_note`**: Required when `team_attention` is set. One-line context string explaining why the file needs team attention. Brief enough to read at a glance in the dashboard. E.g. `Key funder intelligence for Katapult pitch`.
+**`flag_by`**: Who flagged the file. First name for human-confirmed flags (e.g. `Operator-A`). Use `Name (auto)` for auto-flags generated on ungraceful session close (e.g. `Operator-A (auto)`) -- this lets the dashboard render auto-flags differently and helps reviewers calibrate urgency.
+
+**`flag_for`**: The operators the flag is addressed to, as a YAML list of first names (e.g. `[Operator-A, Operator-B]`). This is the routing field the orientation sweep matches against. When an operator acts on their item, remove their name (union-merge discipline). A conscious defer KEEPS the name -- the item re-surfaces due-first next session (marked `flag_status: deferred`) rather than vanishing, so a deferral is never mistaken for a handled item. Clear the whole cluster when the list empties. A single name may be written inline (`flag_for: Operator-A`) or as a one-item list.
+
+**`flag_note`**: Required when `flag` is set. The context string, and it must **state the decision needed and what is blocked until it is made**. "Please review the tiers" fails; "Approve or amend the priority tiers -- outreach proceeds in the current order by default on silence" passes. Keep it to one line at a glance on the dashboard. If the note runs long or contains characters that stress YAML (colons, quotes, brackets), fold it -- use a block scalar (`flag_note: >-`) or a single-quoted string -- because an over-long or unescaped quoted note has broken frontmatter parsing in practice, after which a parser returns empty frontmatter silently and the flag reads as absent. A flag whose note breaks parsing is an undelivered flag.
+
+**`flag_due`** (optional): ISO date by which a response is needed. The sweep orders due-first and surfaces overdue items with their default in effect.
+
+**`flag_default`** (optional): What happens on silence after `flag_due` -- the text that turns an unanswered flag into a decision rather than an indefinite block (e.g. `outreach proceeds in the listed order`). Pairs with `flag_due`.
+
+**`flag_status`** (optional): Lifecycle marker. `deferred` = the operator saw it and consciously deferred; the name stays on `flag_for` and the item re-surfaces due-first next session. `expired-unread` = past `flag_due` with no response; the expiry pass sets this and clears the names, recording that the default is now in effect.
 
 ```yaml
-operator: Kaliya
-team_attention: 2026-05-27
-team_attention_by: Kaliya
-team_attention_note: Key funder intelligence for Katapult pitch
+operator: Operator-A
+flag: 2026-05-27
+flag_by: Operator-A
+flag_for: [Operator-B, Operator-C]
+flag_note: "Approve or amend the funder shortlist -- outreach proceeds in listed order on silence"
+flag_due: 2026-06-03
+flag_default: outreach proceeds in the listed order
 ```
 
-**`team_attention` vs `priority: high`.** These are orthogonal signals. `priority` measures a document's long-term importance to the project. `team_attention` means "other operators need to see this now." A high-priority doc may already be well-known (no flag needed). A medium-priority doc may contain a surprise finding that changes someone else's working assumptions (flag warranted). Use both when appropriate -- they answer different questions.
+**`flag` vs `priority: high`.** Orthogonal signals. `priority` measures a document's long-term importance to the project. `flag` means "these operators need to see this now." A high-priority doc may already be well-known (no flag needed); a medium-priority doc may carry a surprise finding that changes someone else's working assumptions (flag warranted). Use both when appropriate -- they answer different questions.
 
-**Auto-flagging on ungraceful close.** If a session ends without the team flag prompt, the instance should auto-flag any files created that session with `priority: high`, using `Name (auto)` in `team_attention_by`. The human can review and remove auto-flags in a subsequent session.
+**Auto-flagging on ungraceful close.** If a session ends without the flag prompt, the instance auto-flags any files it created that session with `priority: high`, using `Name (auto)` in `flag_by`. The human reviews and removes auto-flags in a later session.
+
+**`flagged_for` is not canonical.** Some vaults use a `flagged_for` field as a wikilink pointer to a separate flags document -- that is unrelated to operator attention and must not be read as an attention flag. Use `flag_for` for attention routing.
+
+**Deprecated: `team_attention*`.** Phase 0 shipped `team_attention` / `team_attention_by` / `team_attention_note`. These are superseded by the `flag*` cluster; no live consumer reads them. Migrate on next touch:
+
+| Deprecated | Canonical |
+|---|---|
+| `team_attention` | `flag` |
+| `team_attention_by` | `flag_by` |
+| `team_attention_note` | `flag_note` |
+| *(none)* | `flag_for` (new -- the routing field the sweep requires) |
 
 ### Harvest Tracking
 
@@ -251,7 +290,7 @@ If the text of a note was written by an AI agent, tag it as `ai-generated`. This
 ```yaml
 tags:
   - ai-generated
-generating_agent: Andrew / Claude
+generating_agent: Operator-A / Claude
 ```
 
 `ai-generated` is a **tag**, not a content type - the note's `type:` should reflect what the content actually *is* (resource, document, companion, etc.), not who made it. This replaces the retired `AI-written` content type (D42).
@@ -266,28 +305,43 @@ generating_agent: Andrew / Claude
 - Raw transcripts - these are recordings of human speech, not AI-generated text
 - Web clippings - the original author is human, AI just captured the content
 
-**The `generating_agent` field is optional but recommended.** Use the format `Operator / Agent` (e.g. `Jay Cousins / Gemini`, `Andrew / Claude`). If the agent is unknown (e.g. an imported doc where you know AI wrote it but not which model), just use the `ai-generated` tag without `generating_agent`.
+**The `generating_agent` field is optional but recommended.** Use the format `Operator / Agent` (e.g. `Operator-B / Gemini`, `Operator-A / Claude`). If the agent is unknown (e.g. an imported doc where you know AI wrote it but not which model), just use the `ai-generated` tag without `generating_agent`.
 
 ### Date Format
 
 All frontmatter dates use plain `YYYY-MM-DD`. Do not use ISO datetime strings (`2026-05-22T00:00:00.000Z`) - plain dates are sufficient for DW's day-level tracking and parse consistently in Dataview.
 
-### The edit_log Field
+### Date Stamping and Time Sense
 
-A cumulative YAML list tracking every session that modified a file. The last entry is the last editor; the full list is the provenance trail.
+**Never stamp a date from memory or context - check the clock first.** Run `date` in the shell before a writing burst (in a sandboxed surface, the device shell: the environment header's date is set at thread start and has been observed both a day behind and a day ahead of the real clock). Prior stamps in the same session are not evidence of today's date; neither are sibling files' stamps - instances anchor on context (the previous session's dates, their own earlier writes, sibling stubs) and drift when a thread crosses midnight or resumes days later. One check per writing burst is enough; a session resuming after a break re-checks before its next write. For any close-time reconciliation, file mtimes - not beliefs or headers - are the evidence base. A single clock read is not proof either: a sandboxed VM's clock can be a day stale right after the machine wakes (it resyncs within minutes). When the date matters, cross-check a second source - a host clock or the mtime of a freshly generated artifact (e.g. the newest nightly report) - and re-read after a beat if they disagree. Field record: independently re-derived in five sessions across four projects (2026-07 to 2026-09), including an instance that mis-stamped its own claim stub from sibling-stub anchoring while triaging this very rule's feature request.
+
+### The origin and edit_log Fields
+
+**`origin`** is the immutable creation entry: which session (or person) created the file, in the same format as an edit_log entry. Written at birth, never modified thereafter.
+
+```yaml
+origin: 'DW-S161 2026-06-09 - created during the birth-metadata build'
+```
+
+**`edit_log`** is a rolling window of the last 5 sessions that modified the file, oldest first (append at the tail). It is a recency hint, not the history. The full per-file provenance trail's canonical home is the session log: every session entry's "Files created" / "Files updated" manifest (session-closer Output Format, Step 3.8), required at every close tier - plus git history where the vault is a repo. (D127; supersedes the earlier cumulative append-only contract.)
 
 ```yaml
 edit_log:
-  - "DW-S70 2026-05-23"
-  - "Andrew 2026-05-24"
-  - "WV-S45 2026-05-25"
+  - 'DW-S70 2026-05-23'
+  - 'Operator-A 2026-05-24'
+  - 'WV-S45 2026-05-25 - repaired YAML break'
 ```
 
-- One entry per session (deduplicated). Append-only.
-- Agent edits: `"ProjectAbbrev-SNN YYYY-MM-DD"`. Human edits: `"Name YYYY-MM-DD"`.
+- **Always single-quote entries.** Unquoted colons and wrapped long lines have twice broken whole-file frontmatter parsing; quoting kills the failure class regardless of length.
+- One entry per session (deduplicated), stamped once per file at session close - not on every touch.
+- Entries are one compact line: session ID + date (agent edits `'ProjectAbbrev-SNN YYYY-MM-DD'`, human edits `'Name YYYY-MM-DD'`), plus an optional short clause of a few words. Narrative belongs in the session log entry, not here.
+- When appending would exceed 5 entries, drop the oldest **in the same write**. Nothing is copied anywhere at trim time: the trimmed history is already recorded in the session log manifests.
 - **Section files:** required. **Infrastructure files (0.x) and standalone docs:** recommended. **Shell files:** none - shells are assembly surfaces; their `updated` field bumps when sections change, but they do not accumulate a log.
-- Updated at session close via the session-closer (Step 3.9).
+- Preferred writer: `stamp_editlog.py` (quote-on-write, append-and-trim, `--manifest` batch mode). Hand edits are legal under the same contract: pass the full windowed list back in a single write (never a bare append via `update_frontmatter` merge - see the MCP Reliability guide's array-wipe warning).
+- SKILL.md files that used edit_log as a version changelog keep that history in a body `## Changelog` section instead; their frontmatter edit_log rolls like everywhere else.
+- Updated at session close via the session-closer (Step 3.8).
+- Migration note: trimming begins only after a project's one-time cleanup pass has archived its pre-D127 history; until then, append-only continues.
 
-Design rationale: `Workshop/Design/YAML Metadata Protocol Decisions.md`.
+Design rationale: D127 (rolling window + origin - link-don't-restate applied to provenance). Earlier: `Workshop/Design/YAML Metadata Protocol Decisions.md`.
 
 *Extracted from the DataWizard Universal Protocol (section 4.0) in the S182 demolition (D94). Structural and formatting conventions live in the [[Conventions Registry]].*

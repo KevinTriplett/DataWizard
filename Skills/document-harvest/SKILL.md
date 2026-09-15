@@ -7,8 +7,8 @@ description: >-
   pending, or hand-highlighted documents. NOT for transcripts - use
   transcript-harvest instead.
 type: skill
-updated: '2026-08-08'
-version: '0.5'
+updated: '2026-09-08'
+version: '0.5.1'
 edit_log:
   - "MMM meta-learning plant 2026-06-09: added Step 3 (triage before fetching),
     renumbered"
@@ -18,6 +18,8 @@ edit_log:
   - "DW-S232 2026-08-04: added companion-vs-harvest default-granularity pointer
     (D112)"
   - "DW-S262 2026-08-08: added Harvest via embeddable synth note pointer (D116)"
+  - "DW-S349 2026-09-08 - v0.5.1: Reader-Facing Output rule added (load the
+    Reader-Facing Prose Style guide when the destination is read-aloud-class)"
 ---
 
 # Document Harvest Skill
@@ -99,6 +101,10 @@ The mapping doc answers "so what?" for the project. The overview and catalog are
 **Naming convention:** Use a shared prefix so the three docs cluster together (e.g., `ToGather - Overview.md`, `ToGather - Resource Catalog.md`, `ToGather - ReWoven Mapping.md`).
 
 This pattern emerged from RW S11 (documenting the ToGather platform) and was filed as a DW feature request. (S142)
+
+## Reader-Facing Output
+
+If the harvest destination is a document a person will read start to finish - a research resource, a brief, a report, an onboarding doc - load `Seed/Guides/Reader-Facing Prose Style.md` before drafting prose there and run its verification pass before shipping. Routing YAML, tracking rows, and triage verdicts are exempt.
 
 ## See Also
 

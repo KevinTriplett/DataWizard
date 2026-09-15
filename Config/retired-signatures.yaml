@@ -1,0 +1,29 @@
+# retired-signatures.yaml - retired-convention signature phrases for dw_lint C15.
+#
+# A body-text hit (frontmatter excluded) of a pattern below is a C15 finding,
+# unless the file's path matches lint_config.yaml `historical_paths`. Retired
+# frontmatter KEYS are handled separately by the C15 `retired_fields` config,
+# not here.
+#
+# Flip ceremony: when a decision retires a convention form (Protocol updated:
+# Yes), add its signature phrase here so C15 catches regressions. The
+# Conventions Registry (Seed/Protocols/Conventions Registry.md) links here;
+# this header points back.
+#
+# An optional instance overlay (lint_config.yaml `signatures_overlay`, e.g.
+# a Workshop retired_signatures_local.yaml) may ADD instance-specific
+# signatures; it may not remove any listed here.
+signatures:
+  - pattern: "session-closer's thresholds table"
+    note: "Cadence numbers moved to the Review Automation guide; table removed v4.3.0"
+    decision: D114
+  - pattern: "START HERE"
+    note: "START HERE files retired; use Vault Config + 0.0 (migrated from C7)"
+    decision: D62
+  - pattern: "team_attention"
+    note: "Deprecated for the flag* cluster (Seed 1.3.0 / YAML Schema S4)"
+  - pattern: "! Action Items"
+    note: "Bang-prefix action-items filename retired at PI v4.0 (migrated from C7)"
+  - pattern: "datawizard_protocol_version"
+    note: "Protocol-version pin retired (drop on touch); body mentions only - the frontmatter key leftover is a C15 retired_fields info finding"
+    decision: D93

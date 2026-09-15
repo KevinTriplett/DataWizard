@@ -4,7 +4,11 @@ name: Check for conflict markers
 # tracked file contains unresolved merge-conflict markers outside a fenced
 # code block. Pairs with check-filenames.yml (Windows-unsafe filename check).
 #
-# NOTE: the awk grammar below is kept byte-identical to the pre-commit hook
+# A bare '=======' is ALSO a valid markdown setext heading underline, so it is
+# only treated as a conflict marker when the same file also contains '<<<<<<<'.
+# A real conflict always has the opening marker; a setext heading never does.
+#
+# NOTE: the awk grammar below is kept in sync with the pre-commit hook
 # (Seed/Scripts/hooks/pre-commit) -- one grammar, two surfaces. Edit both together.
 
 on:
@@ -31,11 +35,10 @@ jobs:
               { sub(/\r$/, ""); s = $0; sub(/^ ? ? ?/, "", s) }
               s ~ /^```/ || s ~ /^~~~/ { infence = !infence; next }
               infence { next }
-              s ~ /^<<<<<<</ || s ~ /^=======$/ || s ~ /^>>>>>>>/ || s ~ /^\|\|\|\|\|\|\|/ {
-                print "::error file=" fname ",line=" FNR "::Unresolved conflict marker: " $0
-                hit = 1
-              }
-              END { exit (hit ? 1 : 0) }' "$path"; then
+              s ~ /^<<<<<<</ { print "::error file=" fname ",line=" FNR "::Unresolved conflict marker: " $0; hit = 1; sawopen = 1; next }
+              s ~ /^>>>>>>>/ || s ~ /^\|\|\|\|\|\|\|/ { print "::error file=" fname ",line=" FNR "::Unresolved conflict marker: " $0; hit = 1; next }
+              s ~ /^=======$/ { eq[++neq] = "::error file=" fname ",line=" FNR "::Unresolved conflict marker: " $0 }
+              END { if (sawopen && neq) { for (i = 1; i <= neq; i++) print eq[i]; hit = 1 } exit (hit ? 1 : 0) }' "$path"; then
               fail=1
             fi
           done < <(git -c core.quotePath=false ls-files -z)

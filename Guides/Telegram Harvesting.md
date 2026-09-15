@@ -2,7 +2,7 @@
 title: Telegram Harvesting
 type: guide
 created: '2026-05-31'
-updated: '2026-06-10'
+updated: '2026-08-24'
 status: active
 tags:
   - protocol
@@ -11,6 +11,8 @@ tags:
   - telegram
 edit_log:
   - DW-S163 2026-06-10
+  - "DW-S284 2026-08-24 - Tips: why the API over Export Chat History / Telegram
+    Web copy-paste (S128 learning, meta-learning review)"
 ---
 
 # Telegram Harvesting
@@ -142,3 +144,5 @@ The full `_messages.json` dump is useful when you need the complete conversation
 - **Multiple groups.** Run the script once per group. Output files are named by group, so they don't collide.
 - **Session persistence.** The `.session` file caches your auth. If you move the script, move the session file too (or re-authenticate).
 - **Rate limits.** Telegram has API rate limits. For very large groups (10K+ messages), the script may slow down. This is normal.
+- **Why the API and not "Export Chat History"?** Telegram Desktop does not offer the export option for every group type, so it cannot be relied on as a harvesting path. The API route works for any group or channel you belong to, is repeatable, and is scriptable. (DataWizard, 2026-05)
+- **Why not copy-paste from Telegram Web?** The web client virtualizes the message DOM and limits the clipboard on large selections, so copy-paste only captures the handful of messages currently visible. Anything beyond that needs the script. (DataWizard, 2026-05)
