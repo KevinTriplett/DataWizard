@@ -1,7 +1,8 @@
 #Requires -Version 5.1
 <#
   update_seed.ps1 - Download or update the DataWizard Seed from GitHub.
-  Windows twin of update_seed.sh. Lives in _DataWizard\Seed\ and works from anywhere.
+  Windows twin of update_seed.sh. Lives at the Seed root and works from anywhere.
+  Zip install: _DataWizard\Seed\. Git clone: _DataWizard\ (repo root IS the Seed).
 
   Usage:
     powershell -ExecutionPolicy Bypass -File update_seed.ps1 [-Vault C:\path\to\vault]
@@ -17,7 +18,7 @@
   machine is next available - the computer does NOT need to be awake at the
   scheduled time to stay in sync. No admin rights required.
 
-  Note: if your Seed is a git clone (Seed\.git exists), sync it with git
+  Note: if your Seed is a git clone (.git at the Seed root), sync it with git
   instead of this script - the zip copy would leave the working tree dirty.
 
   Exit codes: 0 = updated/ok, 1 = error, 2 = already current, 3 = skipped (guard)
@@ -38,16 +39,28 @@ $TmpDir  = Join-Path $env:TEMP "dw-seed-update"
 $TmpZip  = Join-Path $env:TEMP "dw-seed.zip"
 $TaskName = "DataWizard Seed Update"
 
-# --- Determine vault root ---
-$VaultRoot = $Vault
-if ([string]::IsNullOrWhiteSpace($VaultRoot)) {
-    # Script lives at _DataWizard\Seed\update_seed.ps1 ; vault root is two levels up.
-    $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-    $VaultRoot = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+# --- Determine Seed directory ---
+# The script always sits at the Seed root. Zip install: _DataWizard\Seed\.
+# Git clone: _DataWizard\ (the repo root IS the Seed payload; no Seed\ level).
+if (-not [string]::IsNullOrWhiteSpace($Vault)) {
+    if (Test-Path (Join-Path $Vault "_DataWizard\Seed")) {
+        $SeedDir = Join-Path $Vault "_DataWizard\Seed"
+    } else {
+        $SeedDir = Join-Path $Vault "_DataWizard"
+    }
+} else {
+    $SeedDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
 
-$SeedDir = Join-Path $VaultRoot "_DataWizard\Seed"
-$SyncLog = Join-Path $VaultRoot "_DataWizard\Seed Sync Log.md"
+# The _DataWizard folder: parent of Seed\ in a zip install, the Seed dir itself in a clone
+if ((Split-Path $SeedDir -Leaf) -eq "Seed") {
+    $DwDir = Split-Path $SeedDir -Parent
+} else {
+    $DwDir = $SeedDir
+}
+
+$VaultRoot = Split-Path $DwDir -Parent
+$SyncLog = Join-Path $DwDir "Seed Sync Log.md"
 $VaultConfig = Join-Path $SeedDir "Vault Config.md"
 $ScriptPath = Join-Path $SeedDir "update_seed.ps1"
 
