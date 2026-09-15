@@ -1,6 +1,7 @@
 #!/bin/bash
 # update_seed.sh - Download or update the DataWizard Seed from GitHub
-# Lives in _DataWizard/Seed/ (project root) and works from anywhere.
+# Lives at the Seed root and works from anywhere. Zip install: _DataWizard/Seed/.
+# Git clone: _DataWizard/ (the repo root IS the Seed payload; no Seed/ level).
 #
 # Usage:
 #   bash update_seed.sh [--vault /path/to/vault]
@@ -16,7 +17,7 @@
 # machine that was powered off at the scheduled hour. The machine does NOT
 # need to be awake at the scheduled time to stay in sync.
 #
-# If the Seed is a git clone (Seed/.git exists), sync uses git fetch +
+# If the Seed is a git clone (.git at the Seed root), sync uses git fetch +
 # fast-forward merge instead of the zip download, and refuses to touch a
 # working tree with local changes or local commits. Git mode verifies that
 # origin points at the canonical repo; a clone whose origin is a fork is
@@ -368,13 +369,13 @@ if [ -d "$SEED_DIR/.git" ]; then
         echo "Seed self-healed and up to date at $SEED_DIR"
         exit 0
       fi
-      log_entry "ERROR: detected a zip-over-git collision but the reset failed. Follow the recovery procedure in Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
+      log_entry "ERROR: detected a zip-over-git collision but the reset failed. Follow the recovery procedure in $SEED_DIR/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
       exit 1
     fi
     if [ "$ORIGIN_IS_CANONICAL" = true ]; then
-      log_entry "SKIPPED: Seed git working tree has local edits to tracked files. Commit, stash, or discard them, then sync again. If this is a stuck clone (files show as modified but are identical to the remote), follow the recovery procedure in Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic) - do not reset by hand."
+      log_entry "SKIPPED: Seed git working tree has local edits to tracked files. Commit, stash, or discard them, then sync again. If this is a stuck clone (files show as modified but are identical to the remote), follow the recovery procedure in $SEED_DIR/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic) - do not reset by hand."
     else
-      log_entry "SKIPPED: Seed git working tree has local edits to tracked files, and this clone's origin is not the canonical Seed repo. Do NOT run 'git reset --hard origin/main' here - on a fork-shaped clone it can roll the Seed back to a stale state. Follow Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
+      log_entry "SKIPPED: Seed git working tree has local edits to tracked files, and this clone's origin is not the canonical Seed repo. Do NOT run 'git reset --hard origin/main' here - on a fork-shaped clone it can roll the Seed back to a stale state. Follow $SEED_DIR/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
     fi
     exit 3
   fi
@@ -404,7 +405,7 @@ if [ -d "$SEED_DIR/.git" ]; then
   fi
 
   if ! git -C "$SEED_DIR" merge --ff-only origin/main --quiet; then
-    log_entry "ERROR: git fast-forward merge failed (divergent history?). Do not merge and do not reset by hand - follow Seed/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
+    log_entry "ERROR: git fast-forward merge failed (divergent history?). Do not merge and do not reset by hand - follow $SEED_DIR/Guides/Git Guide/7.0 Safety and Recovery.md (Recovering a Seed Clone, Remote-Agnostic)."
     exit 1
   fi
 
