@@ -72,6 +72,9 @@ edit_log:
   - "RL-S10 2026-09-19 - Bridge Drops: cloud-session lazy-loading variant
     (server reconnect drops loaded tool schemas; re-run tool_search, batch the
     reload)"
+  - "RL-S12 2026-09-19 - Bridge Drops: mid-write drop is a clean failure
+    (explicit not-connected error, nothing written); confirm-unwritten then
+    single retry"
 ---
 # MCP Reliability and Write Verification
 
@@ -125,7 +128,7 @@ Rules:
 
 Distinct from a 502 on a single write, the remote bridge itself can fail in two ways, both of which take out *all* MCP calls rather than corrupting one: a **tool-registry drop** (calls return "not found" immediately, no hang) and a **multi-minute hang** on a call. Both recover by quitting Claude Desktop from the tray and relaunching. A mid-session registry drop can also recover via `RefreshMcpTools` once the desktop app reconnects, without a full relaunch. Observed ~3x in one session with no partial writes -- verify-after-write held throughout, so a dropped or hung call is an availability problem, not silent corruption. (Source: Weave, 2026-08)
 
-In a remote (cloud) Cowork session the same event has a **lazy-loading variant**: an MCP server disconnect/reconnect drops the session's already-loaded tool schemas, so a previously working tool returns "No such tool available" even after the server reports connected again. No relaunch needed -- re-run the tool_search load for the tools you need and continue. Treat the first such error after a reconnect notice as a reload signal, not a missing capability, and re-load the full set you'll need in one call rather than one at a time. (Source: Rootland, 2026-09)
+In a remote (cloud) Cowork session the same event has a **lazy-loading variant**: an MCP server disconnect/reconnect drops the session's already-loaded tool schemas, so a previously working tool returns "No such tool available" even after the server reports connected again. No relaunch needed -- re-run the tool_search load for the tools you need and continue. Treat the first such error after a reconnect notice as a reload signal, not a missing capability, and re-load the full set you'll need in one call rather than one at a time. (Source: Rootland, 2026-09) A write call that fails DURING the drop with an explicit "device ... is not connected to the bridge" error is a clean failure, unlike the 502 case: in the observed instances nothing was written. Still confirm-unwritten before retrying (Working Rule 5 / the 502 discipline) - after reconnect and reload, a single retry landed each patch with matchCount 1 and no duplicates. (Source: Rootland, 2026-09)
 
 ## Version Pinning and npx Caching
 
