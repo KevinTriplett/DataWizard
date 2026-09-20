@@ -51,6 +51,10 @@ Alternatively, set `TG_API_ID` and `TG_API_HASH` as environment variables.
 - Do not commit `.env` or `.session` files to git. The Seed's `.gitignore` excludes `Scripts/.env`, `Scripts/*.session`, and `Scripts/output/` (added DW-S163).
 - Keep any note recording these credentials OUT of git-tracked vault folders. Use a gitignored private folder (e.g. a vault-root `_Private/`) or a password manager.
 
+## Cowork note - run from a local folder, not the vault mount
+
+Under Cowork's device shell, running the harvester from the mounted vault fails with `sqlite3.OperationalError: disk I/O error` - Telethon's `.session` file is SQLite, and SQLite locking does not work on the mount. Copy `tg_harvester.py`, `.env`, and the `.session` file to a folder under `$HOME` (outside `mnt/`), run there, then copy the `output/` files back into the vault. `pip3 install --user telethon` works in the device shell when egress allows PyPI. (Community Stack, 2026-09)
+
 ## First Run - Authentication
 
 The first time you run the script, Telethon will prompt for:
