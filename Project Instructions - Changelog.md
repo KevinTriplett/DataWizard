@@ -3,7 +3,7 @@ title: Project Instructions - Changelog
 type: project-doc
 status: active
 created: '2026-06-18'
-updated: '2026-06-23'
+updated: '2026-09-22'
 operator: Andrew
 tags:
   - protocol
@@ -11,6 +11,7 @@ tags:
 edit_log:
   - DW-S189 2026-06-18
   - DW-S198 2026-06-23
+  - RG-S12 2026-09-22 - v4.7 entry + v4.6 backfill + tracker to v4.7
 ---
 # Project Instructions - Changelog
 
