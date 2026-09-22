@@ -12,6 +12,7 @@ edit_log:
   - DW-S189 2026-06-18
   - DW-S198 2026-06-23
   - RG-S12 2026-09-22 - v4.7 entry + v4.6 backfill + tracker to v4.7
+  - DW-S366 2026-09-22 - v4.7 repair note + Seed tracker row corrected
 ---
 # Project Instructions - Changelog
 
@@ -22,13 +23,15 @@ Version history for the DataWizard Project Instructions (`DataWizard Project Ins
 | What | Version | Last changed |
 |---|---|---|
 | Project Instructions | v4.7 | 2026-09-22 |
-| Seed | v1.1.1 | 2026-06-10 |
+| Seed | v1.6.2 | 2026-09-05 |
 
 ---
 
 ## What Changed in v4.7
 
 **New `## Scope - which folder governs` section.** The PI now states which connected folder it governs - a gap surfaced by LV-S38 (Alex's Cowork session). The instructions assume the DW Seed at `_DataWizard/Seed/`, but corpus work often happens in a connected repo (lunation-80) that has no Seed and carries its own `AGENTS.md`, so an instance could not tell which contract bound the session - it could not run the DW session-closer, which is absent there. The new section sets the rule: DataWizard governs the DW vault; a connected repo carrying its own `AGENTS.md` (e.g. `lunation-80/`) is outside DataWizard - its AGENTS.md is the binding contract for work there, including its own session-close; when both are connected, route by where the work happens; do not vendor the Seed into an AGENTS.md-governed repo. Decision by Andrew (architect) in Regenerativa session RG-S12, answering `lunation-80/Session Exchange/DataWizard in lunation-80 - LV-S38 Question 01.md`. No orientation-step or rule renumbering. Re-paste required.
+
+*Repair (DW-S366, 2026-09-22, same day):* the shipped PI text named `lunation-80` and LV-S38 directly - vault-specific content in the portable Seed, against the Seed genericity rule. The in-PI example and provenance were depersonalized; the specifics stay in this entry only. The rule itself is unchanged, so the version stays v4.7. Also fixed here: the tracker's Seed row was stale (v1.1.1/2026-06-10; actual v1.6.2/2026-09-05). Process note: this v4.7 was written to DW canon by a Regenerativa instance without a claimed DW session - substance accepted after DW review (S366); the cross-project canon-write safeguard is tracked in DW.
 
 ---
 

@@ -19,9 +19,11 @@ edit_log:
     reconciliation + intake what's-new) inserted as Step 6; Steps 6-8 renumbered
     to 7-9; Step 3 internal ref updated; see [[Orientation Flag Sweep - Query
     Spec]]"
+  - "DW-S366 2026-09-22: v4.7 repair - Scope example depersonalized per the
+    Seed genericity rule; no rule change. Specifics live in the Changelog."
   - "RG-S12 2026-09-22: v4.7 - added '## Scope - which folder governs'
     (folder-routing rule: a connected repo with its own AGENTS.md is outside DW,
-    incl. its own session-close); resolves LV-S38 Q01"
+    incl. its own session-close); resolves a connected-repo scope question (details: Changelog)"
 ---
 
 
@@ -40,7 +42,7 @@ This is the DataWizard behavioral contract, consumed two ways: pasted into Cowor
 
 ## Scope - which folder governs
 
-These instructions govern the DataWizard vault: the project home folder and the meta-folders, skills, and Seed under it. A connected repo that carries its own `AGENTS.md` (for example `lunation-80/`) is NOT governed by DataWizard - its AGENTS.md is the binding contract for work done there, including its own session-close. When both a DW vault and such a repo are connected, route by where the work happens: DW skills and the session-closer apply to DW-vault work; the repo's AGENTS.md applies to repo work. Do not vendor the Seed into an AGENTS.md-governed repo.
+These instructions govern the DataWizard vault: the project home folder and the meta-folders, skills, and Seed under it. A connected repo that carries its own `AGENTS.md` is NOT governed by DataWizard - its AGENTS.md is the binding contract for work done there, including its own session-close. When both a DW vault and such a repo are connected, route by where the work happens: DW skills and the session-closer apply to DW-vault work; the repo's AGENTS.md applies to repo work. Do not vendor the Seed into an AGENTS.md-governed repo.
 
 ## Tools
 
