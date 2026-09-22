@@ -3,7 +3,7 @@ title: DataWizard Project Instructions
 type: project-doc
 status: active
 created: '2026-03-12'
-updated: '2026-08-18'
+updated: '2026-09-22'
 tags:
   - protocol
   - AI-collaboration
@@ -19,21 +19,28 @@ edit_log:
     reconciliation + intake what's-new) inserted as Step 6; Steps 6-8 renumbered
     to 7-9; Step 3 internal ref updated; see [[Orientation Flag Sweep - Query
     Spec]]"
+  - "RG-S12 2026-09-22: v4.7 - added '## Scope - which folder governs'
+    (folder-routing rule: a connected repo with its own AGENTS.md is outside DW,
+    incl. its own session-close); resolves LV-S38 Q01"
 ---
 
 
 
 
 `Project home folder: 
-# DataWizard Project Instructions v 4.6
+# DataWizard Project Instructions v 4.7
 
 (Project home folder is the obsidian vault folder where this project's 0.0 / 0.2 / 0.5 files live, e.g. `_DataWizard/`. Cowork: fill this in after pasting the file into Settings - Project Instructions. Claude Code / Sidecar: instead declare it in your vault-root `CLAUDE.md` above the `@import`.)
 
 ---
 
-**Version:** v4.6 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
+**Version:** v4.7 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
 
 This is the DataWizard behavioral contract, consumed two ways: pasted into Cowork's Settings - Project Instructions, or `@import`ed from a vault-root `CLAUDE.md` (Claude Code / Sidecar). Heed the tool appendix for your surface (`## Cowork tools` or `## Claude Code tools`) and ignore the other. The Seed itself always lives at `_DataWizard/Seed/`.
+
+## Scope - which folder governs
+
+These instructions govern the DataWizard vault: the project home folder and the meta-folders, skills, and Seed under it. A connected repo that carries its own `AGENTS.md` (for example `lunation-80/`) is NOT governed by DataWizard - its AGENTS.md is the binding contract for work done there, including its own session-close. When both a DW vault and such a repo are connected, route by where the work happens: DW skills and the session-closer apply to DW-vault work; the repo's AGENTS.md applies to repo work. Do not vendor the Seed into an AGENTS.md-governed repo.
 
 ## Tools
 
@@ -81,7 +88,7 @@ Skills live in `_DataWizard/Seed/Skills/` (portable Seed skills) and in the proj
    a. Flag sweep [multi-operator projects only; solo projects report `n/a (solo)`]. Find files in THIS project whose `flag_for` contains the current operator; surface the top ~5 due-first (count the rest) with title, `flag_note`, `flag_by`, `flag`, and `flag_due`, noting `flag_default` on overdue items. The sweep is read-only -- it does not write `flag_status`; act (name removed) and defer (name kept, `flag_status: deferred`) are explicit operator responses, and the closer's expiry pass is the only automatic writer of `expired-unread`.
    b. Stale-stub reconciliation [all projects]. Among the stubs listed at claim time, detect `in-progress` stubs owned by the CURRENT operator older than the stale threshold and not claimed today; offer to mark each abandoned with a one-line reason. Offer only, never auto-author, never touch another operator's stub. (Backfill-and-close arrives with the git-reconstruction helper in a later build.)
    c. Intake what's-new [optional]. List the project's intake folders (Feature Requests, Bug Reports, Skill Requests, Intake Queue) for items newer than the last session-log entry; surface new ones.
-   Trace format (always, with the running PI version): `flag sweep [PI v4.6]: N surfaced, M handled, K deferred | stubs: P stale, Q reconciled | intake: R new`; gated-off checks report their gate. A missing trace line is a broken sweep, distinguishable from 'nothing was waiting.'
+   Trace format (always, with the running PI version): `flag sweep [PI v4.7]: N surfaced, M handled, K deferred | stubs: P stale, Q reconciled | intake: R new`; gated-off checks report their gate. A missing trace line is a broken sweep, distinguishable from 'nothing was waiting.'
 7. State the project abbreviation and session identifier, then present orientation -- including anything the sweep surfaced -- and confirm the session's direction with the user. Solo-operator identifier: "DW S116". Multi-operator: use the composite format from the session-closer skill's Session Identifier Format section (e.g. "WV_2026-06-10_AA_01").
 8. Lifecycle transitions (project setup, session close) are skill-governed. Read the skill before executing.
 9. Ready to work. Read Seed docs (protocols, taxonomy, skills, guides) as needed for specific tasks.

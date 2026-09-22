@@ -20,8 +20,20 @@ Version history for the DataWizard Project Instructions (`DataWizard Project Ins
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v4.5 | 2026-06-23 |
+| Project Instructions | v4.7 | 2026-09-22 |
 | Seed | v1.1.1 | 2026-06-10 |
+
+---
+
+## What Changed in v4.7
+
+**New `## Scope - which folder governs` section.** The PI now states which connected folder it governs - a gap surfaced by LV-S38 (Alex's Cowork session). The instructions assume the DW Seed at `_DataWizard/Seed/`, but corpus work often happens in a connected repo (lunation-80) that has no Seed and carries its own `AGENTS.md`, so an instance could not tell which contract bound the session - it could not run the DW session-closer, which is absent there. The new section sets the rule: DataWizard governs the DW vault; a connected repo carrying its own `AGENTS.md` (e.g. `lunation-80/`) is outside DataWizard - its AGENTS.md is the binding contract for work there, including its own session-close; when both are connected, route by where the work happens; do not vendor the Seed into an AGENTS.md-governed repo. Decision by Andrew (architect) in Regenerativa session RG-S12, answering `lunation-80/Session Exchange/DataWizard in lunation-80 - LV-S38 Question 01.md`. No orientation-step or rule renumbering. Re-paste required.
+
+---
+
+## What Changed in v4.6
+
+**Unified orientation sweep (new Orientation Step 6).** A single sweep step - flag sweep (multi-operator projects), stale-stub reconciliation (all projects), and intake what's-new (optional) - with an unconditional compliance trace written into the claim stub. Old Steps 6-8 renumbered to 7-9; Step 3's internal reference updated. See [[Orientation Flag Sweep - Query Spec]]. (DW-S272, 2026-08-18; logged retroactively in RG-S12.)
 
 ---
 
