@@ -13,17 +13,30 @@ edit_log:
   - DW-S198 2026-06-23
   - RG-S12 2026-09-22 - v4.7 entry + v4.6 backfill + tracker to v4.7
   - DW-S366 2026-09-22 - v4.7 repair note + Seed tracker row corrected
+  - DW-S366 2026-09-22 - v4.8 entry + canon write gate notice
 ---
 # Project Instructions - Changelog
 
 Version history for the DataWizard Project Instructions (`DataWizard Project Instructions.md`). The live instructions stay lean and `@import`-clean; their history lives here. VERSION.md is the canonical version source.
 
+**Canon write gate:** edits to this file come only from a claimed session of the project that owns it. An instance governed by another project's instructions files a proposal at the owning project's intake (or an exchange note in its Session Exchange) instead of editing. Reviewed exceptions are whitelisted in the lint config. (Conventions Registry: "Cross-project canon write gate"; DataWizard, 2026-09)
+
 ## Version Tracker
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v4.7 | 2026-09-22 |
+| Project Instructions | v4.8 | 2026-09-22 |
 | Seed | v1.6.2 | 2026-09-05 |
+
+---
+
+## What Changed in v4.8
+
+**Canon write gate (Scope section, reverse boundary).** v4.7 set which folder governs an instance's work; v4.8 adds the other direction: DW canon (the PI, VERSION.md, this changelog, Seed protocol docs, 0.x files) is edited only from a claimed DW session - an instance under another project's instructions files a proposal at DW's intake or Session Exchange instead. Canonical home: Conventions Registry, "Cross-project canon write gate". Shipped alongside: gate notices in the three canon-file headers and a dw_lint check (canon edit_log provenance + PI/VERSION/changelog version consistency, with a reviewed-exception whitelist). Direct response to how v4.7 landed (see its process note).
+
+**Two accepted intake items fold in, so the re-paste carries them too.** Rule 7 now names the ~50KB threshold where MCP reads and patches turn unreliable as a sectioning trigger (source: a Weave meta-learning feature request, reviewed). Rule 12 gains the clock-check rule - never stamp a date from memory; check the clock before a writing burst and after any session break (source: the Multi-Day Sessions FR, accepted; fixes midnight-crossing and stale-context date stamps).
+
+No renumbering. Re-paste required - one paste covers v4.7 and v4.8. (DW-S366, 2026-09-22)
 
 ---
 

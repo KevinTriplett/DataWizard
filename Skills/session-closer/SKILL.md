@@ -7,9 +7,11 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-09-04'
-version: '4.8.1'
+updated: '2026-09-22'
+version: '4.9.0'
 edit_log:
+  - "DW-S366 2026-09-22 - v4.9.0: Step 3.14 cross-project write check
+    (canon write gate, closer-side)"
   - DW-S158 2026-06-08
   - DW-S159 2026-06-08
   - DW-S161 2026-06-09
@@ -408,6 +410,16 @@ For each expired flag, do one of:
 - **Expire** -- set `flag_status: expired-unread`, clear the `flag_for` names, and record in the `flag_note` that the `flag_default` (if any) is now in effect.
 
 This pass is the **only automatic writer of `flag_status: expired-unread`** and the only automatic name-clearer -- the orientation sweep is read-only (PI Orientation Step 6 / [[Orientation Flag Sweep - Query Spec]]). It runs at close because close already patches shared surfaces. Dated flags expire on the flagger's own deadline; undated flags get the 21-day backstop; deferred flags are exempt (already read). An `expired-unread` flag is itself the record that delivery failed.
+
+### Step 3.14: Cross-project write check (all projects, all tiers)
+
+Answer one question from the session's own history: **did this session create or edit any file outside this project's home folder** (another project's folders, another project's Seed, or shared canon such as a Project Instructions file, VERSION file, changelog, protocol doc, or 0.x file that belongs to a different project)?
+
+- **No** -- done; nothing to write.
+- **Yes, and it was an inbound/outbound note filed to the other project's intake or Session Exchange** -- that is the sanctioned path; just confirm the session log records what was filed where.
+- **Yes, anything else** -- surface it to the operator now, before the log is finalized: name each file and say plainly that another project's canon was touched. The gate rule ("Cross-project canon write gate", Conventions Registry) says such changes belong in the owning project's intake as a proposal, not as a direct edit. With the operator, either (a) revert/move the change into a proposal at the owning project's intake, or (b) record the operator's explicit acceptance in this session's log AND leave a note in the owning project's intake so its next session reviews it. Never close silently over a cross-project canon write -- the write may be sound, but the owning project must be able to see it happened.
+
+This check exists because the offending session is the only place with perfect knowledge of what it wrote; target-side detection (lint) is the backstop, not the primary. (DataWizard, 2026-09)
 
 ### Step 4: Update related infrastructure files
 

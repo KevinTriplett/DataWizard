@@ -19,6 +19,10 @@ edit_log:
     reconciliation + intake what's-new) inserted as Step 6; Steps 6-8 renumbered
     to 7-9; Step 3 internal ref updated; see [[Orientation Flag Sweep - Query
     Spec]]"
+  - "DW-S366 2026-09-22: v4.8 - canon write gate added to Scope (reverse
+    boundary), gate notices + lint check shipped alongside; Rule 7 gains the
+    ~50KB MCP threshold (Weave meta-learning FR); Rule 12 gains the clock-check
+    rule (Multi-Day Sessions FR)"
   - "DW-S366 2026-09-22: v4.7 repair - Scope example depersonalized per the
     Seed genericity rule; no rule change. Specifics live in the Changelog."
   - "RG-S12 2026-09-22: v4.7 - added '## Scope - which folder governs'
@@ -30,19 +34,21 @@ edit_log:
 
 
 `Project home folder: 
-# DataWizard Project Instructions v 4.7
+# DataWizard Project Instructions v 4.8
 
 (Project home folder is the obsidian vault folder where this project's 0.0 / 0.2 / 0.5 files live, e.g. `_DataWizard/`. Cowork: fill this in after pasting the file into Settings - Project Instructions. Claude Code / Sidecar: instead declare it in your vault-root `CLAUDE.md` above the `@import`.)
 
 ---
 
-**Version:** v4.7 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
+**Version:** v4.8 (history: `Project Instructions - Changelog.md`; VERSION.md is canonical)
 
 This is the DataWizard behavioral contract, consumed two ways: pasted into Cowork's Settings - Project Instructions, or `@import`ed from a vault-root `CLAUDE.md` (Claude Code / Sidecar). Heed the tool appendix for your surface (`## Cowork tools` or `## Claude Code tools`) and ignore the other. The Seed itself always lives at `_DataWizard/Seed/`.
 
 ## Scope - which folder governs
 
 These instructions govern the DataWizard vault: the project home folder and the meta-folders, skills, and Seed under it. A connected repo that carries its own `AGENTS.md` is NOT governed by DataWizard - its AGENTS.md is the binding contract for work done there, including its own session-close. When both a DW vault and such a repo are connected, route by where the work happens: DW skills and the session-closer apply to DW-vault work; the repo's AGENTS.md applies to repo work. Do not vendor the Seed into an AGENTS.md-governed repo.
+
+The boundary runs both ways. This project's canon - these instructions, `Seed/VERSION.md`, the PI changelog, the Seed's protocol docs, and the 0.x infrastructure files - is edited only from a claimed session of THIS project. An instance operating under another project's instructions never edits DW canon directly, however sound the change: it files a proposal at this project's intake (`Workshop - DataWizard/Feature Requests/`) or an exchange note in Session Exchange, and a claimed DW session reviews and lands it. Canonical rule: Conventions Registry, "Cross-project canon write gate".
 
 ## Tools
 
@@ -58,12 +64,12 @@ If `obsidian:read_note` returns "File not found" for a path that `obsidian:list_
 4. CHUNK: Break multi-step plans into chunks. Present each, get approval, execute, check in before next. User may override this pattern upon request.
 5. VERIFY: Confirm success after any write/patch/move before retrying. Silent success + retry = duplicate content.
 6. ASK: When uncertain about anything, ask rather than assume.
-7. LARGE FILES: For files over ~5000 words, or any file that truncates on read, flag it as a candidate for sectioning (the shell + section pattern - see the Conventions Registry) before editing. Don't silently work around the size.
+7. LARGE FILES: For files over ~5000 words or ~50KB (past that, MCP reads and patches turn unreliable - patches can report success without landing), or any file that truncates on read, flag it as a candidate for sectioning (the shell + section pattern - see the Conventions Registry) before editing. Don't silently work around the size.
 8. SAFE CHARACTERS: In file titles, use plain hyphens (-) not em-dashes, and straight quotes not curly. Never put Windows-invalid characters in filenames: ? | * < > " \ : / plus tab and non-breaking space. In content you expect to patch, also avoid em-dashes and curly quotes in headings and anchor text - they break patch_note matching. Full character map and replacement rules: `Seed/Guides/Filename Safety.md`.
 9. LIFECYCLE SKILLS: Before any lifecycle transition (project setup, session close), read and follow the governing skill (e.g. project-guidelines, session-closer). Do not write lifecycle artifacts from pattern-matching. If the skill file returns "File not found", check whether the Seed folder exists (list_directory on `_DataWizard/Seed/`). If the folder exists but the skill is missing, the Seed is stale - tell the user to run `bash _DataWizard/Seed/update_seed.sh`. If the Seed folder itself is missing or unreachable, do NOT pattern-match a session close - VERSION.md lives inside the Seed and won't be available either. Stop, tell the user the Seed is unavailable, and give them the install command from the `## Seed recovery` section at the bottom of these instructions. Do not proceed with the lifecycle transition until the skill is accessible.
 10. MCP WRITE VERIFICATION: At session close, verify all writes and patches landed using filesystem tools (Read or Glob on the vault path), not obsidian: read_note. If filesystem tools are unavailable, get filesystem access per your surface appendix. If context compaction is approaching and unverified writes risk falling out of context, verify before compaction rather than waiting for close. Flag the user only if verification fails.
 11. MCP CONCURRENCY: When multiple instances run on the same project, the session log shell (0.2 file) is a shared resource. Patch it only at session close, verify immediately, and if verification fails, retry once before flagging the user.
-12. DOCUMENT METADATA: New files get birth metadata at creation. When you modify an existing file, set `updated:` to the current date (date-granular - once per session in practice). Full birth-metadata contract (type, created, updated, operator, edit_log; plus optional priority/maturity for content docs): YAML Schema Section 4.
+12. DOCUMENT METADATA: New files get birth metadata at creation. When you modify an existing file, set `updated:` to the current date (date-granular - once per session in practice). Never stamp a date from memory or prior context: check the clock (`date` via bash) before a writing burst, and re-check after any session break - earlier stamps in the same session are not evidence of today's date. Full birth-metadata contract (type, created, updated, operator, edit_log; plus optional priority/maturity for content docs): YAML Schema Section 4.
 13. FRONTMATTER SAFETY: Always use update_frontmatter with merge: true (default). merge: false deletes any omitted fields.
 14. CHAT READABILITY: Never present draft documents (skills, design docs, session log entries) as markdown code blocks in chat. Write directly to vault for review. For small edits, describe changes in plain prose.
 15. TERMINAL COMMANDS: When a file or folder operation (move, copy, delete, rename) can't be done via the Obsidian MCP or system tools, generate a terminal command for the user to run, followed by a verification command to confirm it worked. (Surface nuance: Cowork hands the user the command; Claude Code can run it via bash - see your appendix.)

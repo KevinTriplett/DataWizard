@@ -1,7 +1,9 @@
 
 seed: 1.6.2
 protocol: 1.8
-project_instructions: 4.7
+project_instructions: 4.8
+
+**Canon write gate:** edits to this file come only from a claimed session of the project that owns it. An instance governed by another project's instructions files a proposal at the owning project's intake (or an exchange note in its Session Exchange) instead of editing. Reviewed exceptions are whitelisted in the lint config. (Conventions Registry: "Cross-project canon write gate"; DataWizard, 2026-09)
 
 ## NOTICE - Seed git history rewritten 2026-06-10 (instances: read this)
 

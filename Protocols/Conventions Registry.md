@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-09-08
+updated: '2026-09-22'
 operator: Andrew
 priority: high
 maturity: working
@@ -73,6 +73,7 @@ edit_log:
     structure rule (Archive Mirror Pattern FR accepted)"
   - DW-S343 2026-09-08 - retired-convention signatures flip-ceremony line added (points at Seed/Config/retired-signatures.yaml)
   - "DW-S349 2026-09-08 - Model routing entry gains the model-casting pointer (role casting + dated version table live in the skill)"
+  - "DW-S366 2026-09-22: Cross-project canon write gate entry added"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -370,6 +371,16 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 **Rule:** A pull request or collaborator change that alters a **recommended tool, connection method, architecture, or operator-facing setup instruction** requires a **logged decision before merge** -- it must not ride in as a documentation edit. Merging such a change silently adopts a de facto architecture or tooling decision; the decision log is where that choice is made deliberately and greppably, not the diff. Kin to "change the value, check the rationale" (a value change is visible everywhere it is used, but its justification lives in one doc and dies silently) and to the Tracking Model's act-at-the-commit-moment discipline. (D111)
 
 **Example:** a docs PR that switches the recommended MCP connection method is gated -- log the decision (rationale plus the alternatives rejected) first, then merge. The failure mode this guards against: an unlogged method switch that stood as a doc/reality divergence for roughly 40 sessions before anyone caught it.
+
+---
+
+## Cross-project canon write gate
+
+**Rule:** A project's canon - its Project Instructions, VERSION file, PI changelog, protocol docs, and 0.x infrastructure files - is edited only from a claimed session of that project, by an instance operating under that project's instructions. An instance governed by another project's instructions never edits it directly, however sound the change: it files a proposal at the owning project's intake (or an exchange note in its Session Exchange), and a claimed session of the owning project reviews, decides, and lands it. A decision an operator makes while inside another project's session lands the same way: the deciding session files the proposal; the owning project's session executes. This is the editing counterpart of "File placement -- three classes": outbound items route to the target's intake, and outbound edits do too. The Seed-owned-assets exception (fix upstream while hot) covers only defects in shared Seed assets surfaced while consuming them - never the canon files above, where a change is a decision, not a fix (kin: change-governance merge-gate).
+
+**Example:** an instance in another project's session, answering a scope question, wrote a new version of this project's instructions directly - version bump, changelog entry, VERSION update - with no claimed session here. The change was substantively sound and still needed repair (vault-specific content had entered the portable Seed) and re-review. Substance is not the gate; process is. (DataWizard, 2026-09)
+
+**Enforcement:** a gate notice in each canon file's header; a lint check as tripwire (canon edit_log provenance - any non-owning-project session ID in a canon file's edit_log - plus PI/VERSION/changelog version consistency; reviewed exceptions whitelisted in the lint config).
 
 ---
 
