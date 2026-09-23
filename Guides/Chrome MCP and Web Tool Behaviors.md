@@ -95,6 +95,8 @@ When Chrome is driven through the device bridge (a `Control_Chrome`-style proxy)
 
 **Chrome's built-in PDF viewer does not render in screenshots** - the main pane captures blank or black while the thumbnail rail is visible. A PDF you need to see must be fetched some other way (operator download, `fetch_pdf_from_url`); zooming the thumbnails is too low-res to read. (Source: Kosmos, 2026-09)
 
+**`chrome-extension://` URLs are refused outright** - `navigate` answers "Can't interact with browser-internal or unparseable URLs", so an extension's own pages (OneTab's saves list, an extension options page) are unreachable in ANY connected Chromium browser (Chrome, Brave). Data living inside an extension gets out via the extension's own export (OneTab: Export URLs / the saved-tabs HTML export - the export was verified complete against the page's own link count), or by reading its LevelDB from disk with folder access. (DataWizard, 2026-09)
+
 **Headless Playwright in the cloud container cannot replace the extension for third-party sites.** The container's egress allowlist admits package registries and GitHub but resets connections to most product sites, so "screenshot it with Playwright" fails where the extension succeeds. Use Playwright only for local files (e.g. rendering your own artifact once before publishing). (Source: Kosmos, 2026-09)
 
 ## See Also
