@@ -16,11 +16,12 @@ edit_log:
   - "KO-S48 2026-09-06 - Claude-in-Chrome extension from a Cowork cloud session:
     site gate, javascript_tool block, dropdown harvesting, screenshot location,
     PDF viewer, Playwright egress"
+  - 'RW_2026-09-23_AA_01 - client-rendered ladder extended: verbatim-fetch prompt, SPA path-drop + hover-only data, operator Web-Clip fallback; family named (ReWoven meta-learning review)'
 operator: Andrew
 scope: seed
 title: Chrome MCP and Web Tool Behaviors
 type: guide
-updated: 2026-09-06
+updated: 2026-09-23
 ---
 # Chrome MCP and Web Tool Behaviors
 
@@ -44,7 +45,12 @@ Pages that render client-side (JS apps) may expose little or nothing to a plain 
 
 1. **Hash-anchor + scroll-screenshots.** Navigate to a hash anchor and take scroll-screenshots section by section rather than expecting full text from a single fetch. Worked on client-rendered fundraiser/leaderboard pages. (Source: RW S28)
 2. **Render-wait + `innerText` slices.** For heavily client-rendered app pages (e.g. Bubble apps) that defeat `web_fetch` entirely: Chrome `navigate`, wait ~8s for render, then pull text in slices via `javascript_tool` reading `document.body.innerText`. The tool's output truncates around ~1KB, so slice the string across multiple calls. (Source: RW S31)
-3. **Know which sites fetch fine.** Not everything needs the browser: e.g. Substack subdomains fetch cleanly with `web_fetch`. Try the cheap fetch first.
+3. **Know which sites fetch fine.** Not everything needs the browser: e.g. Substack subdomains fetch cleanly with `web_fetch`. Try the cheap fetch first. (Caveat: Substack landing/about pages can still be JS-rendered - a subject's bio may live on their wiki/site while the worldview lives in the Substack posts. (ReWoven, 2026-09))
+4. **Force verbatim output from `web_fetch`.** For public-site copy, the fetch tends to summarize; an explicit no-summarizing instruction ("return the page text verbatim") gets the actual copy. (ReWoven, 2026-08)
+5. **SPAs can drop the path/query on load, and data can hide in hover states.** The built-in browser may land a deep URL on the app root - click through in-page and read visually instead of re-fetching. Some figures exist only in chart tooltips (hover the data point), invisible to every text-read path. (ReWoven, 2026-09)
+6. **Robots-blocked source: hand it to the operator's Web Clipper.** When `web_fetch` returns 429/refuses and both Chrome paths are unavailable, the reliable last rung is asking the operator to clip the page into the vault (Obsidian Web Clipper, `_Clippings/`) and reading the clipping. (ReWoven, 2026-08)
+
+This ladder is the standing home for the recurring "JS-rendered surface needs a live browser" family - try the cheap fetch, then render-wait reads, then in-page click-through, then the operator clip; a source that defeats all rungs is flagged unverifiable rather than guessed at.
 
 ## Editing in Browser Code Editors (GitHub web editor, CodeMirror)
 

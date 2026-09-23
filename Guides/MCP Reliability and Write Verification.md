@@ -3,7 +3,7 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: 2026-09-19
+updated: 2026-09-23
 edit_log:
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -75,6 +75,7 @@ edit_log:
   - "RL-S12 2026-09-19 - Bridge Drops: mid-write drop is a clean failure
     (explicit not-connected error, nothing written); confirm-unwritten then
     single retry"
+  - 'RW_2026-09-23_AA_01 - three additive entries: device_bash E2BIG heredoc limit, device_bash git host-key failure, search_notes fuzzy + searchFrontmatter caveat (ReWoven meta-learning review)'
 ---
 # MCP Reliability and Write Verification
 
@@ -113,6 +114,10 @@ A count of 1 where there should be many means the array was clobbered -- restore
 **Contended files add a clobber-by-concurrency variant.** Because any array you pass replaces the whole array, a second instance's entry appended between your read and your write is silently erased -- the array you write is the array that wins. Mitigations, in order: (1) re-read the frontmatter *immediately* before the write, not minutes earlier, to shrink the race window; (2) after writing, verify the array contains your entry AND any concurrent entries -- an entry you didn't write is the tell that you raced someone; if your write replaced theirs, restore both; (3) for a truly append-only write, use the array-append primitive `stamp_editlog.py` (`Seed/Scripts/`), or a `filesystem:edit_file` insert anchored at the *tail of the array* -- the line before the next top-level key or the closing `---`, never the last `- ` line, since long entries wrap onto four-space continuation lines -- `patch_note` cannot do this, since it does not match inside frontmatter (see below). (Source: ReWoven S24, RW S44; VibeCut S50/S60, independent)
 
 **`filesystem:edit_file` can be dead in a Cowork session (output-schema rejection).** In some Cowork builds the remote-devices `filesystem:edit_file` tool fails every call with an output-schema validation error ("unsupported dialect ... draft-07; the validator supports 2020-12 only") - the tool never runs, so the array-append-via-edit_file mitigation above is unavailable. Fall back to an in-place patch through the device shell: read the file, exact-match replace, write back in place (truncate-write, no unlink - safe even on the no-delete sandbox mount), aborting unless the match count is exactly 1. `filesystem:write_file` (whole-file overwrite) still works. (Source: Cowork, 2026-09)
+
+**`device_bash` heredoc writes fail with `spawn E2BIG` at large sizes.** Writing a file through a single heredoc fails around ~55KB of inline content with `spawn E2BIG` (the shell argument/env size limit). Split the content into sequential `cat >>` appends and verify with `wc -l` (or a hash) after the last chunk. (ReWoven, 2026-09)
+
+**`device_bash` git over SSH fails "Host key verification failed".** A `git fetch` through the device shell can fail host-key verification on a remote that the operator's native Terminal reaches fine - the shell's environment lacks the user's known_hosts/agent context. Treat git-over-SSH as operator-native; do not debug the key from the sandbox. (Standing DW practice goes further: run no git at all through the device bridge on vault-mounted repos - even status can orphan a .git/index.lock.) (ReWoven, 2026-09)
 
 ## Transport 502s: Verify Before Retry, Against a Must-Have-Changed Field
 
@@ -308,6 +313,8 @@ These are not MCP bugs but Obsidian behaviors that agents need to account for.
 **`filesystem:edit_file` can insert text inline when the anchor starts mid-line.** If the match anchor begins partway through a line, the inserted header text lands inline rather than on its own line. Dry-run first and include the preceding text in the anchor so the insertion point is unambiguous. (Source: Weave, 2026-07)
 
 - **read_note resolves by note title, not path.** A read with a stale folder path can still succeed if a note with that title exists anywhere in the vault, silently masking file moves by other operators. Before writing companion files "beside" an asset or citing a note's location, verify the path with a filesystem listing (find/ls), not a successful read_note. (Weave, 2026-09: a field-map relocation from a sorting pass was masked for a whole working chunk; companions were written to the old folder and had to be moved.)
+
+**`search_notes` is fuzzy/token matching, and content search skips frontmatter.** A quoted phrase does NOT do exact-substring matching - token matches surface false positives that need a per-file read to confirm. And occurrences that live only in frontmatter (e.g. a `part_of:` value) are invisible to content search: run a second pass with `searchFrontmatter: true` for any sweep that must be complete (2 of 23 files in one link-retarget were caught only that way). (ReWoven, 2026-08)
 
 ## Incident Reference
 
