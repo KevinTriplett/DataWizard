@@ -75,6 +75,7 @@ edit_log:
   - "DW-S349 2026-09-08 - Model routing entry gains the model-casting pointer (role casting + dated version table live in the skill)"
   - "DW-S366 2026-09-22: Cross-project canon write gate entry added"
   - "DW-S368 2026-09-23: Intake capture placement entry added (captures are notes -> _Intake - ProjectName/, never _Infrastructure; rebuildable intake db may live in infra; personal 1:1 raw captures stay in _Private/)"
+  - "DW-S371 2026-09-23: db-first amendment (D132) - all feeders write links to intake.db, not per-link notes; _Intake area holds keeper notes only"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -574,6 +575,8 @@ This is the general principle under the two entries adjacent to it (file placeme
 
 **Rule:** intake captures are notes, so they live in a project intake area, never in `_Infrastructure - ProjectName/` - that folder holds infrastructure files only (the infra-only-never-notes ruling, "File placement -- three classes"). A project's inbound capture notes go under a dedicated `_Intake - ProjectName/` area (parallel to `_Infrastructure - ProjectName/` and `_Sections - ProjectName/`), or an existing working/captures folder the project already uses. The intake database is the exception that proves the rule: it is a rebuildable local cache (a state file, not a note), so it MAY sit in `_Infrastructure - ProjectName/`.
 
-**Personal-stream split.** When a capture stream is a personal 1:1 conversation, the raw message dump stays in the private, un-synced `_Private/` area; only the extracted links route to the shared project intake. This keeps a private conversation out of a shared repo while the useful links still reach the project. (Kin: the capture/harvest split - raw captures private, derived items routed.)
+**Personal-stream split.** When a capture stream is a personal 1:1 conversation, the raw message dump stays in the private, un-synced `_Private/` area; only the extracted links route to the shared project intake - db-first into `intake.db` (see DB-first below), never as per-link notes. This keeps a private conversation out of a shared repo while the useful links still reach the project. (Kin: the capture/harvest split - raw captures private, derived items routed.)
+
+**DB-first (DW-S371, D132).** Every feeder (Signal, Telegram, Reddit, and future sources) writes links to `intake.db` only - no per-link queue note. Notes exist at exactly two human ends: raw daily captures (above) and keeper notes the apply step writes for links the operator confirms. The `_Intake - ProjectName/` area therefore holds keeper notes, not a queue. This supersedes the note-per-link path of the earlier stream feeders. (DataWizard, 2026-09.)
 
 **Rationale:** an intake note filed into `_Infrastructure/` mixes stream content into the 0.x surface and hides it from the reader's path, the same silent-failure class the file-placement and flag-surfacing entries guard against. (DataWizard, 2026-09.)
