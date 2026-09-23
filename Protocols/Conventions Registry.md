@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-09-22'
+updated: '2026-09-23'
 operator: Andrew
 priority: high
 maturity: working
@@ -74,6 +74,7 @@ edit_log:
   - DW-S343 2026-09-08 - retired-convention signatures flip-ceremony line added (points at Seed/Config/retired-signatures.yaml)
   - "DW-S349 2026-09-08 - Model routing entry gains the model-casting pointer (role casting + dated version table live in the skill)"
   - "DW-S366 2026-09-22: Cross-project canon write gate entry added"
+  - "DW-S368 2026-09-23: Intake capture placement entry added (captures are notes -> _Intake - ProjectName/, never _Infrastructure; rebuildable intake db may live in infra; personal 1:1 raw captures stay in _Private/)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -567,3 +568,12 @@ This is the general principle under the two entries adjacent to it (file placeme
 ---
 
 *Birth-metadata and field definitions live in the YAML Schema; `type:` values live in the Content Type Taxonomy. This registry covers structural and formatting conventions only.*
+
+
+## Intake capture placement
+
+**Rule:** intake captures are notes, so they live in a project intake area, never in `_Infrastructure - ProjectName/` - that folder holds infrastructure files only (the infra-only-never-notes ruling, "File placement -- three classes"). A project's inbound capture notes go under a dedicated `_Intake - ProjectName/` area (parallel to `_Infrastructure - ProjectName/` and `_Sections - ProjectName/`), or an existing working/captures folder the project already uses. The intake database is the exception that proves the rule: it is a rebuildable local cache (a state file, not a note), so it MAY sit in `_Infrastructure - ProjectName/`.
+
+**Personal-stream split.** When a capture stream is a personal 1:1 conversation, the raw message dump stays in the private, un-synced `_Private/` area; only the extracted links route to the shared project intake. This keeps a private conversation out of a shared repo while the useful links still reach the project. (Kin: the capture/harvest split - raw captures private, derived items routed.)
+
+**Rationale:** an intake note filed into `_Infrastructure/` mixes stream content into the 0.x surface and hides it from the reader's path, the same silent-failure class the file-placement and flag-surfacing entries guard against. (DataWizard, 2026-09.)
