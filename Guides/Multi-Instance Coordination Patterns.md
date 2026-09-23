@@ -21,12 +21,14 @@ edit_log:
     Choosing a pattern"
   - "RG-S10 2026-09-06 - transport table: cross-vault row (Session Exchange
     inside a shared repo), first use Regenerativa"
+  - "DW-S374 2026-09-23 - incidental-concurrency bullet: working-tree read
+    distinguishes in-progress from drift (meta-learning review S324-S337)"
 maturity: working
 operator: Andrew
 seed_version: 1.3.1
 title: Multi-Instance Coordination Patterns
 type: guide
-updated: 2026-09-06
+updated: '2026-09-23'
 ---
 # Multi-Instance Coordination Patterns
 
@@ -50,6 +52,8 @@ The baseline is already in place if the Project Instructions and the MCP guide a
 - **A stub claimed today is never stale.** The orientation sweep offers to reconcile stale stubs; it must be structurally incapable of offering a live sibling's stub. Three sessions can be live in one project on one day.
 - **Same day, same block: defer.** If you know a sibling advanced a shared block today (a ledger row, a decision-log section), leave that block to its close, or to the next close, rather than patching it too. A supervising session that had every reason to update a thread's ledger row left it to the build session's close for exactly this reason (DataWizard, 2026-08). Two patches to one block on one day is the collision the concurrency rule exists to prevent; the row is not urgent, the collision is expensive.
 - **Foreign writes are unverified writes.** A sibling instance - especially one running under another project's instructions - can leave a shared file in a state your own checks never saw (an unparseable frontmatter block, an unresolvable path). Treat the first read after a foreign write as a verification read, not a trusting one. Working Rule 5 has a write-side twin: what you did not write, you still verify before building on. The session-scale form: before building on a prior session's close, spend one context-light verification pass reading each of its claims against disk - including a fingerprint check of any script it shipped. It converts the log's claims into verified state for the cost of a single chunk; one such pass over a full close confirmed every claim landed before the next build stacked on it (DataWizard, 2026-08).
+
+- **Git working-tree state distinguishes a sibling's in-progress work from stale drift.** An artifact that looks wrong on a high-concurrency day may be a parallel session's work in flight, not rot: uncommitted changes plus a file mtime newer than the last commit say "in progress - leave it", while a clean tree with an old mtime says "drift - investigate". On vault-mounted repos, run this read via a Terminal command on the operator's machine or the sync tooling, never through the bridged shells (the MCP guide's no-git-through-the-bridge rule). (DataWizard, 2026-09)
 
 ## Roles
 

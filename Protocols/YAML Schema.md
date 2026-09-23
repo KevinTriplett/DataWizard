@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-09-06
+updated: 2026-09-23
 operator: Andrew
 priority: high
 maturity: working
@@ -25,6 +25,8 @@ edit_log:
   - DW-S332 2026-09-06 - added session_started/session_closed span fields + Date
     Stamping and Time Sense section (clock-check rule; Multi-Day Sessions FR
     changes 1-2)
+  - "DW-S374 2026-09-23 - field-retirement rule (remove at retirement time;
+    meta-learning review S301-S323)"
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -114,6 +116,8 @@ All 0.x infrastructure files (0.0 Project Guidelines, 0.1 MOC, 0.2 Session Log, 
 Files that track Seed compliance may also carry `seed_version:` (e.g. `1.1.1`). The older `datawizard_protocol_version:` pin is retired (D93) - do not add it to new files.
 
 This allows any instance to scan a project's infrastructure and immediately see what's current vs stale without reading content.
+
+**Field retirement is a removal, not a deprecation note.** When a field is retired (by decision or supersession), remove it from the files that carry it at retirement time - never lazily on first touch. A retired field left in place reads as spec to the next instance: a retired counter and a stale coordination field each propagated a wrong expectation into a carefully-written brief before anyone noticed. The retirement decision's session owns the sweep. (DataWizard, 2026-08)
 
 ### Creation-Time Metadata Contract
 

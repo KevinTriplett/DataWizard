@@ -76,6 +76,10 @@ edit_log:
     (explicit not-connected error, nothing written); confirm-unwritten then
     single retry"
   - 'RW_2026-09-23_AA_01 - three additive entries: device_bash E2BIG heredoc limit, device_bash git host-key failure, search_notes fuzzy + searchFrontmatter caveat (ReWoven meta-learning review)'
+  - "DW-S374 2026-09-23 - Read-overflow: ceiling keys on total file size, not
+    frontmatter length (meta-learning review S301-S323)"
+  - "DW-S374 2026-09-23 - Known Issues: wake-stale reads named as a class
+    (meta-learning review S324-S337)"
 ---
 # MCP Reliability and Write Verification
 
@@ -96,6 +100,8 @@ As of May 2026, the Obsidian MCP has intermittent reliability issues when multip
 **Stale reads.** After a successful `patch_note`, a subsequent `read_note` on the same file may return the pre-patch version. This may overlap with the phantom read issue (the MCP serving cached pre-patch content).
 
 **Stale serving of synced files (read-side, no concurrency needed).** For files that arrived by repo sync and were never opened locally, the MCP can serve a stale or transformed copy that is not on disk: in the field case, the disk copy was byte-identical to source (no BOM, zero CR) while `read_note` returned CRLF-throughout content whose frontmatter would not parse - so every frontmatter field, `flag*` cluster included, read as absent. Undetectable from inside the MCP path; the tell is an empty or malformed frontmatter result on a file that visibly starts with `---` on disk. Verify against filesystem bytes (Tier 1), and treat empty-frontmatter-on-a-fenced-file as a parse failure to investigate, never as fields-absent. Targets exactly the notes that matter most on multi-operator projects: freshly synced, never yet opened. (WV_2026-09-02_JC_02, confirmed DW S325; upstream report drafted DW S330.)
+
+**Wake-stale reads (a named class).** The first read after any wake or reconnect is the least trustworthy read of the session. Three sub-cases share the mechanism (a layer serving state cached from before the sleep): a just-woken VM clock a day stale (18 files restamped wrong before two clock sources settled it); device-bridge staging returning a cached snapshot on same-path re-use; and the stale MCP serving above. Rule: after any wake, reconnect, or resumed conversation, verify freshness against an independent source (a second clock read, a fresh staged filename, filesystem bytes) before acting on the first read. (DataWizard, 2026-09)
 
 **Frontmatter wipe via merge: false.** `update_frontmatter` with `merge: false` replaces the entire frontmatter -- any field you omit is deleted. Always use `merge: true` (the default) unless intentionally replacing the full schema. If you must use `merge: false`, re-read frontmatter first and include every field.
 
@@ -158,7 +164,7 @@ Rules:
 
 `read_multiple_notes` on a large batch overflows the tool-result ceiling and dumps the payload to a host-path file the Cowork sandbox cannot read -- so the read effectively returns nothing usable (observed at ~73KB of docs, and again with 5+ medium notes). Keep batches to **2-4 notes per `read_multiple_notes` call**, or fall back to individual `read_note` calls, which stay under the limit.
 
-**A single file can overflow too, and `get_frontmatter` on it returns `{}`.** A 73KB section file overflowed `read_note` outright and `get_frontmatter` on the same file came back empty - the empty result is the overflow, not a file without frontmatter. Read the file with the filesystem tools or a device shell instead, and if the overflow has already dumped a tool result to a saved file, slice it by character range in Python (`s[a:b]`) rather than by lines - the dump is one long JSON line, so line-chunking returns the whole thing again. A file that hits this is past the sectioning threshold; log it as a shell + section candidate. (Source: DataWizard, 2026-08)
+**A single file can overflow too, and `get_frontmatter` on it returns `{}`.** A 73KB section file overflowed `read_note` outright and `get_frontmatter` on the same file came back empty - the empty result is the overflow, not a file without frontmatter. Read the file with the filesystem tools or a device shell instead, and if the overflow has already dumped a tool result to a saved file, slice it by character range in Python (`s[a:b]`) rather than by lines - the dump is one long JSON line, so line-chunking returns the whole thing again. A file that hits this is past the sectioning threshold; log it as a shell + section candidate. (Source: DataWizard, 2026-08) The ceiling bites on **total file size, not frontmatter length**: a 74KB body-heavy file failed while a 13.7KB shell with identical frontmatter read fine - so sectioning (shell + section files) is a direct remedy, not just an editing convenience. (DataWizard, 2026-09)
 
 **`get_frontmatter` also returns `{}` silently when the YAML does not parse.** An unquoted edit_log entry containing `: ` (a colon-space inside a plain scalar) made a file's frontmatter unparseable; `get_frontmatter` returned `{}` with no error, and `update_frontmatter` would have written a fresh block over the unparsed one (the array-wipe hazard in its worst form). Treat an empty `get_frontmatter` on a file you know has frontmatter as a signal: read the raw file, run it through a YAML parser, and quote the offending entry before any frontmatter write. Under D127, edit_log entries are always single-quoted at write time (see the [[YAML Schema]] origin/edit_log section), which retires this failure class; quote any unquoted legacy entry on sight. (Source: DataWizard, 2026-08)
 

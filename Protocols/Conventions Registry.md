@@ -76,6 +76,11 @@ edit_log:
   - "DW-S366 2026-09-22: Cross-project canon write gate entry added"
   - "DW-S368 2026-09-23: Intake capture placement entry added (captures are notes -> _Intake - ProjectName/, never _Infrastructure; rebuildable intake db may live in infra; personal 1:1 raw captures stay in _Private/)"
   - "DW-S371 2026-09-23: db-first amendment (D132) - all feeders write links to intake.db, not per-link notes; _Intake area holds keeper notes only"
+  - "DW-S374 2026-09-23 - added Generic-non-blocking ship gate (meta-learning
+    review S324-S337)"
+  - "DW-S374 2026-09-23 - added Self-contained boundary-crossing references;
+    optimistic-claim extension (claim protects the identifier, not the file)
+    (meta-learning review S338-S362)"
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -386,6 +391,14 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 
 ---
 
+## Self-contained boundary-crossing references
+
+**Rule:** A pointer that cannot resolve across a boundary forces the referenced thing to stand alone. Wherever a reference crosses a resolution boundary - separate Obsidian vaults (wikilinks do not resolve across vaults, ever), a deploy target no session can read, a registry key consumed outside the vault - the crossing line must carry everything the receiver needs (title, locator the receiver's side can resolve, and why it matters), and the referenced artifact needs a readable twin on the reader's side of the boundary. Three prior instances re-derived this separately before naming. (DataWizard, 2026-09)
+
+## Generic-non-blocking (Seed ship gate)
+
+**Rule:** A self-contained generic (Seed-bound) artifact's ship must not gate on pending downstream specifics. Fold-in markers and open consumer questions are reconciliation cues, not dependencies. The test: *would the pending answer change THIS text, or only a consumer's adoption of it?* If only the adoption, ship the depersonalized text now and route the specifics to the consumer via a fold-forward note on the shared surface (never a silent later edit). Three instances in one scan window: scaffolding markers nearly gating a build, markers resolved as non-blocking on a guide's draft-to-active flip, and doc fixes to a doc under concurrent redesign needing an explicit fold-forward note. (DataWizard, 2026-09)
+
 ## Priority and maturity vocabularies
 
 **Rule:** two distinct vocabularies; do not mix them.
@@ -497,6 +510,8 @@ The Task IDs row is the worked example: its definition-site / scope / minting tr
 **Example:** two parallel sessions both mint task ID N+1; each re-searches after writing, at least one sees the double definition, renumbers its own line, and re-verifies.
 
 ---
+
+**The claim protects the identifier, not the file.** Verify-after-claim proves you own the slot; nothing in the pattern stops a later instance from appending into a stub whose `claim_id` is not its own - and that has happened in the field (a sibling wrote its orientation trace and focus into a held stub and closed under that identifier). Rule: never write into a claim stub whose `claim_id` is not yours; a stub with a live foreign token is another instance's working file, whatever its age. (DataWizard, 2026-09)
 
 ## Carry the probe, not the snapshot
 

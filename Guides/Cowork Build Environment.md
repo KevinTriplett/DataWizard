@@ -40,11 +40,15 @@ edit_log:
     freeze data; stage-by-id + template-and-generator exit (GUI Hub session)'
   - "DW-S351 2026-09-08 - Shell quirks: unquoted heredoc executes backticks/$()
     in the body (quote the delimiter)"
+  - "DW-S374 2026-09-23 - API thinking-blocks gotcha (meta-learning review
+    S324-S337)"
+  - "DW-S374 2026-09-23 - re.sub lambda literal-return quirk; device-shell
+    Linux-sandbox scope note (meta-learning review S338-S362)"
 operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-09-19
+updated: '2026-09-23'
 ---
 # Cowork Build Environment
 
@@ -74,6 +78,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 ## Python and Packages
 
 - **`pip` has no package index from the sandbox in some configurations (HTTP 403).** numpy is typically preinstalled; graph/scientific extras (`networkx`, `igraph`, `scipy`) may not be installable. Hand-roll in numpy or write the script for local (native) execution. Packages installed on the user's machine are invisible -- the sandbox is an isolated Linux environment. (Source: Weave, 2026-06/08. Other configurations allow installs -- probe before planning around the restriction.)
+- **A `re.sub` replacement-lambda's return value is literal.** Unlike a replacement *string*, a function's return is inserted verbatim - do not escape backslashes for it. Doubling them corrupted embedded JSON before a dry-run caught it. (DataWizard, 2026-09)
 - **`str.lstrip("www.")` strips a character *set*, not a prefix** -- it corrupted `weave-...` to `eave-...` and silently poisoned dedup keys. Use `re.sub(r"^www\.", "", s)`. Dry-run-before-apply is what caught it. (Source: DW S224)
 
 ## Shell and File-Tool Quirks
@@ -99,6 +104,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **Some sandbox configurations 403-block `api.github.com` AND github.com HTML pages outright** (proxy-level), while GitHub release-asset downloads (`github.com/<org>/<repo>/releases/download/...`, including `checksums.txt`) and the git protocol still work. A pinned release-asset URL is then the reliable way to install a released binary: fetch the release's `checksums.txt` to discover exact asset names, download, verify sha256 locally. (Source: DW S329)
 - **GitBook sources are agent-friendly:** append `.md` to any page URL for clean markdown; `llms.txt` is a full index; `?ask=` answers questions against the docs. (Source: Weave, 2026-06/08)
 - **Filing GitHub issues via pre-filled `issues/new?title=&body=` URLs** (URL-encode the body, open in the user's authed browser, human submits) is a robust, low-brittleness alternative to JS form-filling -- and keeps the irreversible public action on a third party's repo in human hands. The `return_to` param survives a login redirect. (Source: DW S230)
+- **API message responses can lead with `thinking` content blocks.** Reading `content[0].text` blindly fails when the first block is thinking-type; iterate the blocks and take the text-type ones. (DataWizard, 2026-09)
 
 ## SQLite on the Vault Mount
 
@@ -118,6 +124,8 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **Headless Chromium via Playwright DOES run in some configurations** -- despite the segfault note above (config-dependent). A sandbox with `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers` preinstalled ran `chromium.launch({headless:true})` reliably for driving a local Leaflet app and asserting rendered DOM (count-honesty checks). Probe with a one-line launch before assuming segfault. Two recipes that matter: (1) require Playwright from a `.cjs` file, not `.mjs` (a `.mjs` forces ESM and `require` is undefined); (2) when serving the app over `http://127.0.0.1`, a blanket `route('**', r=>r.abort())` also aborts the page navigation itself - allow the localhost host through and abort only external hosts. (Source: Location Scout, 2026-08)
 
 ## Device Bridge
+
+- **The device shell is a Linux sandbox mounting only the connected folders.** It cannot reach the Mac's native filesystem outside them (`~/Library/LaunchAgents`, system paths) and cannot run macOS tools (`launchctl`, `osascript`, `sfltool`). Native machine-state work - launch agents, notifications, system settings - must be handed to the operator as a complete, literal Terminal command plus a verification command. (DataWizard, 2026-09)
 
 - **`device_commit_files` rejects an explicit `expectedMtimeMs: null`** -- omit the field entirely when no mtime guard is wanted. (Source: DW S229)
 - **`Control_Chrome` proxy: tab management works; page reads do not.** `list_tabs` / `open_url` / `switch_to_tab` are reliable, but `get_page_content` AND `execute_javascript` return "Google Chrome is not running" even with a live tab (intermittent in DW S230; consistent in LS S73). To read a live, logged-in page (e.g. Google Maps saved lists), use the **claude-in-chrome extension** instead -- once the user signs in, its screenshots + accessibility-tree DOM are reliable. Verify page state via `list_tabs` URL params, not by retrying the read. (Source: DW S230, Location Scout 2026-08)

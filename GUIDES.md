@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: 2026-09-08
+updated: '2026-09-23'
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -27,6 +27,8 @@ edit_log:
   - "DW-S308 2026-08-31 - Operator Gate Queue - Template row added (D126 codification; template at Seed/Templates/)"
   - "DW-S328 2026-09-04 - added the Surfaces and tools sub-table with the FSAccess GUI Pattern guide"
   - "DW-S349 2026-09-08 - Reader-Facing Prose Style row added (Process and coordination)"
+  - "DW-S374 2026-09-23 - added Script Portability guide to the Platform
+    cluster (meta-learning review S324-S337)"
 ---
 # DataWizard Guides
 
@@ -55,6 +57,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 |---|---|
 | **Git Guide** | Git for the vault and DW projects: repo setup, nested vs standalone repos, push workflows, DW Save, and the commit guard (conflict-marker + Windows-unsafe-filename pre-commit hook and CI). Sectioned - see `Git Guide/`. |
 | **Seed Install and Update** | Installing the Seed into a vault and updating it via `update_seed.sh`. |
+| **Script Portability** | Rules for Seed-shipped scripts across macOS (BSD, zsh), Linux (GNU, bash), and Windows PowerShell 5.1: ASCII-only (the BOM-less-.ps1 ANSI trap), BSD-vs-GNU flag differences, shell dialect, and trace-verify before shipping. |
 
 ### Vault structure and content
 | Guide | Covers |

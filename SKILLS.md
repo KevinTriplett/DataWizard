@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: 2026-09-08
+updated: 2026-09-23
 edit_log:
   - DW-S250 2026-08-06 - session-closer row + Protocol nudges paragraph updated
     for pending-report model (D114)
@@ -59,6 +59,10 @@ edit_log:
     version-synced for the Reader-Facing Output rule (tools-research v1.4.1,
     document-harvest v0.5.1, transcript-harvest v0.9.2, project-guidelines
     v1.5.1)"
+  - DW-S374 2026-09-23 - supervised-build row -> v1.3.2 (owning-project
+    orientation + same-session seats note; meta-learning review S301-S323)
+  - DW-S374 2026-09-23 - supervised-build row -> v1.3.3 (fresh-eyes note)
+  - DW-S374 2026-09-23 - supervised-build row -> v1.3.4 (reviewer-lands-cheap-guards)
 ---
 
 # DataWizard Skills
@@ -74,7 +78,7 @@ For how skills work in DW's architecture, see the [Agent and Skills Architecture
 | **project-guidelines** (v1.5.1) | Technique | Creating or updating a project's 0.0 Project Guidelines file. Triggers on project setup, migration, or updating the project brief. Handles existing filename conventions gracefully. Includes `last_content_interests_review:` in new 0.0 templates. |
 | **session-closer** (v4.8.1) | Technique | Writing the session log entry at the end of every session. Includes Learnings section and handoff-quality "What's next." The session log IS the handoff. Surfaces any pending-review report a scan has left waiting (health audit, meta-learning, Content Interests); it no longer computes staleness or nudges on thresholds -- detection and cadence live in the Review Automation guide. Insight-capture-aware knowledge transfer check. Feeds the project's Operator Gate Queue at close (Registry-canonical schema). |
 | **side-quest** (v1.0) | Technique | Tracking a tangent from the project's current arc as a parallel stream in the session log. Routes a side quest's continuation into "Active quest threads" and protects the main arc's "What's next" from being overwritten, so parallel streams don't collide under concurrency. Triggers on: "let's go on a side quest," "continue the [X] side quest." |
-| **supervised-build** (v1.3.1) | Technique | Running a multi-chunk build under a per-chunk review relay with a reviewer instance (Coordination Patterns, Pattern 4). Loads in either seat: the build session gets the review gate as a hard precondition (no chunk written without a `status: reviewed` note - skipping is an on-record choice), the reviewer gets on-disk verification, run-don't-read script testing, harness validation against the real tool's output, and the mandated five-field State Board write so a cold instance can answer "where are we at" from the driver doc alone. |
+| **supervised-build** (v1.3.4) | Technique | Running a multi-chunk build under a per-chunk review relay with a reviewer instance (Coordination Patterns, Pattern 4). Loads in either seat: the build session gets the review gate as a hard precondition (no chunk written without a `status: reviewed` note - skipping is an on-record choice), the reviewer gets on-disk verification, run-don't-read script testing, harness validation against the real tool's output, and the mandated five-field State Board write so a cold instance can answer "where are we at" from the driver doc alone. |
 | **model-casting** (v1.0) | Technique | Casting models by role for multi-session or multi-agent arcs: orchestrator-synthesizer, researcher, writer. Holds the one dated version-specific casting table and three execution paths (same-session subagents, Claude Code version-exact pipeline, manual session relay), plus the handoff formats between seats. Writer seat mandates the Reader-Facing Prose Style guide. Defers to the Conventions Registry's Model routing entry for tier-generic queued-work tags. Triggers on "which model should do this" or setting up a research batch. |
 | **research-tracking** (v1.5) | Technique | Managing research to prevent duplicate work and make past evaluations findable. Tracks evaluations in a tracking index with inline verdicts for light items and links for deeper notes. Always load before starting research. |
 | **tools-research** (v1.4.1) | Technique | Evaluating external tools, repos, frameworks, papers, or flagged content. Gathering-before-judging methodology with single-target, batch triage, and deep-read modes. Batch mode includes harvest pre-filtering and two-speed processing. References research-tracking. |

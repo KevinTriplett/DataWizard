@@ -11,9 +11,9 @@ description: >-
   (Pattern 3), a build with no reviewer available, or incidental concurrency
   between unrelated sessions.
 type: skill
-version: '1.3.1'
+version: '1.3.4'
 created: '2026-08-30'
-updated: '2026-09-06'
+updated: '2026-09-23'
 operator: Andrew
 edit_log:
   - "DW-S306 2026-08-30 - v1.0: codified from Coordination Patterns Pattern 4
@@ -31,6 +31,13 @@ edit_log:
     instrument-measures-itself class (S268 flag distribution, S333 insteadOf
     harness) met codify-on-second-use"
   - 'DW-S327 2026-09-06 - v1.3.1: Shared Setup step 0 - charter authors grep the shared canon before scoping (field-grounded)'
+  - "DW-S374 2026-09-23 - v1.3.2: owning-project supervisor orientation
+    (Shared Setup 2); same-session review->build sequencing note (seats
+    section). Meta-learning review S301-S323."
+  - "DW-S374 2026-09-23 - v1.3.3: fresh-eyes definition (Reviewer Steps;
+    meta-learning review S324-S337)"
+  - "DW-S374 2026-09-23 - v1.3.4: reviewer-lands-cheap-guards boundary
+    (Reviewer Steps; meta-learning review S338-S362)"
 ---
 
 # Supervised Build Skill
@@ -48,14 +55,14 @@ Why the gate is structural: across the field runs that produced this skill, ever
 - **Build session** -> read Shared Setup, then Builder Steps.
 - **Reviewer session** -> read Shared Setup, then Reviewer Steps and The State Board Write.
 
-Both seats follow the guide's Transport conventions for filenames, frontmatter, and statuses - never improvise these; turn-taking runs on them.
+Both seats follow the guide's Transport conventions for filenames, frontmatter, and statuses - never improvise these; turn-taking runs on them. Taking both seats in one session (review, then build) is fine when the review target and the build charter are *different documents* - the design-then-build separation protects design freshness, which the earlier design session already provided. (DataWizard, 2026-09)
 
 ## Shared Setup (once per build)
 
 0. **Charters for shared-canon content: grep the canon first.** When the build's deliverable lives in a shared canon location (a guide, protocol, or template collection), the charter author greps that collection for existing homes of every scoped topic BEFORE scoping sections, and the chunk-1 plan reports the division (what points where, what this build owns). A charter that scopes a section an existing doc already owns produces a restatement the reviewer must catch late; the grep moves the catch to authoring time. (Field grounding: a guide charter scoped a section that restated an existing runtime-behaviors guide; the reviewer's ground-truthing caught it at the chunk-1 gate, 2026-09.)
 
 1. **Confirm the declaration.** A supervised build is declared by the human or by the charter (build plan). If the declaration exists only in chat, record it in the chunk-1 plan note so it is on the record.
-2. **Name the parts:** the arc (the short name used in every exchange filename), the charter (the build plan or design doc the build executes), the **driver doc** that holds arc state, and the project's `Session Exchange/` folder.
+2. **Name the parts:** the arc (the short name used in every exchange filename), the charter (the build plan or design doc the build executes), the **driver doc** that holds arc state, and the project's `Session Exchange/` folder. When the build targets another project's repo, orient the supervisor to the *owning* project, not the target repo: the run-don't-read discipline and the tool contract live in the owning frame. (Field grounding: an owning-frame supervisor caught a key-gluing class defect before the live run, 2026-08.)
 3. **State Board present.** The driver doc must have a `### State Board` section. If absent, the reviewer creates it at its first write, using the five-field block below.
 4. **Turn-taking from convention, not memory:** the highest-numbered note for the arc whose `status` names your seat is the one to act on. Both sides find the latest by listing the folder.
 
@@ -69,6 +76,10 @@ Both seats follow the guide's Transport conventions for filenames, frontmatter, 
 6. **Read decisions from the folder.** Mid-build human decisions arrive as numbered notes from the reviewer - never act on a decision you only heard about secondhand.
 
 ## Reviewer Steps
+
+A pre-flight fresh-eyes review earns its keep even single-session: "fresh eyes" means *did not author the artifact*, not necessarily a separate thread - a same-session reviewer who did not write the chunk still catches what the author cannot. (DataWizard, 2026-09)
+
+**Reviewer-lands-cheap-guards boundary.** A reviewer may land a finding directly - collapsing review -> builder -> re-review into one session - only when it is a small, class-level guard the reviewer can prove in-session with a fixture plus a live dry-run. Body rewrites and design changes always go back to the builder, who has the build context. (DataWizard, 2026-09; stated independently twice before naming.)
 
 Per chunk:
 
