@@ -3,6 +3,7 @@ title: YAML Schema
 type: protocol
 created: '2026-06-13'
 updated: 2026-10-02
+origin: DW-S182 2026-06-13
 operator: Andrew
 priority: high
 maturity: working

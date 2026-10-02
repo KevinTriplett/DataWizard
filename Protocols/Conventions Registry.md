@@ -3,6 +3,7 @@ title: Conventions Registry
 type: protocol
 created: '2026-06-13'
 updated: '2026-10-02'
+origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
 maturity: working

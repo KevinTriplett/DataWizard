@@ -3,6 +3,7 @@ title: Content Type Taxonomy
 type: project-doc
 created: '2026-03-02'
 updated: '2026-10-02'
+origin: DW-S179 2026-06-12
 version: v2.7
 status: active
 operator: Andrew
