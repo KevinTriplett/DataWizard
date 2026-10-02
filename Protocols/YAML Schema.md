@@ -2,11 +2,12 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-09-23
+updated: 2026-10-02
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
+  - "DW-S382 2026-10-02: added Holonic Core Records section (entity_kind vocabulary, core_id/core_note/core_synced, projections states, to_confirm; D133) + the core_note exception to Wikilinks everywhere"
   - DW-S182 2026-06-13
   - DW-S183 2026-06-14
   - "DW-S191 2026-06-21: added stream: session-log field"
@@ -29,7 +30,7 @@ edit_log:
     meta-learning review S301-S323)"
 ---
 
-> **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
+> **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Core Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
 
 ### What "Harvest" Means
 
@@ -286,6 +287,38 @@ federated_note: "Full copy"
 ```
 
 Federated copies also carry harvest tracking fields (`harvest_status`, `harvested_into`, etc.) -- same schema as originals.
+
+### Holonic Core Records (`entity_kind` and the `core_*` cluster)
+
+A *holonic core record* is the one project-agnostic note for an organization (or similar entity) that several projects each describe from their own angle. The core holds the shared facts; each project keeps a *projection* - its own note, in its own folder, carrying a self-contained `## Shared facts (from core)` block plus the project's view. Rule and lifecycle: Conventions Registry, "Holonic org notes". Adopted as DataWizard D133 (2026-10).
+
+**On the core note** (`type: entity`, in the owning vault's `_Entities/` folder):
+
+```yaml
+type: entity
+entity_kind: org          # org | network | fund | community | platform | protocol | tool
+core_id: example-org      # kebab-case, stable forever once written
+name: Example Org
+aliases: []               # real other names only (acronym, aka, former name) - never a parent org
+website: https://example.org/   # the entity's own site, never a shared host (github, linkedin, substack...)
+to_confirm: []            # facts not verified at the source, with where they came from
+projections: []           # one entry per place the entity appears, with a state (see below)
+verified: YYYY-MM-DD      # date of the last check against the entity's own site, or `unverified`
+```
+
+`projections:` entries are `<path or place> (<state>)`; states: `written YYYY-MM-DD`, `existing note - shared block added YYYY-MM-DD`, `pending pickup - exchange note`, `pending pickup - handoff file`, `existing collaborator note, not edited - <project>`, `list entry, not a note`, `registry row, not a note`, `queue line N, graduated YYYY-MM-DD`, `retired YYYY-MM-DD` (never removed).
+
+**On every projection** (a project's own note about the entity):
+
+```yaml
+core_id: example-org
+core_note: _Entities/Example Org.md    # plain path, never a wikilink
+core_synced: YYYY-MM-DD
+```
+
+`core_note` is the one deliberate exception to "Wikilinks everywhere" (top of this document): a projection travels into team repos and other vaults where a wikilink into the owning vault resolves for nobody. A plain path still tells a human where the core lives (Conventions Registry, "Self-contained boundary-crossing references").
+
+`entity_kind` on a note that is not a core record is ignored by the sync; `core_*` fields are written only by the federating skill or its batch twin, never by hand-maintained project views. These fields are unrelated to the Federation Fields above (`federated_to` / `federated_from` copy a file; a core record is a join, not a copy).
 
 ### AI-Generated Content Fields
 

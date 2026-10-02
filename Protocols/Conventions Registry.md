@@ -2,11 +2,12 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-09-23'
+updated: '2026-10-02'
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
+  - "DW-S382 2026-10-02: added Holonic org notes entry (rule, shared facts, projection block, sync rules, delivery classes, identity; D133)"
   - DW-S181 2026-06-13
   - "DW-S182 2026-06-13: clarified archiving banner placement for frontmatter
     files"
@@ -394,6 +395,36 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 ## Self-contained boundary-crossing references
 
 **Rule:** A pointer that cannot resolve across a boundary forces the referenced thing to stand alone. Wherever a reference crosses a resolution boundary - separate Obsidian vaults (wikilinks do not resolve across vaults, ever), a deploy target no session can read, a registry key consumed outside the vault - the crossing line must carry everything the receiver needs (title, locator the receiver's side can resolve, and why it matters), and the referenced artifact needs a readable twin on the reader's side of the boundary. Three prior instances re-derived this separately before naming. (DataWizard, 2026-09)
+
+## Holonic org notes
+
+**Rule:** When several projects each need a note about the same organization (or network, fund, community, platform, protocol, tool), consolidate the *core*, not the views. One core record per entity lives in the owning vault's `_Entities/` folder (`type: entity` + `entity_kind` + a stable `core_id`); every project keeps its own note - a *projection* - in its own folder, carrying a self-contained `## Shared facts (from core)` block plus the project's view. Each projection is a whole in its own repo; the core is the join. Fields that describe the entity are core; fields that describe a project's relationship to it (priority, stage, fit, "why we care") stay in the project.
+
+**Shared facts** (the block, generated from the core): website, what it is, org form, people, partners / co-hosts, location, verified-on date. The core also holds aliases, founded, maturity, interop, sources, `to_confirm`, and `projections:` - one entry per place the entity appears, including list lines and registry rows where no note exists (that is how the join exists before the notes do). Field schema: YAML Schema, "Holonic Core Records".
+
+**Projection block** (verbatim shape; the italic line names the core by plain path):
+
+```
+## Shared facts (from core)
+*Generated from `_Entities/<Entity>.md` (core_synced YYYY-MM-DD). Change these facts in the core note, not here.*
+- **Website:** ...
+- **What it is:** ...
+- **Org form:** ...
+- **People:** ...
+- **Partners / co-hosts:** ...
+- **Location:** ...
+- **Verified:** YYYY-MM-DD (web).
+```
+
+Plus three frontmatter fields on the projection: `core_id`, `core_note` (plain path, never a wikilink - the block must stand alone where the owning vault is not reachable; see "Self-contained boundary-crossing references"), `core_synced`.
+
+**Sync rules:** (1) core wins for shared facts, the project wins for its view - a sync rewrites only the block and the three `core_*` fields; (2) corrections flow *up* through the owning operator, never sideways - a teammate's changed fact inside a projection is reported as a diff, accepted into the core, then carried to every other projection; (3) privacy by construction - only the block leaves the core, two teams can hold different projections of one entity and never see each other's view; (4) never delete - a retired projection is marked in `projections:`, not removed; (5) a core is created when an entity is *touched* (backfill on touch); existing notes are joined, not moved.
+
+**Delivery classes** (who writes the projection): own project, same vault - the federating session writes the note directly; team repo - the session delivers (an exchange note the owning project's session moves into place, or at volume one owned handoff file with a `## Pending` section the other side drains); the federating session never edits collaborator content and never rebuilds another project's map (it leaves a pickup line in that project's action items). Delivery class scales with volume, not with ownership: one exchange note per entity does not scale past a few dozen.
+
+**Identity:** join by the entity's own website domain, with the normalized name and real aliases (acronym, aka, former name) as fallback keys. A shared or multi-tenant host (code forges, social networks, newsletter and doc platforms, directory sites) is never a join key or a `website:` value; a parent org named in a parenthetical is a partner fact, not an alias. In a registry note the entity's own site is the first token of the first `## Sources` bullet.
+
+**Why:** the same entity was being researched once per map and drifting three ways; merging the maps' ontologies was rejected because each map asks a different question of the same entity. Pattern first stated for allies registers and DW-owned sections inside collaborator files; D133 applies it one level up. (DataWizard, 2026-10; D133; builds on the collaborator-repo intake handoff rulings of 2026-09.)
 
 ## Generic-non-blocking (Seed ship gate)
 

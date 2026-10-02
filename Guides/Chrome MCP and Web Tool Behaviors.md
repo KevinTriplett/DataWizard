@@ -17,11 +17,12 @@ edit_log:
     site gate, javascript_tool block, dropdown harvesting, screenshot location,
     PDF viewer, Playwright egress"
   - 'RW_2026-09-23_AA_01 - client-rendered ladder extended: verbatim-fetch prompt, SPA path-drop + hover-only data, operator Web-Clip fallback; family named (ReWoven meta-learning review)'
+  - 'DW-S381 2026-10-02 - web_fetch Behaviors: claude.ai/share links unreadable; artifact links via the Artifact tool'
 operator: Andrew
 scope: seed
 title: Chrome MCP and Web Tool Behaviors
 type: guide
-updated: 2026-09-23
+updated: 2026-10-02
 ---
 # Chrome MCP and Web Tool Behaviors
 
@@ -62,6 +63,8 @@ This ladder is the standing home for the recurring "JS-rendered surface needs a 
 
 - Cowork WebFetch can refuse arbitrary URLs with PROVENANCE_REQUIRED: a permission prompt goes to the human and, unanswered, the fetch fails - fatal for unattended runs. Workaround that held everywhere tested (Weave, 2026-09): run a web search naming the target first, then fetch the URLs the search returns - search-derived URLs carry provenance. Design scheduled web checks search-first, and report still-blocked sources as unverified rather than retrying.
 - The provenance gate is not universal: in an attended Cowork session WebFetch fetched an arbitrary Firebase-hosted page directly with no prompt (Weave, 2026-09). Plan search-first for unattended runs; do not assume the gate in attended ones. Separately, WebFetch sees only server-rendered HTML - a JS-rendered page returned just its toolbar and snapshot stamp; use Chrome MCP (see Reading Client-Rendered Pages) for the content.
+
+- A `claude.ai/share/<id>` conversation link is not readable by `web_fetch` - it returns only the site's meta tags, never the shared chat. Ask the operator for the underlying vault note or artifact instead; a `claude.ai/artifact/<id>` link IS readable, through the Artifact tool's read action (not web_fetch), and a large artifact comes back head-only with the full HTML saved to a local file. (DataWizard, 2026-10)
 
 ## Google Docs via Chrome
 
