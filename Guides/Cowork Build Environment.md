@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - "DW-S387 2026-10-05 - Device Bridge: GNU sed form + Python-heredoc canon patching (S387)"
   - DW-S273 2026-08-18 - created from the Cowork Build Environment Guide FR (VC
     S23-S34 build cluster + Weave sandbox/network items + DW S221-S230
     device-bridge items + RW S51 staged-path item); seeded from the field-tested
@@ -48,7 +49,7 @@ operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: '2026-09-23'
+updated: 2026-10-05
 ---
 # Cowork Build Environment
 
@@ -142,6 +143,8 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **Chat-delivered HTML previews run NO page scripts; published claude.ai artifacts run scripts but block external hosts.** A self-contained interactive HTML sent into the chat (SendUserFile) renders in the Claude app's preview as static markup only - every script is stripped, so a JS-driven page shows its empty skeleton and looks broken. Publishing the same page as a claude.ai artifact (Artifact tool) restores full JS on the page's own origin, but the artifact CSP blocks all external requests (tile servers, CDNs), so the page must be fully self-contained and degrade gracefully when its network layers fail (a caught tile-error toast beats a broken map). Full fidelity - scripts AND network tiles - needs a real browser on a real file. Route accordingly: chat preview for static documents, published artifact for interactive review, local file for the real thing. (Source: Rootland, 2026-09)
 
 - **`device_bash` localhost is the VM's, not the Mac's.** A `curl localhost:<port>` inside `device_bash` probes only the mount VM - connection refused (000) says nothing about servers the operator runs natively on the Mac. Never use the device shell to check whether a Mac-hosted server is up; ask the operator, or verify the change in the sandbox with a staged copy (see the headless-Chromium recipe below). (Source: Location Scout, 2026-09)
+
+- **The device shell is GNU Linux, not macOS: `sed -i ''` (the BSD in-place form) fails with "can't read"; use `sed -i`.** For canon files past the MCP patch size threshold, a Python heredoc run in `device_bash` - read the live file, string-replace with an `assert` that the anchor exists exactly once, write, then parse the frontmatter back - landed multi-section edits in a 10K-word protocol file reliably where `patch_note` is unreliable. Verify with a YAML parse of the frontmatter after every such write. (DataWizard, 2026-10)
 
 ## Verification Discipline for Builds
 

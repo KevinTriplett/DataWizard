@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-02
+updated: 2026-10-05
 origin: DW-S182 2026-06-13
 operator: Andrew
 priority: high
@@ -29,9 +29,10 @@ edit_log:
     changes 1-2)
   - "DW-S374 2026-09-23 - field-retirement rule (remove at retirement time;
     meta-learning review S301-S323)"
+  - 'DW-S387 2026-10-05: Holonic Core Records replaced by Holonic Records (hid, kinds table, keys/anchors, lifecycle, relations records, predicate table, person rules, projection hid; D134)'
 ---
 
-> **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Core Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
+> **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
 
 ### What "Harvest" Means
 
@@ -289,37 +290,124 @@ federated_note: "Full copy"
 
 Federated copies also carry harvest tracking fields (`harvest_status`, `harvested_into`, etc.) -- same schema as originals.
 
-### Holonic Core Records (`entity_kind` and the `core_*` cluster)
+### Holonic Records (`hid`, `entity_kind`, lifecycle, `relations:`, and the `core_*` cluster)
 
-A *holonic core record* is the one project-agnostic note for an organization (or similar entity) that several projects each describe from their own angle. The core holds the shared facts; each project keeps a *projection* - its own note, in its own folder, carrying a self-contained `## Shared facts (from core)` block plus the project's view. Rule and lifecycle: Conventions Registry, "Holonic org notes". Adopted as DataWizard D133 (2026-10).
+A *holonic record* (a *core*) is the one project-agnostic note for a thing several projects each describe from their own angle. The core holds the shared facts and a stable identity; each project keeps a *projection* - its own note, in its own folder, carrying a self-contained `## Shared facts (from core)` block plus the project's view. The vault is the authority for identity, lifecycle and relations; every database that reads cores is an index. Rule and sync contract: Conventions Registry, "Holonic records". Adopted as DataWizard D133 and D134 (2026-10).
 
 **On the core note** (`type: entity`, in the owning vault's `_Entities/` folder):
 
 ```yaml
 type: entity
-entity_kind: org          # org | network | fund | community | platform | protocol | tool
-core_id: example-org      # kebab-case, stable forever once written
+entity_kind: org            # one value from the kinds table below
+hid: k7m2p4q9r3t5w8x2y6z4   # 20 chars a-z 2-7, minted once by the index, never derived from a name
+core_id: example-org        # kebab-case, stable forever once written; the human key
 name: Example Org
-aliases: []               # real other names only (acronym, aka, former name) - never a parent org
-website: https://example.org/   # the entity's own site, never a shared host (github, linkedin, substack...)
-to_confirm: []            # facts not verified at the source, with where they came from
-projections: []           # one entry per place the entity appears, with a state (see below)
-verified: YYYY-MM-DD      # date of the last check against the entity's own site, or `unverified`
+aliases: []                 # real other names only (acronym, aka, former name) - never a parent
+website: https://example.org/   # the entity's own site, never a shared host
+keys: []                    # asserted lookup keys as <scheme>~<value> (anchor table below)
+one_liner: ...
+status: active              # active | merged | retired
+# successor: <hid>          # only when merged
+# merged_from: [<hid>]      # only when this core absorbed another
+relations: []               # list of relation records (shape below)
+to_confirm: []              # facts not verified at the source, with where they came from
+projections: []             # one entry per place the entity appears, with a state (below)
+sources: []
+verified: YYYY-MM-DD        # last check against the entity's own site, or `unverified`
 ```
 
-`projections:` entries are `<path or place> (<state>)`; states: `written YYYY-MM-DD`, `existing note - shared block added YYYY-MM-DD`, `pending pickup - exchange note`, `pending pickup - handoff file`, `existing collaborator note, not edited - <project>`, `list entry, not a note`, `registry row, not a note`, `queue line N, graduated YYYY-MM-DD`, `retired YYYY-MM-DD` (never removed).
+Kind-specific shared facts (`org_form`, `founded`, `location`) follow the kinds table. `unknown` is a legal value in the core (checked, not found); the projection block omits a bullet whose value is unknown.
+
+**Kinds** (the only place a kind is defined; consumers import this table, never the reverse):
+
+| Kind | What it is | Extra shared facts |
+|---|---|---|
+| `org` | an organization of any legal form | `org_form`, `founded`, `location` |
+| `network` | an association of orgs or people with its own name | `org_form`, `founded`, `location` |
+| `fund` | a pool of money with a name and a steward | `org_form`, `founded`, `location` |
+| `community` | a place- or practice-based group without a formal body | `location` |
+| `platform` | software people use as a service | `org_form`, `founded` |
+| `protocol` | a specification several implementations follow | `founded` |
+| `tool` | software people install or run | `founded` |
+| `person` | a human being - see the person rules below | none |
+| `project` | a bounded effort with a name, including the vault's own projects | `founded`, `location` |
+| `place` | a venue, region or site | `location` |
+| `event` | a dated gathering | `founded` (the date), `location` |
+| `work` | a text, talk, recording, film or dataset | `founded` (publication date) |
+
+A kind is added when a real record of it is touched, by adding a row here and a Seed patch note. `entity_kind` on a note that is not a core is ignored by the index.
+
+**Identity.** `hid` is the join key for every index and every consumer; `core_id`, slugs and hosts are lookups. The index mints `hid` on a core that lacks one and writes nothing else back. `keys:` holds asserted lookup keys as `<scheme>~<value>`; derived keys (`core~`, `host~`, `slug~`) are computed by the index and never stored. Normalisation: lowercase; no protocol, `www.`, port, query or trailing slash; non-ASCII hosts to punycode; a value that normalises to empty is not a key. A key is retired by moving it to `keys_retired:`, never deleted.
+
+| Scheme | Value | Example |
+|---|---|---|
+| `linkedin` | path after the host | `linkedin~in/jane-example` |
+| `github` | login | `github~example-org` |
+| `npub` | bech32 Nostr key | `npub~npub1...` |
+| `did` | the DID | `did~did:web:example.org` |
+| `purl` | Murmurations primary_url, host form | `purl~example.org` |
+| `profile:<host>` | path on that host; covers any host not listed | `profile:example.social~jane` |
+
+Scheme rows are added as a project needs them; `profile:<host>` is always available.
+
+**Lifecycle.** `status: active | merged | retired`. A merge or retirement is an operator ruling recorded in the core's `edit_log` and the Decision Log; scripts never set these values. Merged: the loser carries `successor` and `merged: YYYY-MM-DD`; the survivor carries `merged_from`, gains the loser's aliases and keys, and the loser's projections are re-pointed at the survivor on the next sync (the one authorised re-key of a projection). Retired: `retired: YYYY-MM-DD`. Nothing is deleted; a chain of successors is reported, not followed.
+
+**Relations.** `relations:` is a list of records. A relation lives on the core of its subject; the declared direction is the only one stored; inverses are derived. On a core a relation is a shared fact; on a projection it is that project's view.
+
+```yaml
+relations:
+  - pred: part_of           # from the predicate table
+    target: m4k7q2w9x3z6b8c5d2f4   # target hid; a core_id is accepted and rewritten to the hid on the next federating write; null when no core exists yet
+    target_name: Example Network
+    role: hub               # optional qualifier; the source verb for related_to
+    since: 2021             # optional, YYYY or YYYY-MM-DD
+    source: _Projects/Example Org.md#relations[0]   # vault locator, register locator (<project>:<row>.<field>) or URL
+    raw: 'part-of: Example Network'                 # optional, the source string verbatim
+```
+
+A relation is created and retracted, never edited in place: a correction is a retraction (`retracted: YYYY-MM-DD`, `retracted_by`, optional `retracted_reason`) plus a new record, and the retracted record stays. A relation has no stored id; its identity is `(subject hid, pred, target, role, since)`.
+
+| Predicate | Inverse (derived) | Symmetric | On a core |
+|---|---|---|---|
+| `part_of` | `has_part` | no | yes |
+| `member_of` | `has_member` | no | yes |
+| `home` | `home_of` | no | at most one |
+| `works_for` | `employs` | no | yes |
+| `founded` | `founded_by` | no | yes |
+| `leads` | `led_by` | no | yes |
+| `builds` | `built_by` | no | yes |
+| `partner_of` | - | yes | yes |
+| `funded_by` | `funds` | no | yes |
+| `builds_on` | `built_on_by` | no | yes |
+| `federates_with` | - | yes | yes |
+| `same_as` | - | yes | by a merge only |
+| `authored_by` | `author_of` | no | yes |
+| `cites` | `cited_by` | no | yes |
+| `quotes` | `quoted_by` | no | yes |
+| `depicts` | `depicted_in` | no | yes |
+| `derived_from` | `source_of` | no | yes |
+| `related_to` | - | yes | with `role` only |
+| `affiliated_with` | - | yes | view only |
+| `knows` | - | yes | view only |
+| `best_connection_to` | - | no | view only |
+| `represents` | `represented_by` | no | view only |
+
+Adding a predicate is a schema change. Role words that have a finer predicate map to it (`founder` -> `founded`, `builder` -> `builds`, `leader` -> `leads`, `member` -> `member_of`); other role words stay as `role` on `part_of`. A verb with no predicate becomes `related_to` with the verb in `role`.
+
+**Persons.** A person core (`entity_kind: person`) exists before anyone claims it; consent governs exposure, not existence. Fields beyond the common set: `person_state: unclaimed | anchored | claimed` and `exposure: team | public` (default `team`). Allow-list: `hid`, `core_id`, `name`, `aliases`, `website`, `keys`, `keys_retired`, `person_state`, `exposure`, `one_liner` (from the person's own public profile only), `relations` (each with a public `source`), the `status` cluster, `to_confirm`, `projections`, `sources`, `verified`, birth metadata. Any other field is an error. Relationship content about a person never enters a core at any state; it stays in the project's own notes. `unclaimed -> anchored` when the operator adds the first key; `anchored -> claimed` through a claim flow defined outside this schema; `public` exposure is reachable only from `claimed`.
+
+**`projections:`** entries are `<path or place> (<state>)`; states: `written YYYY-MM-DD`, `existing note - shared block added YYYY-MM-DD`, `pending pickup - exchange note`, `pending pickup - handoff file`, `existing collaborator note, not edited - <project>`, `list entry, not a note`, `registry row, not a note`, `queue line N, graduated YYYY-MM-DD`, `retired YYYY-MM-DD`, `merged into <core_id> YYYY-MM-DD`, `merged from <core_id> YYYY-MM-DD` (never removed).
 
 **On every projection** (a project's own note about the entity):
 
 ```yaml
 core_id: example-org
+hid: k7m2p4q9r3t5w8x2y6z4
 core_note: _Entities/Example Org.md    # plain path, never a wikilink
 core_synced: YYYY-MM-DD
 ```
 
-`core_note` is the one deliberate exception to "Wikilinks everywhere" (top of this document): a projection travels into team repos and other vaults where a wikilink into the owning vault resolves for nobody. A plain path still tells a human where the core lives (Conventions Registry, "Self-contained boundary-crossing references").
-
-`entity_kind` on a note that is not a core record is ignored by the sync; `core_*` fields are written only by the federating skill or its batch twin, never by hand-maintained project views. These fields are unrelated to the Federation Fields above (`federated_to` / `federated_from` copy a file; a core record is a join, not a copy).
+`hid` is the join; `core_id` and `core_note` tell a human where the core lives on the far side of a vault boundary. `core_note` is the one deliberate exception to "Wikilinks everywhere" (top of this document; Conventions Registry, "Self-contained boundary-crossing references"). `core_*` fields and `hid` are written only by the federating skill, its batch twin, or the index - never by hand-maintained project views. These fields are unrelated to the Federation Fields above (`federated_to` / `federated_from` copy a file; a core record is a join, not a copy).
 
 ### AI-Generated Content Fields
 

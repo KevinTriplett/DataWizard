@@ -2,7 +2,7 @@
 title: Content Type Taxonomy
 type: project-doc
 created: '2026-03-02'
-updated: '2026-10-02'
+updated: 2026-10-05
 origin: DW-S179 2026-06-12
 version: v2.7
 status: active
@@ -12,6 +12,7 @@ edit_log:
   - >-
     DW-S179 2026-06-12 - v2.7: garden admitted (D89), infrastructure types
     section, corpus-source retired, taxonomy.yaml machine canon pointer
+  - 'DW-S387 2026-10-05: entity line pointer renamed to Holonic Records (D134)'
 ---
 
 # Content Type Taxonomy v2.7
@@ -42,7 +43,7 @@ Prose content — essays, blog posts, reports, opinion pieces, speculative ficti
 ---
 
 ### entity
-Organization, company, collective, project, or initiative homepage. **Persistent** — not time-bounded. Distinguish from `event` (which has specific dates). A core org record (one project-agnostic note per entity, with `entity_kind` and `core_id`) is also `entity` - see YAML Schema, "Holonic Core Records".
+Organization, company, collective, project, or initiative homepage. **Persistent** — not time-bounded. Distinguish from `event` (which has specific dates). A core org record (one project-agnostic note per entity, with `entity_kind` and `core_id`) is also `entity` - see YAML Schema, "Holonic Records".
 
 **Signals**: "About us" language, mission statement, team listings, programs/services, calls to action (join, donate, partner). No specific event dates.
 

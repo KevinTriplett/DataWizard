@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: '2026-10-02'
+updated: 2026-10-05
 origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
@@ -83,6 +83,7 @@ edit_log:
   - "DW-S374 2026-09-23 - added Self-contained boundary-crossing references;
     optimistic-claim extension (claim protects the identifier, not the file)
     (meta-learning review S338-S362)"
+  - 'DW-S387 2026-10-05: Holonic org notes widened to Holonic records (identity, lifecycle, relations, persons, sync-as-diff rule 6); ID families gains hid, core_id and relation-id rows (D134)'
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -397,35 +398,44 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 
 **Rule:** A pointer that cannot resolve across a boundary forces the referenced thing to stand alone. Wherever a reference crosses a resolution boundary - separate Obsidian vaults (wikilinks do not resolve across vaults, ever), a deploy target no session can read, a registry key consumed outside the vault - the crossing line must carry everything the receiver needs (title, locator the receiver's side can resolve, and why it matters), and the referenced artifact needs a readable twin on the reader's side of the boundary. Three prior instances re-derived this separately before naming. (DataWizard, 2026-09)
 
-## Holonic org notes
+## Holonic records
 
-**Rule:** When several projects each need a note about the same organization (or network, fund, community, platform, protocol, tool), consolidate the *core*, not the views. One core record per entity lives in the owning vault's `_Entities/` folder (`type: entity` + `entity_kind` + a stable `core_id`); every project keeps its own note - a *projection* - in its own folder, carrying a self-contained `## Shared facts (from core)` block plus the project's view. Each projection is a whole in its own repo; the core is the join. Fields that describe the entity are core; fields that describe a project's relationship to it (priority, stage, fit, "why we care") stay in the project.
+*(Formerly "Holonic org notes"; widened from organizations to every kind in the YAML Schema kinds table, DataWizard 2026-10, D134.)*
 
-**Shared facts** (the block, generated from the core): website, what it is, org form, people, partners / co-hosts, location, verified-on date. The core also holds aliases, founded, maturity, interop, sources, `to_confirm`, and `projections:` - one entry per place the entity appears, including list lines and registry rows where no note exists (that is how the join exists before the notes do). Field schema: YAML Schema, "Holonic Core Records".
+**Rule:** When several projects each need a note about the same thing, consolidate the *core*, not the views. One core record per entity lives in the owning vault's `_Entities/` folder (`type: entity`, `entity_kind`, a stable `core_id`, and an opaque `hid` minted once); every project keeps its own note - a *projection* - in its own folder, carrying a self-contained `## Shared facts (from core)` block plus the project's view. Each projection is a whole in its own repo; the core is the join. Fields that describe the entity are core; fields that describe a project's relationship to it (priority, stage, fit, "why we care") stay in the project. The vault is the authority for identity, lifecycle and relations; every database that reads cores is an index of them, never the other way round. Field schema: YAML Schema, "Holonic Records".
 
-**Projection block** (verbatim shape; the italic line names the core by plain path):
+**Shared facts** (the block, generated from the core): website, what it is, the kind-specific facts (org form, founded, location - a bullet is omitted when its value is unknown), relations (the core's non-retracted shared relations), status when not active, verified-on date. The core also holds aliases, keys, maturity, interop, sources, `to_confirm`, and `projections:` - one entry per place the entity appears, including list lines and registry rows where no note exists (that is how the join exists before the notes do).
+
+**Projection block** (verbatim shape; the italic line names the core by plain path and by hid):
 
 ```
 ## Shared facts (from core)
-*Generated from `_Entities/<Entity>.md` (core_synced YYYY-MM-DD). Change these facts in the core note, not here.*
+*Generated from `_Entities/<Entity>.md` (hid <hid>, core_synced YYYY-MM-DD). Change these facts in the core note, not here.*
 - **Website:** ...
 - **What it is:** ...
 - **Org form:** ...
-- **People:** ...
-- **Partners / co-hosts:** ...
+- **Founded:** ...
 - **Location:** ...
+- **Relations:** part of Example Network (hub); member of Example Coalition
+- **Status:** merged into Example Survivor YYYY-MM-DD
 - **Verified:** YYYY-MM-DD (web).
 ```
 
-Plus three frontmatter fields on the projection: `core_id`, `core_note` (plain path, never a wikilink - the block must stand alone where the owning vault is not reachable; see "Self-contained boundary-crossing references"), `core_synced`.
+Plus four frontmatter fields on the projection: `core_id`, `hid`, `core_note` (plain path, never a wikilink - the block must stand alone where the owning vault is not reachable; see "Self-contained boundary-crossing references"), `core_synced`.
 
-**Sync rules:** (1) core wins for shared facts, the project wins for its view - a sync rewrites only the block and the three `core_*` fields; (2) corrections flow *up* through the owning operator, never sideways - a teammate's changed fact inside a projection is reported as a diff, accepted into the core, then carried to every other projection; (3) privacy by construction - only the block leaves the core, two teams can hold different projections of one entity and never see each other's view; (4) never delete - a retired projection is marked in `projections:`, not removed; (5) a core is created when an entity is *touched* (backfill on touch); existing notes are joined, not moved.
+**Identity:** `hid` is the join key for every index and consumer; it is minted once by the index, never derived from a name, never re-keyed, and a merge keeps both ids (the loser points at the survivor). `core_id`, the entity's own website host, and the normalised name and real aliases are lookups. A shared or multi-tenant host is never a join key or a `website:` value; a parent named in a parenthetical is a relation, not an alias. Asserted keys (`<scheme>~<value>`) are stored; derived keys are computed.
 
-**Delivery classes** (who writes the projection): own project, same vault - the federating session writes the note directly; team repo - the session delivers (an exchange note the owning project's session moves into place, or at volume one owned handoff file with a `## Pending` section the other side drains); the federating session never edits collaborator content and never rebuilds another project's map (it leaves a pickup line in that project's action items). Delivery class scales with volume, not with ownership: one exchange note per entity does not scale past a few dozen.
+**Lifecycle:** a core is never deleted. `merged` and `retired` are operator rulings recorded in the core's `edit_log` and the Decision Log; scripts never set them. A merge re-points the loser's projections at the survivor on the next sync - the one authorised re-key of a projection - and marks the move in both cores' `projections:`.
 
-**Identity:** join by the entity's own website domain, with the normalized name and real aliases (acronym, aka, former name) as fallback keys. A shared or multi-tenant host (code forges, social networks, newsletter and doc platforms, directory sites) is never a join key or a `website:` value; a parent org named in a parenthetical is a partner fact, not an alias. In a registry note the entity's own site is the first token of the first `## Sources` bullet.
+**Relations:** one grammar, written in the vault as `relations:` records on the subject's core (shared) or projection (view); created and retracted, never edited in place; one predicate list in the schema; a role word with a finer predicate maps to it. Free-string partner or people lists are retired: the strings survive as a relation's `raw`.
 
-**Why:** the same entity was being researched once per map and drifting three ways; merging the maps' ontologies was rejected because each map asks a different question of the same entity. Pattern first stated for allies registers and DW-owned sections inside collaborator files; D133 applies it one level up. (DataWizard, 2026-10; D133; builds on the collaborator-repo intake handoff rulings of 2026-09.)
+**Persons:** a person core exists before anyone claims it; consent governs exposure, not existence. Three states (unclaimed, anchored, claimed); unclaimed and anchored default to team-only exposure, no public export, no endpoints. Only public-by-design facts and relations with a public source enter a person core; relationship content stays in the project's own notes.
+
+**Sync rules:** (1) core wins for shared facts, the project wins for its view - a sync rewrites only the block and the projection's four `core_*`/`hid` fields; (2) corrections flow *up* through the owning operator, never sideways - a changed fact inside a projection is reported as a diff, accepted into the core, then carried to every other projection; (3) privacy by construction - only the block leaves the core, two teams can hold different projections of one entity and never see each other's view; (4) never delete - a retired projection is marked in `projections:`, not removed; (5) a core is created when an entity is *touched* (backfill on touch); existing notes are joined, not moved; (6) **sync is a diff against the live target**, never a rebuild from snapshots: compute, read live, write only what changed, retract or retire what vanished, and append one change-log line per field-level change; every consumer keeps its own cursor.
+
+**Delivery classes** (who writes the projection): own project, same vault - the federating session writes the note directly; team repo - the session delivers (an exchange note the owning project's session moves into place, or at volume one owned handoff file with a `## Pending` section the other side drains); the federating session never edits collaborator content and never rebuilds another project's map (it leaves a pickup line in that project's action items). Delivery class scales with volume, not with ownership.
+
+**Why:** the same entity was being researched once per map and drifting three ways; merging the maps' ontologies was rejected because each map asks a different question of the same entity (D133). A review across four consumers then found that each had re-derived an id scheme, a relation dialect and a privacy boundary locally, because the shared vocabulary lived in an index downstream of where the data is born; identity broke at the vault-to-store seam. The authority for identity, lifecycle and relations sits where the record is written (D134). (DataWizard, 2026-10.)
 
 ## Generic-non-blocking (Seed ship gate)
 
@@ -528,6 +538,9 @@ Role-level casting (orchestrator-synthesizer / researcher / writer) and the one 
 | Quest IDs | `XX-Q-NNN` | quest file frontmatter (`quest_id`) | next free across active quests + archive | project |
 | Task IDs | `PREFIX-NNNNN` | checkbox line in the quest layer | scan-max + verify-after-mint - see the **Quest Lifecycle** protocol (canonical home) | project (scan scope = active quests + archive + quest index) |
 | Intake titles (FRs, bug reports) | descriptive filename | the intake folder | filename uniqueness; descriptive, not coded | intake folder |
+| Holon ids (`hid`) | 20 chars from `a-z 2-7` | core note frontmatter | minted by the holon index when a core lacks one (one-time reconciliation may copy a pre-existing consumer id first); cryptographic random; never derived from a name; never reissued or re-keyed | global - every vault, store and consumer |
+| Core ids (`core_id`) | kebab-case slug | core note frontmatter | written by the federating skill or its batch twin from the name at core creation; stable forever once written; a merge keeps both | vault |
+| Relation ids | derived, not stored: 20 base32 chars of sha256 over `subject hid|pred|target|role|since` | holon index | computed from content, never from list position | global |
 
 The Task IDs row is the worked example: its definition-site / scope / minting triad took a three-session design arc to settle after live collisions in two projects; filling the row at family creation is the cheap alternative.
 
