@@ -4,6 +4,7 @@ type: project-doc
 status: active
 created: '2026-03-12'
 updated: '2026-10-06'
+origin: 'DW-S158 2026-06-08 - backfilled from the earliest edit_log entry (D127)'
 tags:
   - protocol
   - AI-collaboration

@@ -4,6 +4,7 @@ type: project-doc
 status: active
 created: '2026-06-18'
 updated: '2026-10-06'
+origin: 'DW-S189 2026-06-18 - backfilled from the earliest edit_log entry (D127)'
 operator: Andrew
 tags:
   - protocol

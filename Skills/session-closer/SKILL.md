@@ -8,6 +8,7 @@ description: >-
   previous session.
 type: skill
 updated: '2026-10-06'
+origin: 'DW-S158 2026-06-08 - backfilled from the earliest edit_log entry (D127)'
 version: '4.10.0'
 edit_log:
   - "DW-S388 2026-10-06 - v4.10.0: Step 3.14 board rule (asks for outbound items,

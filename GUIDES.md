@@ -3,6 +3,7 @@ title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
 updated: '2026-10-06'
+origin: 'DW-S195 2026-06-22 - backfilled from the earliest edit_log entry (D127)'
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and

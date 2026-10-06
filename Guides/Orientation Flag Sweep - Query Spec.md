@@ -14,6 +14,7 @@ seed_version: 1.2.0
 title: Orientation Flag Sweep - Query Spec
 type: guide
 updated: 2026-10-06
+origin: 'DW-S272 2026-08-18 - backfilled from the earliest edit_log entry (D127)'
 ---
 # Orientation Flag Sweep - Query Spec
 
