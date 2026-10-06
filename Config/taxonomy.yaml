@@ -9,6 +9,8 @@
 # types (D89). Instances extend via an overlay file - see `overlay` below.
 #
 # Created: DW-S179 2026-06-12 (P2, per D89/D84)
+# DW-S388 2026-10-06: infrastructure_types + exchange-note, coordination-board,
+#   coordination-board-archive (T20 Chunk 3; no taxonomy_version bump)
 
 meta:
   taxonomy_version: "2.7"
@@ -108,6 +110,9 @@ infrastructure_types:
   processing-report: "Pipeline/enrichment run reports"
   config: "Machine-readable or config-carrying docs"
   dashboard: "Dashboard and embed surfaces"
+  exchange-note: "Session Exchange notes between instances - plans, reviews, reports, handoffs, briefs"
+  coordination-board: "The vault-level coordination board mirror (_Coordination/Board.md) and its template"
+  coordination-board-archive: "Monthly archive of terminal board rows (_Coordination/Board Archive/YYYY-MM.md)"
 
 # ---------------------------------------------------------------------------
 # Retired types - hard renames from taxonomy history; replacement is canonical

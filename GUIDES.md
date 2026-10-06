@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: '2026-09-23'
+updated: '2026-10-06'
 operator: Andrew
 edit_log:
   - DW-S195 2026-06-22 - created the guides catalog and named the Platform and
@@ -29,6 +29,8 @@ edit_log:
   - "DW-S349 2026-09-08 - Reader-Facing Prose Style row added (Process and coordination)"
   - "DW-S374 2026-09-23 - added Script Portability guide to the Platform
     cluster (meta-learning review S324-S337)"
+  - "DW-S388 2026-10-06 - Coordination Board - Template row added; Query Spec row
+    names the board sub-check (d) (T20 Chunk 3)"
 ---
 # DataWizard Guides
 
@@ -69,10 +71,11 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Obsidian Bases Reference** | Using Obsidian Bases for DW dashboards and filtered views. |
 | **Working Principles** | The reasoning behind the Working Rules - the "why" under the behavioral contract. |
 | **Review Automation** | The three periodic reviews (health audit, meta-learning, Content Interests): the pending-report model, the cadence table (single home), and how scheduled automation detects staleness so the session-closer only surfaces waiting reports. |
-| **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub and intake sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
+| **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub, intake and board (d) sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
 | **Team Attention Rollout** | Activating the flag system on a multi-operator project: preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
 | **Flag Queue Page Template** | Copy-in template for a per-person flag queue page (Dataview): one section per operator over `flag_for` frontmatter, with the empty-due-last sort fix and the exact-name list-matching caveat. Render surface only -- the frontmatter is the mechanism. |
 | **Operator Gate Queue - Template** (`Seed/Templates/`) | Copy-in starter for a deployment-gate queue: class sections A-F + Parked + Deployed and one example G-row. The schema, lifecycle vocabulary, feeding rule, and exit ceremony are canonical in the Conventions Registry's Operator Gate Queue entry; wire the file as the third layer of the 0.5 action-items shell. |
+| **Coordination Board - Template** (`Seed/Templates/`) | Copy-in starter for the vault-level coordination board (`_Coordination/Board.md`): the header with placeholder well-known targets, the block grammar and hand-path steps, one example ask and one example claim. The rule and who writes the table are canonical in the Conventions Registry's Coordination board entry; the orientation read is the Query Spec's sub-check (d). |
 
 ### Surfaces and tools
 | Guide | Covers |

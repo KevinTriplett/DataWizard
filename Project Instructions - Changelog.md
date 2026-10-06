@@ -3,7 +3,7 @@ title: Project Instructions - Changelog
 type: project-doc
 status: active
 created: '2026-06-18'
-updated: '2026-09-22'
+updated: '2026-10-06'
 operator: Andrew
 tags:
   - protocol
@@ -14,6 +14,7 @@ edit_log:
   - RG-S12 2026-09-22 - v4.7 entry + v4.6 backfill + tracker to v4.7
   - DW-S366 2026-09-22 - v4.7 repair note + Seed tracker row corrected
   - DW-S366 2026-09-22 - v4.8 entry + canon write gate notice
+  - DW-S388 2026-10-06 - v4.9 entry + tracker to v4.9 / Seed 1.7.0
 ---
 # Project Instructions - Changelog
 
@@ -25,8 +26,14 @@ Version history for the DataWizard Project Instructions (`DataWizard Project Ins
 
 | What | Version | Last changed |
 |---|---|---|
-| Project Instructions | v4.8 | 2026-09-22 |
-| Seed | v1.6.2 | 2026-09-05 |
+| Project Instructions | v4.9 | 2026-10-06 |
+| Seed | v1.7.0 | 2026-10-06 |
+
+---
+
+## What Changed in v4.9
+
+**Orientation Step 6 gains sub-check (d), the board sweep [all projects].** Each orientation reads the vault-level coordination board (`_Coordination/Board.md`, a filesystem read) and surfaces asks addressed to this project or `all` - top five, due-first then oldest, the rest counted - plus every live claim. The sweep stays read-only; picking up an ask is an explicit act. The compliance trace gains the fragment `| board: N asks (M shown), K live claims`, and the step now reads "four conditionally-gated checks". No new orientation step; nothing else in the PI changed. Mechanism: Query Spec section (d); rule and who writes the table (ruling R4: Cowork sessions use the hand path on the mirror): Conventions Registry, "Coordination board". Shipped with Seed 1.7.0. Re-paste required. (DW-S388, 2026-10-06)
 
 ---
 

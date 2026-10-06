@@ -7,26 +7,29 @@ edit_log:
     field() (live-corpus catch during the whole-build verification sweep)"
   - "DW-S289 2026-08-26 - fifth correction: read_through_frontmatter() replaces the 8 KB read cap (live catch - a 10 KB edit_log-heavy frontmatter hid the queue's only dated flag from every surface; found during the Flag Workbench review)"
   - 'DW-S330 2026-09-04 - fallback section: MCP stale-serving of synced-never-opened files (non-empty-but-wrong); flag-load-bearing reads filesystem-only (WV_2026-09-02_JC_02)'
+  - 'DW-S388 2026-10-06 - sub-check (d) board sweep + trace fragment (lands with PI 4.9; Coordination Board T20 Chunk 3)'
 maturity: working
 operator: Andrew
 seed_version: 1.2.0
 title: Orientation Flag Sweep - Query Spec
 type: guide
-updated: 2026-09-04
+updated: 2026-10-06
 ---
 # Orientation Flag Sweep - Query Spec
 
-*The mechanism behind the PI Orientation sweep step. The PI states WHAT the sweep does in three sub-checks; this doc is HOW -- the query, the constants, the per-surface method -- so the PI stays short (PI real estate is scarce). Referenced by PI Orientation Step 6.*
+*The mechanism behind the PI Orientation sweep step. The PI states WHAT the sweep does in four sub-checks; this doc is HOW -- the query, the constants, the per-surface method -- so the PI stays short (PI real estate is scarce). Referenced by PI Orientation Step 6.*
 
 ## What the sweep is
 
-At orientation, one step runs three conditionally-gated checks and writes a single compliance-trace line into the session claim stub. It surfaces to the current operator what is already waiting on them -- flags addressed to them, their own stale stubs, newly filed intake -- at the one lifecycle point guaranteed to run in their own session. Full behavioral rationale: the Flag Surfacing Chain design (four-link delivery chain; orientation is the reader-path choke point).
+At orientation, one step runs four conditionally-gated checks and writes a single compliance-trace line into the session claim stub. It surfaces to the current operator what is already waiting on them -- flags addressed to them, their own stale stubs, newly filed intake, asks and live claims on the coordination board -- at the one lifecycle point guaranteed to run in their own session. Full behavioral rationale: the Flag Surfacing Chain design (four-link delivery chain; orientation is the reader-path choke point).
 
 ## Read-only by design (conscious deviation, pinned)
 
 **The sweep writes nothing to any file's frontmatter. Its only write is its own trace line in the claim stub.** It surfaces flags and their defaults; it does not stamp `flag_status`. Two writers change flag state, both outside the sweep: an explicit operator response during the session (act -> remove the operator's name from `flag_for`; conscious defer -> keep the name, set `flag_status: deferred`), and the session-closer's expiry pass, which is the ONLY automatic writer of `flag_status: expired-unread` (and the only automatic name-clearer).
 
 This is a deliberate departure from the Flag Surfacing Chain charter's F4-layer-1 note, which suggested the sweep "records `flag_status`" on overdue items. Reasons: (a) flags are multi-addressee -- one operator's sweep must not stamp status or clear names for co-addressees who have not seen the item; (b) automatic frontmatter writes at orientation, from possibly-concurrent sibling sessions, are a new race surface on shared files (the MCP-concurrency rule exists for exactly this); (c) a cheap read-only sweep is what the "PI real estate is scarce" constraint promised. Recorded in the Decision Log with the sweep-adoption entry.
+
+Sub-check (d) is read-only in the same way: it reads the board mirror and writes nothing. Picking up, closing or declining an ask is an explicit act (below), never a side effect of the sweep.
 
 ## Constants
 
@@ -139,12 +142,27 @@ v1 is detect + offer + mark-abandoned. Backfill-and-close (reconstructing the en
 
 List the project's intake folders and surface items added since the last session. **Comparison anchor:** an item is "new" if its frontmatter `created` date is on or after the date of the most recent session-log entry (fall back to file mtime where `created` is absent). Anchoring on the last log entry's date -- not "since I last looked" -- makes two instances compute the same answer. Intake folders for DataWizard: `Feature Requests/`, `Bug Reports/`, `Skill Requests/`, `Intake Queue/` (the canonical intake registry; see the Conventions Registry).
 
+## Sub-check (d) -- board sweep [all projects]
+
+The coordination board (Conventions Registry, "Coordination board") holds cross-project asks and write claims for the whole vault. The sweep reads its markdown mirror. Steps:
+
+1. **Source.** `<vault>/<board_dir>/Board.md` - `board_dir` from `Vault Config.md`, default `_Coordination/`. Filesystem read only, never MCP (the fallback reasons under sub-check (a) apply: a stale or empty MCP read would look like an empty board). No file: the trace fragment is `board: n/a (no board)`.
+2. **Blocks.** Read the blocks under `## Live` only. A block starts at `### B-NNNN ask - <summary>` or `### B-NNNN claim - <summary>`; its fields are `- key: value` lines, several per line separated by ` | `. The grammar itself lives in the board's own header.
+3. **Asks.** Keep asks whose `status` is `open` or `picked-up` and whose `to` list (comma-separated, case-insensitive) holds this project's abbreviation or `all`. Sort: dated `due` first (earliest first), then undated; within that, oldest `posted`, then lowest id. Surface the top **5** (id, status, by, posted, due, summary, note path) and state the count of the rest.
+4. **Claims.** A claim is live when `status: held` AND now (UTC) is before `heartbeat` + `ttl` minutes - never trust `held` alone; the mirror can lag the clock. Surface every live claim, any project (a claim on a store you write blocks your scripts either way): id, target, by, expiry, reason. A `held` claim already past its TTL is listed once as "expired, awaiting expiry" and is not counted; the next render marks it expired.
+5. **Unreconciled.** If the board has an `## Unreconciled` section, say so in one line ("N board blocks unreconciled - see Board.md"). Those are hand blocks the last render refused; they are not counted in the trace, but they are never dropped silently.
+6. **Trace fragment**, appended to the compliance trace: `| board: N asks (M shown), K live claims` - N asks addressed to this project, M = min(N, 5), K live claims.
+
+**Mac-side and Claude Code equivalent:** `python3 "<scripts>/board.py" sweep --project <ABBR>` prints the same lines and the trace fragment from the table. Global options (`--db`, `--vault`, `--board-dir`, `--now`) go BEFORE the subcommand: `python3 "<scripts>/board.py" --db <path> sweep --project <ABBR>`. The table and the mirror agree after every render; between renders the mirror can carry hand rows the table has not folded yet.
+
+**Acting on an ask** (an explicit act, never part of the sweep). By hand, in the mirror (Cowork sessions never write the table - ruling R4 in the Registry entry): edit the block's `status` (`picked-up`, `done`, `declined` or `stale`), add `- picked_by: <session>` or `- closed: <UTC time>` as fits, and set `- updated:` to now (UTC); the next render folds it in. A forgotten `updated` loses to the table and shows as `table wins` on the next render. Mac-side: `python3 "<scripts>/board.py" pickup B-NNNN --by <session>` (likewise `done`, `decline`, `stale`).
+
 ## The compliance trace (always written)
 
 Write ONE line into the claim stub every orientation, unconditionally, including the running PI version. Gated-off checks report their gate rather than being omitted -- a missing line is a broken sweep, and must stay distinguishable from "nothing was waiting."
 
 ```
-flag sweep [PI v4.6]: 3 surfaced, 1 handled, 0 deferred | stubs: 1 stale, 0 reconciled | intake: 2 new
+flag sweep [PI v4.9]: 3 surfaced, 1 handled, 0 deferred | stubs: 1 stale, 0 reconciled | intake: 2 new | board: 2 asks (2 shown), 0 live claims
 ```
 
-Solo-project example: `flag sweep [PI v4.6]: n/a (solo) | stubs: 1 stale, 0 reconciled | intake: 0 new`. The session-closer carries this line forward when it overwrites the stub at close, so even a session that never closes leaves the sweep record on disk.
+Solo-project example: `flag sweep [PI v4.9]: n/a (solo) | stubs: 1 stale, 0 reconciled | intake: 0 new | board: 0 asks (0 shown), 1 live claims`. The session-closer carries this line forward when it overwrites the stub at close, so even a session that never closes leaves the sweep record on disk.

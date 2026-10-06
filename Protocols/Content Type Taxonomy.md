@@ -2,7 +2,7 @@
 title: Content Type Taxonomy
 type: project-doc
 created: '2026-03-02'
-updated: 2026-10-05
+updated: 2026-10-06
 origin: DW-S179 2026-06-12
 version: v2.7
 status: active
@@ -13,6 +13,7 @@ edit_log:
     DW-S179 2026-06-12 - v2.7: garden admitted (D89), infrastructure types
     section, corpus-source retired, taxonomy.yaml machine canon pointer
   - 'DW-S387 2026-10-05: entity line pointer renamed to Holonic Records (D134)'
+  - 'DW-S388 2026-10-06: infrastructure types gain exchange-note, coordination-board, coordination-board-archive (T20)'
 ---
 
 # Content Type Taxonomy v2.7
@@ -215,7 +216,7 @@ An asynchronous communication — voice note, audio message, or text message sen
 
 Scoped list for DW project machinery -- not pipeline source material, not full taxonomy entries (D89). Definitions and fold map for synonym drift: `Seed/Config/taxonomy.yaml`.
 
-`project-doc`, `design-doc`, `research-note`, `feature-request`, `bug-report`, `skill-request`, `skill`, `guide`, `guide-section`, `quest`, `protocol`, `scan-report`, `processing-report`, `config`, `dashboard`
+`project-doc`, `design-doc`, `research-note`, `feature-request`, `bug-report`, `skill-request`, `skill`, `guide`, `guide-section`, `quest`, `protocol`, `scan-report`, `processing-report`, `config`, `dashboard`, `exchange-note`, `coordination-board`, `coordination-board-archive`
 
 ---
 

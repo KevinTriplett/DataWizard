@@ -1,7 +1,7 @@
 
-seed: 1.6.2
+seed: 1.7.0
 protocol: 1.8
-project_instructions: 4.8
+project_instructions: 4.9
 
 **Canon write gate:** edits to this file come only from a claimed session of the project that owns it. An instance governed by another project's instructions files a proposal at the owning project's intake (or an exchange note in its Session Exchange) instead of editing. Reviewed exceptions are whitelisted in the lint config. (Conventions Registry: "Cross-project canon write gate"; DataWizard, 2026-09)
 
@@ -54,6 +54,21 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.7.0
+
+**Coordination board (cross-project asks and write claims).** One vault-level board says "project X, something waits for you - here is where it is" (asks) and "I am writing this store or subtree until this time" (claims). Each row is a pointer; the content stays in the note it points at. The table lives in the operational database; `_Coordination/Board.md` is the shared markdown mirror. Shipped in the Seed:
+
+- `Templates/Coordination Board - Template.md` - depersonalized starter: header, block grammar, hand-path steps, one example ask and one example claim.
+- Conventions Registry entry "Coordination board" (rule, example, and who writes the table: scripts, Claude Code and DW Save write it; a session on a mount that cannot forward SQLite locks, such as Cowork, uses the hand path on the mirror) and the `B-NNNN` row in ID families.
+- `Guides/Orientation Flag Sweep - Query Spec.md` section (d): the board sweep as steps over the mirror, the trace fragment, and how to act on an ask.
+- `session-closer` v4.10.0: Step 3.14 posts an ask for each outbound item and releases held claims; Step 3.13 notes that claim expiry runs in the board render.
+- `Scripts/datawizard-sync.sh` (DW Save): when `board.py` exists and `python3` is on PATH, each save first runs `board.py render` and adds one `board` row to the status card (`folded`, `look at the board`, or `render error`); the save never fails because of the board.
+- `Config/taxonomy.yaml`: infrastructure types `coordination-board` and `coordination-board-archive`; drive-by fix: `exchange-note` registered too (it had been unregistered while every Session Exchange note used it - 21 type-validity errors cleared in this vault).
+
+`board.py` itself stays in the DataWizard Workshop until a second operator runs it; until then the board is read by hand from the mirror in other vaults.
+
+**Propagation:** the Seed files reach every vault through `update_seed.sh`; the orientation sub-check reaches each project only through a per-project re-paste of the Project Instructions (required; tracked as a gate row at close).
 
 ## What's New in 1.6.2
 

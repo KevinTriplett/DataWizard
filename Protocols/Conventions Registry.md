@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-05
+updated: 2026-10-06
 origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
@@ -84,6 +84,7 @@ edit_log:
     optimistic-claim extension (claim protects the identifier, not the file)
     (meta-learning review S338-S362)"
   - 'DW-S387 2026-10-05: Holonic org notes widened to Holonic records (identity, lifecycle, relations, persons, sync-as-diff rule 6); ID families gains hid, core_id and relation-id rows (D134)'
+  - 'DW-S388 2026-10-06: Coordination board entry added (design S387 section 10 + who-writes-the-table paragraph, ruling R4; D135); ID families gains the B-NNNN row'
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -514,6 +515,16 @@ A depersonalized starter file ships as `Seed/Templates/Operator Gate Queue - Tem
 
 ---
 
+## Coordination board
+
+**Rule:** Cross-project asks and write-claims live on one vault-level board, read at every project's orientation (sweep sub-check (d)) and written at every close (the cross-project write check posts an ask for each outbound item; held claims are released). A board row is a pointer - `hid:`, `path:`, `store:` or `project:` - plus one summary line; the content stays in the exchange note, feature request, gate row or core it points at. Claims are coarse (a store, a subtree, a holon), carry a TTL and a heartbeat, and are refused by every owning-project script while another live claim covers the target. Asks never expire automatically; the target project rules them done, declined or stale. The table in the operational db is the atomic store; the markdown mirror is the durable shared record; terminal rows rotate monthly to an archive and are never deleted. This is the reader-side artifact the "rows count as outbound items" rule requires, provided once for every project instead of once per note. (DataWizard, 2026-10; D135.)
+
+**Example:** a session files a pickup note in another project's Session Exchange and, at close, posts `B-0007 ask - to: that project - note: <the note's path>`; that project's next orientation lists it in the first five lines it reads.
+
+**Who writes the table.** Board table writes run on the operator's machine only - the board script, Claude Code sessions, and the DW Save sync, which runs the board render at every save. A session working through a mount that cannot forward SQLite locks (for example a Cowork session) never writes the table; it uses the hand path: write the block in the mirror in the board's grammar, re-read, renumber on collision (Optimistic-claim pattern); release or pick up by editing the row's `status` and `updated`. The next render folds hand edits in: a row in both mirror and table takes the side with the newer `updated`, field by field (a tie goes to the table); a mirror-only row is inserted under its own number (a different row under that number is a collision, carried to `## Unreconciled`, never inserted); a table-only row is written to the mirror; every merge is reported; nothing is deleted on either side. Starter file: `Seed/Templates/Coordination Board - Template.md`. (DataWizard, 2026-10)
+
+---
+
 ## Model routing
 
 **Rule:** when queuing session work for a later instance - a gate row's `model:` field, a What's-next `[model: X]` tag, the session-closer's next-session recap - suggest the model tier by work shape: **Opus-tier** is the default; **Fable-tier** (highest capability) earns its place on deep synthesis, audits, design reviews, canon writes, and multi-perspective judgment; **Sonnet-tier** suits mechanical, well-specified batches (metadata sweeps, triage marking, file moves). Keep names tier-generic - never pin a version, which goes stale. This entry is the single home for the routing heuristic; surfaces that use it point here instead of restating it. (DataWizard, 2026-08; D126)
@@ -541,6 +552,7 @@ Role-level casting (orchestrator-synthesizer / researcher / writer) and the one 
 | Holon ids (`hid`) | 20 chars from `a-z 2-7` | core note frontmatter | minted by the holon index when a core lacks one (one-time reconciliation may copy a pre-existing consumer id first); cryptographic random; never derived from a name; never reissued or re-keyed | global - every vault, store and consumer |
 | Core ids (`core_id`) | kebab-case slug | core note frontmatter | written by the federating skill or its batch twin from the name at core creation; stable forever once written; a merge keeps both | vault |
 | Relation ids | derived, not stored: 20 base32 chars of sha256 over `subject hid|pred|target|role|since` | holon index | computed from content, never from list position | global |
+| Board row IDs | `B-NNNN` | board table in the operational db, mirrored in `_Coordination/Board.md` | script: next above the highest id in table, mirror and archive; by hand: above `next_free` and the mirror's highest id, re-read, renumber on collision | vault |
 
 The Task IDs row is the worked example: its definition-site / scope / minting triad took a three-session design arc to settle after live collisions in two projects; filling the row at family creation is the cheap alternative.
 

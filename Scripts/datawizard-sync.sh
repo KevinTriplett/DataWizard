@@ -33,6 +33,12 @@
 #   3. One result line on stdout (the Shell Commands balloon) plus a macOS desktop
 #      notification via osascript when available - best effort, never load-bearing.
 #
+# Coordination board: when board.py exists (Seed/Scripts first, then the DW
+# Workshop Scripts folder) and python3 is on PATH, each save first runs
+# `board.py render` - it folds hand edits in _Coordination/Board.md into the
+# board table - logs its output and adds one "board" row to the status card.
+# The save never fails because of the board.
+#
 # Portability rules: pure ASCII; macOS ships bash 3.2, so no associative arrays,
 # no mapfile, no case-conversion expansions. The whole body runs inside main() so bash parses the
 # file to EOF before the sync loop can overwrite it (the Seed repo contains this
@@ -264,6 +270,33 @@ run_sync() {
   ERROR_LIST=""     # "Weave Shared (sync conflict)"
   PULLED_LIST=""    # repos that received updates
   ROWS=""           # status note table rows
+
+  # --- Coordination board render (ruling R4): fold hand edits into the table ---
+  # Before the repo loop, so this save commits the freshly rendered mirror.
+  # Runs only when board.py and python3 exist; never fails the save.
+  # Exit 0 = folded, 2 = rendered but some blocks need a look, other = error.
+  local BOARD_PY="" BOARD_OUT BOARD_RC BOARD_SUM bp line
+  if [ -n "$VAULT_ROOT" ]; then
+    for bp in "$VAULT_ROOT/_DataWizard/Seed/Scripts/board.py" \
+              "$VAULT_ROOT/_DataWizard/Workshop - DataWizard/Scripts/board.py"; do
+      if [ -f "$bp" ]; then BOARD_PY="$bp"; break; fi
+    done
+  fi
+  if [ -n "$BOARD_PY" ] && command -v python3 >/dev/null 2>&1; then
+    BOARD_OUT=$(python3 "$BOARD_PY" render 2>&1)
+    BOARD_RC=$?
+    printf '%s\n' "$BOARD_OUT" | while IFS= read -r line; do
+      [ -n "$line" ] && log "board: $line"
+    done
+    BOARD_SUM=$(printf '%s\n' "$BOARD_OUT" | grep -m 1 '^board render: ' | sed 's/^board render: //')
+    [ -n "$BOARD_SUM" ] || BOARD_SUM=$(printf '%s\n' "$BOARD_OUT" | sed -n '/./{p;q;}')
+    case "$BOARD_RC" in
+      0) add_row "board" "folded - $BOARD_SUM" ;;
+      2) add_row "board" "look at the board - $BOARD_SUM" ;;
+      *) add_row "board" "render error (exit $BOARD_RC)"
+         log "WARN board render exit $BOARD_RC (the save continues)" ;;
+    esac
+  fi
 
   local DIR NAME RESULT NFILES HEAD_BEFORE HEAD_AFTER UPSTREAM AHEAD committed pulled
   for DIR in "${PROJECTS[@]}"; do
