@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S390 2026-10-07 - Device Bridge: bridge drops, Linux shell, PI re-paste mid-thread; SQLite: immutable=1 for WAL reads, board mirror races (DW S390, CS S34, HC S8 intake)'
   - "DW-S387 2026-10-05 - Device Bridge: GNU sed form + Python-heredoc canon patching (S387)"
   - DW-S273 2026-08-18 - created from the Cowork Build Environment Guide FR (VC
     S23-S34 build cluster + Weave sandbox/network items + DW S221-S230
@@ -49,7 +50,7 @@ operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-10-05
+updated: 2026-10-07
 ---
 # Cowork Build Environment
 
@@ -121,6 +122,9 @@ The same delete-refusal applies to OTHER FUSE mounts reached through the device 
 
 Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS its child processes (die-with-parent), and each call runs in its own PID namespace - `pgrep` matches your own probe command, so a killed job can look alive. The mirror image bites on the device shell: `pkill -f <name>` matches the `bash -c` process running YOUR OWN command line (it contains the literal name), so it kills your shell mid-script (exit 143, output truncated, later commands never run). Kill by a pattern assembled at runtime - `pkill -f "$(printf 'intake_gu%s' i.py)"` - or by port, and put the kill in its own call (DataWizard, 2026-09). Long jobs (LLM batch loops, big scans) must be sliced so each invocation fits one call; design the consumer idempotent so slices converge.
 
+- **WAL-mode databases, read-only, from the device shell: pass `immutable=1`.** A plain `mode=ro` open of a WAL database creates `-wal`/`-shm` sidecars when they are absent, and the mount cannot forward WAL locks; `file:<path>?mode=ro&immutable=1` reads cleanly and writes nothing (it may lag commits still in the `-wal` file - fine for a dry run, not for a verification; verify after a Mac-side apply with `mode=ro` or from Terminal). Scripts that read a shared store from both the shell and the Mac need an `--immutable` flag. (DataWizard, 2026-10)
+- **Board mirror races within one session.** `_Coordination/Board.md` can be re-rendered by another session's DW Save between your read and your hand-path write; assert on `next_free` and on the absence of the target ids immediately before writing, and redo from a fresh read on failure. (Community Stack, 2026-10)
+
 ## Rendering (HTML to PDF)
 
 - **Use WeasyPrint, not headless Chromium.** Headless Chromium / Playwright segfaults in the Cowork sandbox. WeasyPrint (via pip, where installable) renders HTML to PDF faithfully, including `@font-face`. Caveat: WeasyPrint ignores page breaks *inside* flex containers -- keep break-sensitive content out of flex layouts. (Source: RW S31.5)
@@ -145,6 +149,10 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **`device_bash` localhost is the VM's, not the Mac's.** A `curl localhost:<port>` inside `device_bash` probes only the mount VM - connection refused (000) says nothing about servers the operator runs natively on the Mac. Never use the device shell to check whether a Mac-hosted server is up; ask the operator, or verify the change in the sandbox with a staged copy (see the headless-Chromium recipe below). (Source: Location Scout, 2026-09)
 
 - **The device shell is GNU Linux, not macOS: `sed -i ''` (the BSD in-place form) fails with "can't read"; use `sed -i`.** For canon files past the MCP patch size threshold, a Python heredoc run in `device_bash` - read the live file, string-replace with an `assert` that the anchor exists exactly once, write, then parse the frontmatter back - landed multi-section edits in a 10K-word protocol file reliably where `patch_note` is unreliable. Verify with a YAML parse of the frontmatter after every such write. (DataWizard, 2026-10)
+
+- **The bridge can drop mid-session and come back.** All `remote-devices` tools leave the tool list and return when the computer reconnects; a call in flight returns "not connected to the bridge" and nothing lands. A sub-agent dispatched during a drop reports cleanly and can be resumed with the same instructions once the link is back. Verify before retrying (Rule 5); a clean error is a clean miss. (DataWizard, 2026-10; also Holonic Canvas, 2026-10)
+- **The device shell is Linux with GNU tools, not macOS.** `sed -i ''` (BSD form) fails with "can't read ''"; use `sed -i` or a short Python read-modify-write. Mac paths in notes (`/Users/...`) resolve only through `$HOME/mnt/<folder>/`. (Community Stack, 2026-10)
+- **A Project Instructions re-paste lands in a running thread at the next turn.** A thread that oriented on one PI version sees the new one after the next message; carry both sweep traces in the entry and run any new orientation sub-check late rather than pretending it ran. (Holonic Canvas, 2026-10)
 
 ## Verification Discipline for Builds
 
