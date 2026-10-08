@@ -2,12 +2,13 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-06
+updated: 2026-10-08
 origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
+  - "DW-S391 2026-10-08: Holonic records - person block lines added under the projection block (Name, Public profiles, Roles, Verified; design R5; T19 Chunk 7)"
   - "DW-S382 2026-10-02: added Holonic org notes entry (rule, shared facts, projection block, sync rules, delivery classes, identity; D133)"
   - DW-S181 2026-06-13
   - "DW-S182 2026-06-13: clarified archiving banner placement for frontmatter
@@ -423,6 +424,9 @@ Meaningful design/architecture choice     -> decision log + session log (brief n
 ```
 
 Plus four frontmatter fields on the projection: `core_id`, `hid`, `core_note` (plain path, never a wikilink - the block must stand alone where the owning vault is not reachable; see "Self-contained boundary-crossing references"), `core_synced`.
+
+**Person block:** a projection of a person core prints a shorter block - Name, Public profiles (the core's anchor keys), Roles (relations with a public source), Verified - and nothing about consent.
+The lead line and the four frontmatter fields are the same as above. (DataWizard, 2026-10)
 
 **Identity:** `hid` is the join key for every index and consumer; it is minted once by the index, never derived from a name, never re-keyed, and a merge keeps both ids (the loser points at the survivor). `core_id`, the entity's own website host, and the normalised name and real aliases are lookups. A shared or multi-tenant host is never a join key or a `website:` value; a parent named in a parenthetical is a relation, not an alias. Asserted keys (`<scheme>~<value>`) are stored; derived keys are computed.
 

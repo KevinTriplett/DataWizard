@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S391 2026-10-08 - Shell quirks: temp+rename write drops the macOS extended-ACL marker on the mount (DW S391)'
   - 'DW-S390 2026-10-07 - Device Bridge: bridge drops, Linux shell, PI re-paste mid-thread; SQLite: immutable=1 for WAL reads, board mirror races (DW S390, CS S34, HC S8 intake)'
   - "DW-S387 2026-10-05 - Device Bridge: GNU sed form + Python-heredoc canon patching (S387)"
   - DW-S273 2026-08-18 - created from the Cowork Build Environment Guide FR (VC
@@ -50,7 +51,7 @@ operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-10-07
+updated: 2026-10-08
 ---
 # Cowork Build Environment
 
@@ -95,6 +96,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **`bash wc -w` returns 0 for cloud-synced files** the mount serves as cloud-only placeholders. Use `obsidian:get_notes_info` for sizes instead. (Source: VC S32)
 - **Staged large-file paths do not survive a session interruption/reclaim.** A staged tool-results directory was gone after a session gap; re-fetching was cheap and deterministic. Re-fetch instead of hunting for the old path. (Source: RW S51)
 - **`pkill -f <pattern>` kills the calling shell itself.** Cleaning up backgrounded test servers with `pkill -f hub_server` (or any `-f` pattern) matched the sandbox's own wrapper process and terminated the whole `bash` call - it exits 144 with NO output, including any echoes before the pkill, which reads as a mysterious total failure. Never use `pkill`/`killall` in the sandbox. Track each backgrounded PID from `$!` and `kill "$PID"` explicitly; to free a port, start the next server on a different port instead. (Source: Location Scout, 2026-08)
+- **A temp-file + rename write on the vault mount drops the file's macOS extended-ACL marker** (the `+` after the mode in `ls -l`). Content and mode survive; only the ACL goes. Seen on a template write from the device shell. If a file's ACL matters (sync tooling), edit in place instead of rename-over. (DataWizard, 2026-10)
 
 - **The session's "Today's date" env line goes stale in long-lived sessions.** It is stamped at session start and can lag days behind real time. Run `date` in a shell before claiming session IDs or stamping birth metadata; a stale env date produced a misdated multi-operator session claim that had to be renamed mid-session. (Weave, 2026-09)
 

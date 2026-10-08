@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: '2026-10-06'
+updated: '2026-10-08'
 origin: 'DW-S195 2026-06-22 - backfilled from the earliest edit_log entry (D127)'
 operator: Andrew
 edit_log:
@@ -32,6 +32,7 @@ edit_log:
     cluster (meta-learning review S324-S337)"
   - "DW-S388 2026-10-06 - Coordination Board - Template row added; Query Spec row
     names the board sub-check (d) (T20 Chunk 3)"
+  - "DW-S391 2026-10-08 - Make Your Project Data Holonic row added (Vault structure and content; T19 Chunk 7)"
 ---
 # DataWizard Guides
 
@@ -68,6 +69,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Vault Structure Guide** | Folder conventions, meta-folder naming, and the shell + section architecture. |
 | **Filename Safety** | Cross-platform-safe filenames: the character map and replacement rules. |
 | **Federation Guide** | Sharing content across vaults and projects: the full-copies-only rule and the human-duplication workflow. |
+| **Make Your Project Data Holonic** | Adopting holonic records in a project: when a thing needs a core, what a projection carries, writing relations (five worked shapes), adding a kind, predicate or anchor scheme, person cores and their three states, what an index gives you and its one write-back, and giving an existing vault its hids (reconcile, then mint). The rules stay canonical in the YAML Schema ("Holonic Records") and the Conventions Registry ("Holonic records", ID families); the guide walks through them. |
 | **Harvest Workflow Guide** | The harvest pipeline end to end: routing, provenance, and execution. |
 | **Obsidian Bases Reference** | Using Obsidian Bases for DW dashboards and filtered views. |
 | **Working Principles** | The reasoning behind the Working Rules - the "why" under the behavioral contract. |

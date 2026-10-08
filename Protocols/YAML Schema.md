@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-05
+updated: 2026-10-08
 origin: DW-S182 2026-06-13
 operator: Andrew
 priority: high
@@ -30,6 +30,7 @@ edit_log:
   - "DW-S374 2026-09-23 - field-retirement rule (remove at retirement time;
     meta-learning review S301-S323)"
   - 'DW-S387 2026-10-05: Holonic Core Records replaced by Holonic Records (hid, kinds table, keys/anchors, lifecycle, relations records, predicate table, person rules, projection hid; D134)'
+  - 'DW-S391 2026-10-08: Holonic Records example hids made valid a-z2-7 values (core and projection k7m2..., relation target m4k7...); the old ones held 8 and 9 (T19 Chunk 7)'
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -299,7 +300,7 @@ A *holonic record* (a *core*) is the one project-agnostic note for a thing sever
 ```yaml
 type: entity
 entity_kind: org            # one value from the kinds table below
-hid: k7m2p4q9r3t5w8x2y6z4   # 20 chars a-z 2-7, minted once by the index, never derived from a name
+hid: k7m2p4q3r3t5w6x2y6z4   # 20 chars a-z 2-7, minted once by the index, never derived from a name
 core_id: example-org        # kebab-case, stable forever once written; the human key
 name: Example Org
 aliases: []                 # real other names only (acronym, aka, former name) - never a parent
@@ -357,7 +358,7 @@ Scheme rows are added as a project needs them; `profile:<host>` is always availa
 ```yaml
 relations:
   - pred: part_of           # from the predicate table
-    target: m4k7q2w9x3z6b8c5d2f4   # target hid; a core_id is accepted and rewritten to the hid on the next federating write; null when no core exists yet
+    target: m4k7q2w3x3z6b5c5d2f4   # target hid; a core_id is accepted and rewritten to the hid on the next federating write; null when no core exists yet
     target_name: Example Network
     role: hub               # optional qualifier; the source verb for related_to
     since: 2021             # optional, YYYY or YYYY-MM-DD
@@ -402,7 +403,7 @@ Adding a predicate is a schema change. Role words that have a finer predicate ma
 
 ```yaml
 core_id: example-org
-hid: k7m2p4q9r3t5w8x2y6z4
+hid: k7m2p4q3r3t5w6x2y6z4
 core_note: _Entities/Example Org.md    # plain path, never a wikilink
 core_synced: YYYY-MM-DD
 ```

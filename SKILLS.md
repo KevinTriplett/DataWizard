@@ -2,7 +2,7 @@
 title: DataWizard Skills
 type: project-doc
 created: '2026-03-26'
-updated: 2026-10-06
+updated: 2026-10-08
 origin: DW-S250 2026-08-06
 edit_log:
   - "DW-S382 2026-10-02 - Workshop table: org-federate row (v1.1)"
@@ -66,6 +66,7 @@ edit_log:
   - DW-S374 2026-09-23 - supervised-build row -> v1.3.3 (fresh-eyes note)
   - DW-S374 2026-09-23 - supervised-build row -> v1.3.4 (reviewer-lands-cheap-guards)
   - DW-S388 2026-10-06 - session-closer row -> v4.10.0 (board rule at Step 3.14; row had missed v4.9.0)
+  - DW-S391 2026-10-08 - Workshop table: org-federate row -> v1.2 (T19 Chunk 4 skill; catalog sync in T19 Chunk 7)
 ---
 
 # DataWizard Skills
@@ -126,7 +127,7 @@ Skills that depend on DW infrastructure (tracking index, triage docs, two-vault 
 | **dw-research-workflow** (v2.0) | DW-specific research orchestration: Reddit triage campaigns, two-vault architecture, cross-project routing, git repo collection. Layers on tools-research + research-tracking + design-harvest. |
 | **batch-triage** (v1.4) | Cluster-level triage with integrated design harvesting. Pre-filters items by harvest potential, runs two-speed evaluation (sweep for dismissals, harvest for design-relevant finds), updates all DW tracking infrastructure in one pass. Layers on tools-research + research-tracking + design-harvest. |
 | **corpus-enrichment** (v1.3) | Enrich corpus source articles into structured companion notes (entities, relationships, lexicon candidates, synthesis) for the Rabbit Whole RAG pipeline. The production enrichment path under the Claude-first strategy (D125). Depends on the DW corpus registry and scheduled-task setup. |
-| **org-federate** (v1.1) | One org link in -> one core record (`_Entities/`) + a projection per target project, each carrying a self-contained shared-facts block (holonic org notes, D133). Two modes: federate a URL; project an existing core into one more project. Triggers on 'federate this org <url>'. Direct writes for own projects, exchange note / handoff file for team repos; never writes `allies_*`, never rebuilds a map. Seed promotion requested (S382). |
+| **org-federate** (v1.2) | One org link in -> one core record (`_Entities/`, `hid` minted through the index, `relations:` records) + a projection per target project, each carrying the four projection fields and the v2 shared-facts block (holonic records, D133/D134). Two modes: federate a URL; project an existing core into one more project. Triggers on 'federate this org <url>'. Direct writes for own projects, exchange note / handoff file for team repos; people strings go to the held list, never to the core; never writes `allies_*`, never rebuilds a map. Seed promotion requested (S382). |
 
 ## Skill Format
 

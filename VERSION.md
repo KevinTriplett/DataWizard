@@ -1,5 +1,5 @@
 
-seed: 1.7.0
+seed: 1.8.0
 protocol: 1.8
 project_instructions: 4.9
 
@@ -54,6 +54,21 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.8.0
+
+**Holonic records: one core per thing, one projection per project.** When several projects each keep a note about the same organization, person, tool or event, the shared facts now live once, in a core note in the vault's `_Entities/` folder. Each project keeps its own note, a projection, with a generated `## Shared facts (from core)` block plus its own view. Every core carries a permanent id, `hid`, that indexes and other tools join on, and relations between things are small records drawn from one predicate list, so `member_of` written in one project means the same thing in every other. Shipped in the Seed:
+
+- `Protocols/YAML Schema.md`, section "Holonic Records": the core fields, twelve kinds (`org`, `network`, `fund`, `community`, `platform`, `protocol`, `tool`, `person`, `project`, `place`, `event`, `work`), keys and anchor schemes, lifecycle (`active`, `merged`, `retired`; nothing is deleted), the `relations:` record and predicate table, the person rules (three states, `team` exposure by default, a field allow-list) and the four projection fields. The "Wikilinks everywhere" rule gains one exception: `core_note` is a plain path. The section's example hids are now valid values (the earlier ones held the digits 8 and 9, outside the `a-z2-7` alphabet).
+- `Protocols/Conventions Registry.md`, entry "Holonic records": the rule (consolidate the core, not the views), the shared-facts block and the shorter person block, identity, lifecycle, relations, persons, the sync rules (the core wins for shared facts, corrections flow up, sync is a diff against the live target) and the delivery classes. ID families gains three rows: `hid`, `core_id` and relation ids.
+- `Protocols/Content Type Taxonomy.md`: the `entity` line points at Holonic Records. `Config/taxonomy.yaml` is unchanged.
+- `Guides/Make Your Project Data Holonic.md` (new): how a project adopts the contract - when a thing needs a core, what a projection carries, writing relations, adding a kind or a predicate, person cores, what an index gives you, and giving an existing vault its hids.
+
+The tooling stays in the maintainer's workshop until a second vault runs it with only Vault Config changes: the index that mints `hid` and answers lookups, the reconcile and backfill scripts, the federating skill and the lint checks. The guide says what each does, so a vault can adopt the contract before the tools ship.
+
+**Coming from the organizations-only shape.** A vault that adopted the earlier, organizations-only version of this convention (it shipped without a version note): cores gain `hid`; `partners:` strings become `relations:` records, each string kept as the record's `raw`; `people:` leaves org cores, because it is relationship content, not a shared fact; each projection gains `hid` as its fourth field, and the block loses its People bullet. (DataWizard, 2026-10)
+
+**Propagation:** the Seed files reach every vault through `update_seed.sh`. No Project Instructions change and no re-paste. Projects adopt on touch, following the guide; nothing in an existing vault changes until a session federates a note.
 
 ## What's New in 1.7.0
 
