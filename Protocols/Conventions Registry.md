@@ -2,7 +2,7 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-08
+updated: 2026-10-12
 origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
@@ -86,6 +86,7 @@ edit_log:
     (meta-learning review S338-S362)"
   - 'DW-S387 2026-10-05: Holonic org notes widened to Holonic records (identity, lifecycle, relations, persons, sync-as-diff rule 6); ID families gains hid, core_id and relation-id rows (D134)'
   - 'DW-S388 2026-10-06: Coordination board entry added (design S387 section 10 + who-writes-the-table paragraph, ruling R4; D135); ID families gains the B-NNNN row'
+  - 'DW-S398 2026-10-12 - Provenance: by and via entry added (R3); Coordination board gains awareness asks via intent field (R8)'
 ---
 
 The single home for DataWizard's structural and formatting conventions. When a convention is stated here, every other document points to this entry instead of restating it.
@@ -442,6 +443,31 @@ The lead line and the four frontmatter fields are the same as above. (DataWizard
 
 **Why:** the same entity was being researched once per map and drifting three ways; merging the maps' ontologies was rejected because each map asks a different question of the same entity (D133). A review across four consumers then found that each had re-derived an id scheme, a relation dialect and a privacy boundary locally, because the shared vocabulary lived in an index downstream of where the data is born; identity broke at the vault-to-store seam. The authority for identity, lifecycle and relations sits where the record is written (D134). (DataWizard, 2026-10.)
 
+## Provenance: by and via
+
+**Rule:** A change that is carried across a project or store boundary carries two optional fields: who it was for, and how it travelled. `by` is the person on whose behalf the change was made, as `member:<key>` - never an agent, never a tool; a change with no person behind it (a scheduled task acting on a standing instruction) names the person whose instruction it was, and cross-project records use the same `member:<key>` form. `via` is the custody path: a list of hops, oldest first, each `<kind>:<id>`. The first hop is where the change was made; each later hop is a process that carried it. `via` is append-only - a carrier adds its own hop and never rewrites the path - and a hop carries no time (times live in the carrying run's own log). The two fields sit beside `source`, which keeps its meaning (where the fact came from). Together they answer who it was for (`by`), what made it (the first hop) and what carried it (the later hops). Field placement (`relations:` records, `field_sources` entries): YAML Schema, "Holonic Records". (Holonic Canvas proposal, DataWizard ruling, 2026-10)
+
+**Example:** a fact typed into a published page, picked up by an agent session, carried into a store by a bridge:
+
+```yaml
+source: https://example.org/about
+by: member:operator-a
+via: [page:<artifact-id>, agent:<project>/<session>, bridge:<bridge-name>]
+```
+
+**Hop kinds:**
+
+| Kind | Id | Meaning |
+|---|---|---|
+| `page` | artifact id | a person editing in a published page |
+| `agent` | `<project>/<session>` | an AI instance working in a named session |
+| `task` | task name | a scheduled task |
+| `sync` | skill name | a sync skill carrying records between stores |
+| `bridge` | bridge name | a bridge between a register and a store |
+| `script` | script name | a vault script, run by hand or by a session |
+
+The kind list is open: any `<kind>:<id>` is accepted, and this table is the lint set (a kind not listed here is reported, not refused). A new kind gets its row here when a carrier first needs it.
+
 ## Generic-non-blocking (Seed ship gate)
 
 **Rule:** A self-contained generic (Seed-bound) artifact's ship must not gate on pending downstream specifics. Fold-in markers and open consumer questions are reconciliation cues, not dependencies. The test: *would the pending answer change THIS text, or only a consumer's adoption of it?* If only the adoption, ship the depersonalized text now and route the specifics to the consumer via a fold-forward note on the shared surface (never a silent later edit). Three instances in one scan window: scaffolding markers nearly gating a build, markers resolved as non-blocking on a guide's draft-to-active flip, and doc fixes to a doc under concurrent redesign needing an explicit fold-forward note. (DataWizard, 2026-09)
@@ -525,7 +551,9 @@ A depersonalized starter file ships as `Seed/Templates/Operator Gate Queue - Tem
 
 **Example:** a session files a pickup note in another project's Session Exchange and, at close, posts `B-0007 ask - to: that project - note: <the note's path>`; that project's next orientation lists it in the first five lines it reads.
 
-**Who writes the table.** Board table writes run on the operator's machine only - the board script, Claude Code sessions, and the DW Save sync, which runs the board render at every save. A session working through a mount that cannot forward SQLite locks (for example a Cowork session) never writes the table; it uses the hand path: write the block in the mirror in the board's grammar, re-read, renumber on collision (Optimistic-claim pattern); release or pick up by editing the row's `status` and `updated`. The next render folds hand edits in: a row in both mirror and table takes the side with the newer `updated`, field by field (a tie goes to the table); a mirror-only row is inserted under its own number (a different row under that number is a collision, carried to `## Unreconciled`, never inserted); a table-only row is written to the mirror; every merge is reported; nothing is deleted on either side. Starter file: `Seed/Templates/Coordination Board - Template.md`. (DataWizard, 2026-10)
+**Awareness asks.** An ask may carry `intent: action | awareness` (default `action`; a block without the field is an action ask). An `awareness` ask says "I changed something you build on; nothing is asked": it points at the changed note or its decision entry, and its statuses are open -> seen | stale (no picked-up, no done). The target project marks it `seen` as an explicit act at orientation or close; `stale` means the change was superseded before it was seen. Post one, per affected project (or `all`), when a session changed something another project depends on - a shared vocabulary, a protocol, schema or design doc another project cites, a data contract, a decision another project built on - without asking that project to act. If the other project must do anything, it is an action ask, not awareness; tool-behavior notes the receiving project will plant are `intent: action`. No third block kind: awareness asks share the ask grammar and the `B-NNNN` number space. The orientation trace gains a `K awareness` count at the next Project Instructions bump, not before. (Holonic Canvas proposal, DataWizard ruling, 2026-10)
+
+**Who writes the table.** Board table writes run on the operator's machine only - the board script, Claude Code sessions, and the DW Save sync, which runs the board render at every save. A session working through a mount that cannot forward SQLite locks (for example a Cowork session) never writes the table; it uses the hand path: write the block in the mirror in the board's grammar, re-read, renumber on collision (Optimistic-claim pattern); release or pick up by editing the row's `status` and `updated`. The next render folds hand edits in: a row in both mirror and table takes the side with the newer `updated`, field by field (a tie goes to the table); a mirror-only row is inserted under its own number (a different row under that number is a collision, carried to `## Unreconciled`, never inserted); a table-only row is written to the mirror; every merge is reported; nothing is deleted on either side. Starter file: `Seed/Templates/Coordination Board - Template.md`. (DataWizard, 2026-10) The board script gains the `intent` column and the `seen` status in its next build (backlog); until then its parser refuses a block that carries `intent:` or `status: seen` and carries it to `## Unreconciled` (never dropped), and a render rewrites the mirror's header from the script's own copy.
 
 ---
 
@@ -556,7 +584,7 @@ Role-level casting (orchestrator-synthesizer / researcher / writer) and the one 
 | Holon ids (`hid`) | 20 chars from `a-z 2-7` | core note frontmatter | minted by the holon index when a core lacks one (one-time reconciliation may copy a pre-existing consumer id first); cryptographic random; never derived from a name; never reissued or re-keyed | global - every vault, store and consumer |
 | Core ids (`core_id`) | kebab-case slug | core note frontmatter | written by the federating skill or its batch twin from the name at core creation; stable forever once written; a merge keeps both | vault |
 | Relation ids | derived, not stored: 20 base32 chars of sha256 over `subject hid|pred|target|role|since` | holon index | computed from content, never from list position | global |
-| Board row IDs | `B-NNNN` | board table in the operational db, mirrored in `_Coordination/Board.md` | script: next above the highest id in table, mirror and archive; by hand: above `next_free` and the mirror's highest id, re-read, renumber on collision | vault |
+| Board row IDs | `B-NNNN` (one number space for claims and for asks of either `intent`) | board table in the operational db, mirrored in `_Coordination/Board.md` | script: next above the highest id in table, mirror and archive; by hand: above `next_free` and the mirror's highest id, re-read, renumber on collision | vault |
 
 The Task IDs row is the worked example: its definition-site / scope / minting triad took a three-session design arc to settle after live collisions in two projects; filling the row at family creation is the cheap alternative.
 

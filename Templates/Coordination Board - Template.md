@@ -3,14 +3,15 @@ title: Coordination Board
 type: coordination-board
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-next_free: B-0003
+next_free: B-0004
 generated_by: board.py render
 operator: Operator-A
 edit_log:
   - 2026-10-06 - created (Coordination Board template; DataWizard, 2026-10)
+  - '2026-10-12 - awareness asks: intent field and statuses in the grammar, example block (DataWizard, 2026-10)'
 ---
 
-*Starter for the vault-level coordination board. Copy it to `_Coordination/Board.md` at the vault root (or the `board_dir` set in `Vault Config.md`), replace the placeholder targets, and delete the two example blocks. Once `board.py render` runs, it owns this file: the frontmatter, the header below and every block are machine-written, and this italic paragraph is dropped. Rules: Conventions Registry, entry "Coordination board". Remove this paragraph when you copy.*
+*Starter for the vault-level coordination board. Copy it to `_Coordination/Board.md` at the vault root (or the `board_dir` set in `Vault Config.md`), replace the placeholder targets, and delete the three example blocks. Once `board.py render` runs, it owns this file: the frontmatter, the header below and every block are machine-written, and this italic paragraph is dropped. Rules: Conventions Registry, entry "Coordination board". Remove this paragraph when you copy.*
 
 # Coordination Board
 
@@ -18,12 +19,13 @@ Cross-project asks and write claims for the whole vault. Each row is a pointer; 
 
 By hand (sessions that cannot write the table, e.g. Cowork): add a block at the end of `## Live` using the `next_free` id from this note's frontmatter; re-read; if another block already has that id, renumber yours to the next free one. To release a claim or pick up an ask, edit its `status` and set `updated` to now (UTC, YYYY-MM-DDTHH:MM:SSZ). To take over an expired claim, add your own held claim and set the old one to `status: reclaimed` with `- reclaimed_by: <your id>`. Never delete a block. The next render folds hand edits into the table.
 
-Block grammar (one block per row; statuses - asks: open, picked-up, done, declined, stale; claims: held, released, expired, reclaimed):
+Block grammar (one block per row; statuses - asks: open, picked-up, done, declined, stale; awareness asks (`intent: awareness`): open, seen, stale; claims: held, released, expired, reclaimed):
 
     ### B-NNNN ask - <summary, at most 120 characters>
     - to: <ABBR[,ABBR] or all> | by: <session> | status: open | posted: <UTC time> | due: <date or ->
     - target: project:<ABBR>
     - note: <vault path of the note that holds the content>
+    - intent: <action or awareness; optional, default action - awareness means nothing is asked>
     - updated: <UTC time>
 
     ### B-NNNN claim - <summary>
@@ -53,6 +55,13 @@ Well-known targets (spell exactly):
 - reason: example batch apply; rollback copy taken first
 - token: <claim_id of the claiming session>
 - updated: 2026-01-05T09:30:00Z
+
+### B-0003 ask - Awareness - example shared vocabulary note changed; nothing is asked
+- to: PROJB,PROJC | by: PROJA S<NNN> | status: open | posted: 2026-01-06T10:00:00Z | due: -
+- target: project:PROJB
+- note: <project A home>/Decision Log - example entry for the changed vocabulary.md
+- intent: awareness
+- updated: 2026-01-06T10:00:00Z
 
 ## Recently closed
 

@@ -7,6 +7,7 @@ updated: 2026-10-12
 operator: Andrew
 edit_log:
   - 'DW-S397 2026-10-12 - Managing tasks section: account-level scope, promptless update_trigger, list_triggers overflow (meta-learning review S377-S392)'
+  - 'DW-S398 2026-10-12 - unattended no-ask rule; requires_local_device binding; device_absent and PENDING failure modes; launchd protected folders + kickstart (board intake)'
   - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
     scheduled-task learnings)
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -44,20 +45,26 @@ A task that runs without a human in the loop needs all of:
 - **Deterministic batch ordering.** Process items in a stable, sorted order so reruns and resumes are predictable.
 - **Existing-output detection (idempotency).** Check whether an item's output already exists before producing it. This is what makes a task safe to re-fire, and it is the guard against context-compaction re-stamping: when a long run's context compacts mid-task, the instance can lose track of what it already wrote and redo or re-stamp work. An existing-output check plus post-write verification prevents duplicate or re-stamped output.
 - **Persisted tool approvals.** Obsidian MCP (and any other) tool approvals must be granted on a manual first run before automated firing works; without them the task stalls waiting on an approval no one is there to give. (S165)
+- **No ask-the-human branch on the normal path.** A skill that a scheduled task runs must not contain a step like "tell the operator before committing" on its ordinary path: the unattended run has nobody to tell, so it waits until the task times out. Put the human gate before the task (approval of the plan) or after it (review of the result), never inside it; where a step would ask, have it do the safe subset (e.g. commit only its own paths) and report the rest. (Holonic Canvas, 2026-10)
 
 ## Managing tasks: account scope, update_trigger, list_triggers
 
 - **Scheduled tasks are account-level, not per-project.** `list_triggers`, `update_trigger` and `delete_trigger` see and edit every task on the account, across all projects. Filter by name or prompt before acting; never delete or disable a task by its position in the list. (DataWizard, 2026-10)
 - **`update_trigger` with a new prompt on a computer-bound task re-signs the prompt through the desktop app and needs the linked computer online.** Send schedule, name and enabled changes in a promptless call - those apply immediately without the computer. Change the prompt only while the computer is linked. (DataWizard, 2026-10)
 - **`list_triggers` returns every task's full prompt inline** - enough to overflow the tool-result cap on an account with many tasks. Query the saved tool-result file with `jq` or Python instead of reading it inline. (DataWizard, 2026-10)
+- **A task created with `requires_local_device` binds to that computer at creation and defaults to `permission_mode: auto`** (the create result says so). Decide at creation whether the task needs the computer; for what happens when it is absent at fire time, see Other known failure modes. (Holonic Canvas, 2026-10)
 
 ## Other known failure modes
 
 - **Runtime-constructed URLs.** `web_fetch` inside a scheduled task rejects URLs constructed at runtime (discovered mid-run rather than passed in the prompt). For URLs the run discovers, route through the Chrome MCP instead.
+- **Device-bound tasks are disabled when the computer is absent.** If the Mac is asleep or the desktop app is closed at fire time, the scheduler disables the task (`suspension_reason: device_absent`) and it does not resume on its own. Check device-bound tasks' enabled state in the morning (`list_triggers`) and re-enable with a promptless `update_trigger` (`enabled: true`) - schedule and run history are kept. (Holonic Canvas, 2026-10)
+- **`last_run` can read PENDING for hours and then resolve SUCCEEDED.** Read it twice, some minutes apart, before calling a run stalled - the status alone does not prove a stall. (Holonic Canvas, 2026-10)
 
 ## Native schedulers (launchd, cron): no PATH, no profile
 
 An unattended macOS job started by launchd or cron inherits neither the shell profile (`.zshrc`, `.bash_profile`) nor the GUI-login PATH, so the `python3`, `node`, or Homebrew binary that works in Terminal is not found when the job fires - the job fails silently or runs a different interpreter. In the job's script, pin the concrete interpreter path (a pyenv or system python by absolute path) and export the toolchain PATH explicitly (`/opt/homebrew/bin`, the pyenv shims, whatever the script needs) before any command runs; never rely on the environment the job "should" have. Verify by running the script through the scheduler once (a `launchctl start` or a near-future fire) rather than from Terminal, since Terminal is exactly the environment the job does not get. (DataWizard, 2026-08)
+
+**launchd jobs cannot read `~/Documents`, `~/Desktop` or `~/Downloads`.** macOS privacy protection grants those folders to Terminal but not to background jobs, and no prompt appears: a launchd-run service serving a static file from there fails (the browser sees `ERR_EMPTY_RESPONSE`; the traceback lands in the job's error log). Keep files a launchd service reads elsewhere, e.g. inside the vault. Under `KeepAlive`, `kill` just restarts the service (and a hand-started copy loses the port race); reload it with `launchctl kickstart -k gui/$(id -u)/<label>`. (Holonic Canvas, 2026-10)
 
 ## Hybrid trigger: on-demand primary plus an idempotent scheduled backstop
 

@@ -1,7 +1,9 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S396 2026-10-12 - Operator browser split view (Brave) section: no web API, tab menu limits, build the pane into the page'
   - 'DW-S397 2026-10-12 - web_fetch: attended PROVENANCE_REQUIRED timeout, paste-the-URL unblock (meta-learning review S363-S376)'
+  - 'DW-S398 2026-10-12 - WebSearch budget, scripted-download (User-Agent identity, Wikimedia 429, captcha vs WebFetch) and Connectors sections (board intake)'
   - DW-S273 2026-08-18 - created from the Chrome MCP Tool-Behavior Reference FR
     (behaviors from RW S11-S31 reviews); WeasyPrint item routed to the Cowork
     Build Environment guide
@@ -68,6 +70,18 @@ This ladder is the standing home for the recurring "JS-rendered surface needs a 
 
 - A `claude.ai/share/<id>` conversation link is not readable by `web_fetch` - it returns only the site's meta tags, never the shared chat. Ask the operator for the underlying vault note or artifact instead; a `claude.ai/artifact/<id>` link IS readable, through the Artifact tool's read action (not web_fetch), and a large artifact comes back head-only with the full HTML saved to a local file. (DataWizard, 2026-10)
 
+## WebSearch Behaviors
+
+**The search budget is about 200 calls per user turn, shared by the lead and every sub-agent, and it resets with the next user message.** Parallel research agents can exhaust it in one turn, and the last agent to run dry reports gaps. Give each sub-agent an explicit search budget and item target, run gap-filling in the next turn, and never downgrade an earlier sourced item to unconfirmed just because search ran out later - only a contradicting source does that. (LocationScout, 2026-10)
+
+## Scripted downloads from the shells (container and device)
+
+**Never put the user's identity in a third-party User-Agent or request header.** Some public APIs (Overpass, Nominatim, Wikimedia) ask for a contact in the User-Agent; send a plain project User-Agent string, never the user's email, name or account handle - not even to get a higher rate limit. (LocationScout, 2026-10)
+
+**Wikimedia (Wikidata, Commons) rate-limits per shell.** It answers HTTP 429 to the cloud container at once and to the device shell after fast bursts. From the device shell, a 1 s pause before each call plus one retry after the `Retry-After` header cleared almost all 429s. General fetch throttling: see **Cowork Build Environment**. (LocationScout, 2026-10)
+
+**Portals that captcha the device shell can still be read by WebFetch.** Real-estate portals served a captcha page to `curl` from the device shell while WebFetch read the same page, and their image hosts served photos to plain `curl`. Pattern: collect the `og:image` URLs with WebFetch, then download the images on the device. Some portals block both paths; record those as unreachable rather than retrying. (LocationScout, 2026-10)
+
 ## Google Docs via Chrome
 
 **Heading keyboard shortcuts type literal characters on Mac.** Ctrl+Alt+N and similar heading shortcuts do not apply styles through the Chrome tools -- they insert literal characters into the document. Use the style dropdown, or write plain text with caps. (Source: RW S17)
@@ -103,6 +117,14 @@ When Chrome is driven through the device bridge (a `Control_Chrome`-style proxy)
 **`chrome-extension://` URLs are refused outright** - `navigate` answers "Can't interact with browser-internal or unparseable URLs", so an extension's own pages (OneTab's saves list, an extension options page) are unreachable in ANY connected Chromium browser (Chrome, Brave). Data living inside an extension gets out via the extension's own export (OneTab: Export URLs / the saved-tabs HTML export - the export was verified complete against the page's own link count), or by reading its LevelDB from disk with folder access. (DataWizard, 2026-09)
 
 **Headless Playwright in the cloud container cannot replace the extension for third-party sites.** The container's egress allowlist admits package registries and GitHub but resets connections to most product sites, so "screenshot it with Playwright" fails where the extension succeeds. Use Playwright only for local files (e.g. rendering your own artifact once before publishing). (Source: Kosmos, 2026-09)
+
+## Operator browser split view (Brave)
+
+**A web page cannot place itself, or a tab it opened, into the browser's split view.** There is no web API for split view; a page can only `window.open` a named tab and navigate it later by assigning its `location` (the "follow tab" pattern - works, no pop-up block from inside a same-origin hub iframe). Pairing that tab with the page is then a browser-UI act, and Brave's current tab menu offers only "Add Tab to New Split View" (which opens a blank new tab beside the current one); "New split view with current tab" and "Move tab into split view" were absent on an up-to-date install, and dragging a tab onto a split pane does nothing. When the operator needs page + link side by side, build the pane into the page (an iframe for sites that allow framing, the named follow tab for the ones that refuse) rather than depending on the browser's split view. (DataWizard, 2026-10)
+
+## Connectors
+
+**Google Calendar `create_event` without an explicit `timeZone` can stamp the wrong zone** (Europe/Rome for a Europe/Berlin user - same offset, so times held, but a zone with a different offset would shift them). Pass `timeZone` whenever the operator's zone is known, and check the zone on the created event. (LocationScout, 2026-10)
 
 ## See Also
 

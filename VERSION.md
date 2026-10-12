@@ -1,5 +1,5 @@
 
-seed: 1.8.0
+seed: 1.9.0
 protocol: 1.8
 project_instructions: 4.9
 
@@ -54,6 +54,21 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.9.0
+
+**Board intake release: five projects' field learnings land in the Seed, plus three schema and board rulings.** A DataWizard intake session triaged 25 cross-project asks (Evolutionary Media Commons, Holonic Canvas, LocationScout, Community Stack, Weave) in one pass. Shipped in the Seed:
+
+- `Guides/Published Artifacts and ArtifactData Behaviors.md` (new, Platform and Environment Behaviors cluster; row in GUIDES.md): the publish read gate and refusal sequence, `Artifact read` URL and large-read behavior, the ArtifactData store (list/out_dir, pinned atomic batch, nested-merge update and the `__delete__` marker, body size cap), who can write to an artifact db, and the rendering constraints (image CSP, no browser automation inside the artifact frame).
+- `Guides/Cowork Build Environment.md` (+20): a rejected or cancelled sub-agent launch may still have run; 529 resume by message; staging and commit paths and limits; text-only checksum rule (images change bytes in transit); container survives a restart; folder grants on the nearest parent; `tar --overwrite`; container background jobs die across a pause; per-container staging; Overpass from the device shell; `git archive` has no history (format-patch hand-off); synced-folder `<name> 2.<ext>` duplicates; `device_bash` 180 s cap; a dropped link can leave the command completed; Playwright fold click; Chromium console-error allowlist. Ruling: no git through the device shell on vault-mounted repos stands, with one narrow lead-seat exception (delete grant verified active; never a sub-agent, never unattended).
+- `Guides/MCP Reliability and Write Verification.md`, `Guides/Git Guide/9.0 Troubleshooting.md` (lapsed delete grant leaves `HEAD.lock` and `maintenance.lock`; rename-aside recovery), `Guides/Browser and File System Access Behaviors.md` (a script element id that matches a library global shadows it), `Guides/Chrome MCP and Web Tool Behaviors.md` (WebSearch per-turn budget shared across sub-agents; no user identity in a User-Agent; 429 handling; captcha-vs-WebFetch; a Connectors section), `Guides/Cowork Scheduled Tasks.md` (no ask-the-human branch on an unattended skill's normal path; `requires_local_device` binding; `device_absent` and late-PENDING failure modes; launchd cannot read ~/Documents, ~/Desktop, ~/Downloads; `launchctl kickstart`).
+- `Protocols/YAML Schema.md`, Holonic Records: predicate `uses` / `used_by` (not symmetric, on a core; role words `user`, `runs on`, `hosted on`, `publishes to` map to it); optional provenance fields `by` (the person the change was made for, `member:<key>`) and `via` (append-only custody hops `<kind>:<id>`); example comments are explanatory, not canonical.
+- `Protocols/Conventions Registry.md`: new entry "Provenance: by and via" (rule, example, hop-kind table as the lint set); "Coordination board" gains awareness asks - an `intent: action | awareness` field on asks (default `action`; awareness statuses open -> seen | stale), not a third block kind. `Templates/Coordination Board - Template.md` carries the grammar and an example.
+- `Skills/supervised-build` v1.5.0 (reviewer fixture experiments: two runs, partial apply, re-plan; force the event ordering before accepting "flake"; re-count from files; resume the plan reviewer by message; a cancelled launch may have run). `Skills/session-closer` v4.10.1 (Step 3.14 asks whether the session changed something another project depends on; if so, post an awareness ask). `SKILLS.md` synced.
+
+**Not yet in this release:** the board script's `intent` column and `seen` status (a block carrying `intent:` is parked in Unreconciled by the render until that build lands); the holon index merge path for a core that adopts another project's hid.
+
+**Propagation:** Seed files reach every vault through `update_seed.sh`. No Project Instructions change and no re-paste; the `K awareness` orientation trace count waits for the next PI bump. (DataWizard, 2026-10)
 
 ## What's New in 1.8.0
 

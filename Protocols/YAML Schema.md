@@ -32,6 +32,7 @@ edit_log:
     meta-learning review S301-S323)"
   - 'DW-S387 2026-10-05: Holonic Core Records replaced by Holonic Records (hid, kinds table, keys/anchors, lifecycle, relations records, predicate table, person rules, projection hid; D134)'
   - 'DW-S391 2026-10-08: Holonic Records example hids made valid a-z2-7 values (core and projection k7m2..., relation target m4k7...); the old ones held 8 and 9 (T19 Chunk 7)'
+  - 'DW-S398 2026-10-12 - Holonic Records: uses/used_by predicate (R7), by/via provenance fields (R3), example-comments note, claim-flow pointer'
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -369,6 +370,8 @@ relations:
     raw: 'part-of: Example Network'                 # optional, the source string verbatim
 ```
 
+The trailing `# ...` comments in this example and the core example above explain the fields; they are not canonical YAML. A stored record carries no inline comments, and a reader never has to strip them.
+
 A relation is created and retracted, never edited in place: a correction is a retraction (`retracted: YYYY-MM-DD`, `retracted_by`, optional `retracted_reason`) plus a new record, and the retracted record stays. A relation has no stored id; its identity is `(subject hid, pred, target, role, since)`.
 
 | Predicate | Inverse (derived) | Symmetric | On a core |
@@ -383,6 +386,7 @@ A relation is created and retracted, never edited in place: a correction is a re
 | `partner_of` | - | yes | yes |
 | `funded_by` | `funds` | no | yes |
 | `builds_on` | `built_on_by` | no | yes |
+| `uses` | `used_by` | no | yes |
 | `federates_with` | - | yes | yes |
 | `same_as` | - | yes | by a merge only |
 | `authored_by` | `author_of` | no | yes |
@@ -396,9 +400,11 @@ A relation is created and retracted, never edited in place: a correction is a re
 | `best_connection_to` | - | no | view only |
 | `represents` | `represented_by` | no | view only |
 
-Adding a predicate is a schema change. Role words that have a finer predicate map to it (`founder` -> `founded`, `builder` -> `builds`, `leader` -> `leads`, `member` -> `member_of`); other role words stay as `role` on `part_of`. A verb with no predicate becomes `related_to` with the verb in `role`.
+Adding a predicate is a schema change. Role words that have a finer predicate map to it (`founder` -> `founded`, `builder` -> `builds`, `leader` -> `leads`, `member` -> `member_of`; `user`, `runs on`, `hosted on`, `publishes to` -> `uses`); other role words stay as `role` on `part_of`. A verb with no predicate becomes `related_to` with the verb in `role`. `uses` points from the user to the tool (an org, project or community runs it, hosts its community on it, or publishes through it); `builds_on` stays the dependency of one product on another.
 
-**Persons.** A person core (`entity_kind: person`) exists before anyone claims it; consent governs exposure, not existence. Fields beyond the common set: `person_state: unclaimed | anchored | claimed` and `exposure: team | public` (default `team`). Allow-list: `hid`, `core_id`, `name`, `aliases`, `website`, `keys`, `keys_retired`, `person_state`, `exposure`, `one_liner` (from the person's own public profile only), `relations` (each with a public `source`), the `status` cluster, `to_confirm`, `projections`, `sources`, `verified`, birth metadata. Any other field is an error. Relationship content about a person never enters a core at any state; it stays in the project's own notes. `unclaimed -> anchored` when the operator adds the first key; `anchored -> claimed` through a claim flow defined outside this schema; `public` exposure is reachable only from `claimed`.
+**Provenance (`by`, `via`).** Optional on a `relations:` record and on a `field_sources` entry (where a project's records carry per-field sources). `by` is the person the change was made for, as `member:<key>` - never an agent or a tool. `via` is the custody path, an append-only list of hops oldest first, each `<kind>:<id>` (for an agent hop, `agent:<project>/<session>`); a hop carries no time. The hop-kind list is open; the Registry's table is the lint set. `source` keeps its meaning (where the fact came from); `by` and `via` say who the change was for and how it travelled. Rule, hop kinds and example: Conventions Registry, "Provenance: by and via".
+
+**Persons.** A person core (`entity_kind: person`) exists before anyone claims it; consent governs exposure, not existence. Fields beyond the common set: `person_state: unclaimed | anchored | claimed` and `exposure: team | public` (default `team`). Allow-list: `hid`, `core_id`, `name`, `aliases`, `website`, `keys`, `keys_retired`, `person_state`, `exposure`, `one_liner` (from the person's own public profile only), `relations` (each with a public `source`), the `status` cluster, `to_confirm`, `projections`, `sources`, `verified`, birth metadata. Any other field is an error. Relationship content about a person never enters a core at any state; it stays in the project's own notes. `unclaimed -> anchored` when the operator adds the first key; `anchored -> claimed` through a claim flow defined outside this schema (first implementation: the ontology doc "Fact Tiers, Persons and Personas" in the Holonic Canvas project - the three states and the persona artifact; Holonic Canvas, 2026-10); `public` exposure is reachable only from `claimed`.
 
 **`projections:`** entries are `<path or place> (<state>)`; states: `written YYYY-MM-DD`, `existing note - shared block added YYYY-MM-DD`, `pending pickup - exchange note`, `pending pickup - handoff file`, `existing collaborator note, not edited - <project>`, `list entry, not a note`, `registry row, not a note`, `queue line N, graduated YYYY-MM-DD`, `retired YYYY-MM-DD`, `merged into <core_id> YYYY-MM-DD`, `merged from <core_id> YYYY-MM-DD` (never removed).
 

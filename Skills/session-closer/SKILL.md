@@ -7,10 +7,11 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-10-06'
+updated: '2026-10-12'
 origin: 'DW-S158 2026-06-08 - backfilled from the earliest edit_log entry (D127)'
-version: '4.10.0'
+version: '4.10.1'
 edit_log:
+  - 'DW-S398 2026-10-12 - v4.10.1: Step 3.14 awareness posting question (intent: awareness, ruling R8)'
   - "DW-S388 2026-10-06 - v4.10.0: Step 3.14 board rule (asks for outbound items,
     claims released; Cowork hand path per ruling R4); Step 3.13 claim-expiry
     pointer (Coordination Board T20 Chunk 3)"
@@ -427,7 +428,7 @@ Answer one question from the session's own history: **did this session create or
 
 This check exists because the offending session is the only place with perfect knowledge of what it wrote; target-side detection (lint) is the backstop, not the primary. (DataWizard, 2026-09)
 
-**Board (all projects, all tiers).** Each outbound item filed this session (exchange note or feature request to another project, gate row naming another project's actor) gets an ask on the coordination board; every claim this session holds is released. Mac-side and Claude Code: `python3 "<scripts>/board.py" close --session <id> --ask "TO::NOTE::SUMMARY"` (globals such as `--db` before `close`). Cowork: post by hand in `_Coordination/Board.md` following its header (use `next_free`, re-read, renumber on collision); release by editing `status` and `updated`. Record the ids in the session log. Rule: Conventions Registry, "Coordination board".
+**Board (all projects, all tiers).** Each outbound item filed this session (exchange note or feature request to another project, gate row naming another project's actor) gets an ask on the coordination board; every claim this session holds is released. Mac-side and Claude Code: `python3 "<scripts>/board.py" close --session <id> --ask "TO::NOTE::SUMMARY"` (globals such as `--db` before `close`). Cowork: post by hand in `_Coordination/Board.md` following its header (use `next_free`, re-read, renumber on collision); release by editing `status` and `updated`. Record the ids in the session log. Also ask "did this session change something another project depends on, without asking it to act?" - if yes, post an ask with `intent: awareness` (statuses open -> seen | stale); tool-behavior notes that the receiving project will plant are ordinary asks (`intent: action`, the default). Rule: Conventions Registry, "Coordination board".
 
 ### Step 4: Update related infrastructure files
 
