@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S394 2026-10-12 - headless-shell executablePath recipe for Playwright/browser build mismatch; pkill self-match reminder'
   - 'DW-S393 2026-10-12 - Device Bridge: no sqlite3 CLI; pkill -f kills the device shell - use a pid file (DW S393)'
   - 'DW-S391 2026-10-08 - Shell quirks: temp+rename write drops the macOS extended-ACL marker on the mount (DW S391)'
   - 'DW-S390 2026-10-07 - Device Bridge: bridge drops, Linux shell, PI re-paste mid-thread; SQLite: immutable=1 for WAL reads, board mirror races (DW S390, CS S34, HC S8 intake)'
@@ -52,7 +53,7 @@ operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-10-12
+updated: '2026-10-12'
 ---
 # Cowork Build Environment
 
@@ -167,6 +168,7 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **Unit + component green is not app-works.** Hundreds of passing pure-function and component tests can coexist with an app that crashes on first real interaction, because nothing renders the real app against real state. Keep an integration/smoke tier that does. (Source: VC S62)
 - **A fixture harness on a Mac fires real desktop notifications unless `osascript` is stubbed.** A script under test that calls `osascript -e 'display notification'` finds the real binary on macOS (the Linux VM has none, so cloud runs never show it): ~35 fixture scenarios produced ~35 live banners on the operator's screen. Put a stub `osascript` at the head of `PATH` before the first scenario (record calls to a file so a scenario can still assert a notification was attempted). Same class: scenarios that depend on a tool's *absence* must restrict `PATH` to system dirs, since the host machine may have the real tool (Homebrew `gh`). (Source: DataWizard, 2026-09)
 - **Verify a GUI built against the mount by running it in the cloud sandbox under headless Chromium.** A stdlib web GUI (localhost server + embedded page) written to the user's vault cannot be seen from the sandbox (device VM localhost is not the sandbox's) and cannot be screenshotted from the device shell. Recipe that worked first time (DataWizard, 2026-09): copy the scripts plus a scratch db to a connected non-vault folder, `device_stage_files` them, run the server in the sandbox (`setsid nohup ... &`; `pkill` your own pattern kills the shell - see the SQLite section), drive it with Playwright (`chromium.launch({executablePath:'/opt/pw-browsers/chromium'})` - keyboard, selects, hover, colorScheme emulation) and `Read` the PNGs. Zero page errors in the console listener is the acceptance line; the screenshots go to the operator. Do the real first run on the operator's machine afterwards - the sandbox run proves the page, not the mount.
+- **Playwright-vs-browser version mismatch in the sandbox: launch the headless shell by explicit path.** The npm `playwright` you install may expect a different Chromium build than the one preinstalled under `/opt/pw-browsers` (it then errors "Executable doesn't exist at .../chromium-<other>"), and the preinstalled full `chrome` binary has dropped `--headless=old`, so launching it directly fails with "Old Headless mode has been removed". Recipe that works: `find /opt/pw-browsers -name headless_shell` and pass that path as `executablePath` with `args:['--no-sandbox','--disable-gpu']`; the headless shell still implements the old headless mode Playwright drives. Never `pkill -f` a pattern that appears in your own command line - it kills the calling shell (exit 143/144); record PIDs and `kill` those. (Source: DataWizard, 2026-10)
 - **Verify your writes actually landed.** The recurring failure shape: an operation reports success but the work did not persist -- no push creds (commits never reach origin), `commit -am` skipping untracked files, stale-lock-blocked commits. Before trusting a git/build write: `git status -sb` (ahead/behind + untracked), `git fsck` (lock/object health), and confirm the push ran on the host. Mirrors Working Rule 5 and the MCP Reliability guide's verification protocol. (Source: VC S27-S34, cross-cutting)
 
 ## See Also
