@@ -3,9 +3,10 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: 2026-09-09
+updated: 2026-10-12
 operator: Andrew
 edit_log:
+  - 'DW-S397 2026-10-12 - Managing tasks section: account-level scope, promptless update_trigger, list_triggers overflow (meta-learning review S377-S392)'
   - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
     scheduled-task learnings)
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -43,6 +44,12 @@ A task that runs without a human in the loop needs all of:
 - **Deterministic batch ordering.** Process items in a stable, sorted order so reruns and resumes are predictable.
 - **Existing-output detection (idempotency).** Check whether an item's output already exists before producing it. This is what makes a task safe to re-fire, and it is the guard against context-compaction re-stamping: when a long run's context compacts mid-task, the instance can lose track of what it already wrote and redo or re-stamp work. An existing-output check plus post-write verification prevents duplicate or re-stamped output.
 - **Persisted tool approvals.** Obsidian MCP (and any other) tool approvals must be granted on a manual first run before automated firing works; without them the task stalls waiting on an approval no one is there to give. (S165)
+
+## Managing tasks: account scope, update_trigger, list_triggers
+
+- **Scheduled tasks are account-level, not per-project.** `list_triggers`, `update_trigger` and `delete_trigger` see and edit every task on the account, across all projects. Filter by name or prompt before acting; never delete or disable a task by its position in the list. (DataWizard, 2026-10)
+- **`update_trigger` with a new prompt on a computer-bound task re-signs the prompt through the desktop app and needs the linked computer online.** Send schedule, name and enabled changes in a promptless call - those apply immediately without the computer. Change the prompt only while the computer is linked. (DataWizard, 2026-10)
+- **`list_triggers` returns every task's full prompt inline** - enough to overflow the tool-result cap on an account with many tasks. Query the saved tool-result file with `jq` or Python instead of reading it inline. (DataWizard, 2026-10)
 
 ## Other known failure modes
 

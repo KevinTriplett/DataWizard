@@ -3,8 +3,9 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: 2026-09-23
+updated: 2026-10-12
 edit_log:
+  - 'DW-S397 2026-10-12 - get_frontmatter {} on unparseable YAML: widened from edit_log to any scalar; pointer to the YAML Schema callout (meta-learning review S363-S376)'
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
     (pointer)
@@ -166,7 +167,7 @@ Rules:
 
 **A single file can overflow too, and `get_frontmatter` on it returns `{}`.** A 73KB section file overflowed `read_note` outright and `get_frontmatter` on the same file came back empty - the empty result is the overflow, not a file without frontmatter. Read the file with the filesystem tools or a device shell instead, and if the overflow has already dumped a tool result to a saved file, slice it by character range in Python (`s[a:b]`) rather than by lines - the dump is one long JSON line, so line-chunking returns the whole thing again. A file that hits this is past the sectioning threshold; log it as a shell + section candidate. (Source: DataWizard, 2026-08) The ceiling bites on **total file size, not frontmatter length**: a 74KB body-heavy file failed while a 13.7KB shell with identical frontmatter read fine - so sectioning (shell + section files) is a direct remedy, not just an editing convenience. (DataWizard, 2026-09)
 
-**`get_frontmatter` also returns `{}` silently when the YAML does not parse.** An unquoted edit_log entry containing `: ` (a colon-space inside a plain scalar) made a file's frontmatter unparseable; `get_frontmatter` returned `{}` with no error, and `update_frontmatter` would have written a fresh block over the unparsed one (the array-wipe hazard in its worst form). Treat an empty `get_frontmatter` on a file you know has frontmatter as a signal: read the raw file, run it through a YAML parser, and quote the offending entry before any frontmatter write. Under D127, edit_log entries are always single-quoted at write time (see the [[YAML Schema]] origin/edit_log section), which retires this failure class; quote any unquoted legacy entry on sight. (Source: DataWizard, 2026-08)
+**`get_frontmatter` also returns `{}` silently when the YAML does not parse.** An unquoted scalar containing `: ` (a colon-space inside a plain value - first an edit_log entry, later a `url:` field) made a file's frontmatter unparseable; `get_frontmatter` returned `{}` with no error, and `update_frontmatter` would have written a fresh block over the unparsed one (the array-wipe hazard in its worst form). Treat an empty `get_frontmatter` on a file you know has frontmatter as a signal: read the raw file, run it through a YAML parser, and quote the offending entry before any frontmatter write. Under D127, edit_log entries are always single-quoted at write time (see the [[YAML Schema]] origin/edit_log section), which retires this failure class; quote any unquoted legacy entry on sight. The general rule for every field, not just edit_log, is the [[YAML Schema]] callout "Quote any scalar that contains `: `". (Source: DataWizard, 2026-08; widened 2026-09)
 
 For a single large note that overflows on its own: parse the saved tool-result JSON by section header / character range, or read it with `filesystem:read_text_file` (a 55KB file read cleanly in one call) and script-parse. A note that reliably overflows on read is also a sectioning candidate (Working Rule 7). (Source: ReWoven S34; Weave, 2026-07/08) Nuance for **remote (cloud) Cowork sessions**: there the saved tool-result file lands in the *cloud container*, where the cloud `Bash` tool CAN read it -- parse the saved JSON and slice its `content` field (python `json.loads`, then string-slice). The "sandbox cannot read it" limitation applies to the on-device sandbox layout, not the cloud-container layout. (Source: RW S68)
 

@@ -11,11 +11,12 @@ description: >-
   (Pattern 3), a build with no reviewer available, or incidental concurrency
   between unrelated sessions.
 type: skill
-version: '1.3.4'
+version: '1.4.0'
 created: '2026-08-30'
-updated: '2026-09-23'
+updated: 2026-10-12
 operator: Andrew
 edit_log:
+  - 'DW-S397 2026-10-12 - v1.4.0: In-thread variant section (sub-agent builder; codified on second use); Builder 4 ship-the-spec-surface-early; Reviewer 3 independent classifier over rollback copies; whole-build sweep = blind hand run for skills; chunk-vs-pre-flight instruments (meta-learning review S377-S392)'
   - "DW-S306 2026-08-30 - v1.0: codified from Coordination Patterns Pattern 4
     after four field runs; owns the reviewer's mandated State Board write (five
     fields) and the build-side review gate"
@@ -71,13 +72,13 @@ Both seats follow the guide's Transport conventions for filenames, frontmatter, 
 1. **Post the chunk plan.** `<Arc> - <SessionID> Chunk N Plan.md` with `status: awaiting-review`, `chunk: N`, `audience:` the reviewer. State what the chunk writes, where, and against which charter sections.
 2. **The gate - hard precondition.** Before writing chunk N, list the exchange folder and require a note with `status: reviewed` covering chunk N. If it is absent, **pause and ask**: "Chunk N has no review note yet - relay it, or tell me to proceed unsupervised." Never write on silence. If the human answers "proceed unsupervised," record that answer in the chunk plan note before writing - skipping review is a conscious choice on the record, never a silent omission.
 3. **Fold the review.** Pins are decided before writing (with the human where the review says so); fixes must land; minors fold without discussion. If the review raises a design question, answer it in a response note rather than writing around it.
-4. **Write the chunk, then report what landed** - exact paths, sections, versions - not what was intended. Expect the reviewer to re-read everything on disk; "reported clean" is not a state.
+4. **Write the chunk, then report what landed** - exact paths, sections, versions - not what was intended. Expect the reviewer to re-read everything on disk; "reported clean" is not a state. Ship the user-facing spec surface early - a mirror header, a usage block, a README line - in the first chunk that makes the feature reachable, not at the declaration of done: a parallel session used the hand path before the build was declared done, because the surface it read was the only one that existed. (DataWizard, 2026-10)
 5. **Fix round.** Land the verification findings, confirm in the exchange note, move to the next chunk.
 6. **Read decisions from the folder.** Mid-build human decisions arrive as numbered notes from the reviewer - never act on a decision you only heard about secondhand.
 
 ## Reviewer Steps
 
-A pre-flight fresh-eyes review earns its keep even single-session: "fresh eyes" means *did not author the artifact*, not necessarily a separate thread - a same-session reviewer who did not write the chunk still catches what the author cannot. (DataWizard, 2026-09)
+A pre-flight fresh-eyes review earns its keep even single-session: "fresh eyes" means *did not author the artifact*, not necessarily a separate thread - a same-session reviewer who did not write the chunk still catches what the author cannot. (DataWizard, 2026-09) Chunk reviews and the whole-build pre-flight are different instruments, keep both: a chunk review sees what the chunk touches, the pre-flight sees what the whole build assumes. In two arcs a builder-written pre-flight note answered by a fresh reviewer found four defects that seven chunk reviews of the same artifacts had passed (a stale block, a filter that had never fired, a change feed with no per-run sequence, a missing release note). The standing pre-flight questions live in the consuming project's 0.0 until their Seed home lands. (DataWizard, 2026-10)
 
 **Reviewer-lands-cheap-guards boundary.** A reviewer may land a finding directly - collapsing review -> builder -> re-review into one session - only when it is a small, class-level guard the reviewer can prove in-session with a fixture plus a live dry-run. Body rewrites and design changes always go back to the builder, who has the build context. (DataWizard, 2026-09; stated independently twice before naming.)
 
@@ -85,7 +86,7 @@ Per chunk:
 
 1. **Review the plan.** Verdict first, then pins (must be decided before write), fixes (must land), minors (fold silently), and pre-ruled answers to questions the builder will hit mid-chunk. Cite the charter's section or finding numbers so the builder can trace. Ground-truth the substrate: read what the plan's assumptions touch, not just the plan.
 2. **Verify on disk after every write.** Read what landed, never what was reported. The verification half matters as much as the review half - reported-clean chunks have held defects visible only on re-read.
-3. **Run, don't read, shipped scripts.** Test any script the build ships by running it on scratch fixtures **outside the vault** (a scratch dir in the shell's home, never the working tree). When a run finds an edge bug and the fix comes back as a special case, ask for the class rule, and build fixtures for the bug's *neighbors* - "what else starts a new element / what else looks like this input" - before accepting. Require dry-run output that proves the target (e.g. the line number): verify-after-write only proves the script matched its own intent.
+3. **Run, don't read, shipped scripts.** Test any script the build ships by running it on scratch fixtures **outside the vault** (a scratch dir in the shell's home, never the working tree). When a run finds an edge bug and the fix comes back as a special case, ask for the class rule, and build fixtures for the bug's *neighbors* - "what else starts a new element / what else looks like this input" - before accepting. Require dry-run output that proves the target (e.g. the line number): verify-after-write only proves the script matched its own intent. When the build ships an apply step that keeps rollback copies, verify the apply with an independent classifier over those copies - a second query or script that shares nothing with the apply script's own guard - never with the guard that did the writing. (DataWizard, 2026-10)
 4. **Record human decisions** as their own numbered notes, so the build session reads the decision from the folder, not from a chat it was not in.
 5. **Run the tests the builder cannot.** When the build session lacks a capability (no device bridge, no live corpus), run the test from your own environment and post the results - a live-corpus run beats a synthetic fixture.
 6. **Deliver, don't just file.** Flip the reviewed doc's `status` to name the review, add the banner, stamp its edit_log (the guide's Transport habits) - the author's next session opens the doc, not the exchange folder. Then end your turn with the path of the note the other side reads next: the human relays by poke, and a missing link costs a round trip.
@@ -93,7 +94,7 @@ Per chunk:
 
 **Cheap fixes are yours.** Patch small, well-specified defects yourself in files you already have loaded; anything that requires the builder to re-read or rewrite a body goes into the review note as instructions. And check the builder's status before filing: a supervision note filed after the supervised session closed has no reader - land small fixes yourself and put the state on the board.
 
-**End with a whole-build sweep.** After the last chunk, a supervisor-tier pass over every artifact the build touched, ideally from a fresh instance. Unreviewed is where the defects live.
+**End with a whole-build sweep.** After the last chunk, a supervisor-tier pass over every artifact the build touched, ideally from a fresh instance. Unreviewed is where the defects live. For a skill deliverable the sweep is a blind hand run: a fresh instance holding only the skill text runs it end to end, and the skill is "built" when that run passes - not when the text is written. One blind run surfaced fourteen defects the author could not see. (DataWizard, 2026-10)
 
 **Probe the real thing, not only fixtures.** When verifying a shipped tool or script, include at least one probe against a copy of the hottest real production file it will touch (copied to scratch, never the original). Synthetic fixtures only exercise the failure modes their author imagined; the real file carries shapes nobody imagined - including pre-existing damage the tool must survive. Field grounding: a real-file probe during verification surfaced that the two hottest project files had silently unparseable frontmatter from an earlier manual write - a defect no fixture modeled, caught only because the probe target was real (2026-08).
 
@@ -114,6 +115,16 @@ blocking: <the one open question, or none>
 ```
 
 The test: a fresh instance can answer "where are we at" from the board alone - without the exchange folder or the reviewer's chat. The exchange note stays the message to the other instance; the board is where the state lives. A supervision note filed after the supervised session closed still lands its state on the board. The board write does not replace the builder's own close-time writes (session log, ledger); those stay with the session-closer.
+
+## In-thread variant (sub-agent builder)
+
+Codified on second use (two projects, 2026-10). The whole build runs inside ONE session: the lead holds the reviewer seat and dispatches sub-agent builders (and, for prose, a writer seat) from the supervisor thread; the human appears only at apply gates. What changes and what does not:
+
+- **The relay collapses to turns.** Exchange notes between seats become sub-agent briefs and hand-backs; chunk plans live in the lead's brief, not in the Session Exchange folder. The **driver doc and its State Board stay mandatory** - the session's context is still a viewport, and a fresh instance must still answer "where are we at" from the board.
+- **The gate does not weaken.** Sub-agent builders remove the human relay without weakening the gate only while the supervisor verifies from disk and runs the shipped scripts itself (Reviewer Steps 2-3). A hand-back is a report; the run is the evidence. Seven chunks across two sessions landed with zero defects on disk this way.
+- **Delivery is by fresh-named artifacts with a hash on both sides.** A builder delivers each iteration under a new name (`.v2`, `.v3`) and the lead compares `sha256` container-side and device-side before running anything - same-path re-use is stale in both bridge directions (Cowork Build Environment, Device Bridge).
+- **Scratch, never the vault.** The reviewer still runs the server or script on a scratch copy outside the working tree; builders write to the vault only through the gate.
+- **Topology and casting.** The repeatable shape: a synthesis-tier reviewer in-thread, a worker-tier builder seat and (when the deliverable is prose) a worker-tier writer seat as sub-agents, and one living supervision note per session holding the chunk verdicts. Cast the seats with the model-casting skill; the reviewer writes the supervision note while the builder runs, not after.
 
 ## When NOT to Use
 

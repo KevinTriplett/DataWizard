@@ -2,12 +2,13 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-08
+updated: 2026-10-12
 origin: DW-S182 2026-06-13
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
+  - 'DW-S397 2026-10-12: quote-any-scalar-with-colon-space callout beside Wikilinks everywhere (meta-learning review S363-S376)'
   - "DW-S382 2026-10-02: added Holonic Core Records section (entity_kind vocabulary, core_id/core_note/core_synced, projections states, to_confirm; D133) + the core_note exception to Wikilinks everywhere"
   - DW-S182 2026-06-13
   - DW-S183 2026-06-14
@@ -34,6 +35,8 @@ edit_log:
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
+
+> **Quote any scalar that contains `: `.** A colon-space inside an unquoted frontmatter value (a `url:`, a `title:`, an `edit_log` entry) breaks the whole block: Obsidian `get_frontmatter` returns `{}` silently, while a YAML parser (pyyaml) pinpoints the line. Quote the value, or rewrite the separator as ` - `. After any raw edit of a scalar, parse the frontmatter back before trusting it. Symptom and recovery: the MCP Reliability guide, Read-Tool Overflow and Batch Ceilings. (DataWizard, 2026-09)
 
 ### What "Harvest" Means
 

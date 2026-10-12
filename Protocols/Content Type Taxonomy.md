@@ -2,12 +2,13 @@
 title: Content Type Taxonomy
 type: project-doc
 created: '2026-03-02'
-updated: 2026-10-06
+updated: 2026-10-12
 origin: DW-S179 2026-06-12
 version: v2.7
 status: active
 operator: Andrew
 edit_log:
+  - 'DW-S397 2026-10-12 - register-before-use rule: second sighting, register the moment a family is named (meta-learning review S377-S392)'
   - "DW-S382 2026-10-02: entity line points at Holonic Core Records (entity_kind, core_id; D133)"
   - >-
     DW-S179 2026-06-12 - v2.7: garden admitted (D89), infrastructure types
@@ -28,7 +29,7 @@ edit_log:
 - Values are lowercase with hyphens: `meeting-note`, `video-transcript`, `seedpod`
 - Single value only — no comma-separated types
 - All pipeline outputs referencing vault notes use `[[wikilinks]]`
-- New `type:` values are admitted to `taxonomy.yaml` (or the instance overlay) BEFORE use. Skill output templates that stamp `type:` are the observed drift surface: one template line minted 106 files of an undesigned type before lint caught it (S179). When writing or reviewing a skill that creates files, check its template's `type:` against the taxonomy.
+- New `type:` values are admitted to `taxonomy.yaml` (or the instance overlay) BEFORE use. Skill output templates that stamp `type:` are the observed drift surface: one template line minted 106 files of an undesigned type before lint caught it (S179). When writing or reviewing a skill that creates files, check its template's `type:` against the taxonomy. Second sighting: a note family was named and in daily use for weeks before its type was registered, and cost 21 lint errors - register the type the moment the family is named, not when the files accumulate (DataWizard, 2026-10).
 
 ---
 

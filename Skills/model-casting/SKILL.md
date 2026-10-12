@@ -10,11 +10,12 @@ description: >-
   Model routing entry (tier heuristic for queued work); this skill adds role
   casting and execution mechanics.
 type: skill
-version: '1.0'
+version: '1.1'
 created: '2026-09-08'
-updated: '2026-09-08'
+updated: 2026-10-12
 operator: Andrew
 edit_log:
+  - 'DW-S397 2026-10-12 - v1.1: Path 1 - model: fable accepted for sub-agents; Fable sub-agent reaches web tools (meta-learning review S377-S392)'
   - "DW-S349 2026-09-08 - v1.0: created from field finding that frontier
     synthesis models write dense, hard-to-read-aloud prose; roles, casting
     table, three execution paths, writer prose-guide mandate"
@@ -48,7 +49,7 @@ Casting is per-vault judgment, not doctrine. Another operator may cast different
 
 ## Three execution paths
 
-**Path 1 - same-session subagents (Cowork or any surface with an agent tool).** The orchestrator session spawns subagents for research legs and drafting. Limitation: subagent model choice is family-level only (e.g. "opus", no version pinning), so the writer seat gets whatever the current Opus default is. Acceptable for medium batches where the prose guide plus verification pass carries the writing quality; not the path when exact casting matters.
+**Path 1 - same-session subagents (Cowork or any surface with an agent tool).** The orchestrator session spawns subagents for research legs and drafting. Limitation: subagent model choice is family-level only (e.g. "opus", "fable", no version pinning), so the writer seat gets whatever the current Opus default is. The family set does include the synthesis tier: `model: fable` is accepted, and a Fable sub-agent reaches WebFetch and WebSearch and returns a compact synthesis inside an Opus orchestrator session - so the research-orchestrator seat can be cast from within a cheaper session instead of the other way round (DataWizard, 2026-10). Acceptable for medium batches where the prose guide plus verification pass carries the writing quality; not the path when exact casting matters.
 
 **Path 2 - Claude Code pipeline (version-exact, automatable).** Claude Code subagent definitions accept exact model IDs in their `model:` frontmatter, and headless calls (`claude -p --model <exact-id>`) pin versions too. Define a researcher agent and a writer agent with their exact casts, run the orchestrator as the main session, and fan researcher subagents out in parallel over a research queue. This is the path for chunking through large research batches unattended. The pipeline design (agent definitions, queue format, runbook) lives in the consuming vault's Workshop as a build charter; this skill owns only the casting contract the pipeline implements.
 
