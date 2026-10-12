@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S395 2026-10-12 - Shell quirks: launchctl bootstrap EIO when the log folder is missing (DW S395)'
   - 'DW-S394 2026-10-12 - headless-shell executablePath recipe for Playwright/browser build mismatch; pkill self-match reminder'
   - 'DW-S393 2026-10-12 - Device Bridge: no sqlite3 CLI; pkill -f kills the device shell - use a pid file (DW S393)'
   - 'DW-S391 2026-10-08 - Shell quirks: temp+rename write drops the macOS extended-ACL marker on the mount (DW S391)'
@@ -53,7 +54,7 @@ operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: '2026-10-12'
+updated: 2026-10-12
 ---
 # Cowork Build Environment
 
@@ -100,6 +101,7 @@ The MCP Reliability guide documents the underlying restriction (the sandbox can 
 - **`pkill -f <pattern>` kills the calling shell itself.** Cleaning up backgrounded test servers with `pkill -f hub_server` (or any `-f` pattern) matched the sandbox's own wrapper process and terminated the whole `bash` call - it exits 144 with NO output, including any echoes before the pkill, which reads as a mysterious total failure. Never use `pkill`/`killall` in the sandbox. Track each backgrounded PID from `$!` and `kill "$PID"` explicitly; to free a port, start the next server on a different port instead. (Source: Location Scout, 2026-08)
 - **A temp-file + rename write on the vault mount drops the file's macOS extended-ACL marker** (the `+` after the mode in `ls -l`). Content and mode survive; only the ACL goes. Seen on a template write from the device shell. If a file's ACL matters (sync tooling), edit in place instead of rename-over. (DataWizard, 2026-10)
 
+- **`launchctl bootstrap` fails with `5: Input/output error` when the plist's `StandardOutPath` / `StandardErrorPath` folder does not exist - but the service IS registered.** `plutil -lint` passes (the plist is valid), the bootstrap reports EIO, and a retry says "already loaded"; once the folder exists, `KeepAlive` starts the job on its own. Create the log folder (`mkdir -p`) before the bootstrap in any install recipe, and read EIO as "check the paths the plist opens", not as a broken plist. (Source: DataWizard, 2026-10)
 - **The session's "Today's date" env line goes stale in long-lived sessions.** It is stamped at session start and can lag days behind real time. Run `date` in a shell before claiming session IDs or stamping birth metadata; a stale env date produced a misdated multi-operator session claim that had to be renamed mid-session. (Weave, 2026-09)
 
 ## Network and GitHub Data
