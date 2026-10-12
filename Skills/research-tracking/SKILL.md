@@ -8,11 +8,12 @@ description: >-
   accumulating without a tracking system, or any time you are about to evaluate
   a tool, repo, framework, or external resource.
 type: skill
-updated: '2026-08-05'
-version: '1.5'
+updated: '2026-10-12'
+version: '1.5.1'
 edit_log:
   - "DW-S243 2026-08-05 - v1.5: After Fan-Out routing subsection (routing loop
     for fan-out outputs)"
+  - 'DW-S400 2026-10-12 - v1.5.1: memory-surface sources (web-primary, lead lists not figures) under the Output column; After Research -- Fold Verdicts Back'
 ---
 
 # Research Tracking
@@ -62,6 +63,10 @@ preserving even when a full note isn't warranted. The verdict should
 always answer: what was it, why didn't it warrant a full note, and
 was there any standout detail worth preserving?
 
+**Memory-surface sources.** Some tracked items come from a memory or search surface (a large clipping archive queried by search, for example), not from a file you can open:
+- Mark the row's source as a memory surface, not a vault file, so nobody tries to open a file that is not there. When the item needs a deeper read, go web-primary: re-find the source on the web. (ReWoven, 2026-07)
+- Treat these sources as lead lists, not as figures. They are good at surfacing providers and candidates. Re-verify any number taken from them against the web source before it lands in a working draft. (ReWoven, 2026-08)
+
 ## Workflow
 
 ### Before Research
@@ -108,6 +113,10 @@ link the research note in the Output column.
 Hold all tracking updates until the batch is complete. This prevents
 context-switching and lets you capture batch-level observations.
 Commit all entries to the Evaluated table at once after the batch.
+
+### After Research -- Fold Verdicts Back
+
+Before you start the next research item, fold this pass's verdicts into the live artifacts they inform: the meeting agenda, the open-questions list, the partner or roster doc. The tracking index records *that* an item was evaluated. The live docs take in *what* it concluded. If you skip this step, research piles up in the index without changing the working state. (ReWoven, 2026-07)
 
 ### After Fan-Out -- Route Each Output
 

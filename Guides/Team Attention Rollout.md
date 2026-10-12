@@ -4,12 +4,13 @@ edit_log:
   - "DW-S279 2026-08-18 - created (Flag Surfacing Chain B2: canary protocol,
     diagnosis tree, executor chain, first-render expectations)"
   - 'DW-S330 2026-09-04 - canary refinement: must arrive by sync, never created locally; no watch row trusted until a synced-in canary round-trips (WV_2026-09-02_JC_02)'
+  - 'DW-S400 2026-10-12 - Activation recipe section (five steps; drift lint named as planned)'
 maturity: working
 operator: Andrew
 seed_version: 1.2.0
 title: Team Attention Rollout
 type: guide
-updated: 2026-09-04
+updated: 2026-10-12
 ---
 # Team Attention Rollout
 
@@ -20,6 +21,18 @@ updated: 2026-09-04
 The design rule under this whole system, named once so it can be cited: **artifacts routed by the writer's convenience rather than the reader's path fail silently, while looking like infrastructure.** A flag nobody sweeps, a feature request filed in the origin project's folders, a banner nothing queries -- each looks done at write time and delivers nothing. The design test for any coordination feature: *who reads this, and does their path cross it?* Orientation is the one guaranteed choke point where a reader's path can be enforced -- which is why the sweep lives there. (Conventions Registry: The reader-path principle.)
 
 The flag system's own history is the cautionary tale: the write side shipped first and was measured twice at **0% delivery** -- dozens of files carrying `flag_for`, zero dismissals, for months -- because no read side existed. Do not consider the system live until the live test below passes.
+
+## Activation recipe
+
+Switching a project from solo to multi-operator has now run twice in the field and has settled into five steps (two activations, 2026-08 and 2026-09). The steps say what changes. The sections below say what must be true and how to test it.
+
+1. **0.0 Project Guidelines** gains the operator registry, the composite session ID format (session-closer skill, Session Identifier Format) and the canonical-channel rule (Preconditions, item 5). The registry is what turns the flag sweep on.
+2. **The 0.2 session log shell** gains a cutover note: numbered history stays as written, and entries use composite IDs from the activation date on.
+3. **A flag queue page** is created from [[Flag Queue Page Template]] (Preconditions, item 4).
+4. **Canary flags are planted in both directions**, each arriving by sync. The delivery test is the Rollout protocol below.
+5. **The activation session claims in the new format**, so the first composite ID is on disk before anyone else needs to copy it.
+
+A lint check for the reverse drift (a project that declares solo while its session log shows two or more operators) is planned, not yet built. Until it ships, check the log's `operator:` stamps by hand when a project's mode is in doubt.
 
 ## Preconditions (all of them, before any canary)
 

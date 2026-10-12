@@ -34,6 +34,7 @@ edit_log:
     names the board sub-check (d) (T20 Chunk 3)"
   - "DW-S391 2026-10-08 - Make Your Project Data Holonic row added (Vault structure and content; T19 Chunk 7)"
   - "DW-S398 2026-10-12 - Published Artifacts and ArtifactData Behaviors row added to the Platform cluster (board intake)"
+  - 'DW-S400 2026-10-12 - Agent Tool Contract Checklist row added (Surfaces and tools); Team Attention Rollout, Multi-Instance Coordination Patterns and Seed Install and Update rows extended'
 ---
 # DataWizard Guides
 
@@ -62,7 +63,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | Guide | Covers |
 |---|---|
 | **Git Guide** | Git for the vault and DW projects: repo setup, nested vs standalone repos, push workflows, DW Save, and the commit guard (conflict-marker + Windows-unsafe-filename pre-commit hook and CI). Sectioned - see `Git Guide/`. |
-| **Seed Install and Update** | Installing the Seed into a vault and updating it via `update_seed.sh`. |
+| **Seed Install and Update** | Installing the Seed into a vault and updating it via `update_seed.sh`, including the Seed-embedded-in-a-shared-vault-repo shape. |
 | **Script Portability** | Rules for Seed-shipped scripts across macOS (BSD, zsh), Linux (GNU, bash), and Windows PowerShell 5.1: ASCII-only (the BOM-less-.ps1 ANSI trap), BSD-vs-GNU flag differences, shell dialect, and trace-verify before shipping. |
 
 ### Vault structure and content
@@ -77,7 +78,7 @@ These learnings rot faster than any other kind because they have no design-doc h
 | **Working Principles** | The reasoning behind the Working Rules - the "why" under the behavioral contract. |
 | **Review Automation** | The three periodic reviews (health audit, meta-learning, Content Interests): the pending-report model, the cadence table (single home), and how scheduled automation detects staleness so the session-closer only surfaces waiting reports. |
 | **Orientation Flag Sweep - Query Spec** | The mechanism behind the PI orientation sweep (Step 6): the filesystem-primary `flag_for` query (with MCP fallback and the silent-`{}` parse-failure caveat), the stale-stub, intake and board (d) sub-checks, named constants, and the read-only-sweep decision. Referenced by the PI. |
-| **Team Attention Rollout** | Activating the flag system on a multi-operator project: preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
+| **Team Attention Rollout** | Activating the flag system on a multi-operator project: the five-step activation recipe, preconditions (Seed version, PI loaded per surface), the per-person canary live test, the four-branch diagnosis tree for undelivered flags (incl. shipped-is-not-loaded), the executor chain for `flag_default`, first-render expectations, and the reader-path principle. |
 | **Flag Queue Page Template** | Copy-in template for a per-person flag queue page (Dataview): one section per operator over `flag_for` frontmatter, with the empty-due-last sort fix and the exact-name list-matching caveat. Render surface only -- the frontmatter is the mechanism. |
 | **Operator Gate Queue - Template** (`Seed/Templates/`) | Copy-in starter for a deployment-gate queue: class sections A-F + Parked + Deployed and one example G-row. The schema, lifecycle vocabulary, feeding rule, and exit ceremony are canonical in the Conventions Registry's Operator Gate Queue entry; wire the file as the third layer of the 0.5 action-items shell. |
 | **Coordination Board - Template** (`Seed/Templates/`) | Copy-in starter for the vault-level coordination board (`_Coordination/Board.md`): the header with placeholder well-known targets, the block grammar and hand-path steps, one example ask and one example claim. The rule and who writes the table are canonical in the Conventions Registry's Coordination board entry; the orientation read is the Query Spec's sub-check (d). |
@@ -86,11 +87,12 @@ These learnings rot faster than any other kind because they have no design-doc h
 | Guide | Covers |
 |---|---|
 | **FSAccess GUI Pattern** | Building a repo-resident, no-server, no-refresh local GUI over files in a granted folder: the data adapter, permission and grant scope, operator identity, the concurrency guard, the surgical serializer, parser certification, derived-surface rules, and the testing floor. Runtime facts live in Browser and File System Access Behaviors. |
+| **Agent Tool Contract Checklist** | Designing any surface an agent calls (MCP server, in-app agent tools, scripts whose output an instance acts on): intent-shaped atomic tools, stable IDs, structured receipts with no success-shaped adjusted outcomes, actionable errors, descriptions that route, verification through the boundary; one generic worked example. |
 
 ### Process and coordination
 | Guide | Covers |
 |---|---|
-| **Multi-Instance Coordination Patterns** | Several instances on one project: the incidental-concurrency baseline (claim, patch-at-close, same-day-block deferral, foreign-write verification), the roles table, and four deliberate patterns - coordination thread, relay review, second-model plan review, supervised build with a build-side check-before-write gate - plus the Session Exchange transport and the exchange-note handshake convention (canonical home), with a worked six-note supervision run. |
+| **Multi-Instance Coordination Patterns** | Several instances on one project: the incidental-concurrency baseline (claim, patch-at-close, same-day-block deferral, foreign-write verification), the roles table, and four deliberate patterns - coordination thread, relay review, second-model plan review, supervised build with a build-side check-before-write gate - plus the Session Exchange transport and the exchange-note handshake convention (canonical home), with a worked six-note supervision run and the lost-thread recovery order. |
 | **Reader-Facing Prose Style** | The writing standard for documents a person reads start to finish: a synthesis of eight public style and humanizing rulesets into seven diseases, 15 binding rules, and a count-based verification pass. Mandatory load for the model-casting writer seat; invoked by the research and harvest skills whenever the deliverable is read-aloud-class. |
 
 ### Onboarding and integrations

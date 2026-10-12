@@ -7,8 +7,8 @@ description: >-
   report is ready for review. Also triggered when the scheduled review
   automation has left a pending report.
 type: skill
-updated: 2026-09-04
-version: '1.5.4'
+updated: 2026-10-12
+version: '1.5.5'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -41,6 +41,7 @@ edit_log:
   - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: threshold-nudge trigger
     language replaced with the scheduled review-status check (S312 Seed review)"
   - 'DW-S330 2026-09-04 - v1.5.4: Step 1 read-path example moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
+  - 'DW-S400 2026-10-12 - v1.5.5: Step 4.5 recipes-are-not-learnings line'
 ---
 
 # Meta-Learning Review Skill
@@ -183,6 +184,8 @@ Body sections: `## Problem` (what the learning revealed), `## Proposed Changes` 
 **When running inside DW itself:** Skip this step. Learnings targeting DW infrastructure can be planted directly via Step 4 since you're already in the right project.
 
 **Batch filing.** If multiple learnings target the same skill or doc, consolidate them into a single FR/SR with multiple proposed changes rather than filing one per learning. This matches the pattern discovered in RW S9 where 8 of 23 learnings all targeted DW Seed skills. (S142)
+
+**Recipes are not learnings.** This step routes *learnings*. A complete recipe (a working multi-step method, such as a full processing pipeline) becomes a design doc in the DataWizard Workshop instead of a Feature Request. File a short FR only as a corroboration pointer to that doc. (VibeCut, 2026-07)
 
 ### Step 5: Update the review trail
 

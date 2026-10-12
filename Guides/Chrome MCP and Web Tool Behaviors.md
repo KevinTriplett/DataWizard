@@ -4,6 +4,8 @@ edit_log:
   - 'DW-S396 2026-10-12 - Operator browser split view (Brave) section: no web API, tab menu limits, build the pane into the page'
   - 'DW-S397 2026-10-12 - web_fetch: attended PROVENANCE_REQUIRED timeout, paste-the-URL unblock (meta-learning review S363-S376)'
   - 'DW-S398 2026-10-12 - WebSearch budget, scripted-download (User-Agent identity, Wikimedia 429, captcha vs WebFetch) and Connectors sections (board intake)'
+  - 'DW-S400 2026-10-12 - web_fetch: Reddit blocked at the proxy; transient fetch-cache collision (VibeCut FR intake)'
+  - 'DW-S399 2026-10-12 - split view section: in-page pane recipe (sandbox, server-side framing check) + Chromium named-window capture'
   - DW-S273 2026-08-18 - created from the Chrome MCP Tool-Behavior Reference FR
     (behaviors from RW S11-S31 reviews); WeasyPrint item routed to the Cowork
     Build Environment guide
@@ -69,6 +71,8 @@ This ladder is the standing home for the recurring "JS-rendered surface needs a 
 - When the gate does fire in an attended session, the approval prompt can time out unanswered and the fetch fails the same way. The reliable unblock is to ask the operator to paste the URL into the chat - a pasted URL carries provenance. Do not loop on the fetch while the prompt is pending. (DataWizard, 2026-09)
 
 - A `claude.ai/share/<id>` conversation link is not readable by `web_fetch` - it returns only the site's meta tags, never the shared chat. Ask the operator for the underlying vault note or artifact instead; a `claude.ai/artifact/<id>` link IS readable, through the Artifact tool's read action (not web_fetch), and a large artifact comes back head-only with the full HTML saved to a local file. (DataWizard, 2026-10)
+- Reddit is blocked at the WebFetch proxy: `reddit.com` returns 403 / SITE_BLOCKED, re-confirmed across sessions. Read a thread through the browser tools (`get_page_text`), from a saved copy in the vault, or from an operator paste; do not script around the block. (VibeCut, 2026-08/09)
+- WebFetch can return a cached page for the wrong URL. Two different Hacker News item ids, one of them also tried with a query-string variant, came back with identical content; the collision cleared on a delayed retry days later. When fetches of different URLs return the same content, treat it as a transient cache collision and retry once after a delay before declaring the content unreachable. (VibeCut, 2026-08)
 
 ## WebSearch Behaviors
 
@@ -121,6 +125,8 @@ When Chrome is driven through the device bridge (a `Control_Chrome`-style proxy)
 ## Operator browser split view (Brave)
 
 **A web page cannot place itself, or a tab it opened, into the browser's split view.** There is no web API for split view; a page can only `window.open` a named tab and navigate it later by assigning its `location` (the "follow tab" pattern - works, no pop-up block from inside a same-origin hub iframe). Pairing that tab with the page is then a browser-UI act, and Brave's current tab menu offers only "Add Tab to New Split View" (which opens a blank new tab beside the current one); "New split view with current tab" and "Move tab into split view" were absent on an up-to-date install, and dragging a tab onto a split pane does nothing. When the operator needs page + link side by side, build the pane into the page (an iframe for sites that allow framing, the named follow tab for the ones that refuse) rather than depending on the browser's split view. (DataWizard, 2026-10)
+
+**Building the in-page pane: sandbox it and check framing server-side.** Give the iframe `sandbox` without any `allow-top-navigation` flag (a framed page that tries `top.location = ...` is then refused and cannot replace the host page) plus `referrerpolicy="no-referrer"`, and never `focus()` it so keyboard shortcuts stay with the host. A page cannot learn from script whether a cross-origin frame was refused (the frame just shows the browser's error page), so decide before framing: a short list of known refusers (social sites, big code hosts) and, for the rest, a server-side request that reads `X-Frame-Options` and the CSP `frame-ancestors` directive (when `frame-ancestors` is present it decides and XFO is ignored; report-only CSP does not count). Treat a failed check as unknown, never cache it, and fall back to the named follow tab for refusers. One Chromium edge: a framed page from the same origin as the page the follow tab is showing can call `window.open(url, '<follow tab name>')`, take over that window and its opener, after which the host's `location` assignments are refused - recovery is closing the tab and re-attaching; a per-session random window name prevents it. (DataWizard, 2026-10)
 
 ## Connectors
 

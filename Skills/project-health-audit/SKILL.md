@@ -6,9 +6,9 @@ description: >-
   narrative order, and routes findings. Triggers on: 'DW review', 'audit this
   project', 'check project health', or when the review-automation cadence flags an audit due.
 type: skill
-version: '2.1'
+version: '2.1.1'
 created: '2026-05-23'
-updated: '2026-08-30'
+updated: '2026-10-12'
 operator: Andrew
 edit_log:
   - "DW-S179 2026-06-12 - v2.0: consumes dw_lint report (P2), judgment checks
@@ -21,6 +21,7 @@ edit_log:
     (C10 equivalent)"
   - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: session-closer thresholds
     references repointed to the Review Automation guide (S312 Seed review)"
+  - 'DW-S400 2026-10-12 - v2.1.1: Step 0 cross-project --config / --vault-root note (C9/G4 false positives)'
 ---
 
 # Project Health Audit Skill
@@ -52,6 +53,7 @@ If the vault has no lint tooling (adopter without Python), use the Manual Fallba
 1. Locate the project's lint tooling. DW instance: `Workshop - <Project>/Scripts/dw_lint.py` with `lint_config.yaml` beside it. Reports land in `Workshop - <Project>/Lint Reports/`.
 2. If the newest lint report is less than ~24h old (nightly task output), use it. Otherwise run fresh:
    `python3 "<...>/Scripts/dw_lint.py" --root "<vault>/_<Project>" --session <ProjectAbbrev-SNN>`
+   Auditing a project whose lint tooling lives in another project's folder: also pass `--vault-root "<vault>"` and `--config` with the audited project's own `lint_config.yaml` (and its taxonomy overlay). The host's default config reads the host's taxonomy, so its type-strict checks (C9, G4) flood another project with false positives. Build the per-project config before trusting the counts.
 3. Read the report's summary table and Errors section in full; read warning sections selectively (the per-check counts tell you where to look).
 4. No lint tooling available → Manual Fallback appendix.
 

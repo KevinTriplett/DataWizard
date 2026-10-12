@@ -23,12 +23,13 @@ edit_log:
     inside a shared repo), first use Regenerativa"
   - "DW-S374 2026-09-23 - incidental-concurrency bullet: working-tree read
     distinguishes in-progress from drift (meta-learning review S324-S337)"
+  - 'DW-S400 2026-10-12 - Session Exchange no-Workshop fallback (shared root, per Registry); Recovering a lost thread section'
 maturity: working
 operator: Andrew
 seed_version: 1.3.1
 title: Multi-Instance Coordination Patterns
 type: guide
-updated: '2026-09-23'
+updated: '2026-10-12'
 ---
 # Multi-Instance Coordination Patterns
 
@@ -135,7 +136,7 @@ The `supervised-build` skill (`Seed/Skills/supervised-build/`) codifies this loo
 
 ## Transport - the Session Exchange folder
 
-**Where:** the project's `Session Exchange/` folder (under its Workshop folder when one exists). The placement rule - which notes go here, which go to another project's intake, which are fixed upstream in the Seed - is the Conventions Registry's "File placement - three classes"; this section owns what the notes look like.
+**Where:** the project's `Session Exchange/` folder (under its Workshop folder when one exists, else at the project's shared root; never inside an infrastructure folder). The placement rule - which notes go here, which go to another project's intake, which are fixed upstream in the Seed - is the Conventions Registry's "File placement - three classes"; this section owns what the notes look like.
 
 | Situation | Transport |
 |---|---|
@@ -174,6 +175,16 @@ The run produced the protocol in Pattern 4: every relayed chunk was clean or cau
 ## Inbound defect reports are claims, not evidence
 
 A bug report relayed from another instance - especially one carried through a human or another AI - can be confabulated: one relayed unbound-variable defect existed in no shipped version of the script it named (verified local == origin == raw fetch, plus full history). Before patching anything, verify the defect exists in the shipped artifact. If it does not reproduce, do not patch on faith - send a debug note back requesting the verbatim error output and an artifact fingerprint (a version stamp, a hash, the first lines of the file as the reporter has it), so the next round works from evidence instead of paraphrase. (DataWizard, 2026-08)
+
+## Recovering a lost thread
+
+A cloud chat thread can vanish: one backend event took four of a project's threads at once (VibeCut, 2026-07). Cloud threads leave no local transcript, so the conversation itself is gone. What survives is whatever reached the vault and git. Recover in this order:
+
+1. **The local session store.** Sessions run on a local surface (desktop app or CLI) keep a transcript. List those first.
+2. **The git working tree and log.** Pushed commits and uncommitted working-tree changes survive. Read the log and status for the lost window. On a vault-mounted repo, run this from a Terminal on the operator's machine, as in the working-tree bullet above.
+3. **A vault mtime sweep.** `find "<vault>" -newermt "<start of the lost window>" -name "*.md"` lists every file touched while the thread ran.
+
+At every step, the lost session's claim stub is the search key: its focus line says what the thread was doing, so you know what to look for. That makes the claim ceremony the recovery record as well. The durability boundary under all this is a working principle (`Working Principles`, "Durability lives in the vault and git, not the conversation").
 
 ## Choosing a pattern
 

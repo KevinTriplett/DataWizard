@@ -8,8 +8,8 @@ description: >-
   of flagged items, or any link or resource that needs investigation. Covers
   both single-target deep dives and batch triage passes.
 type: skill
-updated: '2026-09-08'
-version: '1.4.1'
+updated: '2026-10-12'
+version: '1.4.2'
 edit_log:
   - "DW-S243 2026-08-05 - v1.3: Parallel Fan-Out section (mandatory spot-verify,
     roster batching, research-before-tiering) + Common Mistakes bullet"
@@ -17,6 +17,7 @@ edit_log:
     Mistakes bullet"
   - "DW-S349 2026-09-08 - v1.4.1: Reader-Facing Output rule added (load the
     Reader-Facing Prose Style guide for read-aloud-class deliverables)"
+  - 'DW-S400 2026-10-12 - v1.4.2: Deep-Read Mode - rewrite/classic split check; run the comparison peer while warm'
 ---
 
 # Tools Research
@@ -118,6 +119,10 @@ can't be reconstructed.
 calls and tree-page web fetches return empty in the sandbox; a shallow
 `git clone --depth 1` into the working environment is the reliable way
 to pull a small repo's files for a deep read. (DW S166)
+
+**Check for a rewrite/classic split before sizing a lift.** A well-known project name can cover two repos in different states, such as a pre-alpha rewrite and the frozen shipping code. Read the main repo's README opening and find where the shipping code lives before estimating what can be lifted. (VibeCut, 2026-08)
+
+**Run the comparison peer while the frame is warm.** When an evaluation has a natural comparison repo, evaluate it in the same session, while the comparison frame is still in context. It costs a fraction of a cold start. At the end of a research session, ask explicitly what the best next item is, given what is already loaded. (VibeCut, 2026-08)
 
 ## Parallel Fan-Out (Subagents at Scale)
 

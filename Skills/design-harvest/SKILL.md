@@ -8,8 +8,10 @@ description: >-
   update living docs, or any time research has produced findings that should
   change how the project works.
 type: skill
-updated: '2026-06-15'
-version: '1.2'
+updated: '2026-10-12'
+version: '1.2.1'
+edit_log:
+  - 'DW-S400 2026-10-12 - v1.2.1: Harvesting from Foreign Codebases section (four heuristics)'
 ---
 
 # Design Harvest Skill
@@ -159,6 +161,15 @@ planned direction.
 
 **Action items** -- Add "Soon" items for follow-up work that the
 research surfaced but that doesn't belong inline in a design doc.
+
+## Harvesting from Foreign Codebases
+
+When the source is another team's repo rather than a research note, four heuristics keep recurring (VibeCut, 2026-07 to 2026-08):
+
+- **Give extraction sub-agents a contract.** You can harvest a large foreign repo without the main context opening a single source file. Fan out sub-agents with a specified extraction contract: constants, thresholds and edge cases precise enough to reimplement; prose and pseudocode, not code dumps; end with a gotchas list. The contract wording does the work. Two rounds (orientation, then extraction) beat one. Fan-out mechanics: tools-research, Parallel Fan-Out.
+- **The license split, not the badge, sets the boundary.** Trace each component to its origin before treating a repo as either untouchable or free to lift. A copyleft badge often covers less than it implies, and one repo can carry two licenses (permissive orchestration beside a restrictive renderer). Read the license and NOTICE files first, and record the boundary before planting anything.
+- **Verify that the problem transfers before the solution.** A repo's headline design may solve a problem your project does not have. Measure your own project's real case first: in one harvest that measurement changed the headline item's size about seventeenfold. In a staged judgment session, run code verification before forming opinions, and put verification first in any harvest or review brief.
+- **Ask the framing question early, and treat "only if useful" as a real filter.** The operator's framing changes the deliverable. "We are building for ourselves, not competing" turned a competitive analysis into a harvest ledger with a provenance policy. When most of a requested format would be empty for this source, say so and build the useful part: a smaller honest artifact beats a dutifully filled template.
 
 ## Principles
 

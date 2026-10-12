@@ -14,12 +14,13 @@ edit_log:
     sleep/wake catch-up semantics documented; upstream seed_role guard;
     git-clone-aware sync
   - "WV_2026-09-07_AA_03 2026-09-09 - Upstream Operator Note: diagnostic corollary (missing sync log on an upstream clone is expected; check seed_role first)"
+  - 'DW-S400 2026-10-12 - distribution model: Seed-embedded-in-shared-vault-repo shape (update path, social pinning, onboarding presence check)'
 operator: Andrew
 purpose: Canonical guide for installing, manually updating, and auto-syncing the
   DataWizard Seed
 title: Seed Install and Update
 type: guide
-updated: 2026-09-09
+updated: 2026-10-12
 ---
 # Seed Install and Update
 
@@ -30,6 +31,8 @@ updated: 2026-09-09
 The **zip download is the canonical install and update path for every operator, on every platform.** All install/update commands and both update scripts (`update_seed.sh`, `update_seed.ps1`) pull the GitHub zip, not a git clone.
 
 Git clones of the Seed are for **contributors only**. The Seed's history can be rewritten (for example, to purge an accidentally committed secret), which breaks a downstream clone's next `git pull` with an unrelated-histories error -- while the zip is unaffected. So: **operator path = zip** (the scripts below), **contributor path = git clone** (only if you intend to push changes back upstream). `update_seed.sh` recognizes a cloned Seed and syncs it with `git fetch` + fast-forward merge instead of the zip, refusing to touch local edits or local commits; `update_seed.ps1` skips clones and tells you to sync with git.
+
+**A third shape: the Seed embedded in a shared vault repo.** A team can run one shared vault as a single git repo with `_DataWizard/Seed/` committed inside it, so every collaborator gets the Seed when they clone the vault. The embedded copy has no `Seed/.git`, so both update scripts treat it as a zip install. The update runs once for the whole team: one person runs the update script against the embedded copy, then commits and pushes the vault repo, and everyone else gets the new Seed through their normal vault sync. Name one updater and leave auto-sync off on the other machines, or several machines will rewrite the same tracked folder. Version pinning is social, not mechanical: the team works from whatever Seed the vault repo last carried. A machine-onboarding step that checks the cloned vault actually contains the Seed, and flags it when missing, keeps everyone on one pinned protocol version. (Field deployment, 2026-09.)
 
 ---
 

@@ -9,8 +9,9 @@ description: >-
 type: skill
 updated: '2026-10-12'
 origin: 'DW-S158 2026-06-08 - backfilled from the earliest edit_log entry (D127)'
-version: '4.10.1'
+version: '4.10.2'
 edit_log:
+  - 'DW-S400 2026-10-12 - v4.10.2: Step 3.8 link-resolution check (dw_lint C5 or find recipe)'
   - 'DW-S398 2026-10-12 - v4.10.1: Step 3.14 awareness posting question (intent: awareness, ruling R8)'
   - "DW-S388 2026-10-06 - v4.10.0: Step 3.14 board rule (asks for outbound items,
     claims released; Cowork hand path per ruling R4); Step 3.13 claim-expiry
@@ -324,6 +325,8 @@ Scalars (`updated`, `status`) may go through `update_frontmatter` alone. For `ed
 **Scope:** `edit_log` is required on section files, recommended on infrastructure files (0.x) and standalone docs. Shell files are exempt -- they are assembly surfaces whose edit history is captured by their sections' logs. See the [[YAML Schema]] edit_log section for the full convention.
 
 This step catches metadata drift at the source rather than requiring periodic remediation passes.
+
+**Link resolution.** For the same files, confirm that the wikilinks and embeds added this session resolve. A link to a not-quite-right title renders like a live one and reads as "already tracked". Run dw_lint with `--stdout` and read its C5 (link resolution) findings for the files touched this session. Where dw_lint is unavailable, check each new link by hand: `find "<vault>" -name "<title>.md"` returning nothing means the link is dangling. Fix or unlink before the entry ships. (ReWoven, 2026-09)
 
 ### Step 3.9: Section-shell sync check
 
