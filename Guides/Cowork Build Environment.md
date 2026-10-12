@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S393 2026-10-12 - Device Bridge: no sqlite3 CLI; pkill -f kills the device shell - use a pid file (DW S393)'
   - 'DW-S391 2026-10-08 - Shell quirks: temp+rename write drops the macOS extended-ACL marker on the mount (DW S391)'
   - 'DW-S390 2026-10-07 - Device Bridge: bridge drops, Linux shell, PI re-paste mid-thread; SQLite: immutable=1 for WAL reads, board mirror races (DW S390, CS S34, HC S8 intake)'
   - "DW-S387 2026-10-05 - Device Bridge: GNU sed form + Python-heredoc canon patching (S387)"
@@ -51,7 +52,7 @@ operator: Andrew
 scope: seed
 title: Cowork Build Environment
 type: guide
-updated: 2026-10-08
+updated: 2026-10-12
 ---
 # Cowork Build Environment
 
@@ -155,6 +156,8 @@ Related shell limit: a sandbox shell call that hits its time limit (~120s) KILLS
 - **The bridge can drop mid-session and come back.** All `remote-devices` tools leave the tool list and return when the computer reconnects; a call in flight returns "not connected to the bridge" and nothing lands. A sub-agent dispatched during a drop reports cleanly and can be resumed with the same instructions once the link is back. Verify before retrying (Rule 5); a clean error is a clean miss. (DataWizard, 2026-10; also Holonic Canvas, 2026-10)
 - **The device shell is Linux with GNU tools, not macOS.** `sed -i ''` (BSD form) fails with "can't read ''"; use `sed -i` or a short Python read-modify-write. Mac paths in notes (`/Users/...`) resolve only through `$HOME/mnt/<folder>/`. (Community Stack, 2026-10)
 - **A Project Instructions re-paste lands in a running thread at the next turn.** A thread that oriented on one PI version sees the new one after the next message; carry both sweep traces in the entry and run any new orientation sub-check late rather than pretending it ran. (Holonic Canvas, 2026-10)
+- **No `sqlite3` CLI in the device shell.** Query a database on the mount with `python3 -c "import sqlite3; ..."` (read-only: `file:<path>?mode=ro` on a copy in `$HOME`). (DataWizard, 2026-10)
+- **`pkill -f <pattern>` inside `device_bash` kills the shell itself.** The pattern matches the `bash -c` command line that carries it, so the call dies with exit 143 before its later commands run. Stop a device-side server you started in the same call by pid: `(python3 server.py & echo $! > $HOME/x.pid)` ... `kill $(cat $HOME/x.pid)`. (DataWizard, 2026-10)
 
 ## Verification Discipline for Builds
 
