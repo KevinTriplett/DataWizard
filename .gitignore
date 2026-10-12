@@ -19,3 +19,4 @@ Scripts/output/
 Scripts/t/
 Scripts/__pycache__/
 *.pyc
+Scripts/*.session-journal
