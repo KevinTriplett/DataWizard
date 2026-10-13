@@ -2,12 +2,14 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-12
+updated: 2026-10-13
 origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
+  - 'DW-S403 2026-10-13 - Coordination board: interim intent/seen clause removed (board.py schema 6 live, G-059); optional resolution line; ID families hand-path id wording aligned with the board header'
+  - 'DW-S402 2026-10-13 - Coordination board: post the ask at write time; close-time check verifies and backfills (B-0081, CS S42 FR)'
   - "DW-S391 2026-10-08: Holonic records - person block lines added under the projection block (Name, Public profiles, Roles, Verified; design R5; T19 Chunk 7)"
   - "DW-S382 2026-10-02: added Holonic org notes entry (rule, shared facts, projection block, sync rules, delivery classes, identity; D133)"
   - DW-S181 2026-06-13
@@ -551,9 +553,11 @@ A depersonalized starter file ships as `Seed/Templates/Operator Gate Queue - Tem
 
 **Example:** a session files a pickup note in another project's Session Exchange and, at close, posts `B-0007 ask - to: that project - note: <the note's path>`; that project's next orientation lists it in the first five lines it reads.
 
+**Post at write time.** Post the ask in the same step that writes the outbound item (an exchange note or feature request to another project, a gate row naming another project's actor) - not only at close. A session that ends without a full close (lite close, compaction, crash, a long-running thread) otherwise leaves a note no project sees at orientation. The close-time cross-project write check stays as the safety net: it verifies that each outbound item has a row and posts only the missing ones. (Community Stack, 2026-10)
+
 **Awareness asks.** An ask may carry `intent: action | awareness` (default `action`; a block without the field is an action ask). An `awareness` ask says "I changed something you build on; nothing is asked": it points at the changed note or its decision entry, and its statuses are open -> seen | stale (no picked-up, no done). The target project marks it `seen` as an explicit act at orientation or close; `stale` means the change was superseded before it was seen. Post one, per affected project (or `all`), when a session changed something another project depends on - a shared vocabulary, a protocol, schema or design doc another project cites, a data contract, a decision another project built on - without asking that project to act. If the other project must do anything, it is an action ask, not awareness; tool-behavior notes the receiving project will plant are `intent: action`. No third block kind: awareness asks share the ask grammar and the `B-NNNN` number space. The orientation trace gains a `K awareness` count at the next Project Instructions bump, not before. (Holonic Canvas proposal, DataWizard ruling, 2026-10)
 
-**Who writes the table.** Board table writes run on the operator's machine only - the board script, Claude Code sessions, and the DW Save sync, which runs the board render at every save. A session working through a mount that cannot forward SQLite locks (for example a Cowork session) never writes the table; it uses the hand path: write the block in the mirror in the board's grammar, re-read, renumber on collision (Optimistic-claim pattern); release or pick up by editing the row's `status` and `updated`. The next render folds hand edits in: a row in both mirror and table takes the side with the newer `updated`, field by field (a tie goes to the table); a mirror-only row is inserted under its own number (a different row under that number is a collision, carried to `## Unreconciled`, never inserted); a table-only row is written to the mirror; every merge is reported; nothing is deleted on either side. Starter file: `Seed/Templates/Coordination Board - Template.md`. (DataWizard, 2026-10) The board script gains the `intent` column and the `seen` status in its next build (backlog); until then its parser refuses a block that carries `intent:` or `status: seen` and carries it to `## Unreconciled` (never dropped), and a render rewrites the mirror's header from the script's own copy.
+**Who writes the table.** Board table writes run on the operator's machine only - the board script, Claude Code sessions, and the DW Save sync, which runs the board render at every save. A session working through a mount that cannot forward SQLite locks (for example a Cowork session) never writes the table; it uses the hand path: write the block in the mirror in the board's grammar, re-read, renumber on collision (Optimistic-claim pattern); release or pick up by editing the row's `status` and `updated`. The next render folds hand edits in: a row in both mirror and table takes the side with the newer `updated`, field by field (a tie goes to the table); a mirror-only row is inserted under its own number (a different row under that number is a collision, carried to `## Unreconciled`, never inserted); a table-only row is written to the mirror; every merge is reported; nothing is deleted on either side. Starter file: `Seed/Templates/Coordination Board - Template.md`. A render rewrites the mirror's header from the script's own copy. A closing session may add one optional `resolution:` line to an ask, saying how it closed; the render keeps it. (DataWizard, 2026-10)
 
 ---
 
@@ -584,7 +588,7 @@ Role-level casting (orchestrator-synthesizer / researcher / writer) and the one 
 | Holon ids (`hid`) | 20 chars from `a-z 2-7` | core note frontmatter | minted by the holon index when a core lacks one (one-time reconciliation may copy a pre-existing consumer id first); cryptographic random; never derived from a name; never reissued or re-keyed | global - every vault, store and consumer |
 | Core ids (`core_id`) | kebab-case slug | core note frontmatter | written by the federating skill or its batch twin from the name at core creation; stable forever once written; a merge keeps both | vault |
 | Relation ids | derived, not stored: 20 base32 chars of sha256 over `subject hid|pred|target|role|since` | holon index | computed from content, never from list position | global |
-| Board row IDs | `B-NNNN` (one number space for claims and for asks of either `intent`) | board table in the operational db, mirrored in `_Coordination/Board.md` | script: next above the highest id in table, mirror and archive; by hand: above `next_free` and the mirror's highest id, re-read, renumber on collision | vault |
+| Board row IDs | `B-NNNN` (one number space for claims and for asks of either `intent`) | board table in the operational db, mirrored in `_Coordination/Board.md` | script: next above the highest id in table, mirror and archive; by hand: `next_free`, or the next id above the highest present (mirror incl. Unreconciled, and archive) if that is higher; re-read, renumber on collision | vault |
 
 The Task IDs row is the worked example: its definition-site / scope / minting triad took a three-session design arc to settle after live collisions in two projects; filling the row at family creation is the cheap alternative.
 

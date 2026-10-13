@@ -3,8 +3,10 @@ title: MCP Reliability and Write Verification
 type: guide
 scope: seed
 created: '2026-05-03'
-updated: 2026-10-12
+updated: 2026-10-13
 edit_log:
+  - 'DW-S403 2026-10-13 - Bridge Drops: local MCP tools time out while the computer sleeps; Read-Tool Overflow: edit_file dryRun for files past the read ceiling (board intake B-0076 Evolutionary Media Commons, B-0083 MetaMyth)'
+  - 'DW-S403 2026-10-13 - Obsidian gotchas: write_note append re-serialises the frontmatter (board intake B-0065, Kosmosis)'
   - 'DW-S397 2026-10-12 - get_frontmatter {} on unparseable YAML: widened from edit_log to any scalar; pointer to the YAML Schema callout (meta-learning review S363-S376)'
   - "DW-S191 2026-06-21: planted sandbox git-write limitation"
   - DW-S195 2026-06-22 - joined the Platform and Environment Behaviors cluster
@@ -146,6 +148,8 @@ In a remote (cloud) Cowork session the same event has a **lazy-loading variant**
 
 Files already staged into the container survive a mid-session drop, so plan around the drop - wait for the reconnect, reload the tools, then continue from what is staged - rather than retrying calls into a dead bridge. (VibeCut, 2026-08)
 
+**Local MCP tools time out while the computer sleeps.** When the operator's machine is asleep, or has just woken and the session has not yet re-linked, every call to an MCP server that runs on that machine (local Obsidian or filesystem servers) waits about 120-137 s and fails with "No result received from client-side tool execution" or no response at all - even a trivial call such as `list_allowed_directories`. Retrying does not help. Stop after the first such timeout (two at most), ask the user to wake the machine, and once the session re-links continue on the `remote-devices` tools (obsidian, filesystem, `device_bash`, `device_request_folder_access`), which answered at once in both field cases. Treat the first reads after the wake as wake-stale (Known Issues) and verify freshness before acting on them. (Evolutionary Media Commons, 2026-10; MetaMyth, 2026-10)
+
 ## Version Pinning and npx Caching
 
 If you run mcpvault (or any MCP server) via `npx`, note that **npx caches server versions indefinitely** -- a config that names `@bitbonsai/mcpvault` with no version can silently keep running a months-old build long after fixes ship. Several 0.12.x releases carry reliability-relevant fixes (patch_note `$`-pattern corruption fixed in 0.12.2; YAML parser swapped to the `yaml` package in 0.12.1; `.trash/` exclusion in 0.12.3), so an unpinned old build can reintroduce bugs this guide assumes are gone.
@@ -174,6 +178,8 @@ Rules:
 **`get_frontmatter` also returns `{}` silently when the YAML does not parse.** An unquoted scalar containing `: ` (a colon-space inside a plain value - first an edit_log entry, later a `url:` field) made a file's frontmatter unparseable; `get_frontmatter` returned `{}` with no error, and `update_frontmatter` would have written a fresh block over the unparsed one (the array-wipe hazard in its worst form). Treat an empty `get_frontmatter` on a file you know has frontmatter as a signal: read the raw file, run it through a YAML parser, and quote the offending entry before any frontmatter write. Under D127, edit_log entries are always single-quoted at write time (see the [[YAML Schema]] origin/edit_log section), which retires this failure class; quote any unquoted legacy entry on sight. The general rule for every field, not just edit_log, is the [[YAML Schema]] callout "Quote any scalar that contains `: `". (Source: DataWizard, 2026-08; widened 2026-09)
 
 For a single large note that overflows on its own: parse the saved tool-result JSON by section header / character range, or read it with `filesystem:read_text_file` (a 55KB file read cleanly in one call) and script-parse. A note that reliably overflows on read is also a sectioning candidate (Working Rule 7). (Source: ReWoven S34; Weave, 2026-07/08) Nuance for **remote (cloud) Cowork sessions**: there the saved tool-result file lands in the *cloud container*, where the cloud `Bash` tool CAN read it -- parse the saved JSON and slice its `content` field (python `json.loads`, then string-slice). The "sandbox cannot read it" limitation applies to the on-device sandbox layout, not the cloud-container layout. (Source: RW S68)
+
+**Editing a file past the read ceiling: `filesystem:edit_file` with `dryRun: true`, then the same call for real.** On a 91KB file, fifteen section-header inserts plus a frontmatter change went in as one `edit_file` call: the dry run returned the full diff and wrote nothing, then the identical edit list was applied. The file is never read whole or retyped, so neither the read ceiling nor truncation can corrupt it. Anchor each edit on whole-line text (see the mid-line insertion gotcha under Obsidian Behavioral Gotchas); where `edit_file` is dead (output-schema rejection, Known Issues), use the device-shell Python anchored replace in **Cowork Build Environment** (Device Bridge). The file is still a sectioning candidate (Working Rule 7). (MetaMyth, 2026-10)
 
 ## Verification Protocol
 
@@ -282,6 +288,8 @@ The takeaway for DW: when an operation might be undone or re-applied later, reco
 These are not MCP bugs but Obsidian behaviors that agents need to account for.
 
 **`write_note` append mode joins WITHOUT a newline separator.** Appended content is glued directly onto the file's last character, so appending a list item to a file whose last line lacks a trailing newline concatenates the new item onto the old one's line - the file stays valid-looking and every write reports success, but list parsing, greps, and Dataview all see one merged line. Three appended backlog items (plus a parallel session's fourth) chained onto one line this way. Rule: start appended content with a leading newline (or `\n\n` for a new block), and after an append verify the new content begins at column 1 (`grep -c "^- "` style) rather than trusting the success response. (DataWizard, 2026-09)
+
+**`write_note` append mode also re-serialises the frontmatter.** An append to the body rewrote the YAML block too: long `edit_log` strings were folded onto continuation lines, and quoting could change. An exact-string `patch_note` (or a script anchor) built from the pre-append frontmatter text then fails to match. After any append, re-read the file before a frontmatter edit and take anchors from the fresh read. For frontmatter changes, prefer `update_frontmatter` or a device-shell insert (Bulk Frontmatter Backfills, above). (Kosmosis, 2026-10)
 
 **`move_note` does NOT auto-update wikilinks.** When you rename or relocate a note via `move_note`, Obsidian's MCP does not update wikilinks in other files that reference the moved note. After any rename or move, you must manually search the vault for references to the old path/name and patch them. Search vault-wide, not just within the current project -- wikilinks without paths can resolve across projects. (Source: MMM S08)
 

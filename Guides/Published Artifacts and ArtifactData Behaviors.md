@@ -2,13 +2,15 @@
 title: Published Artifacts and ArtifactData Behaviors
 type: guide
 created: 2026-10-12
-updated: 2026-10-12
+updated: 2026-10-13
 operator: Andrew
 scope: seed
 status: active
 edit_log:
   - 'DW-S398 2026-10-12 - created (board intake: eleven artifact behaviors consolidated from four projects)'
   - 'DW-S400 2026-10-12 - Publishing: data-file-only republish needs the page, self-saving page merge; new Local testing and vault copies section (viewer reset, window.claude mock, fragment skeleton) (ReWoven FR intake)'
+  - 'DW-S403 2026-10-13 - Rendering constraints: no deep-link channel into a published page; Publishing: pre-publish byte check from a path read, recipe strips the trailing close tags (board intake B-0072, Holonic Canvas)'
+  - 'DW-S403 2026-10-13 - Publishing: publish recipe gains a read-and-diff check against live and capabilities kept when omitted on republish (board intake B-0076 Evolutionary Media Commons)'
 ---
 # Published Artifacts and ArtifactData Behaviors
 
@@ -24,9 +26,11 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 
 **Republishing needs a "viewed" read of the live source, and a `path` read does not count.** The live version counts as viewed when it is read in full: an `Artifact read` of the URL without `path` (brings the whole page into context), or every line of a saved copy read with the Read tool (about 25k tokens per Read call, so a 75 KB page takes two calls). Partial reads made before a refusal are not counted, and a read with `path: index.html` saves the page to a file but does not count as viewing it. A republish therefore typically costs three calls: read, read, publish for a two-part Read of a 75 KB page, or three publish attempts when nothing was viewed first (next item). (Holonic Canvas, 2026-10)
 
-**A refused publish saves the live source; diff it before you re-publish, then resend.** The first publish without a view is refused with a line diff and the live page's full source saved to a local file (path in the error); that refusal counts as the view. Diff the saved file against your base - if the live page holds only your base plus the publish skeleton, there is nothing to merge; if it holds someone else's edits, merge them first. Sending the same file again is refused once more as "identical content resent", and the next identical send publishes (sequence seen: refused, refused as unchanged, publishes). (Holonic Canvas, 2026-10)
+**A refused publish saves the live source; diff it before you re-publish, then resend.** The first publish without a view is refused with a line diff and the live page's full source saved to a local file (path in the error); that refusal counts as the view. Diff the saved file against your base - if the live page holds only your base plus the publish skeleton, there is nothing to merge; if it holds someone else's edits, merge them first. Sending the same file again is refused once more as "identical content resent", and the next identical send publishes (sequence seen: refused, refused as unchanged, publishes). On a large page, make the merge check before the first attempt instead: a `path: index.html` read saves the live page without counting as viewed, so strip the publish skeleton (recipe below) and compare the body byte for byte with your source copy (the page in git). Byte-equal means nothing was co-written and the refusal's diff will hold only your own lines, so the three-step can run without reading the page into context. (Holonic Canvas, 2026-10)
 
-**Publish recipe for a hand-built full-document page.** Strip the first 5 skeleton lines and the `</head><body>` the tool adds around the page, keep the theme with a one-line script, and smoke-test the page inside a fake artifact skeleton before publishing. Rendering it once locally is the one use the cloud container's headless browser is good for (see **Chrome MCP and Web Tool Behaviors**, Claude-in-Chrome section). (Evolutionary Media Commons, 2026-10)
+**Publish recipe for a hand-built full-document page.** Strip the first 5 skeleton lines, the `</head><body>` and the trailing `</body></html>` the tool adds around the page, keep the theme with a one-line script, and smoke-test the page inside a fake artifact skeleton before publishing. Rendering it once locally is the one use the cloud container's headless browser is good for (see **Chrome MCP and Web Tool Behaviors**, Claude-in-Chrome section). To confirm the stripped copy matches what is live, `read` the artifact and diff: a correct copy differs only in blank lines. (Evolutionary Media Commons, 2026-10)
+
+**A republish with `url` that omits `capabilities` keeps the page's declared capabilities** (for example `downloads`); pass the field only to change them. (Evolutionary Media Commons, 2026-10)
 
 **A data-file-only republish still needs the page.** A `publish` with `url` and `files` alone is refused ("also pass file_path"). To change only a data file (for example a `canvas.json`), pass the unchanged page as `file_path` together with `files`; the viewed-read rule above applies to that page on the first such republish of a session. Afterwards, read `index.html` back with `path` and compare its sha256 with your pre-publish copy to confirm the page did not change. A read copy of the page carries the publish skeleton, so republish from your own source copy or strip the wrapper first (recipe above). (ReWoven, 2026-10)
 
@@ -55,6 +59,8 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 **The artifact CSP blocks images from any outside host, so tiled web maps go grey.** Scripts load from a few CDNs (cdnjs works), but OSM, CARTO or Esri tiles never load and show no error. The fix that worked: embed a vector basemap (an Overpass extract simplified to ~400 KB) and draw it with Leaflet on a canvas renderer with no tile layer, Leaflet CSS inlined. This extends the general CSP rule in **Cowork Build Environment** (Device Bridge: "Chat-delivered HTML previews run NO page scripts; published claude.ai artifacts run scripts but block external hosts"). (LocationScout, Rootland, 2026-10)
 
 **Browser automation cannot act inside a published artifact's frame.** The page runs in a nested cross-origin frame; Claude in Chrome and the built-in browser pane cannot click, type, read or run script inside it. The store read-back is the only automatable evidence of what a page wrote - in-memory page state has to be read by the person or shown on the page. (Holonic Canvas, 2026-10)
+
+**Nothing in an artifact link reaches the page, so a published page has no deep links.** The page runs in a frame on its own host whose URL carries no query or fragment: opened at `https://claude.ai/artifact/<id>?x=1#y=2`, a probe page saw empty `location.search`, `location.hash` and `document.referrer`, and the host's `postMessage` traffic to the frame carried theme, viewport and capability settings but no route. No runtime capability offers a link channel either (checked against runtime contract 0.2.75). A `#route=` scheme in a published page can never be hit from a link: route through a channel the page owns (a paste field, a `db` document another page writes, a sync), and probe with a scratch page that prints what it sees before building any routing. (Holonic Canvas, 2026-10)
 
 ## Local testing and vault copies
 

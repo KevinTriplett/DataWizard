@@ -11,11 +11,12 @@ description: >-
   (Pattern 3), a build with no reviewer available, or incidental concurrency
   between unrelated sessions.
 type: skill
-version: '1.5.0'
+version: '1.5.1'
 created: '2026-08-30'
-updated: 2026-10-12
+updated: 2026-10-13
 operator: Andrew
 edit_log:
+  - 'DW-S403 2026-10-13 - v1.5.1: in-thread variant - per-builder worktree and output folder, no git stash across worktrees (board intake B-0072, Holonic Canvas)'
   - 'DW-S398 2026-10-12 - v1.5.0: Reviewer 3 fixture experiments (two runs, partial apply, re-plan); forced event ordering for a claimed flake; in-thread variant: lead re-counts from files, resume the plan reviewer for verification, cancelled launch may have run (board intake)'
   - 'DW-S397 2026-10-12 - v1.4.0: In-thread variant section (sub-agent builder; codified on second use); Builder 4 ship-the-spec-surface-early; Reviewer 3 independent classifier over rollback copies; whole-build sweep = blind hand run for skills; chunk-vs-pre-flight instruments (meta-learning review S377-S392)'
   - "DW-S306 2026-08-30 - v1.0: codified from Coordination Patterns Pattern 4
@@ -129,7 +130,7 @@ Codified on second use (two projects, 2026-10). The whole build runs inside ONE 
 - **Scratch, never the vault.** The reviewer still runs the server or script on a scratch copy outside the working tree; builders write to the vault only through the gate.
 - **Re-count from the files.** Never carry a number from a sub-agent report into canon without re-deriving it from the files: a worker's prose misstated a count that its own export had right. (Holonic Canvas, 2026-10)
 - **Resume the plan reviewer for verification.** Resume the sub-agent that reviewed the plan by message (SendMessage to the same agent) for the verification seat: it keeps fresh eyes - it did not author the code - and saves the re-orientation a second fresh instance costs. (Holonic Canvas, 2026-10)
-- **One file set per builder, no sharing.** When several builder sub-agents run in parallel, give each a disjoint set of target files and have each back up its targets first; the lead merges nothing. Six parallel builders over fifteen files produced no write conflicts under this rule; the one near-miss was a shared mirror file edited by a sibling session mid-run, caught by an mtime guard. (DataWizard, 2026-10)
+- **One file set per builder, no sharing.** When several builder sub-agents run in parallel, give each a disjoint set of target files and have each back up its targets first; the lead merges nothing. Six parallel builders over fifteen files produced no write conflicts under this rule; the one near-miss was a shared mirror file edited by a sibling session mid-run, caught by an mtime guard. (DataWizard, 2026-10) In a git repo, give each parallel builder its own worktree (`git worktree add ../<tree> -b <branch>`) and its own output folder for patches, logs and checksums, and brief each never to enter a sibling's tree and never to use `git stash` - the stash is shared across worktrees. The lead still verifies each tree on disk and re-runs each suite itself; two builders on two folders of one repo landed clean this way in about 30 minutes of wall time. (Holonic Canvas, 2026-10)
 - **A cancelled launch may have run.** A sub-agent launch rejected or cancelled at the approval prompt may still have run and left files behind; before relaunching, check disk state (`git status`, the outputs folder) and tell the next agent what is there. Three field instances; the full behavior is in the Cowork Build Environment guide. (Evolutionary Media Commons, Holonic Canvas, 2026-10)
 - **Topology and casting.** The repeatable shape: a synthesis-tier reviewer in-thread, a worker-tier builder seat and (when the deliverable is prose) a worker-tier writer seat as sub-agents, and one living supervision note per session holding the chunk verdicts. Cast the seats with the model-casting skill; the reviewer writes the supervision note while the builder runs, not after.
 

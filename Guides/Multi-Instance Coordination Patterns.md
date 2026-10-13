@@ -1,6 +1,7 @@
 ---
 created: 2026-08-26
 edit_log:
+  - 'DW-S403 2026-10-13 - Pattern 3 step 3: execute-verifying review of a run card (board intake B-0065, Kosmosis)'
   - DW-S287 2026-08-26 - created (absorbs the coordination-thread, relay-review,
     second-model plan review, supervised-build, and Session Exchange patterns
     from six uses; canonical home for the exchange-note handshake convention)
@@ -29,7 +30,7 @@ operator: Andrew
 seed_version: 1.3.1
 title: Multi-Instance Coordination Patterns
 type: guide
-updated: '2026-10-12'
+updated: '2026-10-13'
 ---
 # Multi-Instance Coordination Patterns
 
@@ -102,7 +103,7 @@ The evidence for keeping the roles adversarial: the cross-model review caught re
 
 1. **Send the plan, not the code.** The build session posts its chunk plan - approach, the invariants it relies on, and its open questions - before writing a line. The reviewer has the whole plan and no code, which is what makes the review cheap.
 2. **Review from fresh context.** A different session, ideally a different model, and always one that has not been drafting the plan. The drafting instance is structurally blind to collisions outside its doc; a design that redefined what a shared stamp meant collided with a working rule and a skill step, and only a fresh reader saw it (`Working Principles`, "Redefining a shared field...").
-3. **Ground-truth the substrate.** Every high-severity catch in a run of reviews came from reading what the design's assumptions touch - live field values, a sampled day of captures, the other writers of a field the design redefines - never from the doc alone (DataWizard, 2026-08).
+3. **Ground-truth the substrate.** Every high-severity catch in a run of reviews came from reading what the design's assumptions touch - live field values, a sampled day of captures, the other writers of a field the design redefines - never from the doc alone (DataWizard, 2026-08). When the plan is a run card that an unattended run will execute, ground-truth by executing: the reviewer runs the baselines and a prototype of each ruled change, not only the card's literals. On one arc this found blockers no reading could, such as a data file the run would need that the install did not ship, and a "must stay byte-identical" regression block that the ruled change necessarily moves. A short confirmation pass by a fresh instance on the revised card caught new defects the fixes had introduced. (Kosmosis, 2026-10)
 4. **Return flags, pins, and pre-ruled questions.** Code-level flags ("the re-serializer will leak computed state into files"), design pins that must be decided consciously before write, minors to fold without discussion, and answers to the plan's open questions so the build does not stop to ask.
 5. **Fold before the first line.** The build session folds the review into the plan and only then writes. Reviewer confirms the result after.
 

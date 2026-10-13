@@ -3,9 +3,10 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: 2026-10-12
+updated: 2026-10-13
 operator: Andrew
 edit_log:
+  - 'DW-S403 2026-10-13 - Requirements: append-only run log, a launch can start twice (board intake B-0065, Kosmosis)'
   - 'DW-S397 2026-10-12 - Managing tasks section: account-level scope, promptless update_trigger, list_triggers overflow (meta-learning review S377-S392)'
   - 'DW-S398 2026-10-12 - unattended no-ask rule; requires_local_device binding; device_absent and PENDING failure modes; launchd protected folders + kickstart (board intake)'
   - DW-S185 2026-06-15 - created from S160-S171 meta-learning review (4 deferred
@@ -46,6 +47,7 @@ A task that runs without a human in the loop needs all of:
 - **Existing-output detection (idempotency).** Check whether an item's output already exists before producing it. This is what makes a task safe to re-fire, and it is the guard against context-compaction re-stamping: when a long run's context compacts mid-task, the instance can lose track of what it already wrote and redo or re-stamp work. An existing-output check plus post-write verification prevents duplicate or re-stamped output.
 - **Persisted tool approvals.** Obsidian MCP (and any other) tool approvals must be granted on a manual first run before automated firing works; without them the task stalls waiting on an approval no one is there to give. (S165)
 - **No ask-the-human branch on the normal path.** A skill that a scheduled task runs must not contain a step like "tell the operator before committing" on its ordinary path: the unattended run has nobody to tell, so it waits until the task times out. Put the human gate before the task (approval of the plan) or after it (review of the result), never inside it; where a step would ask, have it do the safe subset (e.g. commit only its own paths) and report the rest. (Holonic Canvas, 2026-10)
+- **Append-only run log: a launch can start twice.** One unattended Claude Code run began with a session that wrote its log header and died, and a second session took over a minute later. Because the run log was append-never-rewrite, the false start stayed harmless and visible. A run that rewrote its log or outputs would have hidden it or written over it. Keep the run log append-only and the run idempotent (above), and read a header with no body as a false start, not as a failed run. (Kosmosis, 2026-10)
 
 ## Managing tasks: account scope, update_trigger, list_triggers
 

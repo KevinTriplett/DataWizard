@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S403 2026-10-13 - Scripted downloads: blocked-portal aggregator fallback, mark partial; og:image logo/stock contact-sheet check (board intake B-0074, LocationScout)'
   - 'DW-S396 2026-10-12 - Operator browser split view (Brave) section: no web API, tab menu limits, build the pane into the page'
   - 'DW-S397 2026-10-12 - web_fetch: attended PROVENANCE_REQUIRED timeout, paste-the-URL unblock (meta-learning review S363-S376)'
   - 'DW-S398 2026-10-12 - WebSearch budget, scripted-download (User-Agent identity, Wikimedia 429, captcha vs WebFetch) and Connectors sections (board intake)'
@@ -27,7 +28,7 @@ operator: Andrew
 scope: seed
 title: Chrome MCP and Web Tool Behaviors
 type: guide
-updated: 2026-10-12
+updated: 2026-10-13
 ---
 # Chrome MCP and Web Tool Behaviors
 
@@ -84,7 +85,9 @@ This ladder is the standing home for the recurring "JS-rendered surface needs a 
 
 **Wikimedia (Wikidata, Commons) rate-limits per shell.** It answers HTTP 429 to the cloud container at once and to the device shell after fast bursts. From the device shell, a 1 s pause before each call plus one retry after the `Retry-After` header cleared almost all 429s. General fetch throttling: see **Cowork Build Environment**. (LocationScout, 2026-10)
 
-**Portals that captcha the device shell can still be read by WebFetch.** Real-estate portals served a captcha page to `curl` from the device shell while WebFetch read the same page, and their image hosts served photos to plain `curl`. Pattern: collect the `og:image` URLs with WebFetch, then download the images on the device. Some portals block both paths; record those as unreachable rather than retrying. (LocationScout, 2026-10)
+**Portals that captcha the device shell can still be read by WebFetch.** Real-estate portals served a captcha page to `curl` from the device shell while WebFetch read the same page, and their image hosts served photos to plain `curl`. Pattern: collect the `og:image` URLs with WebFetch, then download the images on the device. Some portals block both paths (one answered agents with HTTP 401); record those as unreachable rather than retrying. An aggregator that indexes the blocked portal can stand in for it, but it may carry only some fields (price and living area, with no land size and no photo); keep such a record and mark it partial rather than dropping it or filling the gaps by guesswork. (LocationScout, 2026-10)
+
+**An `og:image` is not always the listing's own photo.** Collected `og:image` URLs sometimes point to the site's or the agent's logo (1 in 26 in one run), and other runs picked up stock photos. Before publishing a page built from scraped images, review all of them at once as a contact sheet, a single grid of thumbnails, and drop or replace any logo or stock image; a count or URL check will not catch it. (LocationScout, 2026-10)
 
 ## Google Docs via Chrome
 

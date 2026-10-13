@@ -2,11 +2,12 @@
 title: Coordination Board
 type: coordination-board
 created: YYYY-MM-DD
-updated: YYYY-MM-DD
+updated: 2026-10-13
 next_free: B-0004
 generated_by: board.py render
 operator: Operator-A
 edit_log:
+  - '2026-10-13 - header id sentence and awareness seen sentence aligned with board.py schema 6; optional resolution line in the ask grammar (DataWizard, 2026-10)'
   - 2026-10-06 - created (Coordination Board template; DataWizard, 2026-10)
   - '2026-10-12 - awareness asks: intent field and statuses in the grammar, example block (DataWizard, 2026-10)'
 ---
@@ -17,7 +18,7 @@ edit_log:
 
 Cross-project asks and write claims for the whole vault. Each row is a pointer; the content stays where it points. Rendered by `board.py render` from the `board` table in the operational database. Rule: Conventions Registry, entry "Coordination board".
 
-By hand (sessions that cannot write the table, e.g. Cowork): add a block at the end of `## Live` using the `next_free` id from this note's frontmatter; re-read; if another block already has that id, renumber yours to the next free one. To release a claim or pick up an ask, edit its `status` and set `updated` to now (UTC, YYYY-MM-DDTHH:MM:SSZ). To take over an expired claim, add your own held claim and set the old one to `status: reclaimed` with `- reclaimed_by: <your id>`. Never delete a block. The next render folds hand edits into the table.
+By hand (sessions that cannot write the table, e.g. Cowork): add a block at the end of `## Live` with the `next_free` id from this note's frontmatter - or, if any block in this note (the Unreconciled section included) or in the archive already carries that id or a higher one, the next id above the highest present; re-read; if another block already has that id, renumber yours to the next free one. To release a claim or pick up an ask, edit its `status` and set `updated` to now (UTC, YYYY-MM-DDTHH:MM:SSZ). To mark an awareness ask seen, set `status: seen` and `updated`. To take over an expired claim, add your own held claim and set the old one to `status: reclaimed` with `- reclaimed_by: <your id>`. Never delete a block. The next render folds hand edits into the table.
 
 Block grammar (one block per row; statuses - asks: open, picked-up, done, declined, stale; awareness asks (`intent: awareness`): open, seen, stale; claims: held, released, expired, reclaimed):
 
@@ -27,6 +28,7 @@ Block grammar (one block per row; statuses - asks: open, picked-up, done, declin
     - note: <vault path of the note that holds the content>
     - intent: <action or awareness; optional, default action - awareness means nothing is asked>
     - updated: <UTC time>
+    - resolution: <optional one line: how it closed>
 
     ### B-NNNN claim - <summary>
     - by: <session> | status: held | posted: <UTC time> | heartbeat: <UTC time> | ttl: 120
