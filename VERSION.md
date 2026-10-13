@@ -1,5 +1,5 @@
 
-seed: 1.9.0
+seed: 1.9.1
 protocol: 1.8
 project_instructions: 4.9
 
@@ -54,6 +54,16 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.9.1
+
+**Patch release: the board's last interim wording goes, and a second intake batch of field learnings lands.** Two DataWizard sessions (2026-10-13). Shipped in the Seed:
+
+- `Protocols/Conventions Registry.md`, "Coordination board": post the ask at write time, not only at close (the close-time check verifies and backfills); the interim clause about the board script refusing `intent:` / `status: seen` is gone (the script now carries both); an ask may carry an optional `resolution:` line; the hand-path id rule is "`next_free`, or the next id above the highest present (mirror incl. Unreconciled, and archive)", in the Registry, the template and the board header alike. `Templates/Coordination Board - Template.md` matches.
+- `Skills/session-closer` v4.10.3 (Step 3.14 verifies that each outbound item has a board row and posts only the missing ones). `Skills/supervised-build` v1.5.1 (one worktree and one output folder per parallel builder; no `git stash` across worktrees).
+- Platform and Environment Behaviors guides, from five projects' notes (Kosmosis, Holonic Canvas, LocationScout, Evolutionary Media Commons, MetaMyth): `Cowork Build Environment.md` (folder grants: ask for the exact folder, then widen; no connected folder means the Obsidian MCP is the only write path; vault-level files are invisible to the device shell when only a project folder is connected; a Mac venv does not run in the device shell; build sdists in a venv; byte-faithful sectioning; Overpass tiling and `out geom;`; `git archive` crossings miss gitignored inputs; content inventory before consolidating), `MCP Reliability and Write Verification.md` (local MCP tools time out while the computer sleeps; `write_note` append re-serialises the frontmatter; `edit_file` dryRun for files past the read ceiling), `Published Artifacts and ArtifactData Behaviors.md` (no deep-link channel into a published page; byte check before the first publish; recipe strips the trailing close tags; capabilities kept on republish), `Chrome MCP and Web Tool Behaviors.md` (aggregator fallback marked partial; `og:image` contact-sheet check), `Cowork Scheduled Tasks.md` (append-only run log: a launch can start twice), `Multi-Instance Coordination Patterns.md` (a run-card review that executes).
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.9.0
 
