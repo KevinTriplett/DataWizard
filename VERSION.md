@@ -1,5 +1,5 @@
 
-seed: 1.9.1
+seed: 1.9.2
 protocol: 1.8
 project_instructions: 4.9
 
@@ -54,6 +54,17 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.9.2
+
+**Patch release: three big guides become shell + sections, and a third intake batch of field learnings lands.** One DataWizard session (2026-10-15). Shipped in the Seed:
+
+- **Sectioned guides.** `Guides/Cowork Build Environment.md`, `Guides/MCP Reliability and Write Verification.md` and `Guides/Chrome MCP and Web Tool Behaviors.md` were each past or near the ~50 KB line where MCP reads and patches turn unreliable. Each is now a short shell (frontmatter, intro, `![[embeds]]`) plus one section file per former H2 in a folder of the same name; the text was moved byte for byte. The shells' edit_logs are frozen; new edits log on the section files. Device Bridge (Cowork Build Environment 8.0) is further split by theme: 8.0 shell and environment, 8.1 staging, commits and transport, 8.2 sub-agents and orchestration; two near-identical "device shell is GNU Linux" bullets were merged. New learnings go into the matching section file, never the shell.
+- **New section** `Cowork Build Environment/10.0 Scanning Third-Party Code.md` (OSV-Scanner call analysis runs the scanned repo's build code; GuardDog can report a clean run it did not finish).
+- **Platform and Environment Behaviors plants** from six projects' notes (Evolutionary Media Commons, Holonic Canvas, LocationScout, MetaMyth, Community Stack, DataWizard), about 50 learnings: background jobs in the cloud container (survival past the call is undefined; detach with `setsid nohup ... < /dev/null & disown` and check the log grows); folder grants for deep build paths; `sed -i.bak` leaves undeletable backups on a connected folder; spend-limit kills that still wrote output; the general-purpose sub-agent will not write report `.md` files; the read-only Plan agent; staging, commit and checksum refinements; Python glob order and json.dump reformatting; pipx with the newest Homebrew Python; `pdftotext` ligatures; Playwright flakes under parallel runs and Back with `history.replaceState`; reviewing animation from video; published-artifact comment rounds, overlay mock-ups, the byte-exact publish compare, admin-only root rules and ArtifactData `batch`; `visibility` vs `opacity`; Chrome page-text truncation, auto-translation and embedded state JSON; Obsidian tool flips with no reconnect notice; `git am` stopped halfway without the delete grant; `device_request_delete_permission` in scheduled tasks. Plus one tier-generic "Build rounds" sentence in the Conventions Registry, Model routing.
+- **Seed hygiene.** `.gitignore` now ignores `*.bak`: rollback copies stay out of the published Seed (keep them in a backup folder outside the Seed).
+
+**Propagation:** `update_seed.sh`. Links to these guides by name keep working; a heading link of the form `[[Guide#Heading]]` into a sectioned guide should point at the section file. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.9.1
 
