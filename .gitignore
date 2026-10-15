@@ -20,3 +20,6 @@ Scripts/t/
 Scripts/__pycache__/
 *.pyc
 Scripts/*.session-journal
+
+# Rollback copies - keep out of the published Seed (DW-S408)
+*.bak
