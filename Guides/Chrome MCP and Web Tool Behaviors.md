@@ -1,6 +1,7 @@
 ---
 created: 2026-08-18
 edit_log:
+  - 'DW-S408 2026-10-15 - sectioned into shell + sections in "Chrome MCP and Web Tool Behaviors/" (Seed/Guides); this edit_log is frozen - future edits log on the section files'
   - 'DW-S403 2026-10-13 - Scripted downloads: blocked-portal aggregator fallback, mark partial; og:image logo/stock contact-sheet check (board intake B-0074, LocationScout)'
   - 'DW-S396 2026-10-12 - Operator browser split view (Brave) section: no web API, tab menu limits, build the pane into the page'
   - 'DW-S397 2026-10-12 - web_fetch: attended PROVENANCE_REQUIRED timeout, paste-the-URL unblock (meta-learning review S363-S376)'
@@ -28,7 +29,7 @@ operator: Andrew
 scope: seed
 title: Chrome MCP and Web Tool Behaviors
 type: guide
-updated: 2026-10-13
+updated: 2026-10-15
 ---
 # Chrome MCP and Web Tool Behaviors
 
@@ -38,102 +39,31 @@ updated: 2026-10-13
 >
 > Part of the **Platform and Environment Behaviors** guide cluster -- see `GUIDES.md`.
 
-These gotchas are the most rot-prone kind of learning: they have no design-doc home, so they get rediscovered cold session after session. New Chrome MCP / web-tool behaviors append here rather than being re-derived.
+These gotchas are the most rot-prone kind of learning: they have no design-doc home, so they get rediscovered cold session after session. New Chrome MCP / web-tool behaviors go into the matching section file (embedded below) rather than being re-derived.
 
-## Chrome MCP Interaction Limits
+![[1.0 Chrome MCP Interaction Limits]]
 
-**OAuth consent popups cannot be driven -- plan a human-in-the-loop pause.** Authorizing an app (observed with Google Apps Script) triggers an OAuth consent popup window that the Chrome MCP cannot interact with; the user must click through it manually. Plan for a handoff pause at first authorization rather than discovering it mid-flow. (Source: RW S17)
+![[2.0 Reading Client-Rendered Pages]]
 
-**Click coordinates must be scaled by `devicePixelRatio`.** On high-DPI displays, raw coordinates land in the wrong place. (Source: RW S31)
+![[3.0 Editing in Browser Code Editors (GitHub web editor, CodeMirror)]]
 
-## Reading Client-Rendered Pages
+![[4.0 web_fetch Behaviors]]
 
-Pages that render client-side (JS apps) may expose little or nothing to a plain fetch or a naive page read. Three working recipes, in escalating order of effort:
+![[5.0 WebSearch Behaviors]]
 
-1. **Hash-anchor + scroll-screenshots.** Navigate to a hash anchor and take scroll-screenshots section by section rather than expecting full text from a single fetch. Worked on client-rendered fundraiser/leaderboard pages. (Source: RW S28)
-2. **Render-wait + `innerText` slices.** For heavily client-rendered app pages (e.g. Bubble apps) that defeat `web_fetch` entirely: Chrome `navigate`, wait ~8s for render, then pull text in slices via `javascript_tool` reading `document.body.innerText`. The tool's output truncates around ~1KB, so slice the string across multiple calls. (Source: RW S31)
-3. **Know which sites fetch fine.** Not everything needs the browser: e.g. Substack subdomains fetch cleanly with `web_fetch`. Try the cheap fetch first. (Caveat: Substack landing/about pages can still be JS-rendered - a subject's bio may live on their wiki/site while the worldview lives in the Substack posts. (ReWoven, 2026-09))
-4. **Force verbatim output from `web_fetch`.** For public-site copy, the fetch tends to summarize; an explicit no-summarizing instruction ("return the page text verbatim") gets the actual copy. (ReWoven, 2026-08)
-5. **SPAs can drop the path/query on load, and data can hide in hover states.** The built-in browser may land a deep URL on the app root - click through in-page and read visually instead of re-fetching. Some figures exist only in chart tooltips (hover the data point), invisible to every text-read path. (ReWoven, 2026-09)
-6. **Robots-blocked source: hand it to the operator's Web Clipper.** When `web_fetch` returns 429/refuses and both Chrome paths are unavailable, the reliable last rung is asking the operator to clip the page into the vault (Obsidian Web Clipper, `_Clippings/`) and reading the clipping. (ReWoven, 2026-08)
+![[6.0 Scripted Downloads from the Shells (Container and Device)]]
 
-This ladder is the standing home for the recurring "JS-rendered surface needs a live browser" family - try the cheap fetch, then render-wait reads, then in-page click-through, then the operator clip; a source that defeats all rungs is flagged unverifiable rather than guessed at.
+![[7.0 Google Docs via Chrome]]
 
-## Editing in Browser Code Editors (GitHub web editor, CodeMirror)
+![[8.0 Google Apps Script via Chrome]]
 
-**Triple-click selects the trailing newline.** The GitHub web editor is CodeMirror: a triple-click line-select includes the line's newline, so typing a replacement over it joins the next line up. For a small in-place edit, do not select the line. Reliable single-character (or short-span) edit via keyboard: click into the line, `cmd+Right` to end-of-line, `Left` N times to reach the span, `shift+Left` to select it, type the replacement, then read the line back before committing. Prefer this over any select-the-line approach when the edit is one token wide - it was used to fix a one-character workflow bug through the browser without a local clone. (Source: DataWizard, 2026-08)
+![[9.0 Bridged Chrome Control (remote-devices proxy)]]
 
-## web_fetch Behaviors
+![[10.0 Claude-in-Chrome Extension from a Cowork Cloud Session]]
 
-**Token-cap overflow saves to a temp file.** When a page exceeds the token cap, `web_fetch` errors and saves the content to a temp file. In practice, search-result summaries plus one canonical readable page were decision-grade -- budget for this rather than retrying the same oversized fetch. (Source: RW S23)
+![[11.0 Operator Browser Split View (Brave)]]
 
-- Cowork WebFetch can refuse arbitrary URLs with PROVENANCE_REQUIRED: a permission prompt goes to the human and, unanswered, the fetch fails - fatal for unattended runs. Workaround that held everywhere tested (Weave, 2026-09): run a web search naming the target first, then fetch the URLs the search returns - search-derived URLs carry provenance. Design scheduled web checks search-first, and report still-blocked sources as unverified rather than retrying.
-- The provenance gate is not universal: in an attended Cowork session WebFetch fetched an arbitrary Firebase-hosted page directly with no prompt (Weave, 2026-09). Plan search-first for unattended runs; do not assume the gate in attended ones. Separately, WebFetch sees only server-rendered HTML - a JS-rendered page returned just its toolbar and snapshot stamp; use Chrome MCP (see Reading Client-Rendered Pages) for the content.
-- When the gate does fire in an attended session, the approval prompt can time out unanswered and the fetch fails the same way. The reliable unblock is to ask the operator to paste the URL into the chat - a pasted URL carries provenance. Do not loop on the fetch while the prompt is pending. (DataWizard, 2026-09)
-
-- A `claude.ai/share/<id>` conversation link is not readable by `web_fetch` - it returns only the site's meta tags, never the shared chat. Ask the operator for the underlying vault note or artifact instead; a `claude.ai/artifact/<id>` link IS readable, through the Artifact tool's read action (not web_fetch), and a large artifact comes back head-only with the full HTML saved to a local file. (DataWizard, 2026-10)
-- Reddit is blocked at the WebFetch proxy: `reddit.com` returns 403 / SITE_BLOCKED, re-confirmed across sessions. Read a thread through the browser tools (`get_page_text`), from a saved copy in the vault, or from an operator paste; do not script around the block. (VibeCut, 2026-08/09)
-- WebFetch can return a cached page for the wrong URL. Two different Hacker News item ids, one of them also tried with a query-string variant, came back with identical content; the collision cleared on a delayed retry days later. When fetches of different URLs return the same content, treat it as a transient cache collision and retry once after a delay before declaring the content unreachable. (VibeCut, 2026-08)
-
-## WebSearch Behaviors
-
-**The search budget is about 200 calls per user turn, shared by the lead and every sub-agent, and it resets with the next user message.** Parallel research agents can exhaust it in one turn, and the last agent to run dry reports gaps. Give each sub-agent an explicit search budget and item target, run gap-filling in the next turn, and never downgrade an earlier sourced item to unconfirmed just because search ran out later - only a contradicting source does that. (LocationScout, 2026-10)
-
-## Scripted downloads from the shells (container and device)
-
-**Never put the user's identity in a third-party User-Agent or request header.** Some public APIs (Overpass, Nominatim, Wikimedia) ask for a contact in the User-Agent; send a plain project User-Agent string, never the user's email, name or account handle - not even to get a higher rate limit. (LocationScout, 2026-10)
-
-**Wikimedia (Wikidata, Commons) rate-limits per shell.** It answers HTTP 429 to the cloud container at once and to the device shell after fast bursts. From the device shell, a 1 s pause before each call plus one retry after the `Retry-After` header cleared almost all 429s. General fetch throttling: see **Cowork Build Environment**. (LocationScout, 2026-10)
-
-**Portals that captcha the device shell can still be read by WebFetch.** Real-estate portals served a captcha page to `curl` from the device shell while WebFetch read the same page, and their image hosts served photos to plain `curl`. Pattern: collect the `og:image` URLs with WebFetch, then download the images on the device. Some portals block both paths (one answered agents with HTTP 401); record those as unreachable rather than retrying. An aggregator that indexes the blocked portal can stand in for it, but it may carry only some fields (price and living area, with no land size and no photo); keep such a record and mark it partial rather than dropping it or filling the gaps by guesswork. (LocationScout, 2026-10)
-
-**An `og:image` is not always the listing's own photo.** Collected `og:image` URLs sometimes point to the site's or the agent's logo (1 in 26 in one run), and other runs picked up stock photos. Before publishing a page built from scraped images, review all of them at once as a contact sheet, a single grid of thumbnails, and drop or replace any logo or stock image; a count or URL check will not catch it. (LocationScout, 2026-10)
-
-## Google Docs via Chrome
-
-**Heading keyboard shortcuts type literal characters on Mac.** Ctrl+Alt+N and similar heading shortcuts do not apply styles through the Chrome tools -- they insert literal characters into the document. Use the style dropdown, or write plain text with caps. (Source: RW S17)
-
-**Typed numbers auto-convert into nested lists.** When the cursor is inside existing list-formatted content, typing numbered text auto-nests it, and Ctrl+Z does not reliably revert large typed blocks. Workaround: paste the block via clipboard rather than typing it. (Source: RW S16)
-
-## Google Apps Script
-
-**First authorization needs the manual OAuth click** (see Interaction Limits above).
-
-**Batch reads/writes; never loop `setValue()`.** Individual `setValue()` calls are extremely slow (~3 minutes for 200 cells); batch `getValues()` / `setValues()` is ~100x faster (~3 seconds). Standard Apps Script knowledge, recorded here because agent-driven spreadsheet automation hit it cold. (Source: RW S17)
-
-## Bridged Chrome control (remote-devices proxy)
-
-When Chrome is driven through the device bridge (a `Control_Chrome`-style proxy) rather than the in-browser extension, the toolset can go split-brained: `open_url`, `list_tabs`, and `get_current_tab` keep working (they report tabs and titles), while `get_page_content` and `execute_javascript` fail *every* call with "Google Chrome is not running" -- even though the same tabs are listable and Chrome is plainly running. Net capability in that state: navigate and read tab titles, but neither click nor scrape page content. It is session-wide, not transient, so do not burn retries. Fall back to reading tab titles only (navigate to a specific URL and read the resulting `<title>`), hand the click/verify to the operator, or switch to computer use (screenshots) if it can be enabled. (Source: DataWizard, 2026-08)
-
-**The in-browser extension is a separate bridge -- try it before deferring.** The Claude-in-Chrome browser *extension* (its own MCP toolset, distinct from the device-bridge proxy) can be fully functional in the very session where the proxy is split-brained. Flow: `list_connected_browsers` -> `select_browser` (the user must confirm the browser choice) -> `navigate` -> `get_page_text` / `read_page` / `find` / `computer` clicks all work, giving real scrape-and-click, not just tab titles. So when the proxy goes split-brained, check whether the extension is connected before handing verification to the operator -- one dead bridge does not mean the other is down. (This is exactly the gap that left a shipped CI job unverified for hours the prior session, when only the proxy was tried and it was down.) (Source: DataWizard, 2026-08)
-
-**GitHub token creation is automatable except the sudo gate.** Driving PAT creation through the browser extension works end to end (settings/tokens/new: fill note, expiration, scopes, submit, read the one-time token off the result page) EXCEPT GitHub's "Confirm access" sudo-mode step, which emails the operator a verification code - trigger the mailer, then hand the browser to the operator for the code and resume once verified. Credentials stay the human's step; the form work and token capture do not have to be. (Source: Weave, 2026-08)
-
-## Claude-in-Chrome extension from a Cowork cloud session
-
-**Per-site permission is a hard gate, and it clears mid-session.** `navigate` to a domain the operator has not allowed in the extension fails at once with "Navigation to this domain is not allowed" (the batch stops there). Ask the operator to allow the site in the extension, then retry the same navigate - two sites that failed early in a session worked on retry after approval, with no reconnect needed. Some stay blocked; move on rather than looping. (Source: Kosmos, 2026-09)
-
-**`javascript_tool` results can be blocked wholesale.** On a site whose DOM values look like cookies or query strings (astro.com's `<select>` option values), every `javascript_tool` call returns `[BLOCKED: Cookie/query string data]`, even when the expression only reads option text. Use `find` / `read_page` on the element instead. (Source: Kosmos, 2026-09)
-
-**Custom dropdowns populate the accessibility tree only after being opened.** `read_page` on a closed custom select shows one generic child; click it open, then `find "option items inside the X dropdown"` lists every option with its text - reliable for harvesting long option trees (74 options across 10 dropdowns in one pass). (Source: Kosmos, 2026-09)
-
-**`computer screenshot` with `save_to_disk` writes into the cloud container**, at `/tmp/claude-chrome-screenshots-*/screenshot-<ts>-<n>.jpg`, not onto the operator's machine. Copy them with Bash and commit to the vault with `device_commit_files` from `/mnt/user-data/outputs/`. (Source: Kosmos, 2026-09)
-
-**Chrome's built-in PDF viewer does not render in screenshots** - the main pane captures blank or black while the thumbnail rail is visible. A PDF you need to see must be fetched some other way (operator download, `fetch_pdf_from_url`); zooming the thumbnails is too low-res to read. (Source: Kosmos, 2026-09)
-
-**`chrome-extension://` URLs are refused outright** - `navigate` answers "Can't interact with browser-internal or unparseable URLs", so an extension's own pages (OneTab's saves list, an extension options page) are unreachable in ANY connected Chromium browser (Chrome, Brave). Data living inside an extension gets out via the extension's own export (OneTab: Export URLs / the saved-tabs HTML export - the export was verified complete against the page's own link count), or by reading its LevelDB from disk with folder access. (DataWizard, 2026-09)
-
-**Headless Playwright in the cloud container cannot replace the extension for third-party sites.** The container's egress allowlist admits package registries and GitHub but resets connections to most product sites, so "screenshot it with Playwright" fails where the extension succeeds. Use Playwright only for local files (e.g. rendering your own artifact once before publishing). (Source: Kosmos, 2026-09)
-
-## Operator browser split view (Brave)
-
-**A web page cannot place itself, or a tab it opened, into the browser's split view.** There is no web API for split view; a page can only `window.open` a named tab and navigate it later by assigning its `location` (the "follow tab" pattern - works, no pop-up block from inside a same-origin hub iframe). Pairing that tab with the page is then a browser-UI act, and Brave's current tab menu offers only "Add Tab to New Split View" (which opens a blank new tab beside the current one); "New split view with current tab" and "Move tab into split view" were absent on an up-to-date install, and dragging a tab onto a split pane does nothing. When the operator needs page + link side by side, build the pane into the page (an iframe for sites that allow framing, the named follow tab for the ones that refuse) rather than depending on the browser's split view. (DataWizard, 2026-10)
-
-**Building the in-page pane: sandbox it and check framing server-side.** Give the iframe `sandbox` without any `allow-top-navigation` flag (a framed page that tries `top.location = ...` is then refused and cannot replace the host page) plus `referrerpolicy="no-referrer"`, and never `focus()` it so keyboard shortcuts stay with the host. A page cannot learn from script whether a cross-origin frame was refused (the frame just shows the browser's error page), so decide before framing: a short list of known refusers (social sites, big code hosts) and, for the rest, a server-side request that reads `X-Frame-Options` and the CSP `frame-ancestors` directive (when `frame-ancestors` is present it decides and XFO is ignored; report-only CSP does not count). Treat a failed check as unknown, never cache it, and fall back to the named follow tab for refusers. One Chromium edge: a framed page from the same origin as the page the follow tab is showing can call `window.open(url, '<follow tab name>')`, take over that window and its opener, after which the host's `location` assignments are refused - recovery is closing the tab and re-attaching; a per-session random window name prevents it. (DataWizard, 2026-10)
-
-## Connectors
-
-**Google Calendar `create_event` without an explicit `timeZone` can stamp the wrong zone** (Europe/Rome for a Europe/Berlin user - same offset, so times held, but a zone with a different offset would shift them). Pass `timeZone` whenever the operator's zone is known, and check the zone on the created event. (LocationScout, 2026-10)
+![[12.0 Connectors and Web Tools]]
 
 ## See Also
 

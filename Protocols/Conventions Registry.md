@@ -2,12 +2,13 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-13
+updated: 2026-10-15
 origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
+  - 'DW-S408 2026-10-15 - board intake plant: Model routing gains the build-round shape - top tier plans and reviews, default tier builds and owns visual design, review falls to the default tier rather than being dropped (Evolutionary Media Commons)'
   - 'DW-S403 2026-10-13 - Coordination board: interim intent/seen clause removed (board.py schema 6 live, G-059); optional resolution line; ID families hand-path id wording aligned with the board header'
   - 'DW-S402 2026-10-13 - Coordination board: post the ask at write time; close-time check verifies and backfills (B-0081, CS S42 FR)'
   - "DW-S391 2026-10-08: Holonic records - person block lines added under the projection block (Name, Public profiles, Roles, Verified; design R5; T19 Chunk 7)"
@@ -564,6 +565,8 @@ A depersonalized starter file ships as `Seed/Templates/Operator Gate Queue - Tem
 ## Model routing
 
 **Rule:** when queuing session work for a later instance - a gate row's `model:` field, a What's-next `[model: X]` tag, the session-closer's next-session recap - suggest the model tier by work shape: **Opus-tier** is the default; **Fable-tier** (highest capability) earns its place on deep synthesis, audits, design reviews, canon writes, and multi-perspective judgment; **Sonnet-tier** suits mechanical, well-specified batches (metadata sweeps, triage marking, file moves). Keep names tier-generic - never pin a version, which goes stale. This entry is the single home for the routing heuristic; surfaces that use it point here instead of restating it. (DataWizard, 2026-08; D126)
+
+**Build rounds:** the highest-capability tier plans (read-only, with probes) and reviews independently on its own copy of the workspace, and the default tier builds and owns visual design and mock-ups; when the top tier is skipped to save spend or blocked by a spend limit, the default tier takes the plan or review seat rather than dropping it - an independent default-tier reviewer still caught a real bug in each of two rounds. (Evolutionary Media Commons, 2026-10)
 
 Role-level casting (orchestrator-synthesizer / researcher / writer) and the one dated version-specific casting table live in the `model-casting` skill, which defers to this entry for queued-work tags.
 

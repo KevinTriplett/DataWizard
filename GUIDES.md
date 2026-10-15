@@ -2,7 +2,7 @@
 title: DataWizard Guides
 type: project-doc
 created: '2026-06-22'
-updated: '2026-10-13'
+updated: '2026-10-15'
 origin: 'DW-S195 2026-06-22 - backfilled from the earliest edit_log entry (D127)'
 operator: Andrew
 edit_log:
@@ -36,6 +36,8 @@ edit_log:
   - "DW-S398 2026-10-12 - Published Artifacts and ArtifactData Behaviors row added to the Platform cluster (board intake)"
   - 'DW-S400 2026-10-12 - Agent Tool Contract Checklist row added (Surfaces and tools); Team Attention Rollout, Multi-Instance Coordination Patterns and Seed Install and Update rows extended'
   - 'DW-S403 2026-10-13 - Published Artifacts row names the missing deep-link channel (board intake B-0072, Holonic Canvas)'
+  - 'DW-S408 2026-10-15 - MCP Reliability and Cowork Build Environment rows marked sectioned'
+  - 'DW-S408 2026-10-15 - Cowork Build Environment row names third-party code scanning (OSV-Scanner, GuardDog; new section 10.0)'
 ---
 # DataWizard Guides
 
@@ -50,12 +52,12 @@ These learnings rot faster than any other kind because they have no design-doc h
 | Guide | Covers |
 |---|---|
 | **Cowork Scheduled Tasks** | Running DW automation as Cowork scheduled tasks: timezone/`fireAt`, one model per run, cron jitter, idempotency and the requirements for reliable unattended runs, runtime-URL limits. |
-| **MCP Reliability and Write Verification** | Obsidian MCP failure modes (ghost writes, phantom/stale reads, frontmatter wipe), the write-verification protocol, concurrency practice, and sandbox/git gotchas. |
+| **MCP Reliability and Write Verification** | Obsidian MCP failure modes (ghost writes, phantom/stale reads, frontmatter wipe), the write-verification protocol, concurrency practice, and sandbox/git gotchas. Sectioned - see `MCP Reliability and Write Verification/`. |
 | **Editing the Claude Desktop Config** | Finding and safely editing `claude_desktop_config.json` to add MCP servers or grant folder access; JSON pitfalls and recovery. |
 | **Browser and File System Access Behaviors** | Runtime gotchas for a single-file browser tool that reads/writes local files: File System Access API (Chromium-only, `file://`, IndexedDB handle persistence, read→readwrite upgrade, user-gesture rule, folder-scoped grants), artifact contexts blocking local storage, DOM/CSS gotchas (`hidden` vs class `display`, `color-scheme`), and headless mock-adapter verification. |
 | **Git Hook and CI Behaviors** | Where guard/automation scripts run across a git-synced repo's environments: local hooks (install-per-clone, `core.hooksPath` supersedes `.git/hooks/`), mobile Obsidian Git (isomorphic-git runs no hooks - CI is the only mobile net), and awk-in-CI being mawk (interval + grouped-alternation panic; write mawk-safe), self-updating scripts overwriting themselves mid-run (`main()` wrap), and safely comparing a synced working tree to the remote before a reset (throwaway `read-tree` index). Git how-to stays in the Git Guide; this covers execution-environment facts. |
-| **Chrome MCP and Web Tool Behaviors** | Driving external sites via Chrome MCP and web fetch: interaction limits (OAuth popups, devicePixelRatio), client-rendered page read recipes, web_fetch token-cap behavior, and Google Docs / Apps Script gotchas. Local single-file browser tools stay in Browser and File System Access Behaviors. |
-| **Cowork Build Environment** | Building codebases from the Cowork sandbox: git-on-mount build workflow (lock cleanup, no push creds, `git add -A`), Node/npm/Electron and Python toolchain gotchas, shell/file-tool quirks, network and GitHub-data workarounds, WeasyPrint rendering, device-bridge specifics, and build-verification discipline (isolated /tmp loop, typecheck+build+smoke). |
+| **Chrome MCP and Web Tool Behaviors** | Driving external sites via Chrome MCP and web fetch: interaction limits (OAuth popups, devicePixelRatio), client-rendered page read recipes, web_fetch token-cap behavior, and Google Docs / Apps Script gotchas. Local single-file browser tools stay in Browser and File System Access Behaviors. Sectioned - see `Chrome MCP and Web Tool Behaviors/`. |
+| **Cowork Build Environment** | Building codebases from the Cowork sandbox: git-on-mount build workflow (lock cleanup, no push creds, `git add -A`), Node/npm/Electron and Python toolchain gotchas, shell/file-tool quirks, network and GitHub-data workarounds, WeasyPrint rendering, device-bridge specifics, build-verification discipline (isolated /tmp loop, typecheck+build+smoke), and third-party code scanning (OSV-Scanner, GuardDog). Sectioned - see `Cowork Build Environment/`. |
 | **Published Artifacts and ArtifactData Behaviors** | Published claude.ai artifacts and their shared store: the republish read gate (what counts as viewed, refusal sequence, diff the saved live source before re-publishing), the hand-built page publish recipe, full-URL and large-page reads, ArtifactData `list`/`out_dir` output, atomic pinned writes, `update` merge and the `__delete__` marker, body-size cap, who can write to a page `db`, the CSP image block (vector-basemap fix), the cross-origin frame that browser automation cannot reach, and the missing deep-link channel (nothing in an artifact link reaches the page). Desktop-app artifacts stay in Cowork Build Environment. |
 
 ## Other Guides
