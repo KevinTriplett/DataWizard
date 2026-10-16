@@ -2,13 +2,14 @@
 title: Make Your Project Data Holonic
 type: guide
 created: 2026-10-08
-updated: 2026-10-08
+updated: 2026-10-16
 operator: Andrew
 origin: 'DW-S391 2026-10-08 - written for the Holonic Records adoption (T19 Chunk 7); generic Seed guide, reader-facing'
 status: active
 maturity: working
 edit_log:
   - 'DW-S391 2026-10-08 - created (T19 Chunk 7); Reader-Facing Prose Style verification pass run'
+  - 'DW-S410 2026-10-16 - relations: a replacement record goes at the end of the list; lists are never re-ordered because other consumers may key on position (B-0093, Holonic Canvas)'
 ---
 
 # Make Your Project Data Holonic
@@ -100,7 +101,7 @@ The fourth sits on a person core and cites a public page, which every relation o
     source: https://example.org/team
 ```
 
-The fifth is a correction. Never edit a relation in place. Mark the old record retracted, say who retracted it and why, and write the new record below it. The old one stays, so a reader can see what was believed and when it changed.
+The fifth is a correction. Never edit a relation in place. Mark the old record retracted, say who retracted it and why, and add the new record at the end of the list. The old one stays, in its place, so a reader can see what was believed and when it changed.
 
 ```yaml
   - pred: funded_by
@@ -145,7 +146,7 @@ An index is a database built by reading every core. It answers questions that a 
 
 It can be thrown away and rebuilt from the vault at any time. The vault cannot be rebuilt from the index, which is why the vault is the authority and the index is not.
 
-Lookups run on more than the `hid`. The index derives extra keys from each core's `core_id`, its website host, and its names and aliases, then checks them against the keys the core asserts (derivation rules in the YAML Schema, "Identity"). When two cores claim one key, the index holds the key and reports the pair instead of guessing. Each relation also gets an id computed from the record's content, never from its place in the list, so reordering a list changes nothing.
+Lookups run on more than the `hid`. The index derives extra keys from each core's `core_id`, its website host, and its names and aliases, then checks them against the keys the core asserts (derivation rules in the YAML Schema, "Identity"). When two cores claim one key, the index holds the key and reports the pair instead of guessing. Each relation also gets an id computed from the record's content, never from its place in the list, so reordering a list changes nothing for this index. Other consumers may key on a record's position, so never re-order a relations list and never remove a record from it (YAML Schema, "Relations").
 
 Consumers read changes, not snapshots. The index keeps a change log with one line per field-level change, and each consumer (the block sync, an export, a coordination board) keeps its own cursor into it. The Registry's sync rules describe the diff.
 

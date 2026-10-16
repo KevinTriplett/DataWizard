@@ -1,5 +1,5 @@
 
-seed: 1.9.2
+seed: 1.9.3
 protocol: 1.8
 project_instructions: 4.9
 
@@ -54,6 +54,17 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.9.3
+
+**Patch release: two holonic-records schema rulings, and four field learnings.** One DataWizard session (2026-10-16). Shipped in the Seed:
+
+- `Protocols/YAML Schema.md`, Holonic Records: the `community` kind now carries `founded` (with `location`); `place` does not. Relation records keep their place in the list: a retracted record stays at its index, a replacement goes at the end, and no record is removed, spliced or re-ordered, because a consumer may derive an id from a record's position. `Guides/Make Your Project Data Holonic.md` says the same.
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`: the refusal sequence after a refused republish - an identical resend can keep being refused; a shell byte-compare or an `Artifact read` with `path` does not count as reading the saved copy; a Read-tool read of a small slice of it clears the refusal.
+- `Guides/Chrome MCP and Web Tool Behaviors/2.0 Reading Client-Rendered Pages.md`: rung 9 - a fetch that comes back with only the title and meta description means "unreadable", not "no evidence".
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`: a wedged `device_bash` stays wedged for the session; switch to the stage, edit in the container, commit path.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. A vault that generates its holonic shared-facts blocks with a script should let `community` carry `founded` there too, or the next regenerate drops the line. (DataWizard, 2026-10)
 
 ## What's New in 1.9.2
 

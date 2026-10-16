@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-12
+updated: 2026-10-16
 origin: DW-S182 2026-06-13
 operator: Andrew
 priority: high
@@ -33,6 +33,7 @@ edit_log:
   - 'DW-S387 2026-10-05: Holonic Core Records replaced by Holonic Records (hid, kinds table, keys/anchors, lifecycle, relations records, predicate table, person rules, projection hid; D134)'
   - 'DW-S391 2026-10-08: Holonic Records example hids made valid a-z2-7 values (core and projection k7m2..., relation target m4k7...); the old ones held 8 and 9 (T19 Chunk 7)'
   - 'DW-S398 2026-10-12 - Holonic Records: uses/used_by predicate (R7), by/via provenance fields (R3), example-comments note, claim-flow pointer'
+  - 'DW-S410 2026-10-16 - Holonic Records: community kind carries founded (B-0116); a retracted relation record keeps its index - append, never remove, splice or re-order (B-0093)'
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -330,7 +331,7 @@ Kind-specific shared facts (`org_form`, `founded`, `location`) follow the kinds 
 | `org` | an organization of any legal form | `org_form`, `founded`, `location` |
 | `network` | an association of orgs or people with its own name | `org_form`, `founded`, `location` |
 | `fund` | a pool of money with a name and a steward | `org_form`, `founded`, `location` |
-| `community` | a place- or practice-based group without a formal body | `location` |
+| `community` | a place- or practice-based group without a formal body | `founded`, `location` |
 | `platform` | software people use as a service | `org_form`, `founded` |
 | `protocol` | a specification several implementations follow | `founded` |
 | `tool` | software people install or run | `founded` |
@@ -372,7 +373,7 @@ relations:
 
 The trailing `# ...` comments in this example and the core example above explain the fields; they are not canonical YAML. A stored record carries no inline comments, and a reader never has to strip them.
 
-A relation is created and retracted, never edited in place: a correction is a retraction (`retracted: YYYY-MM-DD`, `retracted_by`, optional `retracted_reason`) plus a new record, and the retracted record stays. A relation has no stored id; its identity is `(subject hid, pred, target, role, since)`.
+A relation is created and retracted, never edited in place: a correction is a retraction (`retracted: YYYY-MM-DD`, `retracted_by`, optional `retracted_reason`) plus a new record, and the retracted record stays. A relation has no stored id; its identity is `(subject hid, pred, target, role, since)`. Records keep their place in the list: a retracted record stays at its index, a replacement is added at the end, and no record is ever removed, spliced or re-ordered, because a consumer may derive an id from a record's position (Holonic Canvas, 2026-10).
 
 | Predicate | Inverse (derived) | Symmetric | On a core |
 |---|---|---|---|
