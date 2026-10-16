@@ -1,5 +1,5 @@
 
-seed: 1.9.3
+seed: 1.9.4
 protocol: 1.8
 project_instructions: 4.9
 
@@ -54,6 +54,16 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.9.4
+
+**Patch release: seven field learnings from four projects.** One DataWizard session (2026-10-16). Shipped in the Seed:
+
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`, the wedged-shell bullet: the fault is per session, not per machine, so a new session is the way out, not an app restart; check `get_device_info` for `scratchFolder`; the error text has no detail; stop after two identical failures; list uncommitted files in the handoff; how to rebuild a generated file with the file tools only.
+- `Guides/Cowork Build Environment/8.2 Device Bridge - Sub-agents and Orchestration.md`: a sub-agent can write a `.md` when the file is the named deliverable (always give a fallback); new bullet - "preserved in git history" is false until the vault is saved, so move cut text into an archive note in the same step.
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`: for a large page, budget the lead's own full read of the live source before the first publish (a sub-agent's read does not count); running the read sequence before the first publish avoids the refusal; a page can carry its own `[hidden]` reset so local and live agree.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.9.3
 
