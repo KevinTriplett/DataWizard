@@ -2,7 +2,7 @@
 title: Published Artifacts and ArtifactData Behaviors
 type: guide
 created: 2026-10-12
-updated: 2026-10-16
+updated: 2026-10-17
 operator: Andrew
 scope: seed
 status: active
@@ -17,6 +17,7 @@ edit_log:
   - 'DW-S412 2026-10-16 - large-page publish read cost; sub-agent read does not count (board B-0120)'
   - 'DW-S412 2026-10-16 - reviewer fix: the gate clears on any full read by the lead (URL read or saved-file Read), wording aligned with the bullet'
   - 'DW-S412 2026-10-16 - Publishing: read sequence before the first publish avoids the refusal; Local testing: own reset for hidden (board B-0126, B-0127)'
+  - 'DW-S413 2026-10-17 - Publishing: two confirmation notes (read sequence with a large page; capabilities kept when omitted) (Location Scout board note B-0132)'
 ---
 # Published Artifacts and ArtifactData Behaviors
 
@@ -34,13 +35,13 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 
 **A refused publish saves the live source; diff it before you re-publish, then resend.** The first publish without a view is refused with a line diff and the live page's full source saved to a local file (path in the error); that refusal counts as the view. Diff the saved file against your base - if the live page holds only your base plus the publish skeleton, there is nothing to merge; if it holds someone else's edits, merge them first. Sending the same file again is refused once more as "identical content resent". What the third send does varies: one session saw it publish (sequence: refused, refused as unchanged, publishes), another saw identical resends refused for good with "Read it first". Do not count on the third send. A shell byte-compare of the saved copy (`cmp`, `diff`) does not count as reading it, and neither does an `Artifact read` with `path` (`index.html`); what reliably clears the loop is reading a small slice of the saved file with the Read tool (offset/limit, about 15 lines) and then publishing the same file. After a refusal that slice is enough; the full read in the previous item is what counts as the view before any refusal. (Holonic Canvas, Community Stack, 2026-10) On a large page, make the merge check before the first attempt instead: a `path: index.html` read saves the live page without counting as viewed, so strip the publish skeleton (recipe below) and compare the body byte for byte with your source copy (the page in git). Byte-equal means nothing was co-written and the refusal's diff will hold only your own lines, so the three-step can run without reading the page into context. When the change is small, merge from the saved file: take the live source from `<title>` to `</body>`, apply only the intended edit, and publish that. The live copy can differ from a fresh local build by the publish skeleton and by the key order of an embedded dict, so compare long lines by parsed JSON, not by text. (Holonic Canvas, LocationScout, 2026-10)
 
-**Run the read sequence before the first publish, and the refusal does not happen.** Read the live URL with `Artifact read` (it saves the full HTML), byte-compare the live body with the source copy, read a small slice of the saved file with the Read tool, then publish with `url`. This was accepted on the first try, twice, and a second publish of the same file path later in the same session went through without a new read. (Community Stack, 2026-10)
+**Run the read sequence before the first publish, and the refusal does not happen.** Read the live URL with `Artifact read` (it saves the full HTML), byte-compare the live body with the source copy, read a small slice of the saved file with the Read tool, then publish with `url`. This was accepted on the first try, twice, and a second publish of the same file path later in the same session went through without a new read. A second case: on a 2.3 MB page the `Artifact read` returned the head inline and saved the full HTML to a tool-results file, and a 15-line Read slice of that file was enough for the republish to go through. (Community Stack, 2026-10; LocationScout, 2026-10)
 
 **Publish recipe for a hand-built full-document page.** Strip the first 5 skeleton lines, the `</head><body>` and the trailing `</body></html>` the tool adds around the page, keep the theme with a one-line script, and smoke-test the page inside a fake artifact skeleton before publishing. Rendering it once locally is the one use the cloud container's headless browser is good for (see **Chrome MCP and Web Tool Behaviors**, Claude-in-Chrome section). To confirm the stripped copy matches what is live, `read` the artifact and compare: after the transform (strip the skeleton, keep the one-line theme script) the live inner HTML between the host's `<body>` and `</body></html>` matches byte for byte except one trailing newline the host appends. Compare that way before every publish, including a republish. (Evolutionary Media Commons, 2026-10)
 
 **Mock up a design change as an overlay on a copy of the live page.** Read the published artifact, strip the host skeleton (first line and trailing `</body></html>`), then add a small exposed hook to the page's own API and an overlay script. That gave a working design mock-up in one session with no change to the build kit - good for "try it on one chapter first" asks. (Evolutionary Media Commons, 2026-10)
 
-**A republish with `url` that omits `capabilities` keeps the page's declared capabilities** (for example `downloads`); pass the field only to change them. (Evolutionary Media Commons, 2026-10)
+**A republish with `url` that omits `capabilities` keeps the page's declared capabilities** (for example `downloads`); pass the field only to change them. (Evolutionary Media Commons, 2026-10; LocationScout, 2026-10)
 
 **A data-file-only republish still needs the page.** A `publish` with `url` and `files` alone is refused ("also pass file_path"). To change only a data file (for example a `canvas.json`), pass the unchanged page as `file_path` together with `files`; the viewed-read rule above applies to that page on the first such republish of a session. Afterwards, read `index.html` back with `path` and compare its sha256 with your pre-publish copy to confirm the page did not change. A read copy of the page carries the publish skeleton, so republish from your own source copy or strip the wrapper first (recipe above). (ReWoven, 2026-10)
 
