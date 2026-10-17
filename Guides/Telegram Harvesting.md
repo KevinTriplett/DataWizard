@@ -2,7 +2,7 @@
 title: Telegram Harvesting
 type: guide
 created: '2026-05-31'
-updated: '2026-08-24'
+updated: '2026-10-17'
 status: active
 tags:
   - protocol
@@ -13,6 +13,7 @@ edit_log:
   - DW-S163 2026-06-10
   - "DW-S284 2026-08-24 - Tips: why the API over Export Chat History / Telegram
     Web copy-paste (S128 learning, meta-learning review)"
+  - "DW-S418 2026-10-17 - group-id example replaced with a placeholder (privacy purge)"
 ---
 
 # Telegram Harvesting

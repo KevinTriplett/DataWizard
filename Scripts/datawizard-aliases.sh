@@ -1,5 +1,5 @@
 # datawizard-aliases.sh - DataWizard shell aliases
-# Source this from ~/.zshrc:  source "/Users/USERNAME/ObsidianNoSync/_DataWizard/Scripts/datawizard-aliases.sh"
+# Source this from ~/.zshrc:  source "$HOME/path/to/your/vault/_DataWizard/Seed/Scripts/datawizard-aliases.sh"
 # Edit this file (not ~/.zshrc) to change aliases; reload with `source ~/.zshrc` or open a new shell.
 
 DW_PLIST="$HOME/Library/LaunchAgents/com.datawizard.sync.plist"
