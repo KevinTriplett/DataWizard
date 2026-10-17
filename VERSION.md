@@ -1,5 +1,5 @@
 
-seed: 1.9.4
+seed: 1.9.5
 protocol: 1.8
 project_instructions: 4.9
 
@@ -54,6 +54,22 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.9.5
+
+**Patch release: tool behaviors from three DataWizard sessions and two partner projects.** Three DataWizard sessions (2026-10-17). Shipped in the Seed:
+
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`, the wedged-shell bullet: the fault is not machine-wide, and a new session is not a sure way out - one project had no working device shell in three parallel sessions for a whole day, also after an app restart, and a new session the next day started with the same failure; when the build inputs are one staged bundle, check that a container rebuild matches the staged outputs byte for byte first.
+- `8.1 Device Bridge - Staging, Commits and Transport.md`: `device_stage_files` fails the whole call when one listed path does not exist; if the bridge drops mid-session, keep building in the container and commit after reconnect (no new grant needed).
+- `8.2 Device Bridge - Sub-agents and Orchestration.md`: worker-tier sub-agents wrote JSON deliverables 6 of 6 times when the lead rendered and checked the notes; parallel sub-agents sharing the operator's Chrome tripped a site's bot check for everyone - throttle them or keep browser work in the lead; a worker's count check against its own selection missed a file.
+- `5.0 Network and GitHub Data.md`: Overpass mirrors fail from the container too (proxy drops, 500, 504), the PDF Tools fetch gets 406; Nominatim works from the container; Chrome was the fallback when the device shell was down.
+- `Guides/Chrome MCP and Web Tool Behaviors/1.0 Chrome MCP Interaction Limits.md`: `resize_window` can report success while the viewport does not change.
+- `4.0 web_fetch Behaviors.md`: GitHub open items are readable, history pages answer ROBOTS_DISALLOWED; "no merge seen" is not evidence.
+- `6.0 Scripted Downloads from the Shells (Container and Device).md`: Reddit refuses logged-out reads from every shell (post JSON 403, old.reddit login redirect, bot-check page); a redirect to `/login` must stop a run; the working pattern is an operator-run console script in a logged-in tab that saves one JSON file for a local script to ingest.
+- `10.0 Claude-in-Chrome Extension from a Cowork Cloud Session.md`: `javascript_tool` gives up at 45 s while async page work keeps running (fire-and-forget, then poll); page data has no path to a file except through the conversation; the extension refuses some sites "due to safety restrictions" (hand the step to the operator).
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`: two confirmations (the read sequence on a 2.3 MB page; capabilities kept when omitted on republish).
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.9.4
 

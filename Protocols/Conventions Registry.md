@@ -2,12 +2,13 @@
 title: Conventions Registry
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-15
+updated: 2026-10-17
 origin: DW-S181 2026-06-13
 operator: Andrew
 priority: high
 maturity: working
 edit_log:
+  - 'DW-S417 2026-10-17 - Tech tool evaluations entry added (three notes per tool, look there first, who writes, core trigger, adopt on touch, tool note naming; D153 TT1-TT5 + S417 rulings); Holonic records sync rule 5 points at it for tools'
   - 'DW-S408 2026-10-15 - board intake plant: Model routing gains the build-round shape - top tier plans and reviews, default tier builds and owns visual design, review falls to the default tier rather than being dropped (Evolutionary Media Commons)'
   - 'DW-S403 2026-10-13 - Coordination board: interim intent/seen clause removed (board.py schema 6 live, G-059); optional resolution line; ID families hand-path id wording aligned with the board header'
   - 'DW-S402 2026-10-13 - Coordination board: post the ask at write time; close-time check verifies and backfills (B-0081, CS S42 FR)'
@@ -440,11 +441,50 @@ The lead line and the four frontmatter fields are the same as above. (DataWizard
 
 **Persons:** a person core exists before anyone claims it; consent governs exposure, not existence. Three states (unclaimed, anchored, claimed); unclaimed and anchored default to team-only exposure, no public export, no endpoints. Only public-by-design facts and relations with a public source enter a person core; relationship content stays in the project's own notes.
 
-**Sync rules:** (1) core wins for shared facts, the project wins for its view - a sync rewrites only the block and the projection's four `core_*`/`hid` fields; (2) corrections flow *up* through the owning operator, never sideways - a changed fact inside a projection is reported as a diff, accepted into the core, then carried to every other projection; (3) privacy by construction - only the block leaves the core, two teams can hold different projections of one entity and never see each other's view; (4) never delete - a retired projection is marked in `projections:`, not removed; (5) a core is created when an entity is *touched* (backfill on touch); existing notes are joined, not moved; (6) **sync is a diff against the live target**, never a rebuild from snapshots: compute, read live, write only what changed, retract or retire what vanished, and append one change-log line per field-level change; every consumer keeps its own cursor.
+**Sync rules:** (1) core wins for shared facts, the project wins for its view - a sync rewrites only the block and the projection's four `core_*`/`hid` fields; (2) corrections flow *up* through the owning operator, never sideways - a changed fact inside a projection is reported as a diff, accepted into the core, then carried to every other projection; (3) privacy by construction - only the block leaves the core, two teams can hold different projections of one entity and never see each other's view; (4) never delete - a retired projection is marked in `projections:`, not removed; (5) a core is created when an entity is *touched* (backfill on touch); existing notes are joined, not moved; for a tool, the touch test is in "Tech tool evaluations"; (6) **sync is a diff against the live target**, never a rebuild from snapshots: compute, read live, write only what changed, retract or retire what vanished, and append one change-log line per field-level change; every consumer keeps its own cursor.
 
 **Delivery classes** (who writes the projection): own project, same vault - the federating session writes the note directly; team repo - the session delivers (an exchange note the owning project's session moves into place, or at volume one owned handoff file with a `## Pending` section the other side drains); the federating session never edits collaborator content and never rebuilds another project's map (it leaves a pickup line in that project's action items). Delivery class scales with volume, not with ownership.
 
 **Why:** the same entity was being researched once per map and drifting three ways; merging the maps' ontologies was rejected because each map asks a different question of the same entity (D133). A review across four consumers then found that each had re-derived an id scheme, a relation dialect and a privacy boundary locally, because the shared vocabulary lived in an index downstream of where the data is born; identity broke at the vault-to-store seam. The authority for identity, lifecycle and relations sits where the record is written (D134). (DataWizard, 2026-10.)
+
+## Tech tool evaluations
+
+**Rule:** A vault that keeps a tool-evaluation project evaluates each tech tool (a code repo, an app, a model or a service) once, in one shared note. Every other project reads that note first. The project's folder is the Vault Config row `tool_eval_dir`, for example `_Tech Tools/`. Scripts read the row and refuse to run without it. Each tool has up to three notes, and each answers a different question:
+
+- **Core** (`_Entities/`; kind from the YAML Schema kinds table, `tool` by default): identity and relations only. That means the name, keys (one repository is keyed `github-repo~<owner>/<repo>`), the one-liner, status, and relations such as a project's `uses`. The core never holds the evaluation: every projection reprints the core's fields in its block, and evaluation prose would bloat each copy. Rule: "Holonic records".
+- **Tool note** (in the tool-evaluation project; one per tool): the shared evaluation. It says what the tool is, whether it runs on the operator's platform, its license, maturity, safety, and who looked (`reviewed_by`). It never says whether a project should use the tool. When the repo is cloned, a repo scanner's machine facts sit in the same note, between the scanner's markers. Naming: a repo's note is `Repo - <name>.md`; any other tool's note is the tool's plain name (`<Tool Name>.md`). Once the tool has a core, this note is the tool-evaluation project's projection of it. That is an own-project projection, which the index sees only when the project's folder has a row in the Vault Config `holon_lens_map`. Fields: YAML Schema, "Tool Evaluation Notes".
+- **Fit view** (in each project that uses or considers the tool): fit for that project only - why it cares, what adopting the tool would take, its decision. In the tool note, a project's `fit` entry is only the project's name, a pointer. The reasoning stays in the project ("Holonic records": fit is a project's view). A name in `fit:` is enough on its own; the project's fit note is made the next time a session of that project touches the tool.
+
+**Look there first.** Before a session researches a tool, it looks the tool up in the tool-evaluation project by repo key, name or alias.
+- If a tool note exists, the session reads it first. It writes only its own project's fit view, linking to the tool note. If it evaluated anything, it adds its project to `reviewed_by`. Anything general it learned goes into the tool note's hand region.
+- If no tool note exists, the session writes the tool note first, then the fit view.
+- One tool, one tool note. A second note about the same tool is merged into the first, never kept beside it.
+
+**Who writes.**
+- The hand region and evaluation fields of a tool note: any claimed session of a project the vault's operator runs. This is the "own project, same vault" delivery class in "Holonic records".
+- A collaborator project's instances never write in the tool-evaluation project. They file an exchange note in its Session Exchange (see "File placement -- three classes"). Their own evaluations stay in their repo, and the tool note carries a pointer to them.
+- The machine blocks and the scanner's frontmatter keys: the scanner's note writer only.
+- `verdict`: the operator's own answer only.
+- The holonic fields and the shared-facts block: the federating skill and the index only.
+- A review that checks a tool (usefulness, safety) writes its result into the tool note, never into a separate review note.
+
+**When a tool gets a core** (the tool case of sync rule 5, *touched*):
+- The tool-evaluation project counts as a project.
+- A tool note is *evaluated* when it has a hand-written evaluation section and at least one project named in `fit:`. That makes two projects, so the tool gets a core.
+- The core is minted on the next touch of the note, by the federating skill, one tool at a time, never in a batch. A scan run is never a touch.
+- A scan-only note (no hand-written evaluation, or an empty `fit:`) never gets a core.
+- Until then, a tool note is holonic-ready: it carries the federate-on-touch line and its lookup key (`repo_key` for a repo), and no holonic fields.
+- The repo-level key scheme lands before the first repo core.
+- Archives, folders and containers a scanner finds are lines in the tool index, not notes.
+
+**Adopt on touch.** Evaluations a project wrote before this rule stay where they are. The next session that opens one adds a pointer to the tool note, creating the tool note from it if none exists. Once the tool has a core, it also adds the projection fields. A generated index in the tool-evaluation project lists every tool known in the vault, with pointers to each project's evaluation. Nothing is moved by hand, and nothing is deleted. Scanner-written notes are relocated only by the scanner's own script, which rewrites the note paths it has stored.
+
+**Example:** a video-editor repo.
+- Core: the editor's name, `github-repo~example-org/example-editor`, a one-liner, and a `uses` relation on the core of the project that builds on it.
+- Tool note: what the editor is, MIT, pre-alpha, runs on macOS, watch-outs, scan facts, reviewed by that project, `fit: [Example Project]`.
+- The project's own note: whether the editor's timeline is a better base than the editor it uses today, and what to harvest from it.
+
+**Why:** two projects evaluated the same repos separately, each in its own folder. A catalog note that already held a tool evaluation sat under one project's folder, where the others did not look. A third home beside the cores and the catalog would have been a new silo. One shared evaluation that every project reads first, with thin cores and fit kept local, is the core/view split of "Holonic records" applied to tools. (DataWizard, 2026-10; D153.)
 
 ## Provenance: by and via
 

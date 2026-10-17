@@ -2,7 +2,7 @@
 title: Make Your Project Data Holonic
 type: guide
 created: 2026-10-08
-updated: 2026-10-16
+updated: 2026-10-17
 operator: Andrew
 origin: 'DW-S391 2026-10-08 - written for the Holonic Records adoption (T19 Chunk 7); generic Seed guide, reader-facing'
 status: active
@@ -10,6 +10,7 @@ maturity: working
 edit_log:
   - 'DW-S391 2026-10-08 - created (T19 Chunk 7); Reader-Facing Prose Style verification pass run'
   - 'DW-S410 2026-10-16 - relations: a replacement record goes at the end of the list; lists are never re-ordered because other consumers may key on position (B-0093, Holonic Canvas)'
+  - 'DW-S417 2026-10-17 - cores-on-touch paragraph points at the tool test (Conventions Registry "Tech tool evaluations", D153)'
 ---
 
 # Make Your Project Data Holonic
@@ -26,7 +27,7 @@ Make a core when a second project points at the thing, or when the thing has a n
 
 Some notes look like things and are not. A category note that groups fifteen tools under one heading is editorial, so it stays a project note. A topic or an idea has no kind yet. A project's shortlist is a view.
 
-Cores are made on touch. Nobody backfills a whole vault in one sitting. A core appears the first time a session researches or updates something that lacks one, and a note that already exists is joined to its new core, never moved, so every link into it keeps working.
+Cores are made on touch. Nobody backfills a whole vault in one sitting. A core appears the first time a session researches or updates something that lacks one (tools have a stricter test: Conventions Registry, "Tech tool evaluations"), and a note that already exists is joined to its new core, never moved, so every link into it keeps working.
 
 Pick the kind from the kinds table. The field takes one value. If a network also runs a fund, choose the kind that describes what it mostly is and let a relation carry the rest.
 

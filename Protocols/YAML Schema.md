@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-16
+updated: 2026-10-17
 origin: DW-S182 2026-06-13
 operator: Andrew
 priority: high
@@ -34,6 +34,7 @@ edit_log:
   - 'DW-S391 2026-10-08: Holonic Records example hids made valid a-z2-7 values (core and projection k7m2..., relation target m4k7...); the old ones held 8 and 9 (T19 Chunk 7)'
   - 'DW-S398 2026-10-12 - Holonic Records: uses/used_by predicate (R7), by/via provenance fields (R3), example-comments note, claim-flow pointer'
   - 'DW-S410 2026-10-16 - Holonic Records: community kind carries founded (B-0116); a retracted relation record keeps its index - append, never remove, splice or re-order (B-0093)'
+  - 'DW-S417 2026-10-17 - Holonic Records: github-repo anchor scheme row; new Tool Evaluation Notes section (verdict incl. cloned, fit, platform field e.g. mac, tool_maturity, license, reviewed_by, categories, safety, safety_checked, safety_by; D153 + S417 rulings)'
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -349,6 +350,7 @@ A kind is added when a real record of it is touched, by adding a row here and a 
 |---|---|---|
 | `linkedin` | path after the host | `linkedin~in/jane-example` |
 | `github` | login | `github~example-org` |
+| `github-repo` | one repository: owner/repo, lower-cased (the login alone is `github`) | `github-repo~example-org/example-tool` |
 | `npub` | bech32 Nostr key | `npub~npub1...` |
 | `did` | the DID | `did~did:web:example.org` |
 | `purl` | Murmurations primary_url, host form | `purl~example.org` |
@@ -419,6 +421,38 @@ core_synced: YYYY-MM-DD
 ```
 
 `hid` is the join; `core_id` and `core_note` tell a human where the core lives on the far side of a vault boundary. `core_note` is the one deliberate exception to "Wikilinks everywhere" (top of this document; Conventions Registry, "Self-contained boundary-crossing references"). `core_*` fields and `hid` are written only by the federating skill, its batch twin, or the index - never by hand-maintained project views. These fields are unrelated to the Federation Fields above (`federated_to` / `federated_from` copy a file; a core record is a join, not a copy).
+
+### Tool Evaluation Notes (`verdict`, `fit`, `safety` and the evaluation fields)
+
+A *tool note* is the one shared evaluation of a tech tool (a code repo, an app, a model or a service) in the vault's tool-evaluation project. Rule (three notes per tool, look there first, who writes, when a tool gets a core, naming): Conventions Registry, "Tech tool evaluations". A tool note is `type: resource`. Before the tool has a core it carries no holonic fields; after that it is a projection and gains the four projection fields above.
+
+```yaml
+repo_key: example-org/example-tool   # repos only: lower-cased owner/repo; the value of the core's github-repo key
+one_liner: ...
+license: MIT                 # SPDX id; `none found`; `<id> (README only)` when only the README states it
+mac: yes                     # one field per operator platform (here `mac`): yes | partly | no | unclear
+tool_maturity: active        # the tool's state: active | alpha | frozen | archived | unknown
+categories: [video-editing]  # kebab-case slugs; `other` when none fits
+reviewed_by: [Project A]     # projects that evaluated the tool (who looked), by name
+fit: [Project A]             # projects the tool fits, by name; the reasoning stays in each project's note
+verdict: ""                  # the operator's answer only: clone | later | skip | cloned; empty = not decided
+safety: not checked          # one safety word (below)
+safety_checked: YYYY-MM-DD   # date of the check that set `safety`; empty while `not checked`
+safety_by: agent:<project>/<session>   # who or what checked: one hop in the via hop form
+```
+
+The trailing comments explain the fields; they are not canonical YAML (as in the Holonic Records examples).
+
+- **Platform field:** each operator keeps one field per platform the tool must run on, named for the platform (for example `mac`), with the same four values.
+- **`tool_maturity`** is the tool's state. It is distinct from the document `maturity` field (Document Weighting), which tool notes do not use for this. A tool core's `maturity` is the CS-scale field of Holonic Records, a different scale.
+- **`verdict`:** `clone`, `later` and `skip` answer a review of a repo not yet on disk; `cloned` marks a repo that is already on disk. Like the other values, `cloned` is the operator's own answer; no script sets it (a scanner's own keys already record that a repo is on disk).
+- **`safety`** takes only these words: `not checked` | `look-first (<reasons>)` | `no concerns found (<tier>, <tools>, <date>)` | `do not clone (<reason>)` | `human-audited`. Never "safe" or "clean". `no concerns found` promises only that no repo code ran, that the named files were read, and that cloning and reading the code is fine. It says nothing about installing dependencies or running the tool.
+- **`safety_by`** names the checker as one hop in the `via` hop form of "Provenance: by and via" (Conventions Registry): `agent:<project>/<session>`, `task:<name>`, or `member:<key>` for a person's audit.
+- **Who writes:**
+  - A repo scanner's note writer owns its own keys (`repo_key` and its catalog keys) and its marker blocks. For a repo not yet cloned, the review that creates the note writes `repo_key`.
+  - Sessions write the evaluation fields and the hand region.
+  - The operator sets `verdict`.
+  - A safety or usefulness review writes the `safety*` fields and proposes `fit` names.
 
 ### AI-Generated Content Fields
 
