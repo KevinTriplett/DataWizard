@@ -39,6 +39,14 @@
 # board table - logs its output and adds one "board" row to the status card.
 # The save never fails because of the board.
 #
+# Secret-file guard (DW-S418): after staging, and again right before the push,
+# each repo is checked for secret-class files (Telegram .session files, .env,
+# Scripts/output/, Vault Config.md) in the staged changes AND in every local
+# commit the push would carry. A hit blocks that repo - nothing is committed or
+# pushed - and the status card names the file and the fix. There is no
+# override, and if the check itself fails the repo counts as blocked (fail
+# closed). The pattern list lives in ONE place: is_secret_path, below.
+#
 # Portability rules: pure ASCII; macOS ships bash 3.2, so no associative arrays,
 # no mapfile, no case-conversion expansions. The whole body runs inside main() so bash parses the
 # file to EOF before the sync loop can overwrite it (the Seed repo contains this
@@ -50,6 +58,36 @@ CONF="$HOME/.datawizard-sync.conf"
 LOG_KEEP=1000
 STATUS_KEEP=10
 SCRIPT_PATH="${BASH_SOURCE[0]}"
+
+# ---------------------------------------------------------------------------
+# Secret-file guard: THE pattern list (DW-S418). Extend it here, nowhere else.
+# ---------------------------------------------------------------------------
+# is_secret_path PATH -> 0 when PATH (repo-relative, as git prints it) is a
+# secret-class file that DW Save must never commit or push, whatever
+# .gitignore says. Plain case patterns only (bash 3.2, BSD + GNU safe).
+# Matching ignores case (nocasematch, as the pre-commit hook does): macOS
+# file systems are case-insensitive, so .ENV or Scripts/Output/ is the same
+# file to every tool that reads it.
+is_secret_path() {
+  local p="$1" b hit=1 had=0
+  b="${p##*/}"
+  shopt -q nocasematch && had=1
+  shopt -s nocasematch
+  case "$b" in
+    # Telegram (Telethon) session files and their SQLite journals
+    *.session|*.session-journal) hit=0 ;;
+    # .env and .env.<anything>, except shareable templates
+    .env) hit=0 ;;
+    .env.*)
+      case "$b" in *.example|*.sample|*.template) ;; *) hit=0 ;; esac ;;
+    # operator-specific config, including rollback copies of it
+    'Vault Config.md'|'Vault Config.md.'*) hit=0 ;;
+  esac
+  # harvester output: an output/ folder directly under a Scripts/ folder
+  case "/$p" in */Scripts/output/*) hit=0 ;; esac
+  [ "$had" -eq 1 ] || shopt -u nocasematch
+  return $hit
+}
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -197,6 +235,102 @@ write_status_note() {
   } > "$tmp" && mv -f "$tmp" "$note"
 }
 
+# secret_guard (DW-S418) -> checks the repo in the current folder for files
+# that is_secret_path flags and that a commit or the push would publish:
+#   (a) the staged index (git diff --cached -z; a staged deletion does not
+#       count), and
+#   (b) every file a not-yet-pushed commit adds or modifies: commits in
+#       @{u}..HEAD, or, with no usable upstream, commits on no remote ref.
+#       A commit that deletes or untracks a secret does not count; a merge
+#       counts only for what it adds beyond its parents (combined diff), so
+#       history pulled in from GitHub is not re-flagged.
+# Sets SECRET_STAGED and SECRET_COMMITTED (newline-separated paths),
+# SECRET_UPSTREAM (1 when @{u} was used) and SECRET_ERR. Returns 0 clean,
+# 1 hit(s), 2 the check itself failed - callers treat 2 as blocked (fail
+# closed). Read-only: never stages, unstages or deletes anything.
+secret_guard() {
+  SECRET_STAGED=""; SECRET_COMMITTED=""; SECRET_UPSTREAM=0; SECRET_ERR=""
+  local tmpd p rc nl='
+'
+  tmpd=$(mktemp -d "${TMPDIR:-/tmp}/dwsave-guard.XXXXXX" 2>/dev/null)
+  if [ -z "$tmpd" ] || [ ! -d "$tmpd" ]; then SECRET_ERR="could not create a temp folder"; return 2; fi
+  # (a) staged changes: added, modified, renamed-to (no rename pairing)
+  if ! git diff --cached --name-only -z --no-renames --diff-filter=d > "$tmpd/staged" 2>>"$LOGFILE"; then
+    SECRET_ERR="git diff --cached failed"; rm -rf "$tmpd"; return 2
+  fi
+  while IFS= read -r -d '' p; do
+    is_secret_path "$p" || continue
+    case "$nl$SECRET_STAGED$nl" in *"$nl$p$nl"*) ;; *) SECRET_STAGED="$SECRET_STAGED${SECRET_STAGED:+$nl}$p" ;; esac
+  done < "$tmpd/staged"
+  # (b) commits the push would carry. An unborn branch (no commit yet) has none.
+  if git rev-parse -q --verify HEAD >/dev/null 2>&1; then
+    if git rev-parse -q --verify '@{u}' >/dev/null 2>&1; then
+      SECRET_UPSTREAM=1
+      git rev-list '@{u}..HEAD' > "$tmpd/revs" 2>>"$LOGFILE"; rc=$?
+    else
+      git rev-list HEAD --not --remotes > "$tmpd/revs" 2>>"$LOGFILE"; rc=$?
+    fi
+    if [ "$rc" -ne 0 ]; then SECRET_ERR="git rev-list failed"; rm -rf "$tmpd"; return 2; fi
+    if ! git diff-tree --stdin -r --root --cc --name-only -z --no-renames --diff-filter=d --no-commit-id \
+         < "$tmpd/revs" > "$tmpd/pushed" 2>>"$LOGFILE"; then
+      SECRET_ERR="git diff-tree failed"; rm -rf "$tmpd"; return 2
+    fi
+    while IFS= read -r -d '' p; do
+      is_secret_path "$p" || continue
+      case "$nl$SECRET_COMMITTED$nl" in *"$nl$p$nl"*) ;; *) SECRET_COMMITTED="$SECRET_COMMITTED${SECRET_COMMITTED:+$nl}$p" ;; esac
+    done < "$tmpd/pushed"
+  elif ! git symbolic-ref -q HEAD >/dev/null 2>&1; then
+    SECRET_ERR="HEAD does not resolve"; rm -rf "$tmpd"; return 2
+  fi
+  rm -rf "$tmpd"
+  [ -n "$SECRET_STAGED$SECRET_COMMITTED" ] && return 1
+  return 0
+}
+
+# secret_block NAME DIR RC (DW-S418) -> reports a repo that secret_guard
+# stopped, through the same channels as the other guards: an ERROR log line
+# (plus one BLOCKED line per path with its fix), the error list, a status
+# card row and a notification. Never touches the repo. Paths stay out of
+# the notification text, which is handed to osascript.
+secret_block() {
+  local name="$1" dir="$2" rc="$3" p shown="" n=0 cell
+  ERRORS=$((ERRORS+1))
+  if [ "$rc" -ne 1 ]; then
+    notify "DW Sync Error" "Secret-file check failed in $name - nothing was pushed. See DW Save Status.md" "Basso"
+    log "ERROR secret-file guard could not check $dir (${SECRET_ERR:-unknown error}) - treated as blocked, nothing committed or pushed"
+    ERROR_LIST="$ERROR_LIST, $name (secret-file check failed)"
+    add_row "$name" "BLOCKED: the secret-file check could not run (${SECRET_ERR:-unknown error}) - nothing was committed or pushed; see the log, then save again"
+    return 0
+  fi
+  notify "DW Sync Error" "Secret file blocked in $name - nothing was pushed. See DW Save Status.md" "Basso"
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    log "BLOCKED $name: secret file is staged: $p - fix: cd \"$dir\" && git rm --cached -- \"$p\" (keeps the file on disk), add it to .gitignore, then save again"
+    n=$((n+1)); cell=$(printf '%s' "$p" | sed 's/|/\\|/g'); [ "$n" -le 3 ] && shown="$shown${shown:+, }\`$cell\`"
+  done <<EOF_SG_STAGED
+$SECRET_STAGED
+EOF_SG_STAGED
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    if [ "$SECRET_UPSTREAM" = 1 ]; then
+      log "BLOCKED $name: secret file is in a local commit not yet pushed: $p - fix: cd \"$dir\" && git reset --soft '@{u}' (undoes only the unpushed commits, keeps every file and change), then git rm --cached -- \"$p\", add it to .gitignore, and save again"
+    else
+      log "BLOCKED $name: secret file is in a local commit not yet pushed (this branch has no upstream): $p - fix: the local commit(s) that add it must be undone first (git reset --soft <last pushed commit> keeps every file), then git rm --cached -- \"$p\", add it to .gitignore, and save again; ask for help if unsure"
+    fi
+    n=$((n+1)); cell=$(printf '%s' "$p" | sed 's/|/\\|/g'); [ "$n" -le 3 ] && shown="$shown${shown:+, }\`$cell\`"
+  done <<EOF_SG_COMMITTED
+$SECRET_COMMITTED
+EOF_SG_COMMITTED
+  [ "$n" -gt 3 ] && shown="$shown and $((n-3)) more"
+  log "ERROR secret-file guard blocked $dir: $n secret file(s) would be published - nothing committed or pushed (fix per BLOCKED lines above)"
+  ERROR_LIST="$ERROR_LIST, $name (secret file blocked)"
+  if [ -n "$SECRET_COMMITTED" ]; then
+    add_row "$name" "BLOCKED: secret file(s) would be published: $shown - nothing was committed or pushed. Already in a local commit, so the fix is in the log (BLOCKED lines); then save again"
+  else
+    add_row "$name" "BLOCKED: secret file(s) would be published: $shown - nothing was committed or pushed. Fix: git rm --cached -- \"<path>\" (keeps the file), add it to .gitignore, save again"
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Sync mode
 # ---------------------------------------------------------------------------
@@ -298,7 +432,7 @@ run_sync() {
     esac
   fi
 
-  local DIR NAME RESULT NFILES HEAD_BEFORE HEAD_AFTER UPSTREAM AHEAD committed pulled
+  local DIR NAME RESULT NFILES HEAD_BEFORE HEAD_AFTER UPSTREAM AHEAD committed pulled SG_RC
   for DIR in "${PROJECTS[@]}"; do
     DIR="${DIR%/}"
     NAME=$(basename "$DIR")
@@ -340,6 +474,9 @@ run_sync() {
     fi
 
     git add . >> "$LOGFILE" 2>&1
+    # Secret-file guard, pass 1 (DW-S418): before anything is committed
+    secret_guard; SG_RC=$?
+    if [ "$SG_RC" -ne 0 ]; then secret_block "$NAME" "$DIR" "$SG_RC"; continue; fi
     if ! git diff --cached --quiet; then
       NFILES=$(git diff --cached --name-only | wc -l | tr -d ' ')
       TIMESTAMP=$(ts)
@@ -388,6 +525,10 @@ run_sync() {
     else
       AHEAD=$committed
     fi
+
+    # Secret-file guard, pass 2 (DW-S418): everything the push would carry
+    secret_guard; SG_RC=$?
+    if [ "$SG_RC" -ne 0 ]; then secret_block "$NAME" "$DIR" "$SG_RC"; continue; fi
 
     if ! git push >> "$LOGFILE" 2>&1; then
       ERRORS=$((ERRORS+1))

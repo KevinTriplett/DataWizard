@@ -1,6 +1,6 @@
 ---
 created: 2026-04-24
-updated: 2026-09-06
+updated: 2026-10-17
 type: guide
 scope: seed
 edit_log:
@@ -13,6 +13,8 @@ edit_log:
     relaunch/verify (notification-permission-after-relaunch) + hotkey-combo
     verify; Step 4 cross-ref; Notifications fallback note; silent-notification
     troubleshooting entry"
+  - "DW-S418 2026-10-17 - What It Does: secret-file guard paragraph (DW Save
+    refuses to commit/push .session, .env, Scripts/output/, Vault Config.md)"
 ---
 
 # DataWizard Sync Setup Guide
@@ -35,6 +37,8 @@ The rest of this guide assumes macOS.
 ## What It Does
 
 When triggered (manually or on a schedule), the script loops through your collaborative project repos and for each one: stages any changed files, commits them with a timestamp, pulls any changes your collaborators have pushed, and pushes your new commits to GitHub. You get a macOS notification telling you the result.
+
+**Secret-file guard.** Before committing, and again right before pushing, DW Save checks each repo for secret files: Telegram `.session` / `.session-journal` files, `.env` and `.env.*` (except `.example`, `.sample`, `.template`), anything under a `Scripts/output/` folder, and `Vault Config.md` (including copies like `Vault Config.md.pre-S371.bak`). Upper and lower case count as the same. It checks both the files about to be committed and every local commit that has not been pushed yet. If it finds one, that repo is not committed or pushed (other repos still save), and the DW Save Status note names the file and the fix: usually `git rm --cached -- "<path>"` (the file stays on disk), then add it to `.gitignore` and save again. This works even when `.gitignore` is missing or wrong. There is no override. If the check itself cannot run, the repo is blocked too. Running a `~/Scripts` copy? Re-copy it (Step 2) or re-run `--install` to get this guard.
 
 ## Prerequisites
 
