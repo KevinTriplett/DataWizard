@@ -45,7 +45,15 @@
 # commit the push would carry. A hit blocks that repo - nothing is committed or
 # pushed - and the status card names the file and the fix. There is no
 # override, and if the check itself fails the repo counts as blocked (fail
-# closed). The pattern list lives in ONE place: is_secret_path, below.
+# closed). The pattern list is owned by is_secret_path, below. The commit
+# guard (hooks/pre-commit) holds a verbatim copy of that function between the
+# same marker comments; a drift test (test_secret_guard.sh) fails until the
+# two copies are byte-identical. Edit it here, then copy the marked span.
+#
+# Machine label (DW-S419): auto-sync commit messages read
+# "auto-sync <date> <time> on <label>", where <label> is the conf's
+# "machine: <label>" line (one word: letters, digits, . _ -), or "Mac" when
+# the line is absent or invalid. The hostname is never used.
 #
 # Portability rules: pure ASCII; macOS ships bash 3.2, so no associative arrays,
 # no mapfile, no case-conversion expansions. The whole body runs inside main() so bash parses the
@@ -60,7 +68,9 @@ STATUS_KEEP=10
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 
 # ---------------------------------------------------------------------------
-# Secret-file guard: THE pattern list (DW-S418). Extend it here, nowhere else.
+# Secret-file guard: THE pattern list (DW-S418). This is the owner copy:
+# extend it here, then copy the marked span verbatim into hooks/pre-commit
+# (DW-S419; the drift test in test_secret_guard.sh enforces the match).
 # ---------------------------------------------------------------------------
 # is_secret_path PATH -> 0 when PATH (repo-relative, as git prints it) is a
 # secret-class file that DW Save must never commit or push, whatever
@@ -68,6 +78,7 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 # Matching ignores case (nocasematch, as the pre-commit hook does): macOS
 # file systems are case-insensitive, so .ENV or Scripts/Output/ is the same
 # file to every tool that reads it.
+# >>> is_secret_path - verbatim copy, owner: datawizard-sync.sh >>>
 is_secret_path() {
   local p="$1" b hit=1 had=0
   b="${p##*/}"
@@ -88,6 +99,7 @@ is_secret_path() {
   [ "$had" -eq 1 ] || shopt -u nocasematch
   return $hit
 }
+# <<< is_secret_path <<<
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -119,17 +131,47 @@ notify() {
 # vault that are deliberately not synced - "exclude: <path>" lines, written by
 # --install per design 4.2). Blank lines and # comments are skipped. Sync mode
 # only uses PROJECTS; --doctor and --install use EXCLUDES too.
+# A "machine: <label>" line (DW-S419) is not a repo: it sets CONF_MACHINE (the
+# value, trimmed; the last such line wins) and CONF_MACHINE_SET=1.
 read_conf() {
-  PROJECTS=(); EXCLUDES=()
+  PROJECTS=(); EXCLUDES=(); CONF_MACHINE=""; CONF_MACHINE_SET=0
   [ -f "$CONF" ] || return 1
   local line v
   while IFS= read -r line || [ -n "$line" ]; do
     case "$line" in
       ''|\#*) continue ;;
       exclude:*) v="${line#exclude:}"; v="${v#"${v%%[! ]*}"}"; v="${v%/}"; [ -n "$v" ] && EXCLUDES+=("$v"); continue ;;
+      machine:*) v="${line#machine:}"; v="${v#"${v%%[![:space:]]*}"}"; v="${v%"${v##*[![:space:]]}"}"
+                 CONF_MACHINE="$v"; CONF_MACHINE_SET=1; continue ;;
     esac
     PROJECTS+=("${line%/}")
   done < "$CONF"
+  return 0
+}
+
+# machine_label_ok VALUE -> 0 when VALUE is one non-empty token of ASCII
+# letters, digits, dot, underscore or hyphen (^[A-Za-z0-9._-]+$). Characters
+# are spelled out, not ranged: bash 3.2 ranges follow the locale's collation.
+machine_label_ok() {
+  case "$1" in
+    ''|*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-]*) return 1 ;;
+  esac
+  return 0
+}
+
+# resolve_machine (DW-S419) -> sets SAVE_MACHINE, the last word of every
+# auto-sync commit message ("auto-sync <date> <time> on <label>" - other tools
+# parse that grammar, so the label must be one token). Uses the conf's
+# "machine:" value when valid; absent -> "Mac"; present but invalid -> "Mac"
+# plus one WARN log line per run. Call after read_conf.
+resolve_machine() {
+  SAVE_MACHINE="Mac"
+  [ "${CONF_MACHINE_SET:-0}" = 1 ] || return 0
+  if machine_label_ok "$CONF_MACHINE"; then
+    SAVE_MACHINE="$CONF_MACHINE"
+  else
+    log "WARN conf line 'machine: $CONF_MACHINE' is not one word of letters, digits, '.', '_' or '-' - commit messages say 'on Mac' until it is fixed in $CONF"
+  fi
   return 0
 }
 
@@ -393,6 +435,7 @@ run_sync() {
     echo "DW Save: config file is empty - run --install"
     exit 1
   fi
+  resolve_machine
 
   if ! resolve_vault; then
     log "Status note skipped: vault root not found (no --vault, script not in the Seed, no Seed path in conf)"
@@ -480,7 +523,8 @@ run_sync() {
     if ! git diff --cached --quiet; then
       NFILES=$(git diff --cached --name-only | wc -l | tr -d ' ')
       TIMESTAMP=$(ts)
-      if git commit -m "auto-sync $TIMESTAMP on $(hostname -s)" >> "$LOGFILE" 2>&1; then
+      # machine label from the conf (resolve_machine), never the hostname (DW-S419)
+      if git commit -m "auto-sync $TIMESTAMP on ${SAVE_MACHINE:-Mac}" >> "$LOGFILE" 2>&1; then
         committed=1
       else
         ERRORS=$((ERRORS+1))
@@ -1302,7 +1346,15 @@ EOF_FIND
   # write the conf only when its content changes
   local NEWCONF="" nl='
 '
-  NEWCONF="# DW Save repo list - one repo path per line; every repo here is committed, pulled and pushed on each save.${nl}# Lines starting with \"exclude:\" are repos found in the vault that are deliberately NOT synced.${nl}# Re-run 'datawizard-sync.sh --install' after cloning a new shared project; it adds the repo here (and asks first)."
+  # machine label (DW-S419): an existing "machine:" value survives a re-install
+  # as written; absent (or empty) -> "Mac". An invalid value is kept but flagged.
+  local conf_machine="Mac"
+  if [ "${CONF_MACHINE_SET:-0}" = 1 ] && [ -n "$CONF_MACHINE" ]; then
+    conf_machine="$CONF_MACHINE"
+    machine_label_ok "$conf_machine" \
+      || i_warn "conf line 'machine: $conf_machine' is not one word (letters, digits, . _ -) - kept as you wrote it, but commit messages say 'on Mac' until you fix it in $CONF"
+  fi
+  NEWCONF="# DW Save repo list - one repo path per line; every repo here is committed, pulled and pushed on each save.${nl}# Lines starting with \"exclude:\" are repos found in the vault that are deliberately NOT synced.${nl}# The \"machine:\" line names this computer in DW Save commit messages (one word: letters, digits, . _ -).${nl}# Re-run 'datawizard-sync.sh --install' after cloning a new shared project; it adds the repo here (and asks first).${nl}machine: $conf_machine"
   for p in "${EXC[@]}"; do NEWCONF="$NEWCONF${nl}exclude: $p"; done
   for p in "${KEEP[@]}"; do NEWCONF="$NEWCONF${nl}$p"; done
   if [ -f "$CONF" ] && [ "$(cat "$CONF")" = "$NEWCONF" ]; then

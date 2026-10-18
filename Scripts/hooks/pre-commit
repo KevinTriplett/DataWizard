@@ -2,9 +2,11 @@
 #
 # DataWizard commit guard (pre-commit hook)
 # ------------------------------------------
-# Blocks a commit when the staged changes contain either:
-#   1. unresolved merge-conflict markers (outside fenced code blocks), or
-#   2. Windows-unsafe filenames.
+# Blocks a commit when the staged changes contain any of:
+#   1. unresolved merge-conflict markers (outside fenced code blocks),
+#   2. Windows-unsafe filenames, or
+#   3. secret-class files (DW-S419): Telegram .session files, .env files,
+#      Scripts/output/, Vault Config.md - the list DW Save guards.
 #
 # The conflict-marker check skips .obsidian/ trees (Obsidian workspace/plugin
 # state, not authored content; plugin JS legitimately contains marker strings).
@@ -18,7 +20,20 @@
 # what happened and how to fix it. The note clears itself on the next good save.
 #
 # Installed per-clone by install-git-hooks.sh (.git/hooks/ is not synced).
-# Bypass a genuine false positive once with:  git commit --no-verify
+# Bypass a genuine false positive of checks 1 and 2 once with:
+#   git commit --no-verify
+# The secret-file check (3) offers no bypass: the fix is to take the file out
+# of the commit (git rm --cached), never to skip the check.
+#
+# Secret-file check scope: the STAGED INDEX only - the files this commit would
+# add or change (a staged deletion never blocks; a rename counts as an add of
+# the new name; an unborn branch works). Out of scope: `git commit --no-verify`,
+# and commits made where hooks do not run (e.g. Obsidian Git on mobile). A
+# secret already sitting in a local commit is caught at push time by DW Save's
+# secret_guard (datawizard-sync.sh), not here. The pattern list is a verbatim
+# copy of is_secret_path from datawizard-sync.sh (the owner); a drift test in
+# test_secret_guard.sh fails when the two copies differ. Edit the owner, then
+# copy the marked span here - never edit it here alone.
 #
 # A bare '=======' is ALSO a valid markdown setext heading underline, so it is
 # only treated as a conflict marker when the same file also contains '<<<<<<<'.
@@ -34,6 +49,32 @@ breadcrumb="$repo_root/SYNC-BLOCKED.md"
 
 conflict_hits=""
 filename_hits=""
+secret_hits=""
+secret_err=""
+
+# is_secret_path PATH -> 0 when PATH is a secret-class file (see header).
+# >>> is_secret_path - verbatim copy, owner: datawizard-sync.sh >>>
+is_secret_path() {
+  local p="$1" b hit=1 had=0
+  b="${p##*/}"
+  shopt -q nocasematch && had=1
+  shopt -s nocasematch
+  case "$b" in
+    # Telegram (Telethon) session files and their SQLite journals
+    *.session|*.session-journal) hit=0 ;;
+    # .env and .env.<anything>, except shareable templates
+    .env) hit=0 ;;
+    .env.*)
+      case "$b" in *.example|*.sample|*.template) ;; *) hit=0 ;; esac ;;
+    # operator-specific config, including rollback copies of it
+    'Vault Config.md'|'Vault Config.md.'*) hit=0 ;;
+  esac
+  # harvester output: an output/ folder directly under a Scripts/ folder
+  case "/$p" in */Scripts/output/*) hit=0 ;; esac
+  [ "$had" -eq 1 ] || shopt -u nocasematch
+  return $hit
+}
+# <<< is_secret_path <<<
 
 # ---- Check 1: unresolved conflict markers (skips fenced code blocks) ----
 scan_conflicts() {
@@ -63,7 +104,7 @@ while IFS= read -r -d '' path; do
   else
     conflict_hits="${conflict_hits}${out}"$'\n'
   fi
-done < <(git diff --cached -z --name-only --diff-filter=ACM)
+done < <(git diff --cached -z --name-only --diff-filter=ACMR)
 
 # ---- Check 2: Windows-unsafe filenames (same rules as check-filenames.yml) ----
 while IFS= read -r -d '' path; do
@@ -91,10 +132,28 @@ while IFS= read -r -d '' path; do
       filename_hits="${filename_hits}${path} (${reasons})"$'\n'
     fi
   done
-done < <(git diff --cached -z --name-only --diff-filter=ACM)
+done < <(git diff --cached -z --name-only --diff-filter=ACMR)
+
+# ---- Check 3: secret-class files (staged index only; see header) ----
+# --no-renames: a rename shows as delete + add, so the new name is checked.
+# --diff-filter=d: deletions never block. Fails closed: if git cannot list
+# the staged files (pipefail catches it), the commit is stopped.
+scan_secrets() {
+  local p
+  while IFS= read -r -d '' p; do
+    if is_secret_path "$p"; then printf '%s\n' "$p"; fi
+  done
+  return 0
+}
+if secret_hits="$(git diff --cached --name-only --no-renames --diff-filter=d -z | scan_secrets)"; then
+  [ -n "$secret_hits" ] && secret_hits="${secret_hits}"$'\n'
+else
+  secret_hits=""
+  secret_err="git could not list the staged files"
+fi
 
 # ---- Verdict ----
-if [ -z "$conflict_hits" ] && [ -z "$filename_hits" ]; then
+if [ -z "$conflict_hits" ] && [ -z "$filename_hits" ] && [ -z "$secret_hits" ] && [ -z "$secret_err" ]; then
   rm -f "$breadcrumb" 2>/dev/null || true
   exit 0
 fi
@@ -134,20 +193,61 @@ fi
     echo 'Fix: rename them. No trailing space or dot, and avoid  ? : * " < > |'
     echo
   fi
+  if [ -n "$secret_hits" ]; then
+    echo "## Secret files staged"
+    echo
+    echo "These files hold logins, keys or private settings. Once committed and"
+    echo "pushed they are readable by everyone with access to the repo, and they"
+    echo "stay in its history:"
+    echo
+    echo '```'
+    printf '%s' "$secret_hits"
+    echo '```'
+    echo
+    echo "Fix: take each file out of the commit (this keeps the file on your disk):"
+    echo
+    printf '%s\n' "$secret_hits" | while IFS= read -r p; do
+      [ -n "$p" ] && echo "    git rm --cached -- \"$p\""
+    done
+    echo
+    echo "then add its name to .gitignore so it is not staged again, and save again."
+    echo "This check has no bypass."
+    echo
+  fi
+  if [ -n "$secret_err" ]; then
+    echo "## Secret-file check could not run"
+    echo
+    echo "The check for secret files failed ($secret_err), so the save was"
+    echo "stopped to be safe. Open a terminal in this repo, run git status to see"
+    echo "what is wrong, then save again. This check has no bypass."
+    echo
+  fi
   echo "---"
   echo
   echo "After fixing, just save again (DW Save / commit-and-sync)."
-  echo "If you are certain this is a false alarm, bypass the check once with:"
-  echo
-  echo '    git commit --no-verify'
-  echo
+  if [ -z "$secret_hits" ] && [ -z "$secret_err" ]; then
+    echo "If you are certain this is a false alarm, bypass the check once with:"
+    echo
+    echo '    git commit --no-verify'
+    echo
+  fi
   echo "This note disappears automatically once the next save succeeds."
 } > "$breadcrumb"
 
 echo "COMMIT BLOCKED by the DataWizard commit guard." >&2
 [ -n "$conflict_hits" ] && echo "  - unresolved conflict markers found in staged files" >&2
 [ -n "$filename_hits" ] && echo "  - Windows-unsafe filenames found in staged files" >&2
+if [ -n "$secret_hits" ]; then
+  echo "  - secret file(s) staged - take each out of the commit (keeps the file on disk):" >&2
+  printf '%s\n' "$secret_hits" | while IFS= read -r p; do
+    [ -n "$p" ] && echo "      git rm --cached -- \"$p\"" >&2
+  done
+  echo "    then add it to .gitignore and commit again" >&2
+fi
+[ -n "$secret_err" ] && echo "  - the secret-file check could not run ($secret_err) - run git status" >&2
 echo "  Details written to SYNC-BLOCKED.md (open it in Obsidian)." >&2
-echo "  Bypass once (only if you are sure): git commit --no-verify" >&2
+if [ -z "$secret_hits" ] && [ -z "$secret_err" ]; then
+  echo "  Bypass once (only if you are sure): git commit --no-verify" >&2
+fi
 
 exit 1

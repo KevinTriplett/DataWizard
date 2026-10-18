@@ -1,6 +1,6 @@
 ---
 created: 2026-04-24
-updated: 2026-10-17
+updated: 2026-10-18
 type: guide
 scope: seed
 edit_log:
@@ -15,6 +15,9 @@ edit_log:
     troubleshooting entry"
   - "DW-S418 2026-10-17 - What It Does: secret-file guard paragraph (DW Save
     refuses to commit/push .session, .env, Scripts/output/, Vault Config.md)"
+  - "DW-S419 2026-10-18 - machine: conf key (commit-message label, replaces
+    the hostname) in What It Does + Step 1; Step 3: the commit guard's third
+    check (secret files in the staged index)"
 ---
 
 # DataWizard Sync Setup Guide
@@ -36,9 +39,11 @@ The rest of this guide assumes macOS.
 
 ## What It Does
 
-When triggered (manually or on a schedule), the script loops through your collaborative project repos and for each one: stages any changed files, commits them with a timestamp, pulls any changes your collaborators have pushed, and pushes your new commits to GitHub. You get a macOS notification telling you the result.
+When triggered (manually or on a schedule), the script loops through your collaborative project repos and for each one: stages any changed files, commits them with a timestamp and a machine label (see below), pulls any changes your collaborators have pushed, and pushes your new commits to GitHub. You get a macOS notification telling you the result.
 
 **Secret-file guard.** Before committing, and again right before pushing, DW Save checks each repo for secret files: Telegram `.session` / `.session-journal` files, `.env` and `.env.*` (except `.example`, `.sample`, `.template`), anything under a `Scripts/output/` folder, and `Vault Config.md` (including copies like `Vault Config.md.pre-S371.bak`). Upper and lower case count as the same. It checks both the files about to be committed and every local commit that has not been pushed yet. If it finds one, that repo is not committed or pushed (other repos still save), and the DW Save Status note names the file and the fix: usually `git rm --cached -- "<path>"` (the file stays on disk), then add it to `.gitignore` and save again. This works even when `.gitignore` is missing or wrong. There is no override. If the check itself cannot run, the repo is blocked too. Running a `~/Scripts` copy? Re-copy it (Step 2) or re-run `--install` to get this guard.
+
+**Machine label.** Each commit message reads `auto-sync <date> <time> on <label>`. The label comes from a lower-case `machine: <label>` line in `~/.datawizard-sync.conf` -- one word of letters, digits, `.`, `_` or `-` (for example `machine: Studio`). With no such line the label is `Mac`; a value with spaces or other characters is ignored (the label stays `Mac` and the log gets one `WARN` line per run). DW Save never puts your computer's network name in a commit message. `--install` writes `machine: Mac` when the line is missing and keeps any value you set.
 
 ## Prerequisites
 
@@ -61,8 +66,13 @@ cat > ~/.datawizard-sync.conf << 'EOF'
 
 # Collaborative project repos:
 # /Users/yourname/Vaults/YourVault/_ProjectName/Project Shared
+
+# Optional: the name commit messages use for this computer (one word).
+machine: Mac
 EOF
 ```
+
+The `machine:` line is not a repo path: it sets the label in DW Save commit messages (see What It Does). Change `Mac` to any one-word name, for example `machine: Studio`, so you can tell two of your computers apart in the history.
 
 Edit the file and add your actual repo paths:
 
@@ -87,7 +97,7 @@ chmod +x ~/Scripts/datawizard-sync.sh
 
 ## Step 3: Install the Commit Guard (Per Repo)
 
-The commit guard is a pre-commit hook that blocks a commit containing unresolved conflict markers or Windows-unsafe filenames, so corrupt content never syncs silently. Git hooks are not synced, so install it once **per repo** -- including the Seed itself -- and **re-run it after any Seed update that touches `Scripts/hooks/`** (the installer is idempotent):
+The commit guard is a pre-commit hook that blocks a commit containing unresolved conflict markers, Windows-unsafe filenames, or secret files (the same list as DW Save's secret-file guard above: `.session`, `.env`, `Scripts/output/`, `Vault Config.md`), so corrupt or private content never syncs silently. The secret-file check looks only at what the commit would add (a staged deletion never blocks) and has no bypass: take the file out with `git rm --cached -- "<path>"` and add it to `.gitignore`. Git hooks are not synced, so install it once **per repo** -- including the Seed itself -- and **re-run it after any Seed update that touches `Scripts/hooks/`** (the installer is idempotent):
 
 ```bash
 bash "/path/to/your/vault/_DataWizard/Seed/Scripts/install-git-hooks.sh" "/path/to/your/repo"

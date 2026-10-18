@@ -11,11 +11,12 @@ description: >-
   (Pattern 3), a build with no reviewer available, or incidental concurrency
   between unrelated sessions.
 type: skill
-version: '1.5.1'
+version: '1.5.2'
 created: '2026-08-30'
-updated: 2026-10-13
+updated: 2026-10-18
 operator: Andrew
 edit_log:
+  - 'DW-S419 2026-10-18 - v1.5.2: Reviewer Steps - operator-run check scripts travel as vault files with sha256 checked against the rehearsal copy, never heredoc pastes; in-thread delivery bullet points to it (DW-S418 Seed history purge)'
   - 'DW-S403 2026-10-13 - v1.5.1: in-thread variant - per-builder worktree and output folder, no git stash across worktrees (board intake B-0072, Holonic Canvas)'
   - 'DW-S398 2026-10-12 - v1.5.0: Reviewer 3 fixture experiments (two runs, partial apply, re-plan); forced event ordering for a claimed flake; in-thread variant: lead re-counts from files, resume the plan reviewer for verification, cancelled launch may have run (board intake)'
   - 'DW-S397 2026-10-12 - v1.4.0: In-thread variant section (sub-agent builder; codified on second use); Builder 4 ship-the-spec-surface-early; Reviewer 3 independent classifier over rollback copies; whole-build sweep = blind hand run for skills; chunk-vs-pre-flight instruments (meta-learning review S377-S392)'
@@ -96,6 +97,8 @@ Per chunk:
 
 **Cheap fixes are yours.** Patch small, well-specified defects yourself in files you already have loaded; anything that requires the builder to re-read or rewrite a body goes into the review note as instructions. And check the builder's status before filing: a supervision note filed after the supervised session closed has no reader - land small fixes yourself and put the state on the board.
 
+**Operator-run scripts travel as vault files, not pastes.** When a check script is for the human operator to run in their own terminal, it reaches them as a vault file, and the operator compares its sha256 with the value the reviewer recorded from its rehearsal copy before running it. Never deliver such a script as a heredoc paste: a long paste can be cut off partway. This holds in the relay and in the in-thread variant alike. (DataWizard, 2026-10)
+
 **End with a whole-build sweep.** After the last chunk, a supervisor-tier pass over every artifact the build touched, ideally from a fresh instance. Unreviewed is where the defects live. For a skill deliverable the sweep is a blind hand run: a fresh instance holding only the skill text runs it end to end, and the skill is "built" when that run passes - not when the text is written. One blind run surfaced fourteen defects the author could not see. (DataWizard, 2026-10)
 
 **Probe the real thing, not only fixtures.** When verifying a shipped tool or script, include at least one probe against a copy of the hottest real production file it will touch (copied to scratch, never the original). Synthetic fixtures only exercise the failure modes their author imagined; the real file carries shapes nobody imagined - including pre-existing damage the tool must survive. Field grounding: a real-file probe during verification surfaced that the two hottest project files had silently unparseable frontmatter from an earlier manual write - a defect no fixture modeled, caught only because the probe target was real (2026-08).
@@ -126,7 +129,7 @@ Codified on second use (two projects, 2026-10). The whole build runs inside ONE 
 
 - **The relay collapses to turns.** Exchange notes between seats become sub-agent briefs and hand-backs; chunk plans live in the lead's brief, not in the Session Exchange folder. The **driver doc and its State Board stay mandatory** - the session's context is still a viewport, and a fresh instance must still answer "where are we at" from the board.
 - **The gate does not weaken.** Sub-agent builders remove the human relay without weakening the gate only while the supervisor verifies from disk and runs the shipped scripts itself (Reviewer Steps 2-3). A hand-back is a report; the run is the evidence. Seven chunks across two sessions landed with zero defects on disk this way.
-- **Delivery is by fresh-named artifacts with a hash on both sides.** A builder delivers each iteration under a new name (`.v2`, `.v3`) and the lead compares `sha256` container-side and device-side before running anything - same-path re-use is stale in both bridge directions (Cowork Build Environment, Device Bridge).
+- **Delivery is by fresh-named artifacts with a hash on both sides.** A builder delivers each iteration under a new name (`.v2`, `.v3`) and the lead compares `sha256` container-side and device-side before running anything - same-path re-use is stale in both bridge directions (Cowork Build Environment, Device Bridge). Operator deliveries follow the same rule (Reviewer Steps, "Operator-run scripts travel as vault files").
 - **Scratch, never the vault.** The reviewer still runs the server or script on a scratch copy outside the working tree; builders write to the vault only through the gate.
 - **Re-count from the files.** Never carry a number from a sub-agent report into canon without re-deriving it from the files: a worker's prose misstated a count that its own export had right. (Holonic Canvas, 2026-10)
 - **Resume the plan reviewer for verification.** Resume the sub-agent that reviewed the plan by message (SendMessage to the same agent) for the verification seat: it keeps fresh eyes - it did not author the code - and saves the re-orientation a second fresh instance costs. (Holonic Canvas, 2026-10)

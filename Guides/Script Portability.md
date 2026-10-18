@@ -2,13 +2,14 @@
 title: Script Portability
 type: guide
 created: '2026-09-23'
-updated: '2026-09-23'
+updated: '2026-10-18'
 operator: Andrew
 status: active
 edit_log:
   - "DW-S374 2026-09-23 - created (meta-learning review S324-S337): consolidates
     the scattered cross-platform script-shipping rules (ASCII-only, PowerShell
     encoding, BSD vs GNU, trace-verify)"
+  - "DW-S421 2026-10-18 - S419a-2"
 ---
 
 # Script Portability
@@ -28,6 +29,10 @@ macOS ships BSD versions of `sed`, `awk`, `date`, `stat`, `mktemp`; Linux ships 
 ## Shell dialect
 
 Target `bash` explicitly (`#!/usr/bin/env bash`), never `sh`, and do not assume the interactive shell: macOS defaults to zsh, so anything an operator pastes into a terminal runs under zsh semantics (word-splitting differs, `**` globbing differs). Instructions handed to operators must be paste-safe under both.
+
+## Case-insensitive disks
+
+A default macOS disk treats `Out/data` and `out/DATA` as one folder. Linux treats them as two. A test that creates case-variant paths in one repo passes on Linux and fails on the Mac. Give each case variant its own folder, or its own repo. Run the test suite on a Mac once before the script ships. (DataWizard, 2026-10)
 
 ## Trace-verify before shipping
 

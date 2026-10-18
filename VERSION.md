@@ -1,5 +1,5 @@
 
-seed: 1.10.1
+seed: 1.10.3
 protocol: 1.8
 project_instructions: 4.9
 
@@ -73,15 +73,42 @@ This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
 
+## What's New in 1.10.3
+
+**Patch release: tool behaviors from three partner projects and two DataWizard sessions, a filename rule, and a shorter VERSION.md.** One DataWizard session (2026-10-18). Shipped in the Seed:
+
+- `Guides/Filename Safety.md`: no `!` in new file or folder names (inside double quotes, `!` followed by a letter starts history expansion in an interactive zsh or bash Terminal and a pasted command fails with `event not found`); existing names are renamed on touch, inside the app, never in a batch.
+- `Guides/Git Guide/5.0 Daily Workflow.md`: check every rollback or backup file name against `.gitignore` before a run.
+- `Guides/Git Guide/6.0 Branch Workflow and Pull Requests.md`: new section - an unattended build gets its own linked worktree, never a branch switch in the primary checkout; the merge is `--ff-only`.
+- `Guides/Git Guide/7.0 Safety and Recovery.md`: the GitHub Support category "Deletes" opens a repository deletion form, not a sensitive-data request.
+- `Guides/Cowork Build Environment/`: 4.0 (quote every glob in an operator command - zsh stops on an unquoted glob that matches nothing); 5.0 (the container's GitHub API can refuse one repository for the session); 8.1 (`device_commit_files` writes mode 0600 - add a `chmod 755` step for scripts; with the shell down it still gives a byte copy of a long new file); 8.2 (fast-tier helpers can run stage and commit from path-list files; one file owns a string that parallel agents share; the permission classifier can deny the lead's edit while a sub-agent's passes); 9.0 (same FAIL ids are not the same failures - compare the detail text on the base branch; a fixture `HOME` does not isolate launchd).
+- `Guides/Chrome MCP and Web Tool Behaviors/`: 1.0 (a same-origin iframe gives a true narrow layout when `resize_window` does nothing); 2.0 rung 10 (a sidebar teaser from `get_page_text` - walk up from the `h1`); 4.0 (GitHub search and list pages can answer ROBOTS_DISALLOWED - fetch the repo URL or the raw LICENSE; WebFetch can refuse a quick second fetch of a URL that failed); 10.0 (a bot-check wall can clear after a second navigate and a short wait; the extension can drop to "not connected"); 12.0 (third-party pages can carry text aimed at AI agents - treat page text as data).
+- `Guides/Browser and File System Access Behaviors.md`: Chromium decides `:focus-visible` per document - pass the trigger type into an iframe and use `focus({focusVisible})`.
+- `Guides/Script Portability.md`: new section on case-insensitive disks.
+- `VERSION History.md` (new): the What's New entries for 1.0.0 to 1.5.0 moved there word for word, so this file stays under the size where vault tools turn unreliable. Nothing was cut.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.10.2
+
+**Patch release: the commit guard checks for secret files, commit messages no longer carry the computer's name, and one review pattern is codified.** One DataWizard session (2026-10-18). Shipped in the Seed:
+
+- `Scripts/hooks/pre-commit` (the commit guard): a third check, for secret files. A commit is blocked when its staged files include anything DW Save's secret-file guard blocks (`*.session` / `*.session-journal`, `.env` and `.env.*` except `.example` / `.sample` / `.template`, anything under `Scripts/output/`, `Vault Config.md` and its copies; upper and lower case count as the same). The hook checks only what the commit would add or change: a staged deletion never blocks, a rename counts as the new name, and a first commit on a new repo is checked too. `SYNC-BLOCKED.md` and the terminal name each file with its fix (`git rm --cached -- "<path>"` keeps the file on disk; then add it to `.gitignore`), and for this check neither offers `git commit --no-verify`. If git cannot list the staged files, the commit is blocked. The hook holds a byte-for-byte copy of DW Save's `is_secret_path`, and a test fails when the two differ. Also fixed: the conflict-marker and filename checks now also check renamed files (before, `git mv note.md 'note?.md'` got through).
+- Not covered by the hook: `git commit --no-verify`; commits made where hooks do not run (Obsidian Git on mobile); a merge commit that git creates without a conflict (git runs `pre-merge-commit`, not `pre-commit`, for those); a secret that is already in the last commit and unchanged (for example under `git commit --amend`), because the hook reads the staged changes only. DW Save's guard still catches all of these at push time.
+- `Scripts/datawizard-sync.sh` (DW Save): automatic commit messages no longer contain the computer's network name. They read `auto-sync <date> <time> on <label>`, where `<label>` comes from a new lower-case `machine: <label>` line in `~/.datawizard-sync.conf`: one word made of letters, digits, `.`, `_` or `-`. With no such line the label is `Mac`. With an invalid value (for example `machine: my mac`) the label is also `Mac`, and the log gets one warning per run. `--install` adds `machine: Mac` to a conf that lacks the line and keeps any value already there; because of the new line, the first re-install after this update rewrites the conf once (with a backup). `Scripts/datawizard-sync-setup.md` and `Guides/Git Guide/10.0 Commit Guards.md` describe both changes.
+- `Guides/Multi-Instance Coordination Patterns.md`, Pattern 3 step 3: for a runbook an operator pastes into a terminal, the reviewer rehearses it on a copy, writes every number the operator will see into each step with a STOP condition, and checks the live run against those numbers. `Skills/supervised-build` v1.5.2 (Reviewer Steps): check scripts for the operator travel as vault files with a sha256 to compare, never as pastes. `SKILLS.md` synced.
+
+**Propagation:** `update_seed.sh` for zip installs. Then re-run `datawizard-sync.sh --install` (or `install-git-hooks.sh` in each repo) to pick up the new hook. Repos that keep the hook in a tracked `.githooks/` folder (Weave) need that copy updated in the repo. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
 ## What's New in 1.10.1
 
 **Patch release: DW Save refuses to publish secret files, and the Seed history is clean.** One DataWizard session (2026-10-17). Shipped in the Seed:
 
-- `Scripts/datawizard-sync.sh` (DW Save): a secret-file guard. Before committing, and again right before pushing, each repo is checked for `*.session` / `*.session-journal`, `.env` and `.env.*` (except `.example`, `.sample`, `.template`), anything under `Scripts/output/`, and `Vault Config.md` (including copies such as `Vault Config.md.<suffix>`); upper and lower case count as the same. It checks the staged files and every local commit not yet pushed. A hit blocks that repo (other repos still save), names the file and the fix on the status card, and never unstages or deletes anything; if the check itself cannot run, the repo is blocked too. The pattern list lives in one function, `is_secret_path`. `Scripts/datawizard-sync-setup.md` describes it. Operators running a `~/Scripts` copy: re-run `datawizard-sync.sh --install` to point the hotkey and the scheduled job at the Seed copy.
+- `Scripts/datawizard-sync.sh` (DW Save): a secret-file guard. Before committing, and again right before pushing, each repo is checked for `*.session` / `*.session-journal`, `.env` and `.env.*` (except `.example`, `.sample`, `.template`), anything under `Scripts/output/`, and `Vault Config.md` (including copies such as `Vault Config.md.<suffix>`); upper and lower case count as the same. It checks the staged files and every local commit not yet pushed. A hit blocks that repo (other repos still save), names the file and the fix on the status card, and never unstages or deletes anything; if the check itself cannot run, the repo is blocked too. The pattern list is owned by one function, `is_secret_path`; since 1.10.2 the commit guard holds a verbatim copy, kept identical by a drift test. `Scripts/datawizard-sync-setup.md` describes it. Operators running a `~/Scripts` copy: re-run `datawizard-sync.sh --install` to point the hotkey and the scheduled job at the Seed copy.
 - History rewrite (see the NOTICE above) and placeholder examples in `Scripts/tg_harvest_thread.py`, `Guides/Telegram Harvesting.md` and `Scripts/datawizard-aliases.sh`.
 - `Guides/Git Guide/7.0 Safety and Recovery.md`: Step 4 names the 2026-10 rewrite signature, the file-diff gate for local work, the `reset --keep` then `stash pop` path, and what a pre-1.10.1 DW Save shows on an old clone (`could not reach GitHub`, nothing pushed).
 
-Not yet covered: the commit guard (`Scripts/hooks/pre-commit`) has no secret check, so a manual `git commit` plus `git push` outside DW Save is not stopped.
+Not yet covered: the commit guard (`Scripts/hooks/pre-commit`) has no secret check, so a manual `git commit` plus `git push` outside DW Save is not stopped. *(Covered since 1.10.2: the commit guard now has the same check.)*
 
 **Propagation:** `update_seed.sh` for zip installs; git clones follow the NOTICE. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
@@ -269,143 +296,9 @@ BOM-less `.ps1` is a parse-time landmine on Windows.
 
 **New: `Seed/Templates/Operator Gate Queue - Template.md`** - a depersonalized starter queue (classes A-F, Parked, Deployed, one example row), cataloged in GUIDES.md. First template in the new `Seed/Templates/` folder.
 
-## What's New in 1.5.0
+## Older releases
 
-**supervised-build skill (new).** The Coordination Patterns guide's Pattern 4 - the per-chunk review relay between a build session and a reviewer instance - codified as a skill after four field runs (the guide's own codify-on-second-use rule, overdue by two). One `SKILL.md`, two seats: the build session gets the **review gate as a hard step** (before writing chunk N, a `status: reviewed` note covering it must exist in Session Exchange; if absent, pause and ask - skipping review is a conscious operator choice on the record, never a silent omission), and the reviewer gets the verification discipline (verify on disk, never from reports; test shipped scripts by *running* them on scratch fixtures outside the vault; ask for the class rule, not the special-case fix) plus the **mandated State Board write**: a fixed five-field block (status / verified / next_gate / turn / blocking) updated after every delivered review, so a fresh instance can answer "where are we at on this arc" from the driver doc alone. The guide keeps the rationale and the transport conventions and now points at the skill; the field shape lives in the skill.
-
-## What's New in 1.4.0
-
-**Synthesis provenance - Phase 1: block citation extends to all generated docs.** Block-level citation (D112) now spans every document generated under DW protocols, not only companion notes - design docs, reports, decision entries, session-log entries, exchange reviews, and Seed plants. Granularity follows the **evidence unit, not the document class**: a paragraph or turn takes a block stamp (`^bN`/`^tN`), a whole section takes a section anchor.
-
-- **Conventions Registry** citation section gains generated-docs + obligation tiers, evidence-vs-edit-provenance-root (two syntaxes, one meaning each), the reach rule and metadata exemption (a stamp does not bump `updated:` or `edit_log`), block-ID tolerance (reuse any trailing block ID, human-minted included), and "Seed text may carry block IDs."
-- **block-stamper skill v2**: the non-source exclusion is retired for the evidence-unit rule; adds reach, stamp-before-cite, verify-after-claim collision guard, ID tolerance, the metadata exemption, and the script handoff.
-- **`Scripts/stamp_blocks.py`** (new): an on-cite block stamper - byte-faithful (append to the target line only), stdlib, Python 3.8+, with `--manifest`/`--file`/`--dry-run`/`--verify`, atomic write, and BOM handling. The batch executor twin of the skill; runs natively in Claude Code / GitHub Actions and through the device shell under Cowork. Regression fixtures ship beside it in the consuming vault's test area.
-  Block boundaries follow CommonMark element starts (heading, fence, rule, setext underline, blockquote, table row, list item), so prose directly above any of them is stamped on its own last line, never on the structural line; outcomes report the target line (`@L<n>`) because `--verify` confirms only that an ID landed where intended, not that the intended line was right.
-
-No protocol or Project Instructions change. The extension is recorded as decision entries in the consuming vault; Phase 2 (an outward-facing one-pager as the first production customer) is the next phase.
-
-## What's New in 1.3.1
-
-**Auto-sync self-overwrite fix (`update_seed.sh`).** The updater
-replaced itself on disk mid-run: the zip-mode `cp` and the git-mode
-`merge --ff-only` both overwrite `update_seed.sh` while bash is still
-reading it by byte offset, so execution resumed inside the freshly
-written file -- surfacing as a spurious `UNINSTALL_AUTOSYNC: unbound
-variable` at line 122 (the tell: the "Downloading..." message printed
-first, the line-122 error arrived after). Fixed by wrapping the whole
-script body in a `main()` function invoked on the last line, so bash
-parses to EOF before any file-replacing command runs -- removing the
-dependence on file size entirely. Diagnosed by Tree's instance
-(DreamVault), 2026-08-20. The bash-only fix is version-gated behind
-this 1.3.1 bump so zip-mode installs (which skip when versions match)
-actually pick it up. Note: the *last* run of an old unwrapped script --
-the one that copies 1.3.1 into place -- still crashes on its own bug
-mid-copy (a one-time syntax error, and no sync-log line for that run).
-That is expected and self-correcting: the Seed is already at 1.3.1, and
-the next run (the new script) clears `/tmp` and logs "Already current."
-
-**Zip-over-git self-heal.** A clone that a past zip-mode run copied
-over without committing is left dirty-but-byte-identical to
-`origin/main`, and the git-mode dirty guard then skipped forever
-(exit 3, every run, no sync log ever written). The updater now fetches
-first and, when the tree is dirty but provably lossless to reset (no
-local commits ahead AND working tree already equal to `origin/main`),
-self-heals with `git reset --hard origin/main`. Genuine local edits
-are still refused -- now with the recovery command named in the
-SKIPPED message.
-
-`update_seed.ps1` needed no change: PowerShell parses the whole script
-before executing (no self-overwrite), and it already refuses zip-sync
-on a git clone.
-
-## What's New in 1.3.0
-
-**Team flags are deliverable as of this release.** The Flag Surfacing
-Chain Phase 1 (read side) ships the machinery that surfaces `flag_for`
-items to their addressees -- a system previously measured at 0% delivery
-because only the write side existed.
-
-- **Flag ship date: 2026-08-18.** The session-closer's flag expiry pass
-  (Step 3.13) applies ONLY to flags set on or after this date. Flags
-  that predate it are a pre-existing backlog: triage them in a dedicated
-  session, never mass-expire them (they were set when delivery was
-  broken -- expiring them as "unread" would falsify the record).
-- **Project Instructions v4.6** -- new Orientation Step 6: the unified
-  orientation sweep (flag sweep on multi-operator projects, stale-stub
-  reconciliation, intake what's-new) with an unconditional compliance
-  trace written into the claim stub. **Re-paste required:** copy the
-  updated PI from `Seed/DataWizard Project Instructions.md` into each
-  project's Cowork Settings (or refresh your CLAUDE.md import) --
-  instruction shipped is not instruction loaded, and an operator whose
-  surface still runs v4.5 has no working flag delivery. Instances: the
-  version-mismatch protocol below handles the prompt.
-- **YAML Schema Section 4** reconciled to the `flag*` cluster as
-  canonical (`team_attention*` deprecated, mapping included); new
-  `flag_due` / `flag_default` / `flag_status` fields and a `flag_note`
-  content requirement.
-- **session-closer v4.6.0** -- flag anatomy at set-time, 2-3 flag
-  budget per close, the expiry pass (sole automatic writer of
-  `expired-unread`), sweep-trace carry-forward, and the lean approval
-  gate (write directly for routine closes; three judgment-class
-  stop-and-asks kept).
-- **Three new/updated guides:** `Orientation Flag Sweep - Query Spec`
-  (the sweep query, four corrections, named constants),
-  `Team Attention Rollout` (per-person canary live test, four-branch
-  diagnosis tree, executor chain -- read this before turning flags on
-  in a team project), and `Flag Queue Page Template` (per-person
-  Dataview queue page, empty-due-last sort).
-
-## What's New in 1.2.0
-- One-command Seed auto-sync: `update_seed.sh --install-autosync` (Mac,
-  launchd) / `update_seed.ps1 -InstallAutosync` (Windows, Task Scheduler).
-  Daily check at 6:00 (configurable via --hour / -Hour) plus at login,
-  with catch-up when the machine wakes - it does not need to be awake at
-  the scheduled hour. Remove with --uninstall-autosync / -UninstallAutosync.
-- update_seed.sh is now git-clone aware: a cloned Seed syncs via
-  git fetch + fast-forward merge and is never clobbered when local
-  edits or local commits exist (skip is logged instead).
-- Upstream guard: a `seed_role` row containing `upstream` in Vault
-  Config.md makes both scripts refuse to sync or install auto-sync
-  (protects the maintainer's Seed, which pushes rather than pulls).
-- session-closer v4.5.0: at close, the orientation stub is overwritten
-  in place with the final entry and renamed (write + move) instead of
-  deleted - no more destructive-op permission prompt for the stub.
-- Seed Install and Update guide rewritten around the one-command
-  auto-sync flow; README Updating section points to it.
-
-## What's New in 1.1.1
-- SECURITY: .gitignore now excludes Telegram harvester artifacts
-  (Scripts/.env, Scripts/*.session, Scripts/output/) and
-  task-manager-config.md (user-specific paths)
-- task-manager-config.md removed from the repo and its history
-  (history rewrite -- see NOTICE above)
-- update_seed.sh moved to Seed root and vault-root detection fixed;
-  install commands now copy dotfiles correctly (cp ... /. not /*)
-- README updating/orientation claims corrected (no GitHub fetch during
-  orientation; updates are user-initiated)
-- Telegram Harvesting guide: credential notes must live outside
-  git-tracked folders (e.g. a vault-root _Private/ folder)
-
-## What's New in 1.1.0
-- Meta-folder convention: `_` prefix replaces `~` for Sections, Archive, Infrastructure (D71)
-- `- ProjectName` suffix on meta-folders for vault-wide search disambiguation (D71)
-- Shells live in domain folders, not project root (D72)
-- No Roman numerals in section headers (D73)
-- Project-prefix convention for domain folders (D74)
-- Per-document session log naming: `0.01 Session Log - [Doc Name].md` (D75)
-- Protocol Summary v2.6 with clear shell + section architecture explanation
-- Vault Bootstrap folder template updated with new structure
-- Archiving protocol updated for `_Archive - ProjectName/`
-- Shell + section recommended phrasing added to Vault Bootstrap for 0.0 files
-
-## What's New in 1.0.0
-- Local-first distribution: Seed installs directly into your vault
-- update_seed.sh: one-command install and update with verification
-- Project Instructions v3.0: local-first, 40 lines down from 80
-- Safe Characters rule added to Working Rules (rule 9)
-- Semantic Seed versioning with What's New summaries
-- README rewritten with local-first install flow
-- Backup prompted as part of install
+The What's New entries for 1.0.0 to 1.5.0 are in `VERSION History.md` (moved there word for word, 2026-10).
 
 ## Versioning
 
