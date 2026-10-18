@@ -6,12 +6,82 @@ updated: 2026-10-18
 operator: Andrew
 origin: DW-S421 2026-10-18 - What's New entries 1.0.0 to 1.5.0 moved from VERSION.md word for word (size rotation, archivist rule)
 edit_log:
+  - DW-S422 2026-10-18 - What's New 1.6.0 to 1.6.2 moved in from VERSION.md word for word (size rotation before 1.11.0)
   - DW-S421 2026-10-18 - created
 ---
 
 # VERSION History
 
 Older "What's New" entries of the Seed, moved here from `VERSION.md` word for word. The current version and the newer entries are in `VERSION.md`. When `VERSION.md` passes about 50 KB again, move its oldest entries to the top of the list below, newest first, and leave the pointer in `VERSION.md`.
+
+## What's New in 1.6.2
+
+**Fork-topology guard (`update_seed.sh`).** Git mode now verifies that
+`origin` points at the canonical repo (owner AND repo name matched by URL,
+https or ssh form, case-insensitive) before trusting any origin-based
+comparison. Previously a clone whose origin was a fork was measured against
+the fork alone: a fork-synced clone reported "Already current" while
+releases behind canonical (field-confirmed on a collaborator clone stuck at
+1.1.1 for months), and two error messages prescribed
+`git reset --hard origin/main` - the exact command that rolls a fork-shaped
+clone back to the fork's stale state (demonstrated live on the audit
+fixture: 1.6.0 -> 1.2.0). Now:
+
+- Fork-shaped clones get a WARNING naming the actual canonical remote (or
+  its absence), and the script also fetches canonical to measure real
+  staleness.
+- The staleness report is honest: "in sync with your FORK (origin), but N
+  commit(s) behind the canonical Seed repo", exit 3 - never a false
+  "Already current". A fork clone that IS current with canonical still
+  exits 2, with a note.
+- All four recovery messages (dirty tree, failed self-heal, ahead-of-origin,
+  failed fast-forward) point at Git Guide 7.0 "Recovering a Seed Clone
+  (Remote-Agnostic)" instead of prescribing reset commands - reset-as-
+  default-verb is retired from the script's entire error surface.
+- The zip-over-git self-heal is explicitly restricted to canonical-origin
+  clones.
+
+No remote is ever auto-repointed; all guards still fail closed. Audited in
+DW S318 (run-don't-read fixture audit), built and fixture-verified in DW
+S333 (nine-scenario regression matrix incl. ssh-form URLs, fork-owner
+anchoring, the canonical self-heal, and the upstream guard).
+`update_seed.ps1` needs no change - it refuses git clones entirely.
+
+## What's New in 1.6.1
+
+**Windows updater unbroken (`update_seed.ps1`).** A single em dash on the
+sync-log line made the entire script unparseable under Windows PowerShell
+5.1: with no BOM, PS 5.1 reads `.ps1` files as ANSI, the em dash's bytes
+(E2 80 94) decode to `a`+`euro`+curly-quote, and PowerShell accepts curly
+quotes as string delimiters - the literal closes early and the parse
+collapses. Shipped broken in 1.2.0 (2026-08-15), so **no Windows operator
+has been able to run any Seed update or install auto-sync since** -
+silently (a script that never parses writes no Sync Log line). Diagnosed
+by Jay's instance (WV_2026-09-02_JC_02); verified byte-level on the
+maintainer clone (DW S325).
+
+**IMPORTANT - Windows installs at 1.6.0 or below cannot self-update to
+get this fix** (the broken script IS the update path). One-time manual
+re-download, from the vault root in PowerShell:
+
+    Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/andrewalan11/DataWizard/main/update_seed.ps1 -OutFile "_DataWizard\Seed\update_seed.ps1"
+
+then run the updater normally (add `-InstallAutosync` if the
+"DataWizard Seed Update" scheduled task was never created).
+
+**All Seed shell scripts are now pure ASCII.** Em dashes in
+`update_seed.sh` and `Scripts/datawizard-*.sh` replaced too - cosmetic
+there (bash tolerates UTF-8), but the same defect class. Standing rule:
+scripts that ship in the Seed stay ASCII-only; a non-ASCII byte in a
+BOM-less `.ps1` is a parse-time landmine on Windows.
+
+## What's New in 1.6.0
+
+**Operator Gate Queue codified.** The deployment-gate tracker - built-or-decided work waiting on a specific actor to bring it live - graduates from pilot to canon after two full exit ceremonies in the field. The **Conventions Registry** gains three entries: **Operator Gate Queue** (lifecycle vocabulary `designed -> built -> installed -> verified-live`, parser-first G-row schema, feeding-at-close, verify-a-gate's-live-state-before-working-it, the exit ceremony into the project registry), **Active Threads ledger row schema** (seven fields; `next:` holds current state only, ~5 lines, pointing at the driver doc or State Board - link-don't-restate applied to the ledger itself), and **Model routing** (the single home for the tier heuristic: high-capability default; highest tier for synthesis, audits, reviews, canon writes; fast tier for mechanical batches) - plus a deployment-gate row in the Tracking Model fact-class table.
+
+**session-closer v4.7.0**: Step 4 gains the gate-queue feeding bullet (anything built but not verified-live gets a gate row when the actor is specific; `unverified` is named honestly, never pending-success); Step 4.5's model line points at the Registry instead of restating the heuristic; Step 2.6 handles sectioned ledgers (a shell of per-arc embed files - patch the arc's file, never the shell).
+
+**New: `Seed/Templates/Operator Gate Queue - Template.md`** - a depersonalized starter queue (classes A-F, Parked, Deployed, one example row), cataloged in GUIDES.md. First template in the new `Seed/Templates/` folder.
 
 ## What's New in 1.5.0
 

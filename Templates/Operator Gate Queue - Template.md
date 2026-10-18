@@ -1,11 +1,12 @@
 ---
 created: 2026-08-31
 edit_log:
+  - 2026-10-18 - F class points rulings and small operator tasks to the Waiting-on checklist (Seed 1.11.0; DataWizard)
   - 2026-08-31 - created (Operator Gate Queue codification; DataWizard)
 status: active
 title: Operator Gate Queue - Template
 type: template
-updated: 2026-08-31
+updated: 2026-10-18
 ---
 *The single cross-project queue of deployment gates - things that are built (or decided) and waiting on a specific actor to bring them live. One file per deployment (the primary project hosts it; it covers all projects). Schema, lifecycle vocabulary (`designed -> built -> installed -> verified-live`), feeding rule, and exit ceremony are canonical in the Conventions Registry's **Operator Gate Queue** entry - read that entry before working this file.*
 
@@ -31,6 +32,8 @@ Wire this file as the third layer of the project's 0.5 action-items shell (embed
 ## E - Waiting on people
 
 ## F - Stale micro-items
+
+*Since Seed 1.11.0, rulings and small operator tasks go on the project's Waiting-on checklist (Conventions Registry, "Tracking Model"); this class holds only built or decided items.*
 
 ## Parked
 

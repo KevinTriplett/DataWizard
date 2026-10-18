@@ -11,6 +11,8 @@
 # Created: DW-S179 2026-06-12 (P2, per D89/D84)
 # DW-S388 2026-10-06: infrastructure_types + exchange-note, coordination-board,
 #   coordination-board-archive (T20 Chunk 3; no taxonomy_version bump)
+# DW-S422 2026-10-18: infrastructure_types + protocol-section, skill-reference
+#   (Registry and session-closer sectioning; no taxonomy_version bump)
 
 meta:
   taxonomy_version: "2.7"
@@ -102,10 +104,12 @@ infrastructure_types:
   bug-report: "Bug report"
   skill-request: "Request for a new or changed skill"
   skill: "SKILL.md files and skill definitions"
+  skill-reference: "Reference file under a skill's references/ folder (progressive disclosure; moved verbatim from SKILL.md)"
   guide: "How-to and onboarding guides"
   guide-section: "Section file of a sectioned guide (shell + sections pattern)"
   quest: "Quest files (TMS)"
   protocol: "Protocol documents"
+  protocol-section: "Section file of a sectioned protocol (shell + sections pattern)"
   scan-report: "Vault scans, audits, lint reports, triage worklists"
   processing-report: "Pipeline/enrichment run reports"
   config: "Machine-readable or config-carrying docs"

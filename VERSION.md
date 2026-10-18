@@ -1,5 +1,5 @@
 
-seed: 1.10.3
+seed: 1.11.0
 protocol: 1.8
 project_instructions: 4.9
 
@@ -72,6 +72,34 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.11.0
+
+**Minor release: open items must land on a list.** One DataWizard session (2026-10-18). Two look-backs over 53 session logs found that about one open item in three was not where the next reader would look: it had faded out of "What's next", or it lived only inside a handoff or design doc, or a done parent line hid it. This release closes those gaps at moments that already exist (the close, the chunk done-mark, the moment a document is written). Shipped in the Seed:
+
+- `Skills/session-closer` v4.11.0: Step 4's optional "Action items" bullet is now the required **landing rule**. The closer re-reads the previous "What's next"; each item ends done (struck, with where it landed), carried (it is in the new "What's next"), or landed on a tracking list (a Backlog line, gate row, board ask or ledger row), and the entry quotes that line - its file and its title, id or first few words. "Queued in X" without the quoted line is not allowed. Rulings and small tasks for the operator go to one dated `Waiting on <operator>` checklist, never to a paragraph in "What's next". The rule applies at every close tier (Step 0's lite list names it). Step 2.6: the ledger `next:` is written as the arc's owed list, current state only. Step 3.5: new **tracking-claim verification** - every "tracked in / queued in / see `<list>`" claim must resolve to a line on disk, checked like a planted learning. New Common Mistakes bullet. `references/output-format.md`: the What's next template starts with a **Landing check** line and a **Waiting on `<operator>`** pointer line. `references/changelog.md`: the v4.10.0 edit_log line moved in from the frontmatter (rolling window).
+- `Protocols/Conventions Registry/23.0 Tracking Model.md`: four sub-rules - **follow-ups are born on a list** (a handoff, exchange note, pre-flight answer, build-plan limits list or design doc that names a follow-up writes its Backlog line or board ask at the same moment and keeps only a pointer); **parents do not close over open children**; **no new Unlocks in design docs** (the State Board plus a Backlog line do that job; existing lists stay as history); **rulings and small tasks for the operator** live on one dated Waiting-on checklist. One new fact-class row for that checklist.
+- `Protocols/Conventions Registry/24.0 Active Threads ledger row schema.md`: `next:` is the owed list (one short line per item the arc still owes), not a narrative; the example is in list form.
+- `Skills/supervised-build` v1.6.0: at each chunk's done-mark (Builder Step 5), every leftover - a deferred item, a known limit, a follow-up the chunk names - becomes its own tracking line before the chunk is marked done, and the chunk report quotes the lines; the reviewer checks they exist (Reviewer Step 2); in the in-thread variant the done-mark is the lead's.
+- `Guides/Cowork Build Environment/8.1 Device Bridge - Staging, Commits and Transport.md`: an outputs file edited after the copy can commit as its pre-edit (or part-edited) copy on the FIRST commit, not only on path re-use (4 of 13 files in one run); write the final version to a fresh outputs path, commit, then compare the on-disk size or checksum with the local copy.
+- `Templates/Operator Gate Queue - Template.md`: class F holds only built or decided items; rulings and small operator tasks go on the Waiting-on checklist (the Tracking Model gives the test).
+- `SKILLS.md`: session-closer and supervised-build rows synced.
+
+**Adopters:** the landing rule needs a home for the `Waiting on <operator>` checklist in each project. Pick one - typically a section of your action items or backlog - and move any "rulings waiting" paragraphs from your last "What's next" into it (one dated line per item, with its source session). If a project has none yet, the closer asks the operator where it goes at the first close that needs it (with no answer at hand, it opens one as a section at the end of the action items file and says so). An orientation sub-check that shows the checklist's count and oldest item waits for a later Project Instructions bump. Closes take one to three minutes longer; lite closes run the landing rule too.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.10.4
+
+**Patch release: the Conventions Registry and the session-closer skill are sectioned. No rule changed.** One DataWizard session (2026-10-18). Both files were past the ~50 KB line where vault tools turn unreliable. Text moved byte for byte; a reassembly check matched the originals exactly. Shipped in the Seed:
+
+- `Protocols/Conventions Registry.md` is now a short shell (frontmatter, intro, a navigation paragraph, 37 `![[embeds]]`) plus one section file per entry in `Protocols/Conventions Registry/` (`1.0 Link, don't restate.md` .. `37.0 Intake capture placement.md`). Two file names drop a character that is not filename-safe: `4.0 Operator personal - scratch folders.md` and `19.0 Provenance - by and via.md` (the H1 keeps the original). Cite an entry by name as before (Conventions Registry, "Entry name"). Through the Obsidian MCP an embed does not expand: open the section file. Edit the section file, never the shell. Block ids travel with their entries (`^b42` is in `30.0 Carry the probe, not the snapshot`, `^b43` in `36.0 Attention requests live in the flag cluster, not banners`).
+- `Skills/session-closer` v4.10.4: SKILL.md keeps every step (0 to 5), the step numbers, `name` and `description`. Long, seldom-used blocks moved word for word into `Skills/session-closer/references/` (progressive disclosure, not embeds, because skill loaders do not expand embeds): `output-format.md` (entry templates; read at Step 2), `multi-operator-flags.md` (Step 3.12 team flag prompt, Step 3.13 flag expiry pass), `no-ledger-roster.md` (Step 2.6 roster for projects with no ledger), `action-items-triage.md` (periodic triage), `changelog.md` (older edit_log lines, kept). Each step that needs a reference file says so. SKILL.md drops from about 60 KB to about 42 KB. `SKILLS.md` row synced.
+- `Protocols/Content Type Taxonomy.md` and `Config/taxonomy.yaml`: infrastructure types `protocol-section` and `skill-reference` registered.
+
+**Adopters:** a `[[Conventions Registry#Heading]]` or `[[Conventions Registry#^blockid]]` link in your own notes no longer resolves (headings and block ids now live in the section files): repoint it to the section file, for example `[[30.0 Carry the probe, not the snapshot#^b42]]`. Plain `[[Conventions Registry]]` links and name citations keep working. Find them in a Terminal at the vault root: `grep -rn "Conventions Registry#" --include="*.md" .`
+
+**Propagation:** `update_seed.sh` (it copies the new folders). No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.10.3
 
@@ -227,78 +255,9 @@ The tooling stays in the maintainer's workshop until a second vault runs it with
 
 **Propagation:** the Seed files reach every vault through `update_seed.sh`; the orientation sub-check reaches each project only through a per-project re-paste of the Project Instructions (required; tracked as a gate row at close).
 
-## What's New in 1.6.2
-
-**Fork-topology guard (`update_seed.sh`).** Git mode now verifies that
-`origin` points at the canonical repo (owner AND repo name matched by URL,
-https or ssh form, case-insensitive) before trusting any origin-based
-comparison. Previously a clone whose origin was a fork was measured against
-the fork alone: a fork-synced clone reported "Already current" while
-releases behind canonical (field-confirmed on a collaborator clone stuck at
-1.1.1 for months), and two error messages prescribed
-`git reset --hard origin/main` - the exact command that rolls a fork-shaped
-clone back to the fork's stale state (demonstrated live on the audit
-fixture: 1.6.0 -> 1.2.0). Now:
-
-- Fork-shaped clones get a WARNING naming the actual canonical remote (or
-  its absence), and the script also fetches canonical to measure real
-  staleness.
-- The staleness report is honest: "in sync with your FORK (origin), but N
-  commit(s) behind the canonical Seed repo", exit 3 - never a false
-  "Already current". A fork clone that IS current with canonical still
-  exits 2, with a note.
-- All four recovery messages (dirty tree, failed self-heal, ahead-of-origin,
-  failed fast-forward) point at Git Guide 7.0 "Recovering a Seed Clone
-  (Remote-Agnostic)" instead of prescribing reset commands - reset-as-
-  default-verb is retired from the script's entire error surface.
-- The zip-over-git self-heal is explicitly restricted to canonical-origin
-  clones.
-
-No remote is ever auto-repointed; all guards still fail closed. Audited in
-DW S318 (run-don't-read fixture audit), built and fixture-verified in DW
-S333 (nine-scenario regression matrix incl. ssh-form URLs, fork-owner
-anchoring, the canonical self-heal, and the upstream guard).
-`update_seed.ps1` needs no change - it refuses git clones entirely.
-
-## What's New in 1.6.1
-
-**Windows updater unbroken (`update_seed.ps1`).** A single em dash on the
-sync-log line made the entire script unparseable under Windows PowerShell
-5.1: with no BOM, PS 5.1 reads `.ps1` files as ANSI, the em dash's bytes
-(E2 80 94) decode to `a`+`euro`+curly-quote, and PowerShell accepts curly
-quotes as string delimiters - the literal closes early and the parse
-collapses. Shipped broken in 1.2.0 (2026-08-15), so **no Windows operator
-has been able to run any Seed update or install auto-sync since** -
-silently (a script that never parses writes no Sync Log line). Diagnosed
-by Jay's instance (WV_2026-09-02_JC_02); verified byte-level on the
-maintainer clone (DW S325).
-
-**IMPORTANT - Windows installs at 1.6.0 or below cannot self-update to
-get this fix** (the broken script IS the update path). One-time manual
-re-download, from the vault root in PowerShell:
-
-    Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/andrewalan11/DataWizard/main/update_seed.ps1 -OutFile "_DataWizard\Seed\update_seed.ps1"
-
-then run the updater normally (add `-InstallAutosync` if the
-"DataWizard Seed Update" scheduled task was never created).
-
-**All Seed shell scripts are now pure ASCII.** Em dashes in
-`update_seed.sh` and `Scripts/datawizard-*.sh` replaced too - cosmetic
-there (bash tolerates UTF-8), but the same defect class. Standing rule:
-scripts that ship in the Seed stay ASCII-only; a non-ASCII byte in a
-BOM-less `.ps1` is a parse-time landmine on Windows.
-
-## What's New in 1.6.0
-
-**Operator Gate Queue codified.** The deployment-gate tracker - built-or-decided work waiting on a specific actor to bring it live - graduates from pilot to canon after two full exit ceremonies in the field. The **Conventions Registry** gains three entries: **Operator Gate Queue** (lifecycle vocabulary `designed -> built -> installed -> verified-live`, parser-first G-row schema, feeding-at-close, verify-a-gate's-live-state-before-working-it, the exit ceremony into the project registry), **Active Threads ledger row schema** (seven fields; `next:` holds current state only, ~5 lines, pointing at the driver doc or State Board - link-don't-restate applied to the ledger itself), and **Model routing** (the single home for the tier heuristic: high-capability default; highest tier for synthesis, audits, reviews, canon writes; fast tier for mechanical batches) - plus a deployment-gate row in the Tracking Model fact-class table.
-
-**session-closer v4.7.0**: Step 4 gains the gate-queue feeding bullet (anything built but not verified-live gets a gate row when the actor is specific; `unverified` is named honestly, never pending-success); Step 4.5's model line points at the Registry instead of restating the heuristic; Step 2.6 handles sectioned ledgers (a shell of per-arc embed files - patch the arc's file, never the shell).
-
-**New: `Seed/Templates/Operator Gate Queue - Template.md`** - a depersonalized starter queue (classes A-F, Parked, Deployed, one example row), cataloged in GUIDES.md. First template in the new `Seed/Templates/` folder.
-
 ## Older releases
 
-The What's New entries for 1.0.0 to 1.5.0 are in `VERSION History.md` (moved there word for word, 2026-10).
+The What's New entries for 1.0.0 to 1.6.2 are in `VERSION History.md` (moved there word for word, 2026-10).
 
 ## Versioning
 
