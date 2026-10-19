@@ -6,6 +6,7 @@ created: '2026-06-15'
 updated: 2026-10-19
 operator: Andrew
 edit_log:
+  - 'DW-S427 2026-10-19 - tool behaviors B-0190 (a one-time run can start late; fire_trigger text runs the task twice; page-started runs reach the artifact store but only maybe the vault; Obsidian MCP works in a timed run when the device shell shows no folders; store writes need no approval)'
   - 'DW-S424 2026-10-19 - folders not attached unless passed; one-time test run of the exact prompt'
   - 'DW-S408 2026-10-15 - board intake plant: delete-permission prompt waits for a human even in an auto-approved task; touch + rm probe instead (Holonic Canvas)'
   - 'DW-S403 2026-10-13 - Requirements: append-only run log, a launch can start twice (board intake B-0065, Kosmosis)'
@@ -40,6 +41,8 @@ A scheduled task runs on a single model for its entire run; it cannot switch mod
 
 Tasks fire with up to roughly 8 minutes of jitter past their cron time. Hourly cadence held reliably across 7 consecutive runs. Do not design tasks that assume firing exactly on the minute, or that two tasks scheduled close together fire in a guaranteed order; space dependent tasks apart. (S165)
 
+**A one-time run (`run_once_at`) can start late too.** One set for 12:21 UTC fired at 12:28 UTC, and `next_run_at` still read 12:21 while the run waited. Poll for several minutes before calling a timed run missing. (MetaMyth, 2026-10; seen once)
+
 ## Requirements for reliable unattended automation
 
 A task that runs without a human in the loop needs all of:
@@ -58,7 +61,11 @@ A task that runs without a human in the loop needs all of:
 - **`list_triggers` returns every task's full prompt inline** - enough to overflow the tool-result cap on an account with many tasks. Query the saved tool-result file with `jq` or Python instead of reading it inline. (DataWizard, 2026-10)
 - **A task created with `requires_local_device` binds to that computer at creation and defaults to `permission_mode: auto`** (the create result says so). Decide at creation whether the task needs the computer; for what happens when it is absent at fire time, see Other known failure modes. (Holonic Canvas, 2026-10)
 - **A task created without `folders` gets no folders, even when the creating conversation has folders connected.** The create result shows `folders_state: FOLDERS_STATE_NONE`; the run can still reach the vault through the Obsidian MCP, but a file write to another folder (`device_commit_files`, the device shell) has no target. Pass `folders` explicitly at creation (with `requires_local_device`) and check the result says `FOLDERS_STATE_PRESENT`. (DataWizard, 2026-10)
+- **In a timed run, the Obsidian MCP can write the vault while the device shell reports no connected folders.** Even with `folders` set at creation, one task found "no connected folders" in the device shell, yet appended to a vault note through `write_note` in append mode. Have the task prompt load the Obsidian tools with an exact `select:` list in ToolSearch and use them for vault writes, not the device shell. (MetaMyth, 2026-10; seen once)
 - **Test a new task with a one-time copy of its exact prompt** (`run_once_at` a few minutes out, plus a test-only line such as a forced input window). It runs in the real harness - approvals, sub-agent model choice, folders, the device shell - which an interactive run in your own session does not test. Snapshot the files the task must not touch first (size and modification time) and compare after. (DataWizard, 2026-10)
+- **`fire_trigger` with `text` makes the run work twice.** The task prompt runs as the first turn, then the `text` arrives as a second user turn, and the run repeated all its steps (two log lines and two store documents per start, one without the text and one with it). Start runs without `text`, and write the prompt so every step is safe to repeat (see the idempotency requirement above). (MetaMyth, 2026-10; seen once)
+- **A run started from a published page reached the artifact store every time, but the vault only sometimes.** Four page-started runs of one test task (`requires_local_device`, `folders` set) wrote no vault file, while a later page-started run of a different task did, through the Obsidian MCP. Treat vault access on a page-started run as unproven and let the task test it on each run. How a page starts a task: **Published Artifacts and ArtifactData Behaviors**, Page runtime calls. (MetaMyth, 2026-10; seen once)
+- **Scheduled runs wrote the artifact store with no human approval.** `ArtifactData` `set` and `batch` went through in runs with `permission_mode` auto. (MetaMyth, 2026-10; seen once)
 
 ## Other known failure modes
 

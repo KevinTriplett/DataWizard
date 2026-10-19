@@ -1,5 +1,5 @@
 
-seed: 1.11.4
+seed: 1.11.6
 protocol: 1.8
 project_instructions: 4.9
 
@@ -72,6 +72,30 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.11.6
+
+**Patch release: 9 tool behaviors from two partner projects (LocationScout, MetaMyth).** One DataWizard session (2026-10-19). Of the 12 behaviors sent, 3 were not planted: two were facts about particular public data sources (they stay in the project that found them) and one was already in the guides. Shipped in the Seed:
+
+- `Guides/Cowork Scheduled Tasks.md`: a one-time (`run_once_at`) run can start about seven minutes late; `fire_trigger` with `text` makes the run work twice; a run started from a published page reached the artifact store every time but the vault only sometimes; in a timed run the Obsidian MCP wrote the vault while the device shell showed no folders (load the tools with an exact `select:` list); scheduled runs wrote the artifact store with no approval.
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`, "Page runtime calls": a page can start a scheduled task through the `mcp` capability (the task's owner only; gate the button with `user.isOwner()`); count every live subscription before checking the `db` cap (64 per view).
+- `Guides/Cowork Build Environment/5.0 Network and GitHub Data.md`: the device shell failed on Overpass too (HTTP 406, then a timeout); a `fetch` POST from a Chrome tab on `overpass-turbo.eu` worked; one sub-agent got through only on two mirrors after retries. `8.2 Device Bridge - Sub-agents and Orchestration.md`: web-only research sub-agents ran in parallel without the shared-Chrome problem.
+- `Guides/Chrome MCP and Web Tool Behaviors/`: 2.0 (reduce the data in the page before slicing it); 10.0 (the `[BLOCKED: Cookie/query string data]` result also fires on plain text that looks like query parameters; replace `[&=?%]` with spaces).
+- `GUIDES.md`: the Cowork Scheduled Tasks and Published Artifacts rows list the new topics.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.11.5
+
+**Patch release: 8 tool behaviors from three partner projects (ReWoven, MetaMyth, Rootland).** One DataWizard session (2026-10-19). Shipped in the Seed:
+
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`: the side-panel window a published page opens in (about 780-900 px wide) and a fit pass for fixed-size pages; `sample` takes a size, not a model, and the viewer who clicks pays; where the platform shows comments and the two artifact link forms (a sent comment carries the uuid one); the publish result's sharing line is the live state; clearing a comment history means a new artifact. `sample` and the existing second-HTML-page bullet now sit under a new heading, "Page runtime calls".
+- `Guides/Chrome MCP and Web Tool Behaviors/`: 9.0 (the built-in browser as a route when the extension is not connected; it reaches a server started on the operator's computer; its `resize_window` does change the layout); 1.0 (pointer to that resize); 2.0 (rung 11: a page that loads its screens in same-origin iframes is read through `contentDocument`); 10.0 (the "not connected" bullet points to the built-in browser).
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`: the device shell held for a full session after the inode fix; a pointer to the built-in browser for operator-started localhost servers.
+- `GUIDES.md`: the Published Artifacts and Chrome MCP rows list the new topics.
+- `VERSION History.md`: the What's New entry for 1.9.0 moved there word for word (size rotation, so this file stays under about 50 KB). Nothing was cut.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.11.4
 
@@ -259,24 +283,9 @@ Not yet covered: the commit guard (`Scripts/hooks/pre-commit`) has no secret che
 
 **Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
-## What's New in 1.9.0
-
-**Board intake release: five projects' field learnings land in the Seed, plus three schema and board rulings.** A DataWizard intake session triaged 25 cross-project asks (Evolutionary Media Commons, Holonic Canvas, LocationScout, Community Stack, Weave) in one pass. Shipped in the Seed:
-
-- `Guides/Published Artifacts and ArtifactData Behaviors.md` (new, Platform and Environment Behaviors cluster; row in GUIDES.md): the publish read gate and refusal sequence, `Artifact read` URL and large-read behavior, the ArtifactData store (list/out_dir, pinned atomic batch, nested-merge update and the `__delete__` marker, body size cap), who can write to an artifact db, and the rendering constraints (image CSP, no browser automation inside the artifact frame).
-- `Guides/Cowork Build Environment.md` (+20): a rejected or cancelled sub-agent launch may still have run; 529 resume by message; staging and commit paths and limits; text-only checksum rule (images change bytes in transit); container survives a restart; folder grants on the nearest parent; `tar --overwrite`; container background jobs die across a pause; per-container staging; Overpass from the device shell; `git archive` has no history (format-patch hand-off); synced-folder `<name> 2.<ext>` duplicates; `device_bash` 180 s cap; a dropped link can leave the command completed; Playwright fold click; Chromium console-error allowlist. Ruling: no git through the device shell on vault-mounted repos stands, with one narrow lead-seat exception (delete grant verified active; never a sub-agent, never unattended).
-- `Guides/MCP Reliability and Write Verification.md`, `Guides/Git Guide/9.0 Troubleshooting.md` (lapsed delete grant leaves `HEAD.lock` and `maintenance.lock`; rename-aside recovery), `Guides/Browser and File System Access Behaviors.md` (a script element id that matches a library global shadows it), `Guides/Chrome MCP and Web Tool Behaviors.md` (WebSearch per-turn budget shared across sub-agents; no user identity in a User-Agent; 429 handling; captcha-vs-WebFetch; a Connectors section), `Guides/Cowork Scheduled Tasks.md` (no ask-the-human branch on an unattended skill's normal path; `requires_local_device` binding; `device_absent` and late-PENDING failure modes; launchd cannot read ~/Documents, ~/Desktop, ~/Downloads; `launchctl kickstart`).
-- `Protocols/YAML Schema.md`, Holonic Records: predicate `uses` / `used_by` (not symmetric, on a core; role words `user`, `runs on`, `hosted on`, `publishes to` map to it); optional provenance fields `by` (the person the change was made for, `member:<key>`) and `via` (append-only custody hops `<kind>:<id>`); example comments are explanatory, not canonical.
-- `Protocols/Conventions Registry.md`: new entry "Provenance: by and via" (rule, example, hop-kind table as the lint set); "Coordination board" gains awareness asks - an `intent: action | awareness` field on asks (default `action`; awareness statuses open -> seen | stale), not a third block kind. `Templates/Coordination Board - Template.md` carries the grammar and an example.
-- `Skills/supervised-build` v1.5.0 (reviewer fixture experiments: two runs, partial apply, re-plan; force the event ordering before accepting "flake"; re-count from files; resume the plan reviewer by message; a cancelled launch may have run). `Skills/session-closer` v4.10.1 (Step 3.14 asks whether the session changed something another project depends on; if so, post an awareness ask). `SKILLS.md` synced.
-
-**Not yet in this release:** the board script's `intent` column and `seen` status (a block carrying `intent:` is parked in Unreconciled by the render until that build lands); the holon index merge path for a core that adopts another project's hid.
-
-**Propagation:** Seed files reach every vault through `update_seed.sh`. No Project Instructions change and no re-paste; the `K awareness` orientation trace count waits for the next PI bump. (DataWizard, 2026-10)
-
 ## Older releases
 
-The What's New entries for 1.0.0 to 1.8.0 are in `VERSION History.md` (moved there word for word, 2026-10).
+The What's New entries for 1.0.0 to 1.9.0 are in `VERSION History.md` (moved there word for word, 2026-10).
 
 ## Versioning
 

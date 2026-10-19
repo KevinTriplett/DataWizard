@@ -19,6 +19,8 @@ edit_log:
   - 'DW-S412 2026-10-16 - Publishing: read sequence before the first publish avoids the refusal; Local testing: own reset for hidden (board B-0126, B-0127)'
   - 'DW-S413 2026-10-17 - Publishing: two confirmation notes (read sequence with a large page; capabilities kept when omitted) (Location Scout board note B-0132)'
   - 'DW-S426 2026-10-19 - tool behaviors B-0167, B-0175, B-0176 (publish root; slide notes in aside; as_level rule check; un-sent comments; comment paging; entry-page capabilities)'
+  - 'DW-S427 2026-10-19 - tool behaviors B-0181, B-0182 (side-panel page window and fit pass; new section Page runtime calls: sample takes a size, and the second-HTML-page bullet moved there unchanged from Rendering constraints; platform comment panel and the two link forms; publish result sharing line; new artifact as the answer to clearing comments)'
+  - 'DW-S427 2026-10-19 - tool behaviors B-0190 (Page runtime calls: a page starts a scheduled task through the mcp capability, owner only; count every live subscription before checking the cap)'
 ---
 # Published Artifacts and ArtifactData Behaviors
 
@@ -80,6 +82,8 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 
 **`as_level` gives a cheap post-publish check of the db rules.** With rules `<collection>` read view / write owner and `<collection>/{self}` write interact, an `ArtifactData set` at `as_level: "interact"` on another person's document failed with `invalid_argument: no such artifact, collection, or document (or no access)` and wrote nothing. That is the refusal shape, and it proves a Contributor cannot write another person's data. (MetaMyth, 2026-10)
 
+**The publish result's sharing line is the live sharing state; do not assume more than it says.** After a republish it read "readable by only you" while the operator believed two collaborators were Editors. Before telling the operator that collaborators can open a new feature, ask them to check the Share menu. (MetaMyth, 2026-10; seen once)
+
 ## Comments from the operator
 
 **Comment mode works as a feedback channel into a remote session.** When the operator comments on an artifact and uses "Send to Claude", each comment arrives in the session as a turn (with thread id and anchor), even though `ArtifactComments watch` reports "not supported yet from remote sessions". `read` lists threads with anchors (CSS path plus location label), `reply` posts as Claude labelled "via the user", `resolve` closes. Plain comments (not sent to Claude) do not arrive, so the operator says "check comments". Seven threads were built, answered and resolved in one round this way. (Evolutionary Media Commons, 2026-10; ReWoven, 2026-10)
@@ -88,17 +92,35 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 
 **Comments not sent to Claude can be read but not answered.** `read` lists them as "not activated"; `reply` and `resolve` refuse. The session can read and apply them but reports in chat, and the threads stay open until a person resolves them in the artifact view. (ReWoven, 2026-10)
 
-**The comment list gets expensive on a long-lived review artifact.** After about 90 threads, each `read` page is size-capped (about 14 threads) and lists threads sent to Claude first, so new un-sent comments sit several pages down. Resolved threads stay listed, and threads cannot be deleted. Page through with a fast-tier sub-agent that returns only the open threads after a timestamp (8 calls, about 135k sub-agent tokens, a short list back to the lead). Better: start a fresh review artifact for each review round and keep the old one for history. (ReWoven, 2026-10)
+**The comment list gets expensive on a long-lived review artifact.** After about 90 threads, each `read` page is size-capped (about 14 threads) and lists threads sent to Claude first, so new un-sent comments sit several pages down. Resolved threads stay listed, and threads cannot be deleted. Page through with a fast-tier sub-agent that returns only the open threads after a timestamp (8 calls, about 135k sub-agent tokens, a short list back to the lead). Better: start a fresh review artifact for each review round and keep the old one for history. The same answer fits an operator's ask to "delete the comment history": Claude cannot delete threads, so publish the next version as a new artifact and record the old one as superseded. (ReWoven, 2026-10)
+
+**The platform's comment panel is the speech-bubble button left of Share in the artifact frame ("All comments").** An empty panel ("No comments yet") matched `ArtifactComments read` ("No comment threads"), so the store was empty, not hidden. (MetaMyth, 2026-10; seen once)
+
+**One artifact has two link forms, and a comment sent to Claude arrives with the uuid one.** The same artifact opens as `claude.ai/artifact/<short id>` and as `claude.ai/code/artifact/<uuid>`. A comment sent to Claude carries the uuid form, and `reply` and `resolve` work with it. (MetaMyth, 2026-10; seen once)
 
 ## Rendering constraints
 
 **The artifact CSP blocks images from any outside host, so tiled web maps go grey.** Scripts load from a few CDNs (cdnjs works), but OSM, CARTO or Esri tiles never load and show no error. The fix that worked: embed a vector basemap (an Overpass extract simplified to ~400 KB) and draw it with Leaflet on a canvas renderer with no tile layer, Leaflet CSS inlined. This extends the general CSP rule in **Cowork Build Environment** (Device Bridge: "Chat-delivered HTML previews run NO page scripts; published claude.ai artifacts run scripts but block external hosts"). (LocationScout, Rootland, 2026-10)
 
+**A published page opened in the claude.ai side panel at about 780-900 px wide and 500-560 px tall.** A check at 1600x900 can look right and still miss what breaks in the panel. Test a page with fixed-size parts (a 16:9 slide deck, a fixed stage) at 860x560 and 780x500 as well as full size. (ReWoven, 2026-10; seen once)
+
+**Type sizes with a pixel minimum stop shrinking in a small panel, and the text runs over what sits below it.** In a slide deck, type set with `max(15px, ...)` stopped scaling below a stage width of about 970 px. What fixed it: a small fit script that steps a slide's type and gap scale down (to 66% at most) when its content does not fit, runs again on slide change, resize and font load, and lets the slide scroll as the last resort. (ReWoven, 2026-10; seen once)
+
 **Browser automation cannot act inside a published artifact's frame.** The page runs in a nested cross-origin frame; Claude in Chrome and the built-in browser pane cannot click, type, read or run script inside it. The store read-back is the only automatable evidence of what a page wrote - in-memory page state has to be read by the person or shown on the page. (Holonic Canvas, 2026-10)
 
 **Nothing in an artifact link reaches the page, so a published page has no deep links.** The page runs in a frame on its own host whose URL carries no query or fragment: opened at `https://claude.ai/artifact/<id>?x=1#y=2`, a probe page saw empty `location.search`, `location.hash` and `document.referrer`, and the host's `postMessage` traffic to the frame carried theme, viewport and capability settings but no route. No runtime capability offers a link channel either (checked against runtime contract 0.2.75). A `#route=` scheme in a published page can never be hit from a link: route through a channel the page owns (a paste field, a `db` document another page writes, a sync), and probe with a scratch page that prints what it sees before building any routing. (Holonic Canvas, 2026-10)
 
+## Page runtime calls
+
 **A second HTML page may not get the runtime; put capability code on the entry page.** The runtime contract names only the entry page; whether a second HTML page in `files` gets `window.claude` was not tested. Put capability code on the entry page and route other views by hash; keep a second page as a redirect. (MetaMyth, 2026-10)
+
+**`sample` takes a size, not a model.** A page calls `sample(input, {modelTier})` with `quick`, `default` or `complex`. A named model (`model: "claude-..."`) is allowed only when the user names one, and the call falls back to the tier when that model cannot be used; `modelApplied` in the result says what ran. (MetaMyth, 2026-10)
+
+**A `sample` call is paid by the viewer who clicks, not by the owner.** Pattern that worked: a size picker for the viewer (default Quick, remembered in browser storage inside try/catch), a cost warning beside the button, and no call at all when there is nothing to send. (MetaMyth, 2026-10; seen once)
+
+**A published page can start a scheduled task, and only the task's owner can.** A page that declares `mcp: {servers: [{server: "Claude Code Remote", tools: ["fire_trigger"]}]}` can call `callTool("Claude Code Remote", "fire_trigger", {trigger_id})`. The call runs as the viewer, so only the owner of the task can start it: show the button only when `user.isOwner()` is true (`use("user")` itself can resolve `null`; treat that as not the owner). Keep the trigger id in a store document, not in the page source. What the started run can reach is in **Cowork Scheduled Tasks**. (MetaMyth, 2026-10; seen once)
+
+**Count every live subscription before checking the cap.** The `db` cap is 64 active subscriptions per view, that is per open page, and the 65th rejects `resource_exhausted` (runtime contract 0.2.85). One page checked its count before its reply and thread listeners had started, so the check read 62 while the real total reached 79 with 40 people in the store. Count after all listeners are planned, then drop the optional ones if the total is over. (MetaMyth, 2026-10; seen once)
 
 ## Local testing and vault copies
 
