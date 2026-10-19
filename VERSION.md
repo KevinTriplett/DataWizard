@@ -1,5 +1,5 @@
 
-seed: 1.11.1
+seed: 1.11.3
 protocol: 1.8
 project_instructions: 4.9
 
@@ -72,6 +72,32 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.11.3
+
+**Patch release: rows that a script can close.** One DataWizard session (2026-10-19). A tracking row that waits on something written only in words keeps saying "pending" after the thing it waited on has closed somewhere else. About a third of the leaked items in two look-backs were rows of this kind. This release gives such rows an id a script can read. The scripts that read it (a board render flag and a lint check) come in a later release. Shipped in the Seed:
+
+- `Protocols/Conventions Registry/23.0 Tracking Model.md`: new sub-rule **Dependencies name their id** - a line or gate row that waits on another tracked item writes `after: G-NNN` / `B-NNNN` / `Tnn` (comma-separated for several); where it goes; when a target counts as done; a dependency on something with no id stays in words (the check's named blind spot).
+- `25.0 Operator Gate Queue.md`: two row fields - `ask` (required in the waiting-on-people class: the board ask id, or `-` when a person, not a project, is the actor) and `after`. Admission: work that waits on another project's session is a board ask, not a gate row; existing rows of that kind move to the board when next touched.
+- `26.0 Coordination board.md`: a gate row that waits on an ask carries `- ask: B-NNNN`; the ask may end its summary with `[G-NNN]`.
+- `30.0 Carry the probe, not the snapshot.md`: extended to tracking lines - no file size, count or version that will change; write the probe.
+- `Templates/Operator Gate Queue - Template.md`: `- ask: -` on the example row; a note under the waiting-on-people class.
+- `VERSION History.md`: the What's New entry for 1.7.0 moved there word for word (size rotation).
+- Tool behaviors: `Guides/Cowork Scheduled Tasks.md` - a task created without `folders` gets none (pass them explicitly); test a new task with a one-time copy of its exact prompt. `Guides/MCP Reliability and Write Verification/12.0 Obsidian Behavioral Gotchas.md` - filesystem `edit_file` applies a multi-edit call all or nothing.
+
+**Adopters:** nothing breaks - scripts ignore unknown row keys. Add `- ask:` to the rows of your waiting-on-people class when you next touch them, and move rows that wait on another project to the board.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.11.2
+
+**Patch release: the cause and the fix for a device shell that fails in every session.** One DataWizard session (2026-10-18 to 2026-10-19). From 2026-10-16 `device_bash` failed in every new Cowork session on one computer, in every project, for three days. The cause was not a wedged session: the desktop app keeps one Linux user and home folder per session on a fixed 10 GB session disk inside its VM and does not remove them, and that disk ran out of file entries (inodes). Shipped in the Seed:
+
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`: the wedged-shell bullet is rewritten around the cause - the signs (only "device_bash failed in the device workspace", no `scratchFolder`, every new session in every project, a restart does not help), the confirm step (`df -i /sessions` in an older session whose shell still works), and the operator fix as observed once (quit Claude with Cmd-Q, check with `lsof`, move `sessiondata.img` aside to a backup, start Claude - the app made a new, empty disk; if it does not, move the backup back and report). The bullet is split in two: the cause and fix, and how to work without the shell until the swap.
+
+**Adopters:** if your device shell fails in every new session, follow the 8.0 bullet. Once in a while, run `df -i /sessions` in a working device shell; when it nears 100%, plan the swap before the shell stops.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.11.1
 
@@ -250,24 +276,9 @@ The tooling stays in the maintainer's workshop until a second vault runs it with
 
 **Propagation:** the Seed files reach every vault through `update_seed.sh`. No Project Instructions change and no re-paste. Projects adopt on touch, following the guide; nothing in an existing vault changes until a session federates a note.
 
-## What's New in 1.7.0
-
-**Coordination board (cross-project asks and write claims).** One vault-level board says "project X, something waits for you - here is where it is" (asks) and "I am writing this store or subtree until this time" (claims). Each row is a pointer; the content stays in the note it points at. The table lives in the operational database; `_Coordination/Board.md` is the shared markdown mirror. Shipped in the Seed:
-
-- `Templates/Coordination Board - Template.md` - depersonalized starter: header, block grammar, hand-path steps, one example ask and one example claim.
-- Conventions Registry entry "Coordination board" (rule, example, and who writes the table: scripts, Claude Code and DW Save write it; a session on a mount that cannot forward SQLite locks, such as Cowork, uses the hand path on the mirror) and the `B-NNNN` row in ID families.
-- `Guides/Orientation Flag Sweep - Query Spec.md` section (d): the board sweep as steps over the mirror, the trace fragment, and how to act on an ask.
-- `session-closer` v4.10.0: Step 3.14 posts an ask for each outbound item and releases held claims; Step 3.13 notes that claim expiry runs in the board render.
-- `Scripts/datawizard-sync.sh` (DW Save): when `board.py` exists and `python3` is on PATH, each save first runs `board.py render` and adds one `board` row to the status card (`folded`, `look at the board`, or `render error`); the save never fails because of the board.
-- `Config/taxonomy.yaml`: infrastructure types `coordination-board` and `coordination-board-archive`; drive-by fix: `exchange-note` registered too (it had been unregistered while every Session Exchange note used it - 21 type-validity errors cleared in this vault).
-
-`board.py` itself stays in the DataWizard Workshop until a second operator runs it; until then the board is read by hand from the mirror in other vaults.
-
-**Propagation:** the Seed files reach every vault through `update_seed.sh`; the orientation sub-check reaches each project only through a per-project re-paste of the Project Instructions (required; tracked as a gate row at close).
-
 ## Older releases
 
-The What's New entries for 1.0.0 to 1.6.2 are in `VERSION History.md` (moved there word for word, 2026-10).
+The What's New entries for 1.0.0 to 1.7.0 are in `VERSION History.md` (moved there word for word, 2026-10).
 
 ## Versioning
 

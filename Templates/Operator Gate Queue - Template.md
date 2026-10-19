@@ -1,12 +1,13 @@
 ---
 created: 2026-08-31
 edit_log:
+  - 2026-10-19 - ask: field on G-001; E class note (board asks for other projects; Seed 1.11.3; DataWizard)
   - 2026-10-18 - F class points rulings and small operator tasks to the Waiting-on checklist (Seed 1.11.0; DataWizard)
   - 2026-08-31 - created (Operator Gate Queue codification; DataWizard)
 status: active
 title: Operator Gate Queue - Template
 type: template
-updated: 2026-10-18
+updated: 2026-10-19
 ---
 *The single cross-project queue of deployment gates - things that are built (or decided) and waiting on a specific actor to bring them live. One file per deployment (the primary project hosts it; it covers all projects). Schema, lifecycle vocabulary (`designed -> built -> installed -> verified-live`), feeding rule, and exit ceremony are canonical in the Conventions Registry's **Operator Gate Queue** entry - read that entry before working this file.*
 
@@ -18,6 +19,7 @@ Wire this file as the third layer of the project's 0.5 action-items shell (embed
 
 ### G-001 Example gate (replace me)
 - who: Operator-A | project: ProjectName | arc: T1 | state: installed | est: 15 min
+- ask: -
 - action: relaunch the app so the edited config loads; confirm the new behavior once
 - unblocks: the nightly job runs on the new schedule
 - clock: config drift accumulates until relaunch
@@ -30,6 +32,8 @@ Wire this file as the third layer of the project's 0.5 action-items shell (embed
 ## D - Setup and installs
 
 ## E - Waiting on people
+
+*Rows here carry `- ask:` (the board ask id, or `-` when a person, not a project, is the actor). Work that waits on another project's session is a board ask, not a row (Conventions Registry, "Operator Gate Queue").*
 
 ## F - Stale micro-items
 

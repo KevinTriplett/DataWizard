@@ -3,9 +3,10 @@ title: Cowork Scheduled Tasks
 type: guide
 scope: seed
 created: '2026-06-15'
-updated: 2026-10-15
+updated: 2026-10-19
 operator: Andrew
 edit_log:
+  - 'DW-S424 2026-10-19 - folders not attached unless passed; one-time test run of the exact prompt'
   - 'DW-S408 2026-10-15 - board intake plant: delete-permission prompt waits for a human even in an auto-approved task; touch + rm probe instead (Holonic Canvas)'
   - 'DW-S403 2026-10-13 - Requirements: append-only run log, a launch can start twice (board intake B-0065, Kosmosis)'
   - 'DW-S397 2026-10-12 - Managing tasks section: account-level scope, promptless update_trigger, list_triggers overflow (meta-learning review S377-S392)'
@@ -56,6 +57,8 @@ A task that runs without a human in the loop needs all of:
 - **`update_trigger` with a new prompt on a computer-bound task re-signs the prompt through the desktop app and needs the linked computer online.** Send schedule, name and enabled changes in a promptless call - those apply immediately without the computer. Change the prompt only while the computer is linked. (DataWizard, 2026-10)
 - **`list_triggers` returns every task's full prompt inline** - enough to overflow the tool-result cap on an account with many tasks. Query the saved tool-result file with `jq` or Python instead of reading it inline. (DataWizard, 2026-10)
 - **A task created with `requires_local_device` binds to that computer at creation and defaults to `permission_mode: auto`** (the create result says so). Decide at creation whether the task needs the computer; for what happens when it is absent at fire time, see Other known failure modes. (Holonic Canvas, 2026-10)
+- **A task created without `folders` gets no folders, even when the creating conversation has folders connected.** The create result shows `folders_state: FOLDERS_STATE_NONE`; the run can still reach the vault through the Obsidian MCP, but a file write to another folder (`device_commit_files`, the device shell) has no target. Pass `folders` explicitly at creation (with `requires_local_device`) and check the result says `FOLDERS_STATE_PRESENT`. (DataWizard, 2026-10)
+- **Test a new task with a one-time copy of its exact prompt** (`run_once_at` a few minutes out, plus a test-only line such as a forced input window). It runs in the real harness - approvals, sub-agent model choice, folders, the device shell - which an interactive run in your own session does not test. Snapshot the files the task must not touch first (size and modification time) and compare after. (DataWizard, 2026-10)
 
 ## Other known failure modes
 
