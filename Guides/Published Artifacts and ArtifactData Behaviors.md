@@ -2,7 +2,7 @@
 title: Published Artifacts and ArtifactData Behaviors
 type: guide
 created: 2026-10-12
-updated: 2026-10-17
+updated: 2026-10-19
 operator: Andrew
 scope: seed
 status: active
@@ -18,6 +18,7 @@ edit_log:
   - 'DW-S412 2026-10-16 - reviewer fix: the gate clears on any full read by the lead (URL read or saved-file Read), wording aligned with the bullet'
   - 'DW-S412 2026-10-16 - Publishing: read sequence before the first publish avoids the refusal; Local testing: own reset for hidden (board B-0126, B-0127)'
   - 'DW-S413 2026-10-17 - Publishing: two confirmation notes (read sequence with a large page; capabilities kept when omitted) (Location Scout board note B-0132)'
+  - 'DW-S426 2026-10-19 - tool behaviors B-0167, B-0175, B-0176 (publish root; slide notes in aside; as_level rule check; un-sent comments; comment paging; entry-page capabilities)'
 ---
 # Published Artifacts and ArtifactData Behaviors
 
@@ -45,6 +46,8 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 
 **A data-file-only republish still needs the page.** A `publish` with `url` and `files` alone is refused ("also pass file_path"). To change only a data file (for example a `canvas.json`), pass the unchanged page as `file_path` together with `files`; the viewed-read rule above applies to that page on the first such republish of a session. Afterwards, read `index.html` back with `path` and compare its sha256 with your pre-publish copy to confirm the page did not change. A read copy of the page carries the publish skeleton, so republish from your own source copy or strip the wrapper first (recipe above). (ReWoven, 2026-10)
 
+**Multi-file publish: `files` sources must sit under the working directory or the scratchpad, and a Bash `cd` moves the working directory.** A site built in a folder under the container home was outside the (moved) working directory at publish time. Copying the site into the scratchpad and publishing with `root` set to that folder worked first time (16 files, one call). (MetaMyth, 2026-10)
+
 **A page that saves itself rewrites its data file under you.** With the `artifact` capability in its files form, every save from the open page rewrites the data file. To merge new records in: re-read the data file right before merging, add records (never rebuild the file), check with a script that every old record is unchanged, then publish. A viewer with the page open gets a conflict on their next save and reloads - tell them to reload. (ReWoven, 2026-10)
 
 **The session's safety check can deny a live-store write or a publish, even after earlier approval.** An `ArtifactData batch` to a live store was denied as "Modify Shared Resources" although the operator had approved it in chat; it passed when the operator approved it again in the session right before the call. An Artifact publish of a new page version was denied as "Production Deploy" and passed after the operator wrote an explicit go-ahead naming the publish ("yes, publish version 7"). Expect it on live writes and publishes: stop and ask the operator for an explicit go-ahead naming the action, never work around it. (Holonic Canvas, 2026-10)
@@ -54,6 +57,8 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 **`Artifact read` needs the full `https://claude.ai/artifact/<id>` URL.** A bare `claude.ai/artifact/<id>` (or a bare id) is refused as "not an artifact URL". (Evolutionary Media Commons, 2026-10)
 
 **A large read is saved to a tool-results file; only the head shows inline.** A ~700 KB page came back head-only, with the full HTML in a tool-results file; extract what you need (e.g. a baked data constant) from that file with a script rather than re-reading. (Holonic Canvas, 2026-10)
+
+**A Slides-type artifact keeps its speaker notes in each slide's `<aside>`, not in the store.** The notes sit in `project/slides/<id>.html` (slide order in `project/deck.json`). The ArtifactData `notes` collection was empty in both decks read. Read all slide files in one `Artifact read` call with `paths`. (MetaMyth, 2026-10)
 
 ## ArtifactData store
 
@@ -73,11 +78,17 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 
 **Admin-only root rules leave the owner's ArtifactData writes unrestricted.** Under root rules `read: admin, write: admin` the owner's ArtifactData writes are unrestricted while `as_level: interact` and `view` see nothing. (Evolutionary Media Commons, 2026-10)
 
+**`as_level` gives a cheap post-publish check of the db rules.** With rules `<collection>` read view / write owner and `<collection>/{self}` write interact, an `ArtifactData set` at `as_level: "interact"` on another person's document failed with `invalid_argument: no such artifact, collection, or document (or no access)` and wrote nothing. That is the refusal shape, and it proves a Contributor cannot write another person's data. (MetaMyth, 2026-10)
+
 ## Comments from the operator
 
-**Comment mode works as a feedback channel into a remote session.** When the operator comments on an artifact and uses "Send to Claude", each comment arrives in the session as a turn (with thread id and anchor), even though `ArtifactComments watch` reports "not supported yet from remote sessions". `read` lists threads with anchors (CSS path plus location label), `reply` posts as Claude labelled "via the user", `resolve` closes. Plain comments (not sent to Claude) do not arrive, so the operator says "check comments". Seven threads were built, answered and resolved in one round this way. (Evolutionary Media Commons, 2026-10)
+**Comment mode works as a feedback channel into a remote session.** When the operator comments on an artifact and uses "Send to Claude", each comment arrives in the session as a turn (with thread id and anchor), even though `ArtifactComments watch` reports "not supported yet from remote sessions". `read` lists threads with anchors (CSS path plus location label), `reply` posts as Claude labelled "via the user", `resolve` closes. Plain comments (not sent to Claude) do not arrive, so the operator says "check comments". Seven threads were built, answered and resolved in one round this way. (Evolutionary Media Commons, 2026-10; ReWoven, 2026-10)
 
 **Read every open sent-to-Claude thread before acting on one.** Two comments on one paragraph arrived as separate threads ("remove" on the first sentence, "larger font" on the rest); acting on the first alone removed the whole paragraph, and the second thread showed the intent. Read every open thread on the artifact first, then act. (Evolutionary Media Commons, 2026-10)
+
+**Comments not sent to Claude can be read but not answered.** `read` lists them as "not activated"; `reply` and `resolve` refuse. The session can read and apply them but reports in chat, and the threads stay open until a person resolves them in the artifact view. (ReWoven, 2026-10)
+
+**The comment list gets expensive on a long-lived review artifact.** After about 90 threads, each `read` page is size-capped (about 14 threads) and lists threads sent to Claude first, so new un-sent comments sit several pages down. Resolved threads stay listed, and threads cannot be deleted. Page through with a fast-tier sub-agent that returns only the open threads after a timestamp (8 calls, about 135k sub-agent tokens, a short list back to the lead). Better: start a fresh review artifact for each review round and keep the old one for history. (ReWoven, 2026-10)
 
 ## Rendering constraints
 
@@ -86,6 +97,8 @@ Runtime behaviors of published claude.ai artifacts (the Artifact tool: publish, 
 **Browser automation cannot act inside a published artifact's frame.** The page runs in a nested cross-origin frame; Claude in Chrome and the built-in browser pane cannot click, type, read or run script inside it. The store read-back is the only automatable evidence of what a page wrote - in-memory page state has to be read by the person or shown on the page. (Holonic Canvas, 2026-10)
 
 **Nothing in an artifact link reaches the page, so a published page has no deep links.** The page runs in a frame on its own host whose URL carries no query or fragment: opened at `https://claude.ai/artifact/<id>?x=1#y=2`, a probe page saw empty `location.search`, `location.hash` and `document.referrer`, and the host's `postMessage` traffic to the frame carried theme, viewport and capability settings but no route. No runtime capability offers a link channel either (checked against runtime contract 0.2.75). A `#route=` scheme in a published page can never be hit from a link: route through a channel the page owns (a paste field, a `db` document another page writes, a sync), and probe with a scratch page that prints what it sees before building any routing. (Holonic Canvas, 2026-10)
+
+**A second HTML page may not get the runtime; put capability code on the entry page.** The runtime contract names only the entry page; whether a second HTML page in `files` gets `window.claude` was not tested. Put capability code on the entry page and route other views by hash; keep a second page as a redirect. (MetaMyth, 2026-10)
 
 ## Local testing and vault copies
 
