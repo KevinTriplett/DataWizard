@@ -1,5 +1,5 @@
 
-seed: 1.11.0
+seed: 1.11.1
 protocol: 1.8
 project_instructions: 4.9
 
@@ -72,6 +72,16 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.11.1
+
+**Patch release: a session look-back report has a home.** One DataWizard session (2026-10-19). A look-back scan reads the session logs closed since the last look-back and reports open items that slipped (on no tracking list) or sit on an out-of-date tracking line. It is the safety net behind the 1.11.0 landing rule. Shipped in the Seed:
+
+- `Skills/session-closer` v4.11.1: Step 3.10 also surfaces a pending `Look-Back Report - *` at a full close, the same way as the other review reports. The v4.10.1 edit_log line moved into `references/changelog.md` (rolling window).
+- `Guides/Review Automation.md`: the "Backlog + FR triage" row names the session look-back scan as its between-triage producer, with `Look-Back Report - *.md` as its pending report. The full triage stays manual at its own cadence; a look-back review stamps `last_backlog_triage` only when it also covered the full triage. Producer maturity: the look-back producer runs in one project's workshop and is not yet shipped in the Seed.
+- `SKILLS.md`: session-closer row synced; Workshop table gains a session-lookback row.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. A project without a look-back scan sees no change. (DataWizard, 2026-10)
 
 ## What's New in 1.11.0
 

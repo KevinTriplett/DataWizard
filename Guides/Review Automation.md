@@ -2,7 +2,7 @@
 title: "Review Automation"
 type: guide
 created: 2026-08-06
-updated: 2026-09-06
+updated: 2026-10-19
 operator: Andrew
 edit_log:
   - "DW-S250 2026-08-06 - created: pending-report model + review-cadence
@@ -22,6 +22,9 @@ edit_log:
     declared single home (Weave FR WV_2026-09-02_AA_01)
   - DW-S332 2026-09-06 - triage checklist gains the since-shipped-blockers
     re-check lens (S332 FR batch)
+  - "DW-S424 2026-10-19 - Backlog + FR triage row: session look-back scan as its
+    between-triage producer (Look-Back Report, pending-review); producer
+    maturity line (leak prevention fix 3)"
 ---
 
 # Review Automation
@@ -48,9 +51,9 @@ These numbers live here and nowhere else (D114, relocating D88). Every other doc
 | Project health audit | `last_health_audit` | 30+ sessions since, or never recorded | `dw_lint` (machine half of `project-health-audit`) | `Health Audit Report - *.md` |
 | Meta-learning review | `last_meta_learning_review` | 30+ sessions since, or never recorded | `meta-learning-scan` | `Meta-Learning Report - *.md` |
 | Content Interests | `last_content_interests_review` | 30+ days since, OR 10+ sessions since, OR field absent | `content-interest-scan` | `Content Interests Report - *.md` |
-| Backlog + FR triage | `last_backlog_triage` | 30+ sessions since, or never recorded | none yet (manual; a stock-take session) | none -- the stale-item sweep is the review itself |
+| Backlog + FR triage | `last_backlog_triage` | 30+ sessions since, or never recorded | session look-back scan, between triages (see below); the full triage stays manual (a stock-take session) | `Look-Back Report - *.md` |
 
-The backlog row is manual for now: no scan producer, no pending report, so the scheduled check does not fire it -- it lives here so the number has one home (D114). The triage itself: retire items overtaken by platform evolution or absorbed by other work, verify long-standing "blocked" items (they are often silently resolved), reconcile FR statuses against what was actually implemented, and re-check existing dispositions whose named sequencing blockers have since shipped - a triage note that says "sequence after X lands" goes stale silently when X lands, because nothing points back at it (two of five items in one triage batch were exactly this; DataWizard, 2026-09). Yield on past runs: 17 of 46 action items retired in one pass; 7 of 19 FRs resolved in another, 4 by status correction alone (DataWizard, 2026-05). A later run confirmed the intake's failure mode is **status-lag, not junk**: 24 of 57 FRs closed with only ~6 needing real supersession judgment - the rest were status corrections of already-shipped work, because nothing points a shipping session back at the FR that asked for it; the cadence is what reconciles. The same run showed a logged strategic decision does not sweep its own downstream backlog/FR surfaces - three retires traced to one decision logged four sessions earlier - so the triage doubles as the ripple-sweep for recent decisions (DataWizard, 2026-08). Stamp the current session ID, as for the health audit.
+The full triage is still manual: the scheduled check does not fire it, and the row lives here so the number has one home (D114). Between triages, a **session look-back scan** feeds it. The scan reads the session logs closed since the last look-back report and reports only the open items that slipped (not done, on no tracking list) or sit on an out-of-date tracking line. It runs on its own weekly schedule, does nothing until 10 sessions have closed or while an earlier look-back report still waits for review, and writes a `Look-Back Report - *.md` with `status: pending-review`; the session-closer surfaces it (Step 3.10). Review it in the bulk-recommendation mode below. A look-back review stamps `last_backlog_triage` only when it also covered the full triage; then it stamps the report's end-of-range session, as for the meta-learning review. (DataWizard, 2026-10) The triage itself: retire items overtaken by platform evolution or absorbed by other work, verify long-standing "blocked" items (they are often silently resolved), reconcile FR statuses against what was actually implemented, and re-check existing dispositions whose named sequencing blockers have since shipped - a triage note that says "sequence after X lands" goes stale silently when X lands, because nothing points back at it (two of five items in one triage batch were exactly this; DataWizard, 2026-09). Yield on past runs: 17 of 46 action items retired in one pass; 7 of 19 FRs resolved in another, 4 by status correction alone (DataWizard, 2026-05). A later run confirmed the intake's failure mode is **status-lag, not junk**: 24 of 57 FRs closed with only ~6 needing real supersession judgment - the rest were status corrections of already-shipped work, because nothing points a shipping session back at the FR that asked for it; the cadence is what reconciles. The same run showed a logged strategic decision does not sweep its own downstream backlog/FR surfaces - three retires traced to one decision logged four sessions earlier - so the triage doubles as the ripple-sweep for recent decisions (DataWizard, 2026-08). Stamp the current session ID, as for the health audit.
 
 **Run the triage as bulk recommendations, not item-by-item questions.** Present the whole batch (twenty park-or-revive items is a normal size) with a one-line recommendation per item and a default verdict, and ask the operator to blanket-approve with named exceptions. Twenty items cleared in one round this way where item-by-item questions had never got through them; the operator's attention goes only to the exceptions. Then annotate each verdict at the item's canonical home (the Backlog line, the gate row, the FR frontmatter) in the same pass, so the decision is not stranded in chat. (DataWizard, 2026-08)
 
@@ -86,4 +89,4 @@ The scan producers are the same regardless of substrate; only the harness differ
 
 ### Producer maturity
 
-As of 2026-08: `meta-learning-scan` produces its report today. `content-interest-scan` is a draft (v0.1). `project-health-audit` is a judgment-half skill -- only its machine half (`dw_lint`) runs unattended, producing a lint-based Health Audit Report for the operator to pick up; the judgment pass and planting stay human. Until a producer is finalized into the scheduled check, the session-closer simply finds no pending report for that review and stays silent.
+As of 2026-08: `meta-learning-scan` produces its report today. `content-interest-scan` is a draft (v0.1). `project-health-audit` is a judgment-half skill -- only its machine half (`dw_lint`) runs unattended, producing a lint-based Health Audit Report for the operator to pick up; the judgment pass and planting stay human. Until a producer is finalized into the scheduled check, the session-closer simply finds no pending report for that review and stays silent. As of 2026-10: a session look-back producer runs in one project's workshop as a scheduled task and is not yet shipped in the Seed.

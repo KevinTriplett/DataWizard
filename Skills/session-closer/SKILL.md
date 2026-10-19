@@ -7,15 +7,15 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-10-18'
+updated: '2026-10-19'
 origin: 'DW-S158 2026-06-08 - backfilled from the earliest edit_log entry (D127)'
-version: '4.11.0'
+version: '4.11.1'
 edit_log:
+  - 'DW-S424 2026-10-19 - v4.11.1: Step 3.10 also surfaces pending Look-Back Reports (session look-back scan, leak prevention fix 3)'
   - 'DW-S422 2026-10-18 - v4.11.0: landing rule - Step 4 action-items bullet made a required landing rule with one dated Waiting-on checklist; Step 2.6 ledger next: is the owed list; Step 3.5 tracking-claim verification; Step 0 lite list; output-format landing check and Waiting-on pointer; Common Mistakes bullet (leak prevention fix 1)'
   - 'DW-S422 2026-10-18 - v4.10.4: sectioned - output templates, multi-operator flag steps, no-ledger roster, triage guidance and old edit_log moved verbatim to references/; steps unchanged'
   - 'DW-S402 2026-10-13 - v4.10.3: Step 3.14 board asks posted at write time; close verifies and backfills (B-0081)'
   - 'DW-S400 2026-10-12 - v4.10.2: Step 3.8 link-resolution check (dw_lint C5 or find recipe)'
-  - 'DW-S398 2026-10-12 - v4.10.1: Step 3.14 awareness posting question (intent: awareness, ruling R8)'
 ---
 
 # Session Closer Skill
@@ -273,7 +273,7 @@ This catches the most common drift pattern -- adding sections without updating t
 
 The session-closer does **not** compute review staleness or nudge on session/day thresholds. Detecting that a health audit, meta-learning review, or Content Interests refresh is due -- and running the scan that produces a report -- is the job of the scheduled review automation (see the **Review Automation** guide). This step's only job is to surface reports those scans have already left waiting. None of this blocks session close.
 
-List the project's Learning Reports folder (`{infrastructure folder}/Learning Reports/` for full-convention projects, e.g. `{home}/_Infrastructure - {ProjectName}/Learning Reports/`; `{home}/Learning Reports/` for flat; canonical location: the Review Automation guide's "Report locations" section). For any report file with `status: pending-review` (`Meta-Learning Report - *`, `Health Audit Report - *`, `Content Interests Report - *`), add one line to "What's next":
+List the project's Learning Reports folder (`{infrastructure folder}/Learning Reports/` for full-convention projects, e.g. `{home}/_Infrastructure - {ProjectName}/Learning Reports/`; `{home}/Learning Reports/` for flat; canonical location: the Review Automation guide's "Report locations" section). For any report file with `status: pending-review` (`Meta-Learning Report - *`, `Health Audit Report - *`, `Content Interests Report - *`, `Look-Back Report - *`), add one line to "What's next":
 
 "A [review type] report is waiting for your review: [filename]."
 

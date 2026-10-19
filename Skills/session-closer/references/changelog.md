@@ -3,12 +3,16 @@ title: 'Changelog'
 type: skill-reference
 parent: "[[_DataWizard/Seed/Skills/session-closer/SKILL|session-closer]]"
 created: '2026-10-18'
-updated: '2026-10-18'
+updated: '2026-10-19'
 operator: Andrew
 origin: 'DW-S422 2026-10-18 - moved verbatim from session-closer SKILL.md v4.10.3'
 edit_log:
-  - 'DW-S422 2026-10-18 - created: moved verbatim from session-closer SKILL.md v4.10.3'
-  - 'DW-S422 2026-10-18 - v4.11.0: the v4.10.0 line moved in verbatim from SKILL.md frontmatter (rolling window)'
+  - "DW-S422 2026-10-18 - created: moved verbatim from session-closer SKILL.md
+    v4.10.3"
+  - "DW-S422 2026-10-18 - v4.11.0: the v4.10.0 line moved in verbatim from
+    SKILL.md frontmatter (rolling window)"
+  - "DW-S424 2026-10-19 - v4.11.1: the v4.10.1 line moved in verbatim from
+    SKILL.md frontmatter (rolling window)"
 ---
 
 *Part of the [[_DataWizard/Seed/Skills/session-closer/SKILL|session-closer]] skill*
@@ -16,6 +20,7 @@ edit_log:
 # Changelog
 
 ```yaml
+  - 'DW-S398 2026-10-12 - v4.10.1: Step 3.14 awareness posting question (intent: awareness, ruling R8)'
   - "DW-S388 2026-10-06 - v4.10.0: Step 3.14 board rule (asks for outbound items,
     claims released; Cowork hand path per ruling R4); Step 3.13 claim-expiry
     pointer (Coordination Board T20 Chunk 3)"
