@@ -2,10 +2,11 @@
 title: VERSION History
 type: guide
 created: 2026-10-18
-updated: 2026-10-19
+updated: 2026-10-20
 operator: Andrew
 origin: DW-S421 2026-10-18 - What's New entries 1.0.0 to 1.5.0 moved from VERSION.md word for word (size rotation, archivist rule)
 edit_log:
+  - DW-S428 2026-10-20 - What's New 1.9.1 to 1.9.5 moved in from VERSION.md word for word (size rotation before 1.11.7)
   - DW-S427 2026-10-19 - What's New 1.9.0 moved in from VERSION.md word for word (size rotation before 1.11.5)
   - DW-S426 2026-10-19 - What's New 1.8.0 moved in from VERSION.md word for word (size rotation before 1.11.4)
   - DW-S424 2026-10-19 - What's New 1.7.0 moved in from VERSION.md word for word (size rotation before 1.11.3)
@@ -16,6 +17,64 @@ edit_log:
 # VERSION History
 
 Older "What's New" entries of the Seed, moved here from `VERSION.md` word for word. The current version and the newer entries are in `VERSION.md`. When `VERSION.md` passes about 50 KB again, move its oldest entries to the top of the list below, newest first, and leave the pointer in `VERSION.md`.
+
+## What's New in 1.9.5
+
+**Patch release: tool behaviors from three DataWizard sessions and two partner projects.** Three DataWizard sessions (2026-10-17). Shipped in the Seed:
+
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`, the wedged-shell bullet: the fault is not machine-wide, and a new session is not a sure way out - one project had no working device shell in three parallel sessions for a whole day, also after an app restart, and a new session the next day started with the same failure; when the build inputs are one staged bundle, check that a container rebuild matches the staged outputs byte for byte first.
+- `8.1 Device Bridge - Staging, Commits and Transport.md`: `device_stage_files` fails the whole call when one listed path does not exist; if the bridge drops mid-session, keep building in the container and commit after reconnect (no new grant needed).
+- `8.2 Device Bridge - Sub-agents and Orchestration.md`: worker-tier sub-agents wrote JSON deliverables 6 of 6 times when the lead rendered and checked the notes; parallel sub-agents sharing the operator's Chrome tripped a site's bot check for everyone - throttle them or keep browser work in the lead; a worker's count check against its own selection missed a file.
+- `5.0 Network and GitHub Data.md`: Overpass mirrors fail from the container too (proxy drops, 500, 504), the PDF Tools fetch gets 406; Nominatim works from the container; Chrome was the fallback when the device shell was down.
+- `Guides/Chrome MCP and Web Tool Behaviors/1.0 Chrome MCP Interaction Limits.md`: `resize_window` can report success while the viewport does not change.
+- `4.0 web_fetch Behaviors.md`: GitHub open items are readable, history pages answer ROBOTS_DISALLOWED; "no merge seen" is not evidence.
+- `6.0 Scripted Downloads from the Shells (Container and Device).md`: Reddit refuses logged-out reads from every shell (post JSON 403, old.reddit login redirect, bot-check page); a redirect to `/login` must stop a run; the working pattern is an operator-run console script in a logged-in tab that saves one JSON file for a local script to ingest.
+- `10.0 Claude-in-Chrome Extension from a Cowork Cloud Session.md`: `javascript_tool` gives up at 45 s while async page work keeps running (fire-and-forget, then poll); page data has no path to a file except through the conversation; the extension refuses some sites "due to safety restrictions" (hand the step to the operator).
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`: two confirmations (the read sequence on a 2.3 MB page; capabilities kept when omitted on republish).
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.9.4
+
+**Patch release: seven field learnings from four projects.** One DataWizard session (2026-10-16). Shipped in the Seed:
+
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`, the wedged-shell bullet: the fault is per session, not per machine, so a new session is the way out, not an app restart; check `get_device_info` for `scratchFolder`; the error text has no detail; stop after two identical failures; list uncommitted files in the handoff; how to rebuild a generated file with the file tools only.
+- `Guides/Cowork Build Environment/8.2 Device Bridge - Sub-agents and Orchestration.md`: a sub-agent can write a `.md` when the file is the named deliverable (always give a fallback); new bullet - "preserved in git history" is false until the vault is saved, so move cut text into an archive note in the same step.
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`: for a large page, budget the lead's own full read of the live source before the first publish (a sub-agent's read does not count); running the read sequence before the first publish avoids the refusal; a page can carry its own `[hidden]` reset so local and live agree.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.9.3
+
+**Patch release: two holonic-records schema rulings, and four field learnings.** One DataWizard session (2026-10-16). Shipped in the Seed:
+
+- `Protocols/YAML Schema.md`, Holonic Records: the `community` kind now carries `founded` (with `location`); `place` does not. Relation records keep their place in the list: a retracted record stays at its index, a replacement goes at the end, and no record is removed, spliced or re-ordered, because a consumer may derive an id from a record's position. `Guides/Make Your Project Data Holonic.md` says the same.
+- `Guides/Published Artifacts and ArtifactData Behaviors.md`: the refusal sequence after a refused republish - an identical resend can keep being refused; a shell byte-compare or an `Artifact read` with `path` does not count as reading the saved copy; a Read-tool read of a small slice of it clears the refusal.
+- `Guides/Chrome MCP and Web Tool Behaviors/2.0 Reading Client-Rendered Pages.md`: rung 9 - a fetch that comes back with only the title and meta description means "unreadable", not "no evidence".
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md`: a wedged `device_bash` stays wedged for the session; switch to the stage, edit in the container, commit path.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. A vault that generates its holonic shared-facts blocks with a script should let `community` carry `founded` there too, or the next regenerate drops the line. (DataWizard, 2026-10)
+
+## What's New in 1.9.2
+
+**Patch release: three big guides become shell + sections, and a third intake batch of field learnings lands.** One DataWizard session (2026-10-15). Shipped in the Seed:
+
+- **Sectioned guides.** `Guides/Cowork Build Environment.md`, `Guides/MCP Reliability and Write Verification.md` and `Guides/Chrome MCP and Web Tool Behaviors.md` were each past or near the ~50 KB line where MCP reads and patches turn unreliable. Each is now a short shell (frontmatter, intro, `![[embeds]]`) plus one section file per former H2 in a folder of the same name; the text was moved byte for byte. The shells' edit_logs are frozen; new edits log on the section files. Device Bridge (Cowork Build Environment 8.0) is further split by theme: 8.0 shell and environment, 8.1 staging, commits and transport, 8.2 sub-agents and orchestration; two near-identical "device shell is GNU Linux" bullets were merged. New learnings go into the matching section file, never the shell.
+- **New section** `Cowork Build Environment/10.0 Scanning Third-Party Code.md` (OSV-Scanner call analysis runs the scanned repo's build code; GuardDog can report a clean run it did not finish).
+- **Platform and Environment Behaviors plants** from six projects' notes (Evolutionary Media Commons, Holonic Canvas, LocationScout, MetaMyth, Community Stack, DataWizard), about 50 learnings: background jobs in the cloud container (survival past the call is undefined; detach with `setsid nohup ... < /dev/null & disown` and check the log grows); folder grants for deep build paths; `sed -i.bak` leaves undeletable backups on a connected folder; spend-limit kills that still wrote output; the general-purpose sub-agent will not write report `.md` files; the read-only Plan agent; staging, commit and checksum refinements; Python glob order and json.dump reformatting; pipx with the newest Homebrew Python; `pdftotext` ligatures; Playwright flakes under parallel runs and Back with `history.replaceState`; reviewing animation from video; published-artifact comment rounds, overlay mock-ups, the byte-exact publish compare, admin-only root rules and ArtifactData `batch`; `visibility` vs `opacity`; Chrome page-text truncation, auto-translation and embedded state JSON; Obsidian tool flips with no reconnect notice; `git am` stopped halfway without the delete grant; `device_request_delete_permission` in scheduled tasks. Plus one tier-generic "Build rounds" sentence in the Conventions Registry, Model routing.
+- **Seed hygiene.** `.gitignore` now ignores `*.bak`: rollback copies stay out of the published Seed (keep them in a backup folder outside the Seed).
+
+**Propagation:** `update_seed.sh`. Links to these guides by name keep working; a heading link of the form `[[Guide#Heading]]` into a sectioned guide should point at the section file. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.9.1
+
+**Patch release: the board's last interim wording goes, and a second intake batch of field learnings lands.** Two DataWizard sessions (2026-10-13). Shipped in the Seed:
+
+- `Protocols/Conventions Registry.md`, "Coordination board": post the ask at write time, not only at close (the close-time check verifies and backfills); the interim clause about the board script refusing `intent:` / `status: seen` is gone (the script now carries both); an ask may carry an optional `resolution:` line; the hand-path id rule is "`next_free`, or the next id above the highest present (mirror incl. Unreconciled, and archive)", in the Registry, the template and the board header alike. `Templates/Coordination Board - Template.md` matches.
+- `Skills/session-closer` v4.10.3 (Step 3.14 verifies that each outbound item has a board row and posts only the missing ones). `Skills/supervised-build` v1.5.1 (one worktree and one output folder per parallel builder; no `git stash` across worktrees).
+- Platform and Environment Behaviors guides, from five projects' notes (Kosmosis, Holonic Canvas, LocationScout, Evolutionary Media Commons, MetaMyth): `Cowork Build Environment.md` (folder grants: ask for the exact folder, then widen; no connected folder means the Obsidian MCP is the only write path; vault-level files are invisible to the device shell when only a project folder is connected; a Mac venv does not run in the device shell; build sdists in a venv; byte-faithful sectioning; Overpass tiling and `out geom;`; `git archive` crossings miss gitignored inputs; content inventory before consolidating), `MCP Reliability and Write Verification.md` (local MCP tools time out while the computer sleeps; `write_note` append re-serialises the frontmatter; `edit_file` dryRun for files past the read ceiling), `Published Artifacts and ArtifactData Behaviors.md` (no deep-link channel into a published page; byte check before the first publish; recipe strips the trailing close tags; capabilities kept on republish), `Chrome MCP and Web Tool Behaviors.md` (aggregator fallback marked partial; `og:image` contact-sheet check), `Cowork Scheduled Tasks.md` (append-only run log: a launch can start twice), `Multi-Instance Coordination Patterns.md` (a run-card review that executes).
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.9.0
 
