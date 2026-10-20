@@ -4,6 +4,7 @@ type: guide
 created: 2026-10-12
 updated: 2026-10-20
 operator: Andrew
+origin: 'DW-S398 2026-10-12 - created (board intake: eleven artifact behaviors consolidated from four projects); backfilled DW-S428'
 scope: seed
 status: active
 edit_log:
