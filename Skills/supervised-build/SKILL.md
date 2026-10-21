@@ -11,11 +11,12 @@ description: >-
   (Pattern 3), a build with no reviewer available, or incidental concurrency
   between unrelated sessions.
 type: skill
-version: '1.6.0'
+version: '1.6.1'
 created: '2026-08-30'
-updated: 2026-10-18
+updated: 2026-10-21
 operator: Andrew
 edit_log:
+  - 'DW-S430 2026-10-21 - v1.6.1: Reviewer Steps - exact current -> replacement text goes in the review file the fixer reads, never only in the hand-back; In-thread variant - device_bash builders write output to an absolute path outside the vault (Seed 1.11.8)'
   - 'DW-S422 2026-10-18 - v1.6.0: Builder 5 chunk done-mark - every leftover becomes its own tracking line before the chunk is marked done, and the chunk report quotes the lines; Reviewer 2 checks they exist (leak prevention fix 2)'
   - 'DW-S419 2026-10-18 - v1.5.2: Reviewer Steps - operator-run check scripts travel as vault files with sha256 checked against the rehearsal copy, never heredoc pastes; in-thread delivery bullet points to it (DW-S418 Seed history purge)'
   - 'DW-S403 2026-10-13 - v1.5.1: in-thread variant - per-builder worktree and output folder, no git stash across worktrees (board intake B-0072, Holonic Canvas)'
@@ -98,6 +99,8 @@ Per chunk:
 
 **Cheap fixes are yours.** Patch small, well-specified defects yourself in files you already have loaded; anything that requires the builder to re-read or rewrite a body goes into the review note as instructions. And check the builder's status before filing: a supervision note filed after the supervised session closed has no reader - land small fixes yourself and put the state on the board.
 
+**Fix text goes in the review file, not only in the hand-back.** When a review asks for fixes, write each one as exact text - the current text and its replacement - in the review file the fixer reads. A reviewer that puts the exact text only in its chat or sub-agent hand-back loses it, and the fixer then rewrites the fixes from one-line summaries. Where the reviewer can, it applies the fixes itself in a copy of the file instead. In the in-thread variant, name the review file as the sub-agent's deliverable: a sub-agent often declines a report-type `.md` file unless it is named (Cowork Build Environment, 8.2). (DataWizard, 2026-10)
+
 **Operator-run scripts travel as vault files, not pastes.** When a check script is for the human operator to run in their own terminal, it reaches them as a vault file, and the operator compares its sha256 with the value the reviewer recorded from its rehearsal copy before running it. Never deliver such a script as a heredoc paste: a long paste can be cut off partway. This holds in the relay and in the in-thread variant alike. (DataWizard, 2026-10)
 
 **End with a whole-build sweep.** After the last chunk, a supervisor-tier pass over every artifact the build touched, ideally from a fresh instance. Unreviewed is where the defects live. For a skill deliverable the sweep is a blind hand run: a fresh instance holding only the skill text runs it end to end, and the skill is "built" when that run passes - not when the text is written. One blind run surfaced fourteen defects the author could not see. (DataWizard, 2026-10)
@@ -131,7 +134,7 @@ Codified on second use (two projects, 2026-10). The whole build runs inside ONE 
 - **The relay collapses to turns.** Exchange notes between seats become sub-agent briefs and hand-backs; chunk plans live in the lead's brief, not in the Session Exchange folder. The **driver doc and its State Board stay mandatory** - the session's context is still a viewport, and a fresh instance must still answer "where are we at" from the board.
 - **The gate does not weaken.** Sub-agent builders remove the human relay without weakening the gate only while the supervisor verifies from disk and runs the shipped scripts itself (Reviewer Steps 2-3). A hand-back is a report; the run is the evidence. Seven chunks across two sessions landed with zero defects on disk this way.
 - **Delivery is by fresh-named artifacts with a hash on both sides.** A builder delivers each iteration under a new name (`.v2`, `.v3`) and the lead compares `sha256` container-side and device-side before running anything - same-path re-use is stale in both bridge directions (Cowork Build Environment, Device Bridge). Operator deliveries follow the same rule (Reviewer Steps, "Operator-run scripts travel as vault files").
-- **Scratch, never the vault.** The reviewer still runs the server or script on a scratch copy outside the working tree; builders write to the vault only through the gate.
+- **Scratch, never the vault.** The reviewer still runs the server or script on a scratch copy outside the working tree; builders write to the vault only through the gate. Brief every `device_bash` builder to write all its output (logs, grep results, scratch files) to an absolute path outside the vault, and never to `cd` into the vault and use a relative file name: a sub-agent seat has no delete grant on the mount, so a stray file stays until the lead asks for the grant or the operator removes it (Cowork Build Environment, 8.2). (DataWizard, 2026-10)
 - **Re-count from the files.** Never carry a number from a sub-agent report into canon without re-deriving it from the files: a worker's prose misstated a count that its own export had right. (Holonic Canvas, 2026-10)
 - **The done-mark is the lead's.** A sub-agent hand-back lists the chunk's leftovers; the lead writes their tracking lines (Builder Step 5) and checks them on disk (Reviewer Step 2) before marking the chunk done.
 - **Resume the plan reviewer for verification.** Resume the sub-agent that reviewed the plan by message (SendMessage to the same agent) for the verification seat: it keeps fresh eyes - it did not author the code - and saves the re-orientation a second fresh instance costs. (Holonic Canvas, 2026-10)

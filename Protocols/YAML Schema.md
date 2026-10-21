@@ -2,7 +2,7 @@
 title: YAML Schema
 type: protocol
 created: '2026-06-13'
-updated: 2026-10-17
+updated: 2026-10-21
 origin: DW-S182 2026-06-13
 operator: Andrew
 priority: high
@@ -35,6 +35,7 @@ edit_log:
   - 'DW-S398 2026-10-12 - Holonic Records: uses/used_by predicate (R7), by/via provenance fields (R3), example-comments note, claim-flow pointer'
   - 'DW-S410 2026-10-16 - Holonic Records: community kind carries founded (B-0116); a retracted relation record keeps its index - append, never remove, splice or re-order (B-0093)'
   - 'DW-S417 2026-10-17 - Holonic Records: github-repo anchor scheme row; new Tool Evaluation Notes section (verdict incl. cloned, fit, platform field e.g. mac, tool_maturity, license, reviewed_by, categories, safety, safety_checked, safety_by; D153 + S417 rulings)'
+  - 'DW-S430 2026-10-21 - Holonic Records: stored form of a key (hashed in the operational db; consumers hash the plain anchor before joining)'
 ---
 
 > **Wikilinks everywhere.** Any YAML field that references another vault note should use `[[Note Name]]` syntax. This makes references clickable in the Obsidian properties panel. Applies to: `harvested_into`, `federated_from`, `federated_to`, `transcript`, `source_note`, `companion`, and any other cross-reference field. One exception: `core_note` on a holonic projection is a plain path (see Holonic Records). Obsidian resolves wikilinks by filename regardless of folder path, so the short form is sufficient and more robust than full paths.
@@ -357,6 +358,8 @@ A kind is added when a real record of it is touched, by adding a row here and a 
 | `profile:<host>` | path on that host; covers any host not listed | `profile:example.social~jane` |
 
 Scheme rows are added as a project needs them; `profile:<host>` is always available.
+
+**Stored form of a key.** The table shows what a core's `keys:` holds: the plain `<scheme>~<value>`. The index does not always store a key that way. Its key function keeps the plain form only when the whole `<scheme>~<value>` string uses the key alphabet (letters, digits and `_ - . ~ : @ +`) and is at most 200 bytes. Any other key (a "/" in the value is enough) is stored as `<scheme>~sha256-<hex>`, where `<hex>` is the SHA-256 of the normalised value (UTF-8). A `github-repo` value always has a "/" (so does a `linkedin` value), and `purl` and `did` keys are always hashed, so the operational database holds `github-repo~sha256-<hex>`, never `github-repo~example-org/example-tool`. A consumer that joins a core to the index hashes the plain key from the core's `keys:` with the index's own key function (for `github-repo` it lower-cases the value first and checks that it is `owner/repo`), and checks the result against that holon's active keys (a retired or held key does not count). Never compare plain text with the database, and never strip the scheme prefix and compare the rest: neither can match. Import the index's function instead of writing a second copy, so one file owns the rule. (DataWizard, 2026-10)
 
 **Lifecycle.** `status: active | merged | retired`. A merge or retirement is an operator ruling recorded in the core's `edit_log` and the Decision Log; scripts never set these values. Merged: the loser carries `successor` and `merged: YYYY-MM-DD`; the survivor carries `merged_from`, gains the loser's aliases and keys, and the loser's projections are re-pointed at the survivor on the next sync (the one authorised re-key of a projection). Retired: `retired: YYYY-MM-DD`. Nothing is deleted; a chain of successors is reported, not followed.
 

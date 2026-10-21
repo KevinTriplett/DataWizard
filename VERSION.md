@@ -1,5 +1,5 @@
 
-seed: 1.11.7
+seed: 1.11.8
 protocol: 1.8
 project_instructions: 4.9
 
@@ -72,6 +72,18 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.11.8
+
+**Patch release: five lessons from the last builds.** One DataWizard session (2026-10-21). Each had been written down in the project's backlog but was not yet in the Seed. Shipped in the Seed:
+
+- `Skills/supervised-build/SKILL.md` (v1.6.1): Reviewer Steps, new paragraph "Fix text goes in the review file" - a reviewer writes the exact current text and its replacement into the review file the fixer reads, never only into its hand-back. In-thread variant, "Scratch, never the vault" - brief every `device_bash` builder to write its output to an absolute path outside the vault. `SKILLS.md`: the row is now v1.6.1.
+- `Guides/Cowork Build Environment/8.2 Device Bridge - Sub-agents and Orchestration.md`: new bullet - a `device_bash` sub-agent that did `cd` into the vault and wrote a relative file name left a file in the vault root that the sub-agent could not delete; give the agent a scratch folder and full paths.
+- `Protocols/Conventions Registry/26.0 Coordination board.md`: new paragraph - post claims for a step the operator runs by hand just before the run, and re-post them (old blocks `reclaimed`) if the run slips past the ttl.
+- `Protocols/YAML Schema.md`, Holonic Records: new paragraph "Stored form of a key" - a key whose value has a "/" (every `github-repo` key) is stored hashed in the operational database; a consumer hashes the plain key from the core's `keys:` with the index's key function and checks the active keys, never plain text.
+- `Guides/Cowork Build Environment/9.0 Verification Discipline for Builds.md`: two new bullets - an apply that says `unchanged` is expected when a fix changes only the JSON report (verify on the report); `python3 -I` drops the script folder from `sys.path`, so a test that imports a sibling script needs a run without `-I`.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.11.7
 
