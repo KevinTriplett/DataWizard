@@ -1,6 +1,7 @@
 ---
 created: 2026-08-26
 edit_log:
+  - 'DW-S433 2026-10-21 - Pattern 2: write-order safety points at Conventions Registry 7.0 for the splitting procedure'
   - 'DW-S419 2026-10-18 - Pattern 3 step 3: operator-run runbooks - rehearse on a copy, predict every number the operator will see, STOP per step, gate the live run on the predictions; check scripts reach the operator as vault files with a checksum, pointer to supervised-build (codified on second use: Kosmosis 2026-10, DW-S418 Seed history purge)'
   - 'DW-S403 2026-10-13 - Pattern 3 step 3: execute-verifying review of a run card (board intake B-0065, Kosmosis)'
   - DW-S287 2026-08-26 - created (absorbs the coordination-thread, relay-review,
@@ -31,7 +32,7 @@ operator: Andrew
 seed_version: 1.3.1
 title: Multi-Instance Coordination Patterns
 type: guide
-updated: '2026-10-18'
+updated: '2026-10-21'
 ---
 # Multi-Instance Coordination Patterns
 
@@ -90,7 +91,7 @@ The coordinator ends the cluster with a **final verification pass** over every t
 
 *For cross-project migrations, audits, and rebuilds where the work has mechanical, judgment, and review components of different weights.* Three instances in matched roles, each on the model tier its role needs:
 
-- A **mechanical executor** (cheapest tier) on a **judgment-stripped brief**: verbatim moves, a fixed date cut, write-order safety (sections first, shell last), parity checks. If the brief needs a decision, the brief is wrong - take the decision out and hand it up.
+- A **mechanical executor** (cheapest tier) on a **judgment-stripped brief**: verbatim moves, a fixed date cut, write-order safety (sections first, shell last; the full procedure is Conventions Registry [[7.0 Shell and section architecture]]), parity checks. If the brief needs a decision, the brief is wrong - take the decision out and hand it up.
 - An **audit-executor** (middle tier) that does the substantive rebuild and writes **review-bait sections** - the places it knows a reviewer should look, stated as such.
 - A **cross-project reviewer** (strongest tier) reading from the other project's context, surfacing what the rebuild's own audit could not see, and answering the open questions.
 

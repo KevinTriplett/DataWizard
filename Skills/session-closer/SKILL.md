@@ -7,15 +7,15 @@ description: >-
   pick up where we left off' in a new thread and there's no log entry for the
   previous session.
 type: skill
-updated: '2026-10-19'
+updated: '2026-10-21'
 origin: 'DW-S158 2026-06-08 - backfilled from the earliest edit_log entry (D127)'
-version: '4.11.1'
+version: '4.11.2'
 edit_log:
+  - 'DW-S433 2026-10-21 - v4.11.2: Step 2 a proposed Decision Log entry is written into the entry or a working doc before close (Community Stack ask); Step 3.11 uses the 30 / 50 KB sizes and points at Conventions Registry 7.0'
   - 'DW-S424 2026-10-19 - v4.11.1: Step 3.10 also surfaces pending Look-Back Reports (session look-back scan, leak prevention fix 3)'
   - 'DW-S422 2026-10-18 - v4.11.0: landing rule - Step 4 action-items bullet made a required landing rule with one dated Waiting-on checklist; Step 2.6 ledger next: is the owed list; Step 3.5 tracking-claim verification; Step 0 lite list; output-format landing check and Waiting-on pointer; Common Mistakes bullet (leak prevention fix 1)'
   - 'DW-S422 2026-10-18 - v4.10.4: sectioned - output templates, multi-operator flag steps, no-ledger roster, triage guidance and old edit_log moved verbatim to references/; steps unchanged'
   - 'DW-S402 2026-10-13 - v4.10.3: Step 3.14 board asks posted at write time; close verifies and backfills (B-0081)'
-  - 'DW-S400 2026-10-12 - v4.10.2: Step 3.8 link-resolution check (dw_lint C5 or find recipe)'
 ---
 
 # Session Closer Skill
@@ -91,6 +91,8 @@ Scan the conversation for:
 Follow the output format below. Write the close artifacts directly to the vault -- there is no pre-write approval gate for routine closes. The chat deliverable is exactly two things: the **files touched** (created / updated / moved) and **What's next**. Everything else -- log-entry composition, frontmatter stamping, edit_logs, ledger updates -- happens in the vault, not in chat.
 
 **Always stop and ask first, before writing, for judgment-class items:** a Decision Log entry (it binds future sessions), a status change on someone else's work (you are speaking for another operator), or a claim about what a third party said (misattribution risk). A blanket gate everyone silently skips erodes the rules that matter (ceremony diet, S196); this restatement concentrates the gate where the write is genuinely irreversible or speaks for others. Scope: this governs the close ceremony only -- the PI Working Rules (share plan first, show edits) still govern live working sessions.
+
+**A proposed Decision Log entry is written down before close.** When a Decision Log entry still waits for approval at close, write its proposed text into the session entry (a "Proposed decision" block) or into a working doc the entry links, so the next session can approve it as written. Text shown only in chat is gone when the thread ends; one project had to rebuild a proposed decision from the records a session later. (Community Stack, 2026-10)
 
 > **Harvest sessions:** For sessions that are primarily harvest work, the session log entry may already be partially written as part of the end-of-harvest checklist (which includes a session log update). In that case, the session closer adds Learnings and What's Next to the existing entry rather than writing a full entry from scratch. Check whether a partial entry already exists before drafting.
 
@@ -283,18 +285,12 @@ Name the file; do not summarize it. If no reports are pending, say nothing.
 
 ### Step 3.11: File size check
 
-Scan the "Files updated" and "Files created" lists for files
-that may be approaching MCP read limits. For any file you
-touched this session that you noticed was large or slow to
-read, check its size. Flag files approaching 50KB as
-candidates for shell + sections migration.
+For each file in the "Files updated" and "Files created" lists, check its size (a folder listing with sizes, or `wc -c`). The sizes and the growth rule have one home: Conventions Registry 7.0 "Shell and section architecture".
 
-If a file is already over 50KB and hasn't been sectioned,
-add an action item: "Section [filename] -- currently [size],
-exceeds MCP read limit."
+- **At or over 50 KB** (the hard limit) and not yet sectioned or continued: add an action item: "Section [filename] -- currently [size], over the MCP read limit (Registry 7.0)."
+- **An append target at or over 30 KB** (the soft size; the shell's grow line names the target, else the group's last embed): add an action item: "Start the continuation of [filename] -- [size], over the soft size (Registry 7.0)." The continuation itself is started at the beginning of a working session, never during a close.
 
-This catches growth before overflow. Skip if no large files
-were encountered this session.
+This catches growth before overflow. A lint size check is planned to take this step over; until it lands, check by hand.
 
 ### Step 3.12: Operator field and team flag prompt
 

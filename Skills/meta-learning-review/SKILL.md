@@ -7,8 +7,8 @@ description: >-
   report is ready for review. Also triggered when the scheduled review
   automation has left a pending report.
 type: skill
-updated: 2026-10-12
-version: '1.5.5'
+updated: 2026-10-21
+version: '1.5.6'
 edit_log:
   - DW-S159 2026-06-08 RP-8 effort note in Step 4.5
   - DW-S185 2026-06-15 - platform/environment learnings homing note (Step 3
@@ -42,6 +42,7 @@ edit_log:
     language replaced with the scheduled review-status check (S312 Seed review)"
   - 'DW-S330 2026-09-04 - v1.5.4: Step 1 read-path example moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
   - 'DW-S400 2026-10-12 - v1.5.5: Step 4.5 recipes-are-not-learnings line'
+  - 'DW-S433 2026-10-21 - v1.5.6: Step 2 item 2 - a tracked-in claim must resolve to a quoted line on disk, else the item is ready to plant (points at session-closer Step 3.5)'
 ---
 
 # Meta-Learning Review Skill
@@ -96,7 +97,7 @@ When first adopting this skill on a project with many unreviewed sessions, expec
 This is the critical step that separates useful planting from noise. For each suggested update or extracted learning:
 
 1. **Read the target document** (skill, design doc, protocol section) that the learning would be planted into
-2. **Check whether it's already there.** S97 found 2 of 10 suggestions were already implemented and 4 of 6 external validations already planted. Expect a significant already-done rate, especially in active projects.
+2. **Check whether it's already there.** S97 found 2 of 10 suggestions were already implemented and 4 of 6 external validations already planted. Expect a significant already-done rate, especially in active projects. A report's or outcome's "tracked in X" or "already on the Backlog" claim counts only when the line resolves on disk: find it and quote its title. A claim that does not resolve means the item is not homed - classify it "ready to plant", never "already done" (the canonical rule: session-closer Step 3.5, "Tracking-claim verification").
 3. **Check whether the learning is still accurate.** A learning from 8 sessions ago about tool behavior may have been superseded by a tool update or a subsequent session's finding.
 
 4. **When a learning supersedes a prior claim, check the rest of the vault.** For any learning with a "use X over Y", "Y was wrong", or "Y is deprecated" shape, verifying that the plant landed in its target doc is not enough -- search the vault for other docs still asserting the old claim, and either fix them in the same pass or file an action item per doc. A plant can succeed while other docs keep teaching the superseded thing for many sessions afterward.

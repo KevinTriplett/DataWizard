@@ -2,7 +2,7 @@
 title: Script Portability
 type: guide
 created: '2026-09-23'
-updated: '2026-10-18'
+updated: '2026-10-21'
 operator: Andrew
 status: active
 edit_log:
@@ -10,6 +10,7 @@ edit_log:
     the scattered cross-platform script-shipping rules (ASCII-only, PowerShell
     encoding, BSD vs GNU, trace-verify)"
   - "DW-S421 2026-10-18 - S419a-2"
+  - "DW-S433 2026-10-21 - new section SQLite builds differ: pointer to the WAL read-only failure in Cowork Build Environment 6.0 (meta-learning review S405-S422)"
 ---
 
 # Script Portability
@@ -33,6 +34,10 @@ Target `bash` explicitly (`#!/usr/bin/env bash`), never `sh`, and do not assume 
 ## Case-insensitive disks
 
 A default macOS disk treats `Out/data` and `out/DATA` as one folder. Linux treats them as two. A test that creates case-variant paths in one repo passes on Linux and fails on the Mac. Give each case variant its own folder, or its own repo. Run the test suite on a Mac once before the script ships. (DataWizard, 2026-10)
+
+## SQLite builds differ
+
+The macOS SQLite (3.51 in one case) refused a read-only open of a WAL-mode database that had no `-shm` file. The container's older SQLite, running as root, allowed it, so the script passed every cloud test. Run a script that reads a shared database on a Mac once before it ships. Symptom and fix: [[6.0 SQLite on the Vault Mount]]. (DataWizard, 2026-10)
 
 ## Trace-verify before shipping
 

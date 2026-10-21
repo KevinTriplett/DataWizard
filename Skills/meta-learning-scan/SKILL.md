@@ -10,9 +10,9 @@ description: >-
   planting. Also use when the user wants to set up automated learning extraction
   for any DW project.
 type: skill
-version: '1.4.2'
+version: '1.4.3'
 created: '2026-06-01'
-updated: 2026-09-04
+updated: 2026-10-21
 edit_log:
   - DW-S185 2026-06-15 - platform/environment routing hint (Step 4 Deferred)
   - "DW-S243 2026-08-05 - v1.3: Step 3 header-variant note (### Findings treated
@@ -29,6 +29,7 @@ edit_log:
   - "DW-S312 2026-08-30 - D114 cadence-pointer sweep: session-closer-nudge
     trigger language replaced; stray cadence number dropped (S312 Seed review)"
   - 'DW-S330 2026-09-04 - v1.4.2: Step 5 write path moved to the infrastructure folder Learning Reports (Weave FR WV_2026-09-02_AA_01; single home = Review Automation guide)'
+  - 'DW-S433 2026-10-21 - v1.4.3: Step 4 Already planted - a tracked-in claim names the file and quotes the line, else "no tracking line found" (points at session-closer Step 3.5)'
 ---
 
 # Meta-Learning Scan
@@ -115,7 +116,7 @@ Group extracted learnings by natural theme. Don't force a fixed taxonomy -- let 
 
 For each learning, provide a **suggested disposition**:
 
-- **Already planted** -- The learning describes work that was done in-session (e.g., "planted in D12 cross-reference," "added to Build Plan"). These are the majority in projects with active design-harvest workflows. Evidence: the learning text itself describes the planting, or the session's "Files updated" section lists the target doc.
+- **Already planted** -- The learning describes work that was done in-session (e.g., "planted in D12 cross-reference," "added to Build Plan"). These are the majority in projects with active design-harvest workflows. Evidence: the learning text itself describes the planting, or the session's "Files updated" section lists the target doc. When the scan writes "tracked in X" or "already planted in X", it names the file and quotes the line's title; a claim it cannot resolve on disk is written as "no tracking line found", never as already planted (the canonical rule: session-closer Step 3.5, "Tracking-claim verification").
 
 - **Ready to plant** -- The learning contains actionable guidance not yet captured in an operational doc. Suggest a specific target doc and briefly describe what the change would be.
 

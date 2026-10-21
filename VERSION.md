@@ -1,5 +1,5 @@
 
-seed: 1.11.8
+seed: 1.11.10
 protocol: 1.8
 project_instructions: 4.9
 
@@ -72,6 +72,33 @@ Design, edit its plist to point at the new root path.
 This notice can be removed from VERSION.md after 2026-09. The recovery
 procedure itself lives durably in Git Guide 7.0 ("Recovering a Seed
 Clone (Remote-Agnostic)") and survives this notice's retirement.
+
+## What's New in 1.11.10
+
+**Patch release: one written method for splitting big files, for every project.** One DataWizard session (2026-10-21), answering a partner project (Community Stack) and an older request for a migration guide (ReWoven). Shipped in the Seed:
+
+- `Protocols/Conventions Registry/7.0 Shell and section architecture.md`: the method is now the standard and the layout an option. Besides its embeds a shell may carry its H1, an intro line, an entry template, grow lines and script-owned marked blocks. A group grows by continuation files with the next free number (never move items, never renumber), and a one-line grow comment in the shell says where new sections go (default: after the group's last embed). Sizes: 50 KB hard, 30 KB soft, about 25 KB per piece when splitting. New "How to split safely" steps: plan, slice by script, prove the byte rejoin with sha256, keep a pre-split copy in the archive mirror, write the sections first and the shell last; the flat-log migration rule; a SKILL.md sections by `references/`, never by embeds.
+- `Skills/session-closer/SKILL.md` (v4.11.2): Step 2 - a Decision Log entry that waits for approval has its proposed text written into the session entry or a working doc before close. Step 3.11 - the file-size check uses the 30 / 50 KB sizes and points at Registry 7.0. `references/changelog.md` takes the oldest edit_log line (rolling window).
+- `Skills/meta-learning-review/SKILL.md` (v1.5.6) and `Skills/meta-learning-scan/SKILL.md` (v1.4.3): a "tracked in X" claim must resolve to a quoted line on disk; one that does not means the item is not homed (pointer to session-closer Step 3.5).
+- `Guides/Cowork Build Environment/8.0 Device Bridge.md` and `Guides/Multi-Instance Coordination Patterns.md` (Pattern 2): pointers to Registry 7.0 for the splitting procedure.
+- `SKILLS.md`: the three rows carry the new versions.
+
+A script that finds oversize files and splits them by these steps is planned; this release is the written method it will follow.
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
+
+## What's New in 1.11.9
+
+**Patch release: 13 lessons from a meta-learning review and a partner project (ReWoven).** One DataWizard session (2026-10-21). Ten lessons come from the review of two meta-learning reports, two tool behaviors were sent by ReWoven, and one web-fetch behavior comes from a DataWizard research run (re-tested before planting). Shipped in the Seed:
+
+- `Guides/MCP Reliability and Write Verification/`: 7.0 (the filesystem MCP `outputSchema` failure was seen on one link in 2026-09; in 2026-10 the same tools worked in five sessions in a row, on files up to 84 KB - test one call before you assume the server is broken); 1.0 (the same note on the `filesystem:edit_file` bullet).
+- `Guides/Cowork Build Environment/`: 8.0 (`mv` inside one connected folder needs no delete grant, and between two connected folders it copies, then fails to remove the source; the device shell's `$HOME` outlasted a six-hour pause but is no place for the only rollback copy; the `pkill -f` bullet points at the cloud-container case); 4.0 (an always-on launchd job always shows a PID, so an idle check names the jobs that write the store); 6.0 (on macOS a read-only open of a WAL-mode database fails with "unable to open database file" when no `-shm` file exists, and the fix that worked); 8.1 (a stale commit was also seen two turns after the edit - patch a small vault edit on the device instead; staging from the device shell's scratch folder was refused even when `get_device_info` described it as stageable); 8.2 (ids that must be unique are given by the installer at write time; drafts carry a placeholder); 9.0 (`2>&1 | tail` can hide the unittest summary - send the output to a file and grep it).
+- `Guides/Chrome MCP and Web Tool Behaviors/4.0 web_fetch Behaviors.md`: the gitlab.com REST API answers `ROBOTS_DISALLOWED`; a gitlab.com project page was blocked for research sub-agents in one session and read fine from another; the GitHub API and the Docker Hub v2 tags API were readable.
+- `Guides/Cowork Scheduled Tasks.md`, Other known failure modes: a task prompt's stated premise is a snapshot from when it was written; read the live `last_*` stamp first.
+- `Guides/Script Portability.md`: new short section "SQLite builds differ", pointing at the WAL read-only failure in Cowork Build Environment 6.0.
+- `Protocols/Conventions Registry/`: 17.0 Holonic records (when you rule on a relation's predicate, read the schema's definition, not only whether the predicate exists); 30.0 Carry the probe, not the snapshot (notes about tools and platforms rot too - read the live source before acting on a recorded tool fact).
+
+**Propagation:** `update_seed.sh`. No Project Instructions change and no re-paste. (DataWizard, 2026-10)
 
 ## What's New in 1.11.8
 
