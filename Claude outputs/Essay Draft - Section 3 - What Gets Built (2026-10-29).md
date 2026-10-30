@@ -13,7 +13,7 @@ tags:
   - essay
   - draft
 ---
-*Drafted from Part IV of [[1. Essay Outline - Stress-Tested - Hall and Schmachtenberger (2026-10-25)]] as revised 2026-10-29, with [[Theory of Change - Standing Context]] governing where the outline predates it (existing groups, not communities formed; the substrate under everything). Follows Section 2, which ends "What follows is what gets built on it if the bet is taken." The substrate is treated first and briefly; Passage 1 of [[Essay Draft - Exit Passages (2026-10-26)]] ("the group is the unit of exit") belongs at the end of the substrate part and is not repeated here. Footnotes continue from [^19]. `[Kevin: ...]` his; `[fill]` mine; `[complete]` source needed.*
+*Drafted from Part IV of [[1. Essay Outline - Stress-Tested - Hall and Schmachtenberger (2026-10-25)]] as revised 2026-10-29, with [[Theory of Change - Standing Context]] governing where the outline predates it (existing groups, not communities formed; the substrate under everything). Follows Section 2, which ends "What follows is what gets built on it if the bet is taken." The substrate is treated first and briefly; Passage 1 of [[Essay Draft - Exit Passage Fragments for Sections (2026-10-26)]] ("the group is the unit of exit") belongs at the end of the substrate part and is not repeated here. Footnotes continue from [^19]. `[Kevin: ...]` his; `[fill]` mine; `[complete]` source needed.*
 
 ## Section 3: what gets built
 
